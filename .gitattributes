@@ -30,3 +30,4 @@
 *.R              whitespace=tab-in-indent,no-lf-at-eof
 *.tcl whitespace=tab-in-indent,no-lf-at-eof
 tips             eol=lf         whitespace=indent-with-non-tab
+setup-*          eol=lf         whitespace=indent-with-non-tab
