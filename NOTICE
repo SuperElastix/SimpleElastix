@@ -1,11 +1,17 @@
 SimpleElastix
-Copyright 2015-2016 Kasper Marstal
+Copyright 2015-2018 Kasper Marstal
 
 Elastix
 Copyright 2014 University Medical Center Utrecht and contributors
 
 SimpleITK
 Copyright 1999-2013 Insight Software Consortium
+
+Kitware Local Git Setup Scripts
+Copyright 2010-2012 Kitware, Inc.
+
+This product includes software developed at Kitware, Inc.
+(http://www.kitware.com/).
 
 This software is distributed under the Apache 2.0 License.
 
