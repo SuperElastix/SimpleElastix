@@ -29,3 +29,4 @@
 *.rb             whitespace=tab-in-indent,no-lf-at-eof
 *.R              whitespace=tab-in-indent,no-lf-at-eof
 *.tcl whitespace=tab-in-indent,no-lf-at-eof
+tips             eol=lf         whitespace=indent-with-non-tab
