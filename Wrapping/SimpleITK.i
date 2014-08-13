@@ -140,6 +140,7 @@ namespace std
 // Transforms
 %include "sitkTransform.h"
 %include "sitkBSplineTransform.h"
+%include "sitkDisplacementFieldTransform.h"
 %include "sitkAffineTransform.h"
 %include "sitkEuler3DTransform.h"
 %include "sitkEuler2DTransform.h"
