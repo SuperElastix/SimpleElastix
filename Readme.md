@@ -33,9 +33,11 @@ resultImage = elastix.SimpleElastix(fixedImage, movingImage.hdr, 'nonrigidParame
 ```
 
 ### Object Oriented interface 
-# SimpleElastix also comes with a powerful object oriented suited for scripting purposes
+
+SimpleElastix also comes with a powerful object oriented suited for scripting purposes
 elastix = sitk.SimpleElastix()
 
+```python
 # Images can loaded from memory or disk
 elastix.SetFixedImage('fixedImage.hdr')
 elastix.SetMovingImage(inMemoryImage)
@@ -56,6 +58,7 @@ selx.AddParameterFile('nonrigid.txt')
 # resampled when both registrations have run
 elastix.Run()
 sitk.Show(selx.GetResultImage())
+```
 
 ### What you get from SimpleITK integration
 Together, elastix and SimpleITK becomes an efficient, scriptable registration toolkit. For exmaple, say you want to compute mean intensities and standard deviation of segmented structures.
