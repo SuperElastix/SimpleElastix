@@ -1,20 +1,114 @@
-SimpleITK
-=========
+SimpleElastix
+=============
 
-The goal of SimpleITK is to provide an abstraction layer to [ITK](http://www.itk.org) that enables developers and users to access the powerful features of the Insight Toolkit in a more simplified manner.  SimpleITK's goal is to provide a simple layer to ITK's complicated C++ templeted API to be easily wrap-able in several languages including:
+SimpleElastix integrates [SimpleITK](https://github.com/SimpleITK/SimpleITK) with the [elastix medical image registration library](http://elastix.isi.uu.nl/ "Elastix website") intended to make elastix's robust registration algorithms accessible to a wider audience. In addition to the standard SimpleITK image processing algorithms, this package provides
 
-* [Python](http://www.python.org)
-* [Java](http://www.java.com)
-* [C#](http://msdn.microsoft.com/en-us/vcsharp/default.aspx)
-* [Lua](http://www.lua.org)
+- elastix and transformix bindings for Python, Java, R, Octave, Lua, Tcl and C#
+- Preconfigured parameter files for affine, non-rigid, groupwise and labelmap registration that should serve as good starting points for new users
 
-Wrapping is accomplished through [SWIG](http://www.swig.org), in principle, any language wrapped by SWIG should be applicable to SimpleITK.
+The goal of SimpleElastix is to bring the robust langauge wrapping of SimpleITK to elastix. SimpleElastix has been designed specifically for rapid prototyping and use in scripting languages. Using elastix and transformix on large datasets typically incurs a significant amount of overhead from scripting command line arguments to copying images and transform parameter files across folders. With SimpleElastix this complexity is easier to manage and much more memory and disk I/O efficient.
 
-SimpleITK is licensed under the [Apache License](http://www.opensource.org/licenses/apache2.0.php) in the [same way as ITK](http://www.itk.org/Wiki/ITK_Release_4/Licensing).
+Examples
+--------
 
-Development
-===========
+### Procedural Interface
+This interface aligns with the SimpleITK procedural paradigm and reduces registration to a one-liner. The procedural interface directly invokes registration and hiding the elastix API's object oriented methods.
 
-SimpleITK uses the [Git](http://git-scm.com/) distributed version control system.  The main repository is hosted on [itk.org](http://itk.org/SimpleITK.git) and mirrored to [Github](https://blowekamp@github.com/SimpleITK/SimpleITK.git).  There are two main branches, master and next. The "master" is a stable branch of the code, and suitable for most users, while "next" contains future features that are unlikely to be stable.
+```python
+import SimpleITK as sitk
 
-Documentation in maintained in [Doxygen](http://www.itk.org/SimpleITKDoxygen/html/annotated.html).  [Development instructions](http://www.itk.org/SimpleITKDoxygen/html/pages.html) are also on this site.  There is also the [Wiki](http://www.itk.org/Wiki/ITK_Release_4/SimpleITK) with additional information. SimpleITK requires a recent build of [ITK v4](http://itk.org/), but this can be automatically build along side SimpleITK with the SuperBuild cmake build.
+# Register images using a preset parameter file.
+resultImage = sitk.elastix('fixedImage.hdr', 'movingImage.hdr', 'defaultNonrigidParameters')
+```
+
+However, consecutive registrations sacrifice some image quality for code simplicity (the moving image is warped and resampled following each registeration). 
+
+```python
+# Affine initialization followed by non-rigid registration. This time we pass 
+# elastix images from memory and load a parameter file from disk.
+f = sitk.ReadImage('fixedImage');
+m = sitk.ReadImage('movingImage');
+initializedImage = elastix.SimpleElastix(fixedImage, movingImage, 'affineParameterFile.txt')
+resultImage = elastix.SimpleElastix(fixedImage, movingImage.hdr, 'nonrigidParameterFile.txt')
+```
+
+### Object Oriented interface 
+# SimpleElastix also comes with a powerful object oriented suited for scripting purposes
+elastix = sitk.SimpleElastix()
+
+# Images can loaded from memory or disk
+elastix.SetFixedImage('fixedImage.hdr')
+elastix.SetMovingImage(inMemoryImage)
+
+# Get a preconfigured parameter map and customize e.g. number of iterations to suit your needs
+p = selx.GetDefaultAffineParameters()
+p.SetParameter("MaximumNumberOfIterations", 512)
+
+# SetParameterMap() overrides existing parameter maps or add a new one if none exist
+selx.SetParameterMap(p)
+
+# You can also load your own parameter files. In this case, AddParameterFile() will
+# append nonrigid.txt to an internal list of parameter files
+selx.AddParameterFile('nonrigid.txt')
+
+# This will run an affine registration followed by non-rigid registration since the parameter
+# files were added in this order. The transforms are composed and the moving image is only
+# resampled when both registrations have run
+elastix.Run()
+sitk.Show(selx.GetResultImage())
+
+### What you get from SimpleITK integration
+Together, elastix and SimpleITK becomes an efficient, scriptable registration toolkit. For exmaple, say you want to compute mean intensities and standard deviation of segmented structures.
+
+```python
+# Transform label map and compute some statistics
+transformix = sitk.SimpleTransformix()
+in = transformix.ReadImage('labels.hdr')
+transformix.SetImage(in)
+transformix.SetParameterMap(elastix.GetTransformParameters())
+transformix.Run()
+sitk.ComputeLabelStatisticsImageFilter(elastix.GetResultImage(), transformix.GetResultImage())
+```
+
+### Parameter file interface 
+You can also construct your parameter file from SimpleElastix's parameter file interface.
+
+```python
+import SimpleITK as sitk
+
+p = sitk.SimpleElastix().ParameterMap()
+
+# SetParameter() overrides existing parameters or creates them if none exist
+p.SetParameter("Registration", "MultiResolutionRegistration")     
+
+# AddParameter() does not override existing parameters but throws warnings if a parameter exists
+p.AddParameter("Metric", ["AdvancedMattesMutualInformationMetric", "TransformBendingEnergyPenalty"])
+
+# Multi-valued parameters can also be set using AppendParameter()
+p.SetParameter("Metric", "NormalizedCorrelationCoefficient") # this overrides the previous declaration
+p.AppendParameter("Metric", "TransformBendingEnergyPenalty")
+
+# SimpleElastix maps naturally the target language types
+p.AddParameter("FixedImagePyramidSchedule", [8, 4, 2, 1])
+```
+
+Wrapping is accomplished through SWIG thanks to the elastix library interface. In principle, any language wrapped by SWIG should be applicable to this project. SimpleElastix is licensed under the Apache 2.0 License in the same way as ITK, SimpleITK and elastix.
+
+Building
+--------
+
+SimpleElastix integrates elastix and transformix with the SimpleITK superbuild. Simply clone this repository invoke the superbuild.
+
+```
+git clone https://github.com/kaspermarstal/SimpleITK
+mkdir build
+cd build
+ccmake ../SimpleElastix/SuperBuild
+make -j4
+```
+
+This will download and install ITK, SimpleITK, SWIG and elastix to your computer, compile and install the binaries.
+
+Notes
+-----
+- At the moment, the elastix library API does not support using multiple fixed and moving images so SimpleElastix doesn't either. 

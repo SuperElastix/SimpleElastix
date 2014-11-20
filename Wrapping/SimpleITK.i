@@ -118,6 +118,8 @@ namespace std
 #define SITKBasicFilters0_HIDDEN
 #define SITKBasicFilters_EXPORT
 #define SITKBasicFilters_HIDDEN
+#define SELX_EXPORT
+#define SELX_HIDDEN
 #define SITKIO_EXPORT
 #define SITKIO_HIDDEN
 #define SITKRegistration_EXPORT
@@ -160,6 +162,9 @@ namespace std
 %template(ImageFilter_3) itk::simple::ImageFilter<3>;
 %template(ImageFilter_4) itk::simple::ImageFilter<4>;
 %template(ImageFilter_5) itk::simple::ImageFilter<5>;
+
+// Elastix
+%include "selxSimpleElastix.h"
 
 // IO
 %include "sitkShow.h"

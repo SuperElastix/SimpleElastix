@@ -96,15 +96,17 @@ endif()
 
 set ( SimpleITK_INCLUDE_DIRS
       ${CMAKE_SOURCE_DIR}/Code/Common/include
+      ${CMAKE_SOURCE_DIR}/Code/Elastix/include
       ${CMAKE_SOURCE_DIR}/Code/Registration/include
       ${CMAKE_SOURCE_DIR}/Code/BasicFilters/include
       ${CMAKE_SOURCE_DIR}/Code/IO/include
       ${CMAKE_BINARY_DIR}/Code/BasicFilters/include
       ${CMAKE_BINARY_DIR}/Code/Common/include
+      ${CMAKE_BINARY_DIR}/Code/Elastix/include
 
       )
 
-set ( SimpleITK_LIBRARIES SimpleITKCommon SimpleITKIO SimpleITKRegistration CACHE INTERNAL "" )
+set ( SimpleITK_LIBRARIES SimpleITKCommon SimpleITKIO SimpleITKRegistration SimpleElastix CACHE INTERNAL "" )
 
 # Be sure to clear these each time
 set ( GENERATED_TEST_LIST "" CACHE INTERNAL "" )
@@ -373,6 +375,17 @@ include(CTest)
 
 
 #------------------------------------------------------------------------------
+# Use elastix
+set( ELASTIX_BUILD_DIR "" CACHE PATH "Path to elastix build folder" )
+set( ELASTIX_USE_FILE ${ELASTIX_BUILD_DIR}/UseElastix.cmake )
+
+# Tell elastix to build shared libs
+if( ELASTIX_BUILD_EXECUTABLE )
+  message(FATAL_ERROR "SimpleElastix requires elastix shared libraries, please set ELASTIX_BUILD_EXECUTABLE=OFF and rebuild elastix")
+endif()
+
+
+#------------------------------------------------------------------------------
 # Go to subdirectories
 add_subdirectory ( Utilities )
 add_subdirectory ( Code )
@@ -481,6 +494,8 @@ file( GLOB __files
   ${CMAKE_SOURCE_DIR}/Code/BasicFilters/include/*.hxx
   ${CMAKE_SOURCE_DIR}/Code/Common/include/*.h
   ${CMAKE_SOURCE_DIR}/Code/Common/include/*.hxx
+  ${CMAKE_SOURCE_DIR}/Code/Elastix/include/*.h
+  ${CMAKE_SOURCE_DIR}/Code/Elastix/include/*.hxx
   ${CMAKE_SOURCE_DIR}/Code/IO/include/*.h
   ${CMAKE_SOURCE_DIR}/Code/IO/include/*.hxx
   ${CMAKE_SOURCE_DIR}/Code/Registration/include/*.h
