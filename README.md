@@ -10,24 +10,34 @@ The goal of this project is to make elastix's robust registration algorithms acc
 
 SimpleElastix has been designed specifically for rapid prototyping and use in scripting languages. Previously, using elastix and transformix on large datasets would incur a significant overhead from scripting command line invocations and arguments to copying images and transform parameter files across folders. With SimpleElastix this complexity is easier to manage and more memory and disk I/O efficient. 
 
-Enough talk. Let's see some code. Say you need to compare the volume, mean intensity and standard deviation of multiple segmented structures across a population of images. Then, for each image in the population, you run the following python code:
+Enough talk. Let's see some code. Say you need to compare the volume, mean intensity and standard deviation of multiple segmented structures across a population of images but only have one segmentation. Then, for each image in the population, you run the following python code:
 
 ```python
 import SimpleElastix as sitk
 
-# Register images
-elastix = sitk.SimpleElastix();
-elastix.SetFixedImage('fixedImage.hdr')
-elastix.SetMovingImage('movingImage.hdr')
-elastix.SetParameterMap('defaultNonrigidRegistration')
-elastix.Run()
+referenceImage = sitk.ReadImage('referenceImage.hdr')
+referenceLabel = sitk.ReadImage('referenceImage.hdr')
+population = ['image1.hdr', 'image2.hdr', ... , 'imageN.hdr']
 
-# Transform label map and compute statistics assuming you have segmented the moving image
-registeredLabels = sitk.SimpleTransformix('movingLabels.hdr', elastix.GetTransformParameters())
-sitk.LabelStatisticsImageFilter(elastix.GetResultImage(), registeredLabels)
+elastix = sitk.SimpleElastix();
+elastix.SetMovingImage(referenceImage)
+elastix.SetParameterMap('defaultNonrigidRegistration')
+
+# We warp the segmentation to each image in the population
+for fixedImage in population
+  # Register images
+  elastix.SetFixedImage(fixedImage)
+  elastix.Run()
+
+  # Transform label map using the deformation field from above and compute statistics
+  resultLabels = sitk.SimpleTransformix(referenceLabel, elastix.GetTransformParameters())
+  sitk.LabelStatisticsImageFilter(elastix.GetResultImage(), resultLabel)
+  
 ```
 
-SimpleElastix is easy to prototype, robust and fast. Wrapping is accomplished through SWIG thanks to the elastix library interface. In principle, any language wrapped by SWIG should be applicable to this project. SimpleElastix is licensed under the Apache 2.0 License in the same way as ITK, SimpleITK and elastix.
+We could also have warped the images to the reference image domain and computed statistics here, registered images groupwise or registered all images to the reference and segmented the mean image. This example merely demonstrates efficiency of combining the the object oriented interface (the way we used elastix) and the procedural interface (the way we warped the reference labels) with SimpleITK (the way we computed statistics). There are more examples below and in the [Examples/SimpleElastix](https://github.com/kaspermarstal/SimpleElastix/tree/SimpleElastix/Examples/SimpleElastix "SimpleElastix examples") directory. 
+
+Wrapping is accomplished through SWIG thanks to the elastix library interface. In principle, any language wrapped by SWIG should be applicable to this project. SimpleElastix is licensed under the Apache 2.0 License in the same way as ITK, SimpleITK and elastix.
 
 More Examples
 --------
