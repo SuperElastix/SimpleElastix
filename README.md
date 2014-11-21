@@ -10,7 +10,7 @@ The goal of this project is to make elastix's robust registration algorithms acc
 
 SimpleElastix has been designed specifically for rapid prototyping and use in scripting languages. Previously, using elastix and transformix on large datasets would incur a significant overhead from scripting command line invocations and arguments to copying images and transform parameter files across folders. With SimpleElastix this complexity is easier to manage and more memory and disk I/O efficient. 
 
-So, what do you get from SimpleElastix? Say you need to compare the volume, mean intensity and standard deviation of multiple segmented structures across a population of images. Then, for each image in the population, you run the following python code:
+Enough talk. Let's see some code. Say you need to compare the volume, mean intensity and standard deviation of multiple segmented structures across a population of images. Then, for each image in the population, you run the following python code:
 
 ```python
 import SimpleElastix as sitk
@@ -27,7 +27,7 @@ registeredLabels = sitk.SimpleTransformix('movingLabels.hdr', elastix.GetTransfo
 sitk.LabelStatisticsImageFilter(elastix.GetResultImage(), registeredLabels)
 ```
 
-Wrapping is accomplished through SWIG thanks to the elastix library interface. In principle, any language wrapped by SWIG should be applicable to this project. SimpleElastix is licensed under the Apache 2.0 License in the same way as ITK, SimpleITK and elastix.
+SimpleElastix is easy to prototype, robust and fast. Wrapping is accomplished through SWIG thanks to the elastix library interface. In principle, any language wrapped by SWIG should be applicable to this project. SimpleElastix is licensed under the Apache 2.0 License in the same way as ITK, SimpleITK and elastix.
 
 More Examples
 --------
