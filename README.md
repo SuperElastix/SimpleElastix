@@ -23,7 +23,7 @@ elastix = sitk.SimpleElastix();
 elastix.SetMovingImage(referenceImage)
 elastix.SetParameterMap('defaultNonrigidRegistration')
 
-# We warp the segmentation to each image in the population
+# Warp the segmentation to each image in the population
 for fixedImage in population
   # Register images
   elastix.SetFixedImage(fixedImage)
@@ -35,7 +35,7 @@ for fixedImage in population
   
 ```
 
-We could also have warped the images to the reference image domain and computed statistics here, registered images groupwise or registered all images to the reference and segmented the mean image. This example merely demonstrates efficiency of combining the the object oriented interface (the way we used elastix) and the procedural interface (the way we warped the reference labels) with SimpleITK (the way we computed statistics). There are more examples below and in the [Examples/SimpleElastix](https://github.com/kaspermarstal/SimpleElastix/tree/SimpleElastix/Examples/SimpleElastix "SimpleElastix examples") directory. 
+This example demonstrates efficiency of combining the object oriented interface (the way we used elastix to register images) and the procedural interface (the way we used transformix to warp labels) with SimpleITK (the way we computed statistics). We could also have warped the images to the reference image domain and computed statistics here, registered images groupwise or registered all images to the reference and segmented the mean image. For more such examples, see below and the [Examples/SimpleElastix](https://github.com/kaspermarstal/SimpleElastix/tree/SimpleElastix/Examples/SimpleElastix "SimpleElastix examples") directory. 
 
 Wrapping is accomplished through SWIG thanks to the elastix library interface. In principle, any language wrapped by SWIG should be applicable to this project. SimpleElastix is licensed under the Apache 2.0 License in the same way as ITK, SimpleITK and elastix.
 
