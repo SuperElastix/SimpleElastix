@@ -10,13 +10,16 @@ The goal of this project is to make elastix's robust registration algorithms acc
 
 SimpleElastix has been designed specifically for rapid prototyping and use in scripting languages. Previously, using elastix and transformix on large datasets would incur a significant overhead from scripting command line invocations and arguments to copying images and transform parameter files across folders. With SimpleElastix this complexity is easier to manage and more memory and disk I/O efficient. 
 
-Enough talk. Let's see some code. Say you need to compare the volume, mean intensity and standard deviation of multiple segmented structures across a population of images but only have one segmentation. Then, for each image in the population, you run the following python code:
+Enough talk. Let's see some code. Say you need to compare the volume, mean intensity and standard deviation of multiple segmented structures across a population of images but only have one segmentation. Just run the following code:
 
 ```python
 import SimpleElastix as sitk
 
+# These images are loaded once and held in memory
 referenceImage = sitk.ReadImage('referenceImage.hdr')
 referenceLabel = sitk.ReadImage('referenceLabel.hdr')
+
+# The images to compare
 population = ['image1.hdr', 'image2.hdr', ... , 'imageN.hdr']
 
 elastix = sitk.SimpleElastix();
