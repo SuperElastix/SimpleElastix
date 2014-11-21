@@ -16,7 +16,7 @@ Enough talk. Let's see some code. Say you need to compare the volume, mean inten
 import SimpleElastix as sitk
 
 referenceImage = sitk.ReadImage('referenceImage.hdr')
-referenceLabel = sitk.ReadImage('referenceImage.hdr')
+referenceLabel = sitk.ReadImage('referenceLabel.hdr')
 population = ['image1.hdr', 'image2.hdr', ... , 'imageN.hdr']
 
 elastix = sitk.SimpleElastix();
@@ -30,7 +30,7 @@ for fixedImage in population
   elastix.Run()
 
   # Transform label map using the deformation field from above and compute statistics
-  resultLabels = sitk.SimpleTransformix(referenceLabel, elastix.GetTransformParameters())
+  resultLabel = sitk.SimpleTransformix(referenceLabel, elastix.GetTransformParameters())
   sitk.LabelStatisticsImageFilter(elastix.GetResultImage(), resultLabel)
   
 ```
