@@ -10,7 +10,7 @@ The goal of this project is to make elastix's robust registration algorithms acc
 
 SimpleElastix has been designed specifically for rapid prototyping and use in scripting languages. Previously, using elastix and transformix on large datasets would incur a significant overhead from scripting command line invocations and arguments to copying images and transform parameter files across folders. With SimpleElastix this complexity is easier to manage and more memory and disk I/O efficient. 
 
-Enough talk. Let's see some code. Say you need to compare the volume, mean intensity and standard deviation of multiple segmented structures across a population of images but only have one segmentation. Just run the following code:
+Enough talk. Let's see some code. Say you need to compare the volume, mean intensity and standard deviation of multiple segmented structures across a population of images but only have one segmentation. Just run the following python code:
 
 ```python
 import SimpleElastix as sitk
@@ -38,7 +38,7 @@ for fixedImage in population
   
 ```
 
-This example demonstrates efficiency of combining the object oriented interface (the way we used elastix to register images) and the procedural interface (the way we used transformix to warp labels) with SimpleITK (the way we computed statistics). We could also have warped the images to the reference image domain and computed statistics here, registered images groupwise or registered all images to the reference and segmented the mean image. For more such examples, see below and the [Examples/SimpleElastix](https://github.com/kaspermarstal/SimpleElastix/tree/SimpleElastix/Examples/SimpleElastix "SimpleElastix examples") directory. 
+This example demonstrates the efficiency of combining SimpleElastix's object oriented interface (the way we used elastix to register images) and procedural interface (the way we used transformix to warp labels) with SimpleITK (the way we computed statistics). We could also have warped the images to the reference image domain and computed statistics here, performed groupwise registration or registered all images to the reference and segmented the mean image. For more such examples, see below and the [Examples/SimpleElastix](https://github.com/kaspermarstal/SimpleElastix/tree/SimpleElastix/Examples/SimpleElastix "SimpleElastix examples") directory. 
 
 Wrapping is accomplished through SWIG thanks to the elastix library interface. In principle, any language wrapped by SWIG should be applicable to this project. SimpleElastix is licensed under the Apache 2.0 License in the same way as ITK, SimpleITK and elastix.
 
