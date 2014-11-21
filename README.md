@@ -13,16 +13,16 @@ SimpleElastix has been designed specifically for rapid prototyping and use in sc
 Examples
 --------
 
-SimpleElastix provides a procedural inteface that aligns well with the SimpleITK design philosophy and reduces registration to a one-liner. The procedural interface hides the elastix API's object oriented methods and directly invokes registration.
+SimpleElastix provides a procedural inteface that aligns well with the SimpleITK design philosophy and reduces registration to a one-liner. The procedural interface hides the elastix API's object oriented methods, templated types and directly invokes registration. The following snippets are Python code.
 
 ```python
 import SimpleITK as sitk
 
 # The images and parameter file is loaded from disk
-resultImage = sitk.SimpleElastix('fixedImage.hdr', 'movingImage.hdr', 'parameterfile.txt')
+registeredImage = sitk.SimpleElastix('fixedImage.hdr', 'movingImage.hdr', 'parameterfile.txt')
 ```
 
-In-memory images can also be passed to elastix. Loading an image from memory does not count towards your RAM limit as only a pointer is passed. Here, we first perform affine initialization and feed the resulting image to a non-rigid registration algorithm. Notice the use of the default registration configurations that come with SimpleElastix.
+In-memory images can also be passed to elastix. Loading an image from memory does not count extra towards your RAM limit as only a pointer is passed. Here, we first perform affine initialization and feed the resulting image to a non-rigid registration algorithm. Notice the use of the default registration configurations that come with SimpleElastix.
 
 ```python
 import SimpleITK as sitk
@@ -30,10 +30,10 @@ import SimpleITK as sitk
 fixedImage = sitk.ReadImage('fixedImage');
 movingImage = sitk.ReadImage('movingImage');
 affineInitializationImage = sitk.SimpleElastix(fixedImage, movingImage, 'defaultAffineParameterMap')
-resultImage = sitk.SimpleElastix(fixedImage, affineInitializationImage, 'defaultNonrigidParameterMap')
+registeredImage = sitk.SimpleElastix(fixedImage, affineInitializationImage, 'defaultNonrigidParameterMap')
 ```
 
-That was easy. However, the procedural interface trades off code simplicity for flexibility. The final deformation field cannot be retrived and applied to another image since portable language wrapping dictates only one return one object per function call (in this case the image). This is a problem if, for example, you want to subsequently warp segmentations of the moving image. Further, in the case above image quality is reduced from resampling resulting image twice.
+That was easy. However, the procedural interface trades off code simplicity for flexibility. The final deformation field cannot be retrived and applied to another image since portable language wrapping dictates only one return object per function call (in this case the image). This is a problem if, for example, you want to subsequently warp segmentations of the moving image. Further, in the case above image quality is reduced from resampling resulting image twice.
 
 Therefore, SimpleElastix also comes with a powerful object oriented interface suitable for more advanced use cases and scripting purposes.
 
@@ -45,7 +45,7 @@ elastix = sitk.SimpleElastix()
 
 # As with the procedural interface, images can loaded both from disk and memory.
 elastix.SetFixedImage('fixedImage.hdr')
-elastix.SetMovingImage(inMemoryImage)
+elastix.SetMovingImage(inMemoryMovingImage)
 
 # Get a preconfigured parameter map and customize e.g. number of iterations to suit your needs
 p = elastix.GetDefaultAffineParameters()
@@ -58,21 +58,20 @@ elastix.SetParameterMap(p)
 # append nonrigid.txt to an internal list of parameter files
 selx.AddParameterFile('nonrigid.txt')
 
-# This will run an affine registration followed by non-rigid registration since the parameter
-# files were added in this order. The transforms are composed and the moving image is only
-# resampled when both registrations have run
+# In this case, an affine registration will be run followed by non-rigid registration since the parameter
+# files were added in this order. The moving image is only resampled after both registrations have run
 elastix.Run()
-sitk.Show(selx.GetResultImage())
+sitk.Show(elastix.GetResultImage())
 ```
 
 What you get from SimpleITK integration
 ---------------------------------------
 
-Together, elastix, transformix and SimpleITK becomes a powerful image processing and registration toolkit. For exmaple, say you want to compute mean intensities and standard deviation of segmented structures in an image:
+Together, elastix, transformix and SimpleITK becomes a powerful image processing and registration toolkit. For example, say you need the mean intensities and standard deviation of segmented structures in a registered image:
 
 ```python
 # Transform label map and compute some statistics
-resultLabels = sitk.SimpleTransformix('movingLabelImage.hdr', elastix.GetTransformParameters())
+registeredLabels = sitk.SimpleTransformix('movingLabelImage.hdr', elastix.GetTransformParameters())
 sitk.LabelStatisticsImageFilter(elastix.GetResultImage(), resultLabels)
 ```
 
@@ -105,7 +104,7 @@ Wrapping is accomplished through SWIG thanks to the elastix library interface. I
 Building
 --------
 
-SimpleElastix integrates elastix and transformix with the SimpleITK superbuild. Simply clone this repository invoke the superbuild (may take up to an hour if you wrap all languages).
+SimpleElastix integrates elastix and transformix with the SimpleITK superbuild. Simply clone this repository invoke the superbuild (may take up to an hour on a quad-core machine).
 
 ```
 git clone https://github.com/kaspermarstal/SimpleITK
