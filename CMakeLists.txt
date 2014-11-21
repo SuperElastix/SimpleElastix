@@ -311,7 +311,7 @@ include_directories( ${SimpleITK_INCLUDE_DIRS} )
 set ( SimpleITK_DOC_FILES
   "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE"
   "${CMAKE_CURRENT_SOURCE_DIR}/NOTICE"
-  "${CMAKE_CURRENT_SOURCE_DIR}/Readme.md"
+  "${CMAKE_CURRENT_SOURCE_DIR}/README.md"
   )
 
 # add important files from ITK

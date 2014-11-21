@@ -274,6 +274,18 @@ else()
 endif()
 
 
+#------------------------------------------------------------------------------
+# Elastix
+#------------------------------------------------------------------------------
+
+include(External_Elastix)
+list(APPEND ${CMAKE_PROJECT_NAME}_DEPENDENCIES ELASTIX)
+
+
+#------------------------------------------------------------------------------
+# SimpleITK
+#------------------------------------------------------------------------------
+
 get_cmake_property( _varNames VARIABLES )
 
 foreach (_varName ${_varNames})
@@ -345,14 +357,6 @@ ExternalProject_Add_Step(${proj} forcebuild
 # installation of SimpleITK
 
 include(External_SimpleITKExamples)
-
-
-#------------------------------------------------------------------------------
-# Elastix
-#------------------------------------------------------------------------------
-
-include(External_Elastix)
-
 
 #------------------------------------------------------------------------------
 # List of external projects
