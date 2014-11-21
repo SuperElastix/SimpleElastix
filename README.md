@@ -8,18 +8,17 @@ The goal of this project is to make elastix's robust registration algorithms acc
 - SuperBuild that automatically compiles and installs SimpleElastix and its dependencies (elastix, ITK, SimpleITK, SWIG and target language dependencies)
 - The usual SimpleITK image processing algorithms. If you are interested in the design philosophy behind SimpleITK, [The Design of SimpleITK](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3874546/ "PubMed article") is a great read.
 
-SimpleElastix has been designed specifically for rapid prototyping and use in scripting languages. Previously, using elastix and transformix on large datasets would incur a significant overhead from scripting command line arguments and invocations to copying images and transform parameter files across folders. With SimpleElastix this complexity is easier to manage and more memory and disk I/O efficient. 
+SimpleElastix has been designed specifically for rapid prototyping and use in scripting languages. Previously, using elastix and transformix on large datasets would incur a significant overhead from scripting command line invocations and arguments to copying images and transform parameter files across folders. With SimpleElastix this complexity is easier to manage and more memory and disk I/O efficient. 
 
-So, what do you get from SimpleElastix? Say you need to compare the volume, mean intensity and standard deviation of multiple segmented structures across a population of images. Then, for each image in the population, you do the following:
+So, what do you get from SimpleElastix? Say you need to compare the volume, mean intensity and standard deviation of multiple segmented structures across a population of images. Then, for each image in the population, you run the following python code:
 
 ```python
-# The following snippet is python code
 import SimpleElastix as sitk
 
 # Register images
 elastix = sitk.SimpleElastix();
-elastix.SetFixedImage(fixedImage)
-elastix.SetMovingImage(movingImage)
+elastix.SetFixedImage('fixedImage.hdr')
+elastix.SetMovingImage('movingImage.hdr')
 elastix.SetParameterMap('defaultNonrigidRegistration')
 elastix.Run()
 
@@ -116,7 +115,7 @@ ccmake ../SimpleElastix/SuperBuild
 make -j4
 ```
 
-This will download and compile SimpleElastix along with any dependencies (elastix, ITK, SimpleITK and SWIG and target language dependencies).
+This will download and compile SimpleElastix along with any dependencies (elastix, ITK, SimpleITK, SWIG and target language dependencies).
 
 Notes
 -----
