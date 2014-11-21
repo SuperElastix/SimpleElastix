@@ -13,16 +13,16 @@ SimpleElastix has been designed specifically for rapid prototyping and use in sc
 Enough talk. Let's see some code. Say you need to compare the volume, mean intensity and standard deviation of multiple segmented structures across a population of images but only have one segmentation. Just run the following python code:
 
 ```python
-import SimpleElastix as sitk
+import SimpleElastix as selx
 
 # These images are loaded once and held in memory
-referenceImage = sitk.ReadImage('referenceImage.hdr')
-referenceLabel = sitk.ReadImage('referenceLabel.hdr')
+referenceImage = selx.ReadImage('referenceImage.hdr')
+referenceLabel = selx.ReadImage('referenceLabel.hdr')
 
 # The images to compare
 population = ['image1.hdr', 'image2.hdr', ... , 'imageN.hdr']
 
-elastix = sitk.SimpleElastix();
+elastix = selx.SimpleElastix();
 elastix.SetMovingImage(referenceImage)
 elastix.SetParameterMap('defaultNonrigidRegistration')
 
@@ -33,8 +33,8 @@ for fixedImage in population
   elastix.Run()
 
   # Transform label map using the deformation field from above and compute statistics
-  resultLabel = sitk.SimpleTransformix(referenceLabel, elastix.GetTransformParameters())
-  sitk.LabelStatisticsImageFilter(elastix.GetResultImage(), resultLabel)
+  resultLabel = selx.SimpleTransformix(referenceLabel, elastix.GetTransformParameters())
+  selx.LabelStatisticsImageFilter(elastix.GetResultImage(), resultLabel)
   
 ```
 
@@ -48,21 +48,21 @@ More Examples
 SimpleElastix provides a procedural inteface that aligns well with the SimpleITK design philosophy and reduces registration to a one-liner. The procedural interface hides the elastix API's object oriented methods, templated types and directly invokes registration. 
 
 ```python
-import SimpleITK as sitk
+import SimpleElastix as selx
 
 # The images and parameter file is loaded from disk
-registeredImage = sitk.SimpleElastix('fixedImage.hdr', 'movingImage.hdr', 'parameterfile.txt')
+registeredImage = selx.SimpleElastix('fixedImage.hdr', 'movingImage.hdr', 'parameterfile.txt')
 ```
 
 In-memory images can also be passed to elastix. Loading an image from memory does not count extra towards your RAM limit as only a pointer is passed. Here, we first perform affine initialization and feed the resulting image to a non-rigid registration algorithm. Notice the use of the default registration configurations that come with SimpleElastix.
 
 ```python
-import SimpleITK as sitk
+import SimpleElastix as selx
 
-fixedImage = sitk.ReadImage('fixedImage');
-movingImage = sitk.ReadImage('movingImage');
-affineInitializationImage = sitk.SimpleElastix(fixedImage, movingImage, 'defaultAffineParameterMap')
-registeredImage = sitk.SimpleElastix(fixedImage, affineInitializationImage, 'defaultNonrigidParameterMap')
+fixedImage = selx.ReadImage('fixedImage');
+movingImage = selx.ReadImage('movingImage');
+affineInitializationImage = selx.SimpleElastix(fixedImage, movingImage, 'defaultAffineParameterMap')
+registeredImage = selx.SimpleElastix(fixedImage, affineInitializationImage, 'defaultNonrigidParameterMap')
 ```
 
 That was easy. However, the procedural interface trades off code simplicity for flexibility. The final deformation field cannot be retrived and applied to another image since portable language wrapping dictates only one return object per function call (in this case the image). This is a problem if, for example, you want to subsequently warp segmentations of the moving image as we did in the first example. Further, in the case above image quality is reduced from resampling resulting image twice.
@@ -70,10 +70,10 @@ That was easy. However, the procedural interface trades off code simplicity for 
 Therefore, SimpleElastix also comes with a powerful object oriented interface suitable for more advanced use cases and scripting purposes.
 
 ```python
-import SimpleITK as sitk
+import SimpleElastix as selx
 
 # Here we instantiate an elastix object that will hold you data and configuration
-elastix = sitk.SimpleElastix()
+elastix = selx.SimpleElastix()
 
 # As with the procedural interface, images can loaded both from disk and memory.
 elastix.SetFixedImage('fixedImage.hdr')
@@ -93,15 +93,15 @@ selx.AddParameterFile('nonrigid.txt')
 # In this case, an affine registration will be run followed by non-rigid registration since the parameter
 # files were added in this order. The moving image is only resampled after both registrations have run
 elastix.Run()
-sitk.Show(elastix.GetResultImage())
+selx.Show(elastix.GetResultImage())
 ```
 
 You can also construct your parameter file from SimpleElastix's parameter file interface.
 
 ```python
-import SimpleITK as sitk
+import SimpleElastix as selx
 
-p = sitk.SimpleElastix().ParameterMap()
+p = selx.SimpleElastix().ParameterMap()
 
 # SetParameter() overrides existing parameters or creates them if none exist
 p.SetParameter("Metric", "NormalizedCorrelationCoefficient")    # this overrides any previous declaration
