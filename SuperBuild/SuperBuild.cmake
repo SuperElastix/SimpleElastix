@@ -325,6 +325,8 @@ ExternalProject_Add(${proj}
     ${ep_languages_args}
     # ITK
     -DITK_DIR:PATH=${ITK_DIR}
+    # Elastix
+    -DELASTIX_USE_FILE:PATH=${ELASTIX_USE_FILE}
     # Swig
     -DSWIG_DIR:PATH=${SWIG_DIR}
     -DSWIG_EXECUTABLE:PATH=${SWIG_EXECUTABLE}

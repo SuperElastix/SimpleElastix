@@ -377,9 +377,15 @@ include(CTest)
 #------------------------------------------------------------------------------
 # Use elastix
 set( ELASTIX_BUILD_DIR "" CACHE PATH "Path to elastix build folder" )
-set( ELASTIX_USE_FILE ${ELASTIX_BUILD_DIR}/UseElastix.cmake )
 
-# Tell elastix to build shared libs
+if( NOT EXISTS ${ELASTIX_USE_FILE} )
+  set( ELASTIX_USE_FILE ${ELASTIX_BUILD_DIR}/UseElastix.cmake )
+endif()
+
+if( NOT EXISTS ${ELASTIX_USE_FILE} )
+  message(FATAL_ERROR "Could not find UseElastix.cmake. Point ELASTIX_BUILD_DIR to folder containing UseElastix.cmake or use SuperBuild.")
+endif()
+
 if( ELASTIX_BUILD_EXECUTABLE )
   message(FATAL_ERROR "SimpleElastix requires elastix shared libraries, please set ELASTIX_BUILD_EXECUTABLE=OFF and rebuild elastix")
 endif()
