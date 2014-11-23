@@ -1,9 +1,9 @@
 #ifndef __selxsimpleelastix_h_
 #define __selxsimpleelastix_h_
 
+#include "sitkSimpleElastix.h"
 #include "SimpleITK.h"
 #include "elastixlib.h"
-#include "sitkSimpleElastix.h"
 
 namespace itk {
   namespace simple {
@@ -14,8 +14,13 @@ class SELX_EXPORT SimpleElastix
 
     // typedefs inherited from elastix library api
     typedef elastix::ELASTIX                      ElastixLibType;
-    typedef ElastixLibType::ParameterMapType      parameterMap;
-    typedef ElastixLibType::ParameterMapListType  parameterMapList;
+    typedef ElastixLibType::ParameterMapType      ParameterMapType;
+    typedef ElastixLibType::ParameterMapListType  ParameterMapListType;
+    typedef itk::ParameterFileParser              ParameterFileParserType;
+    typedef ParameterFileParserType::Pointer      ParameterFileParserPointer;
+
+    // typedefs for images
+    typedef itk::Image< float, 3u >               ITKImageType;
 
     SimpleElastix( void );
     ~SimpleElastix( void );
@@ -24,22 +29,23 @@ class SELX_EXPORT SimpleElastix
 
     void SetFixedImage( Image fixedImage );
     void SetMovingImage( Image movingImage );
+    void SetParameterMap( std::string filename );
 
-    // void SetFixedImage( Image fixedMask );
-    // void SetMovingImage( Image movingMask );
-    // void SetParameterMap( ParameterMapType parameterMap );
-    // void SetParameterMap( ParameterMapListType parameterMapList );
+    void Run( void );
+
+    Image GetResultImage( void );
 
   protected:
 
   private:
 
-    ElastixLibType m_Elastix;
+    ElastixLibType* m_Elastix;
 
-    Image          m_FixedImage;
-    Image          m_MovingImage;
-    Image          m_FixedMask;
-    Image          m_MovingMask;
+    Image               m_FixedImage;
+    Image               m_MovingImage;
+    ParameterMapType    m_ParameterMap;
+    Image               m_FixedMask;
+    Image               m_MovingMask;
 
 };
 
