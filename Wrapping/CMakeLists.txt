@@ -39,6 +39,9 @@ if ( WRAP_LUA OR WRAP_PYTHON OR WRAP_JAVA OR WRAP_CSHARP OR WRAP_TCL OR WRAP_R O
     set ( CMAKE_SWIG_GLOBAL_FLAGS "-DSWIGWORDSIZE64" )
   endif()
 
+  include( ${ITK_USE_FILE} )
+  include( ${ELASTIX_USE_FILE} )
+
 endif()
 
 #

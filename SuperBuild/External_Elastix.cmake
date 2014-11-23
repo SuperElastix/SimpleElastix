@@ -22,9 +22,7 @@ ExternalProject_Add( ${proj}
   ${ELASTIX_DEPENDENCIES}
 )
 
-message(STATUS "In elastix external elastix use file before: " ${ELASTIX_USE_FILE})
 ExternalProject_Get_Property(ELASTIX BINARY_DIR)
-set( ELASTIX_USE_FILE "${BINARY_DIR}/src/UseElastix.cmake"  )
-message(STATUS "In elastix external elastix use file after: " ${ELASTIX_USE_FILE})
+set( ELASTIX_USE_FILE "${BINARY_DIR}/src/UseElastix.cmake" )
 
 

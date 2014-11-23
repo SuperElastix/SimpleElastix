@@ -8,7 +8,7 @@
     #define SELX_EXPORT SITK_ABI_EXPORT
   #else
     #define SELX_EXPORT SITK_ABI_IMPORT
-  #endif  /* SimpleEalstix_EXPORTS */
+  #endif  /* SimpleElastix_EXPORTS */
 #else
   // Don't hide symbols in the static SimpleITKRegistration library in case
   // -fvisibility=hidden is used

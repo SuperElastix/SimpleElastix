@@ -55,7 +55,6 @@
 #include "sitkImageFileWriter.h"
 #include "sitkImportImageFilter.h"
 
-
 #include "sitkHashImageFilter.h"
 #include "sitkJoinSeriesImageFilter.h"
 #include "sitkComposeImageFilter.h"
@@ -69,6 +68,11 @@
 #include "sitkAdditionalProcedures.h"
 
 #include "sitkImageRegistrationMethod.h"
+
+// Elastix
+#include "selxSimpleElastix.h"
+#include "elastixlib.h"
+#include "transformixlib.h"
 
 // These headers are auto-generated
 #include "SimpleITKBasicFiltersGeneratedHeaders.h"

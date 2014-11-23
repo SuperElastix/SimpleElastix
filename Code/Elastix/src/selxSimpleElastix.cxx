@@ -1,25 +1,43 @@
 #ifndef __selxsimpleelastix_cxx_
 #define __selxsimpleelastix_cxx_
 
-#include "selxSimpleElastix.h"
+#include "SimpleITK.h"
 
 namespace itk {
   namespace simple {
 
-SimpleElastix::SimpleElastix( void )
+SimpleElastix
+::SimpleElastix( void )
 {
-
+  this->m_Elastix = new ElastixLibType();
 }
 
-SimpleElastix::~SimpleElastix( void )
+SimpleElastix
+::~SimpleElastix( void )
 {
-
+  delete this->m_Elastix;
 }
 
-const std::string SimpleElastix::GetName( void )
+const std::string 
+SimpleElastix
+::GetName( void )
 { 
   const std::string name = std::string("SimpleElastix");
   return name;
+}
+
+void 
+SimpleElastix
+::SetFixedImage( Image fixedImage )
+{
+  this->m_FixedImage = fixedImage;
+}
+
+void 
+SimpleElastix
+::SetMovingImage( Image movingImage )
+{
+  this->m_MovingImage = movingImage;
 }
 
 /** Procedural interface */
