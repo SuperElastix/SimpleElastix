@@ -1,7 +1,7 @@
 #ifndef __selxsimpleelastix_cxx_
 #define __selxsimpleelastix_cxx_
 
-#include "SimpleITK.h"
+#include "selxSimpleElastix.h"
 
 namespace itk {
   namespace simple {
@@ -42,20 +42,18 @@ SimpleElastix
 
 void
 SimpleElastix
-::SetParameterMap( std::string filename )
+::SetParameterMap( ParameterMapListType parameterMapList )
 {
-  ParameterFileParserPointer parser = ParameterFileParserType::New();
-  parser->SetParameterFileName( filename );
-  try
-  {
-    parser->ReadParameterFile();
-  }
-  catch( itk::ExceptionObject &e )
-  {
-    std::cout << e.what() << std::endl;
-  }
+  this->m_ParameterMapList = parameterMapList;
+}
 
-  this->m_ParameterMap = parser->GetParameterMap();
+void
+SimpleElastix
+::SetParameterMap( ParameterMapType parameterMap )
+{
+  ParameterMapListType parameterMapList;
+  parameterMapList.push_back( parameterMap );
+  this->SetParameterMap( parameterMapList );
 }
 
 void
@@ -68,7 +66,7 @@ SimpleElastix
     isError = this->m_Elastix->RegisterImages(
       static_cast< typename itk::DataObject::Pointer >( this->m_FixedImage.GetITKBase() ),
       static_cast< typename itk::DataObject::Pointer >( this->m_MovingImage.GetITKBase() ),
-      this->m_ParameterMap,
+      this->m_ParameterMapList,
       "",
       false,
       false,
@@ -88,9 +86,10 @@ SimpleElastix
 {
   if( this->m_Elastix->GetResultImage().IsNotNull() )
   {
-    ITKImageType* resultImage;
-    resultImage = dynamic_cast< ITKImageType* >( this->m_Elastix->GetResultImage().GetPointer() );
-    return Image( resultImage );
+    std::cout << "TODO: Return image" << std::cout;
+    //ITKImageType* resultImage;
+    //resultImage = dynamic_cast< ITKImageType* >( this->m_Elastix->GetResultImage().GetPointer() );
+    //return Image( resultImage );
   }
   else
   {
@@ -98,15 +97,9 @@ SimpleElastix
   }
 }
 
-/** Procedural interface */
-
-const std::string HelloWorld( void )
-{
-  SimpleElastix elastix;
-  return elastix.GetName();
-}
-
-const std::string ReadParameterMap( const std::string filename )
+SimpleElastix::ParameterMapType
+SimpleElastix
+::ReadParameterMap( const std::string filename)
 {
   ParameterFileParserPointer parser = ParameterFileParserType::New();
   parser->SetParameterFileName( filename );
@@ -119,7 +112,23 @@ const std::string ReadParameterMap( const std::string filename )
     std::cout << e.what() << std::endl;
   }
 
-  this->m_ParameterMap = parser->GetParameterMap();
+  return parser->GetParameterMap();
+}
+
+/** Procedural interface */
+
+const std::string
+HelloWorld( void )
+{
+  SimpleElastix elastix;
+  return elastix.GetName();
+}
+
+SimpleElastix::ParameterMapType
+ReadParameterMap( const std::string filename )
+{
+  SimpleElastix elastix;
+  return elastix.ReadParameterMap( filename );
 }
 
 } // end namespace simple

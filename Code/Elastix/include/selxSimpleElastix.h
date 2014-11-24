@@ -2,7 +2,7 @@
 #define __selxsimpleelastix_h_
 
 #include "sitkSimpleElastix.h"
-#include "SimpleITK.h"
+#include "sitkImage.h"
 #include "elastixlib.h"
 
 namespace itk {
@@ -29,11 +29,15 @@ class SELX_EXPORT SimpleElastix
 
     void SetFixedImage( Image fixedImage );
     void SetMovingImage( Image movingImage );
-    void SetParameterMap( std::string filename );
+
+    void SetParameterMap( ParameterMapType parameterMap);
+    void SetParameterMap( ParameterMapListType parameterMapList );
 
     void Run( void );
 
     Image GetResultImage( void );
+
+    ParameterMapType ReadParameterMap( const std::string filename );
 
   protected:
 
@@ -41,11 +45,13 @@ class SELX_EXPORT SimpleElastix
 
     ElastixLibType* m_Elastix;
 
-    Image               m_FixedImage;
-    Image               m_MovingImage;
-    ParameterMapType    m_ParameterMap;
-    Image               m_FixedMask;
-    Image               m_MovingMask;
+    Image                   m_FixedImage;
+    Image                   m_MovingImage;
+    ParameterMapListType    m_ParameterMapList;
+    bool                    m_LogToConsole;
+    std::string             m_LogToFile;
+    Image                   m_FixedMask;
+    Image                   m_MovingMask;
 
 };
 

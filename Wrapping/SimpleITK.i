@@ -164,7 +164,12 @@ namespace std
 %template(ImageFilter_5) itk::simple::ImageFilter<5>;
 
 // Elastix
+%template(ParameterMap) std::map< std::string, std::vector< std::string > >;
+%template(ParameterMapList) std::vector< std::map< std::string, std::vector< std::string > > >;
+%rename(ParameterMap) ParameterMapType;
+%rename(PrameterMapList) ParameterMapListType;
 %include "selxSimpleElastix.h"
+
 
 // IO
 %include "sitkShow.h"
@@ -174,15 +179,15 @@ namespace std
 %include "sitkImageFileReader.h"
 
 // Basic Filters
-// %include "sitkHashImageFilter.h"
-// %include "sitkBSplineTransformInitializerFilter.h"
-// %include "sitkCenteredTransformInitializerFilter.h"
-// %include "sitkCenteredVersorTransformInitializerFilter.h"
-// %include "sitkCastImageFilter.h"
-// %include "sitkAdditionalProcedures.h"
+%include "sitkHashImageFilter.h"
+%include "sitkBSplineTransformInitializerFilter.h"
+%include "sitkCenteredTransformInitializerFilter.h"
+%include "sitkCenteredVersorTransformInitializerFilter.h"
+%include "sitkCastImageFilter.h"
+%include "sitkAdditionalProcedures.h"
 
 // Registration
-// %include "sitkImageRegistrationMethod.h"
+%include "sitkImageRegistrationMethod.h"
 
 
 // Only C# can handle import filter
@@ -195,6 +200,5 @@ namespace std
 %include "sitkPyCommand.h"
 #endif
 
-
 // Auto-generated headers
-// %include "SimpleITKBasicFiltersGeneratedHeaders.i"
+%include "SimpleITKBasicFiltersGeneratedHeaders.i"
