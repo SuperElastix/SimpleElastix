@@ -22,22 +22,37 @@ class SELX_EXPORT SimpleElastix
     // typedefs for images
     typedef itk::Image< float, 3u >               ITKImageType;
 
+    // To be wrapped by SWIG
+
     SimpleElastix( void );
     ~SimpleElastix( void );
 
     const std::string GetName( void );
 
+    // Images
     void SetFixedImage( Image fixedImage );
     void SetMovingImage( Image movingImage );
+    void SetFixedMask( Image fixedMask );
+    void SetMovingMask( Image movingMask );
 
-    void SetParameterMap( ParameterMapType parameterMap);
+    // Parameter Maps
+    void SetParameterMap( ParameterMapType parameterMap );
     void SetParameterMap( ParameterMapListType parameterMapList );
+    void AppendParameterMap( ParameterMapType parameterMap );
+    void AppendParameterMap( ParameterMapListType parameterMapList );
+    ParameterMapListType GetParameterMapList( void );
+    ParameterMapType GetParameterMap( int n );
+    ParameterMapType GetParameterMap( void );
+    int GetNumberOfParameterMaps( void );
+    ParameterMapType ReadParameterMap( const std::string filename );
 
+    // Register images
     void Run( void );
 
+    // Get result
     Image GetResultImage( void );
-
-    ParameterMapType ReadParameterMap( const std::string filename );
+    ParameterMapType GetTransformParameterMap( void );
+    ParameterMapListType GetTransformParameterMapList( void );
 
   protected:
 
@@ -48,19 +63,19 @@ class SELX_EXPORT SimpleElastix
     Image                   m_FixedImage;
     Image                   m_MovingImage;
     ParameterMapListType    m_ParameterMapList;
+    std::string             m_LogFileName;
     bool                    m_LogToConsole;
-    std::string             m_LogToFile;
     Image                   m_FixedMask;
     Image                   m_MovingMask;
 
 };
 
-SELX_EXPORT const std::string HelloWorld( void );
+SELX_EXPORT SimpleElastix::ParameterMapType ReadParameterMap( const std::string filename );
 
 /** Procedural Interface 
 
-SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, ParameterMapType parameterMap, bool logToConsole = false, std::string logToFile = "" );
-SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, ParameterMapType parameterMap, Image fixedMask, Image movingMask, bool logToConsole = false, std::string logToFile = "" );
+SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, ParameterMapType parameterMap, bool logToConsole = false, std::string logFileName = "" );
+SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, ParameterMapType parameterMap, Image fixedMask, Image movingMask, bool logToConsole = false, std::string logFileName = "" );
 */
 
 } // end namespace simple

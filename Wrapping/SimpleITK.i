@@ -167,7 +167,7 @@ namespace std
 %template(ParameterMap) std::map< std::string, std::vector< std::string > >;
 %template(ParameterMapList) std::vector< std::map< std::string, std::vector< std::string > > >;
 %rename(ParameterMap) ParameterMapType;
-%rename(PrameterMapList) ParameterMapListType;
+%rename(ParameterMapList) ParameterMapListType;
 %include "selxSimpleElastix.h"
 
 
