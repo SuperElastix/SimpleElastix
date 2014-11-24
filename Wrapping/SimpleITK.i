@@ -77,6 +77,7 @@
 %{
 #include <SimpleITK.h>
 #include <sitkImageOperators.h>
+#include <selxSimpleElastix.h>
 %}
 
 // Language Specific Sections
@@ -166,10 +167,7 @@ namespace std
 // Elastix
 %template(ParameterMap) std::map< std::string, std::vector< std::string > >;
 %template(ParameterMapList) std::vector< std::map< std::string, std::vector< std::string > > >;
-%rename(ParameterMap) ParameterMapType;
-%rename(ParameterMapList) ParameterMapListType;
 %include "selxSimpleElastix.h"
-
 
 // IO
 %include "sitkShow.h"
@@ -201,4 +199,4 @@ namespace std
 #endif
 
 // Auto-generated headers
-%include "SimpleITKBasicFiltersGeneratedHeaders.i"
+// %include "SimpleITKBasicFiltersGeneratedHeaders.i"

@@ -69,11 +69,6 @@
 
 #include "sitkImageRegistrationMethod.h"
 
-// Elastix
-#include "selxSimpleElastix.h"
-#include "elastixlib.h"
-#include "transformixlib.h"
-
 // These headers are auto-generated
 #include "SimpleITKBasicFiltersGeneratedHeaders.h"
 #endif

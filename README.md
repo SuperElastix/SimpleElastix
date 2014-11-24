@@ -1,5 +1,6 @@
 SimpleElastix
 =============
+[![Build Status](https://drone.io/github.com/kaspermarstal/SimpleElastix/status.png)](https://drone.io/github.com/kaspermarstal/SimpleElastix/latest)
 
 The goal of this project is to make elastix's robust registration algorithms accessible to a wider audience by integrating the [elastix medical image registration library](http://elastix.isi.uu.nl/ "Elastix website") with [SimpleITK](https://github.com/SimpleITK/SimpleITK "SimpleITK github repository"). This approach brings the robust language wrapping and automated build infrastructure of SimpleITK to elastix and transformix. SimpleElastix provides
 
@@ -11,12 +12,12 @@ The goal of this project is to make elastix's robust registration algorithms acc
 
 Previously, using elastix and transformix on large datasets would incur a significant overhead from scripting command line invocations and arguments to copying images and transform parameter files across folders. With SimpleElastix this complexity is easier to manage and more memory and disk I/O efficient. 
 
-How does SimpleElastix accomplish this? Let's take a look at the following python code. Say you need to compare the volume, mean intensity and standard deviation of multiple segmented structures across a population of images using an atlas segmentation. Do this:
+How does SimpleElastix accomplish this? Let's take a look at some python code. Say you need to compare the volume, mean intensity and standard deviation of multiple segmented structures across a population of images using an atlas segmentation. Do this:
 
 ```python
 import SimpleITK as sitk
 
-# The atlas and associated segmentatin is loaded once and held in memory
+# The atlas and associated segmentation is loaded once and held in memory
 movingImage = sitk.ReadImage('movingImage.hdr')
 movingLabel = sitk.ReadImage('movingLabel.hdr')
 
@@ -108,7 +109,7 @@ p['Metric'] = ['NormalizedMutualInformation', 'TransformBendingEnergyPenalty']
 p['Transform'] = 'AffineTransform'
 p['FixedImagePyramidSchedule'] = ['8', '4', '2', '1']
 
-# Lists of parameter maps are encapsulated as a C-style vector that works just like its std::vector counterpart
+# Lists of parameter maps are encapsulated in a C-style vector that works just like its std::vector counterpart
 plist = ParameterMapList()
 plist.push_back(p)
 
