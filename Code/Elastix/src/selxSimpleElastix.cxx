@@ -10,8 +10,13 @@ SimpleElastix
 ::SimpleElastix( void )
 {
   this->m_Elastix = new ElastixLibType();
-
+  this->m_FixedMask = 0;
+  this->m_MovingImage = 0;
+  this->m_FixedMask = 0;
+  this->m_MovingMask = 0;
+  this->m_ParameterMapList = ParameterMapListType();
   this->m_LogFileName = "";
+  this->m_LogToConsole = false;
 }
 
 SimpleElastix
@@ -30,36 +35,47 @@ SimpleElastix
 
 void 
 SimpleElastix
-::SetFixedImage( Image fixedImage )
+::SetFixedImage( Image& fixedImage )
 {
-  this->m_FixedImage = fixedImage;
+  std::cout << "Setting fixed image ... " << std::endl;
+  this->m_FixedImage = &fixedImage;
 }
 
 void 
 SimpleElastix
-::SetMovingImage( Image movingImage )
+::SetMovingImage( Image& movingImage )
 {
-  this->m_MovingImage = movingImage;
+  std::cout << "Setting moving image ... " << std::endl;
+  this->m_MovingImage = &movingImage;
 }
 
 void 
 SimpleElastix
-::SetFixedMask( Image fixedMask )
+::SetFixedMask( Image& fixedMask )
 {
-  this->m_FixedMask = fixedMask;
+  this->m_FixedMask = &fixedMask;
 }
 
 void 
 SimpleElastix
-::SetMovingMask( Image movingMask )
+::SetMovingMask( Image& movingMask )
 {
-  this->m_MovingMask = movingMask;
+  this->m_MovingMask = &movingMask;
+}
+
+Image* 
+SimpleElastix
+::GetFixedImage( void )
+{
+  std::cout << "Returning fixed image ... " << std::endl;
+  return this->m_FixedImage;
 }
 
 void
 SimpleElastix
 ::SetParameterMap( ParameterMapListType parameterMapList )
 {
+  std::cout << "Setting ParameterMap ... " << std::endl;
   this->m_ParameterMapList = parameterMapList;
 }
 
@@ -121,7 +137,7 @@ SimpleElastix
 
 SimpleElastix::ParameterMapType
 SimpleElastix
-::ReadParameterMap( const std::string filename)
+::ReadParameterFile( const std::string filename)
 {
   ParameterFileParserPointer parser = ParameterFileParserType::New();
   parser->SetParameterFileName( filename );
@@ -141,41 +157,67 @@ void
 SimpleElastix
 ::Run( void )
 {
-  bool logToFile = false;
-  if( this->m_LogFileName != "" )
+  std::cout << "Setting images ... " << std::endl;
+
+  itk::DataObject::Pointer fixedImage = 0;
+  if( this->m_FixedImage )
   {
-    logToFile = true;
+    fixedImage = static_cast< typename itk::DataObject::Pointer >( this->m_FixedImage->GetITKBase() );
   }
+  else
+  {
+    sitkExceptionMacro( << "Fixed image is not set. Use SetFixedImage() or Help() to get information on how to use this module." );
+  }
+
+  itk::DataObject::Pointer movingImage = 0;
+  if( this->m_MovingImage )
+  {
+    movingImage = static_cast< typename itk::DataObject::Pointer >( this->m_MovingImage->GetITKBase() );
+  }
+  else
+  {
+    sitkExceptionMacro( << "Moving image is not set. Use SetMovingImage() or Help() to get information on how to use this module." );
+  }
+
+  itk::DataObject::Pointer fixedMask = 0;
+  if( this->m_FixedMask )
+  {
+    fixedMask = static_cast< typename itk::DataObject::Pointer >( this->m_FixedMask->GetITKBase() );
+  }
+
+  itk::DataObject::Pointer movingMask = 0;
+  if( this->m_MovingMask )
+  {
+    movingMask = static_cast< typename itk::DataObject::Pointer >( this->m_MovingMask->GetITKBase() );
+  }
+
+  std::cout << "Invoking RegisterImages() ... " << std::endl;
+
+  std::string fn = std::string("parameterfile.bending.txt");
+  ParameterMapType p = this->ReadParameterFile(fn);
 
   int isError = 1;
   try
   {
     isError = this->m_Elastix->RegisterImages(
-      static_cast< typename itk::DataObject::Pointer >( this->m_FixedImage.GetITKBase() ),
-      static_cast< typename itk::DataObject::Pointer >( this->m_MovingImage.GetITKBase() ),
-      this->m_ParameterMapList,
+      fixedImage,
+      movingImage,
+      p, // this->m_ParameterMapList,
       this->m_LogFileName,
-      logToFile,
-      false,
-      0,
-      0
+      this->m_LogFileName != "",
+      this->m_LogToConsole,
+      fixedMask,
+      movingMask
     );
   }
   catch( itk::ExceptionObject &e )
   {
-    std::cout << e.what() << std::endl;
+    sitkExceptionMacro( << e.what() );
   }
 
   if( isError != 0 )
   {
-    std::cout << "Errors occured during registration. ";
-
-    if( this->m_LogFileName == "" && this->m_LogToConsole == false )
-    {
-      std::cout << "Switch on logging to inspect.";
-    }
-
-    std::cout << std::endl;
+    sitkExceptionMacro( << "Errors occured during registration. Switch on logging to inspect." );
   }
 }
 
@@ -196,6 +238,27 @@ SimpleElastix
   }
 }
 
+void
+SimpleElastix
+::LogToConsoleOn( void )
+{
+  this->m_LogToConsole = true;
+}
+
+void
+SimpleElastix
+::LogToConsoleOff( void )
+{
+  this->m_LogToConsole = false;
+}
+
+void
+SimpleElastix
+::LogFileName( const std::string filename )
+{
+  this->m_LogFileName = filename;
+}
+
 SimpleElastix::ParameterMapType
 SimpleElastix
 ::GetTransformParameterMap( void )
@@ -213,10 +276,10 @@ SimpleElastix
 /** Procedural interface */
 
 SimpleElastix::ParameterMapType
-ReadParameterMap( const std::string filename )
+ReadParameterFile( const std::string filename )
 {
   SimpleElastix elastix;
-  return elastix.ReadParameterMap( filename );
+  return elastix.ReadParameterFile( filename );
 }
 
 } // end namespace simple

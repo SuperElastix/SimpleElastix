@@ -30,10 +30,12 @@ class SELX_EXPORT SimpleElastix
     const std::string GetName( void );
 
     // Images
-    void SetFixedImage( Image fixedImage );
-    void SetMovingImage( Image movingImage );
-    void SetFixedMask( Image fixedMask );
-    void SetMovingMask( Image movingMask );
+    void SetFixedImage( Image& fixedImage );
+    void SetMovingImage( Image& movingImage );
+    void SetFixedMask( Image& fixedMask );
+    void SetMovingMask( Image& movingMask );
+
+    Image* GetFixedImage( void );
 
     // Parameter Maps
     void SetParameterMap( ParameterMapType parameterMap );
@@ -44,7 +46,7 @@ class SELX_EXPORT SimpleElastix
     ParameterMapType GetParameterMap( int n );
     ParameterMapType GetParameterMap( void );
     int GetNumberOfParameterMaps( void );
-    ParameterMapType ReadParameterMap( const std::string filename );
+    ParameterMapType ReadParameterFile( const std::string filename );
 
     // Register images
     void Run( void );
@@ -54,23 +56,28 @@ class SELX_EXPORT SimpleElastix
     ParameterMapType GetTransformParameterMap( void );
     ParameterMapListType GetTransformParameterMapList( void );
 
+    // Logging
+    void LogToConsoleOn( void );
+    void LogToConsoleOff( void );
+    void LogFileName( const std::string filename );
+
   protected:
 
   private:
 
-    ElastixLibType* m_Elastix;
+    ElastixLibType*         m_Elastix;
 
-    Image                   m_FixedImage;
-    Image                   m_MovingImage;
+    Image*                  m_FixedImage;
+    Image*                  m_MovingImage;
     ParameterMapListType    m_ParameterMapList;
     std::string             m_LogFileName;
     bool                    m_LogToConsole;
-    Image                   m_FixedMask;
-    Image                   m_MovingMask;
+    Image*                  m_FixedMask;
+    Image*                  m_MovingMask;
 
 };
 
-SELX_EXPORT SimpleElastix::ParameterMapType ReadParameterMap( const std::string filename );
+SELX_EXPORT SimpleElastix::ParameterMapType ReadParameterFile( const std::string filename );
 
 /** Procedural Interface 
 
