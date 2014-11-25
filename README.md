@@ -1,7 +1,7 @@
 SimpleElastix
 =============
 
-[Elastix](elastix.isi.uu.nl/download/elastix_manual_v4.7.pdf "elastix manual") is a powerful, state-of-the-art medical image registration library. The goal of this project is to make elastix's robust medical image registration algorithms accessible to a wider audience by integrating [elastix](http://elastix.isi.uu.nl/ "Elastix website") with [SimpleITK](https://github.com/SimpleITK/SimpleITK "SimpleITK github repository"). This approach brings the robust language wrapping and automated build infrastructure of SimpleITK to elastix and transformix. SimpleElastix provides
+[Elastix](elastix.isi.uu.nl/download/elastix_manual_v4.7.pdf "elastix manual") is a powerful, state-of-the-art medical image registration library. The goal of SimpleElastix is to bring elatix's robust medical image registration algorithms to a wider audience by integrating [elastix](http://elastix.isi.uu.nl/ "Elastix website") with [SimpleITK](https://github.com/SimpleITK/SimpleITK "SimpleITK github repository"). SimpleElastix provides
 
 - elastix and transformix bindings for Python, Java, R, Ruby, Octave, Lua, Tcl and C#.
 - A user-friendly API that aligns with the design philosophy of SimpleITK, developed specifically for rapid prototyping and use in scripting languages. If you are interested, [The Design of SimpleITK](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3874546/ "PubMed") is a great read.
@@ -11,7 +11,7 @@ SimpleElastix
 
 Previously, using elastix and transformix on large datasets would incur a significant overhead from scripting command line invocations and arguments to copying images and transform parameter files across folders. With SimpleElastix this complexity is easier to manage and more memory and disk I/O efficient. 
 
-How does SimpleElastix accomplish this? Let's look at some code. Say you need to compare the volume, mean intensity and standard deviation of multiple anatomical structures across a population of images using an atlas segmentation. The following lines of python code does this:
+How does SimpleElastix accomplish this? Let's look at some code. Say you need to compare the volume, mean intensity and standard deviation of (possibly multiple) anatomical structures across a population of images using an atlas segmentation. The following lines of python code does this:
 
 ```python
 import SimpleITK as sitk
@@ -20,7 +20,7 @@ import SimpleITK as sitk
 movingImage = sitk.ReadImage('movingImage.hdr')
 movingLabel = sitk.ReadImage('movingLabel.hdr')
 
-# These images are loaded from disk one at a time
+# Images are loaded from disk one at a time
 population = ['image1.hdr', 'image2.hdr', ... , 'imageN.hdr']
 
 selx = sitk.SimpleElastix();
@@ -51,7 +51,7 @@ import SimpleElastix as sitk
 resultImage = sitk.SimpleElastix(sitk.ReadImage(fixedImage), sitk.ReadImage(movingImage), sitk.ReadParameterFile('pf.txt'))
 ```
 
-Loading images that already recide in memory does not count extra towards your RAM limit as only pointers are passed. In the next example, we first perform affine initialization and feed the resulting image to a non-rigid registration algorithm. The same fixed image is loaded once and used in both registrations. Notice the use of the default registration configurations that come with SimpleElastix.
+Loading images that already recide in memory does not count extra towards your RAM limit as only pointers are passed. In the next example, we first perform affine initialization and feed the resulting image to a non-rigid registration algorithm. The same fixed image is used in both registrations. Notice the use of the default registration configurations that come with SimpleElastix.
 
 ```python
 import SimpleElastix as sitk
@@ -64,7 +64,7 @@ registeredImage = sitk.SimpleElastix(fixedImage, affineMovingImage, 'defaultNonr
 
 ### Object Oriented Interface
 
-While the procedural interface may be useful in rapid prototyping, it trades off code simplicity for flexibility. In the above example, the final deformation field cannot be retrived and applied to another image since portable language wrapping dictates only one return object per function call (in this case the image). This is a problem if you want to subsequently warp segmentations as we did in the first example. Further, image quality is reduced from resampling resulting image twice. To this end, SimpleElastix also comes with a powerful object oriented interface suitable for more advanced use cases and scripting purposes. In the next example, we perform non-rigid true groupwise registration as described in [Metz et al 2012](http://#).
+While the procedural interface may be useful in rapid prototyping, it trades off code simplicity for flexibility. In the above example, the final deformation field cannot be retrived and applied to another image since portable language wrapping dictates only one return object per function call (in this case the image). This is a problem if you want to subsequently warp segmentations as we did in the first example. Further, image quality is reduced from resampling resulting image twice. To this end, SimpleElastix also comes with a powerful object oriented interface suitable for more advanced use cases and scripting purposes. In the next example, we perform true groupwise registration as described in [Metz et al 2012](http://#).
 
 ```python
 import SimpleITK as sitk
@@ -83,41 +83,39 @@ selx = sitk.SimpleElastix()
 selx.SetFixedImage(image4d) 
 selx.SetMovingImage(image4d)
 
-# Get the preconfigured groupwise parameter map and customize e.g. number of iterations
+# Customize the preconfigured groupwise parameter map and run the registration
 p = selx.GetDefaultGroupwiseNonRigidParameters()
 p['MaximumNumberOfIterations'] = '1024'
-
-
 selx.SetParameterMap(p)
 selx.Run()
 ```
 
 ### Parameter Maps
-In addition to loading your own parameter files from disk, you can construct parameter maps programmatically from SimpleElastix's parameter map interface. SimpleElastix maps the native language array types to an internal C++-map structure that you can call `keys(), size()`, `count()` on etc and even iterate over. 
+In addition to loading your own parameter files from disk, you can construct parameter maps programmatically from SimpleElastix's parameter map interface that works seamlessly with target language native types. In python, a parameter map is a dictionary-like structure that you can call `keys(), clear()`, `has_key()` on etc and even iterate over. 
 
 ```python
 import SimpleITK as sitk
+selx = sitk.SimpleElastix()
 
-# In python, ParameterMap() returns a dictionary-like object that works as you expect
+# The dictionary-like object that works as you'd expect
 p = sitk.ParameterMap()
 p['Registration'] = 'MultiMetricMultiResolutionRegistration'
 p['Metric'] = ['NormalizedMutualInformation', 'TransformBendingEnergyPenalty']
 p['Transform'] = 'AffineTransform'
 p['FixedImagePyramidSchedule'] = ['8', '4', '2', '1']
 
-# Lists of parameter maps can encapsulated in a C-style vector that works just like its
-# std::vector counterpart. This will invod eMultiple consecutive registrations in one go. 
+# Lists of parameter maps can be encapsulated in a C-style vector. Running SimpleElastix with a
+# list of parameter maps will run multiple registrations consecutively in one go. 
 plist = ParameterMapList()
 plist.push_back(p)
 
-# In most cases yoy can treat the parameter list as a native dictionary type. 
 # The following call will initialize a new parameter map at position two in the list
 plist[1]['Transform'] = 'BSplineTransform'
+# ... set rest of parameters, images etc
 
 # Passing the above list will cause elastix to run an affine initialization followed by a nonrigid registration
-selx = sitk.SimpleElastix()
 selx.SetParameterMap( plist ) 
-selx.Run()  # ... set required parameters, images etc first of course
+selx.Run()  
 ```
 
 At the moment, the elastix library API does not support using multiple fixed and moving images so SimpleElastix doesn't either.
@@ -135,4 +133,4 @@ ccmake ../SimpleElastix/SuperBuild
 make -j4
 ```
 
-SimpleElastix will be compiled along with any dependencies (elastix, ITK, SimpleITK, SWIG and target language dependencies). These are downloaded on the fly.
+SimpleElastix will be compiled along with any dependencies (elastix, ITK, SimpleITK, SWIG and target language dependencies) are downloaded on the fly.
