@@ -64,32 +64,32 @@ registeredImage = sitk.SimpleElastix(fixedImage, affineMovingImage, 'defaultNonr
 
 ### Object Oriented Interface
 
-While the procedural interface may be useful in rapid prototyping, it trades off code simplicity for flexibility. In the above example, the final deformation field cannot be retrived and applied to another image since portable language wrapping dictates only one return object per function call (in this case the image). This is a problem if you want to subsequently warp segmentations as we did in the first example. Further, image quality is reduced from resampling resulting image twice. To this end, SimpleElastix also comes with a powerful object oriented interface suitable for more advanced use cases and scripting purposes.
+While the procedural interface may be useful in rapid prototyping, it trades off code simplicity for flexibility. In the above example, the final deformation field cannot be retrived and applied to another image since portable language wrapping dictates only one return object per function call (in this case the image). This is a problem if you want to subsequently warp segmentations as we did in the first example. Further, image quality is reduced from resampling resulting image twice. To this end, SimpleElastix also comes with a powerful object oriented interface suitable for more advanced use cases and scripting purposes. In the next example, we perform non-rigid true groupwise registration as described in [Metz et al 2012](http://#).
 
 ```python
 import SimpleITK as sitk
 
-# Here we instantiate an elastix object that will hold you data and configuration
+# First we concatenate the ND images into one (N+1)D image
+population = ['image1.hdr', 'image2.hdr', ... , 'imageN.hdr']
+vectorOfImages = sitk.VectorOfImages()
+vectorOfImages = [vectorOfImages.push_back(sitk.ReadImage(image)) for image in population]
+image4d = sitk.JoinSeriesFilter(vectorOfImages)
+
+# We instantiate an elastix object that will hold data and configuration  
 selx = sitk.SimpleElastix()
 
-selx.SetFixedImage(sitk.ReadImage('fixedImage.hdr'))
-selx.SetMovingImage(sitk.ReadImage('movingImage.hdr')
+# The groupwise transform works only on the moving image. However, a 
+# dummy fixed image is needed to prevent elastix from throwing errors
+selx.SetFixedImage(image4d) 
+selx.SetMovingImage(image4d)
 
-# Get a preconfigured parameter map and customize e.g. number of iterations to suit your needs
-p = selx.GetDefaultAffineParameters()
-p['MaximumNumberOfIterations'] = '512'
+# Get the preconfigured groupwise parameter map and customize e.g. number of iterations
+p = selx.GetDefaultGroupwiseNonRigidParameters()
+p['MaximumNumberOfIterations'] = '1024'
 
-# SetParameterMap() overrides existing parameter maps or create a new one if none exist
+
 selx.SetParameterMap(p)
-
-# You can also load your own parameter files. In this case, AppendParameterMap() will
-# append nonrigid.txt to an internal list of parameter files
-selx.AppendParameterMap(selx.ReadParameterFile('nonrigid.txt'))
-
-# An affine registration will be run followed by non-rigid registration since the parameter
-# files were added in this order. The moving image is resampled only after both registrations have run
 selx.Run()
-sitk.Show(selx.GetResultImage())
 ```
 
 ### Parameter Maps
