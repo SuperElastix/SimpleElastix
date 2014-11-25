@@ -4,6 +4,7 @@
 #include "sitkSimpleElastix.h"
 #include "sitkImage.h"
 #include "elastixlib.h"
+#include "SimpleITK.h"
 
 namespace itk {
   namespace simple {
@@ -11,6 +12,10 @@ namespace itk {
 class SELX_EXPORT SimpleElastix
 {
   public:
+
+    typedef SimpleElastix Self;
+    SimpleElastix( void );
+    ~SimpleElastix( void );
 
     // typedefs inherited from elastix library api
     typedef elastix::ELASTIX                      ElastixLibType;
@@ -20,20 +25,18 @@ class SELX_EXPORT SimpleElastix
     typedef ParameterFileParserType::Pointer      ParameterFileParserPointer;
 
     // typedefs for images
-    typedef itk::Image< float, 3u >               ITKImageType;
+    typedef itk::Image< float, 3u >               TFixedImage;
+    typedef itk::Image< float, 3u >               TMovingImage;
 
     // To be wrapped by SWIG
-
-    SimpleElastix( void );
-    ~SimpleElastix( void );
 
     const std::string GetName( void );
 
     // Images
-    void SetFixedImage( Image& fixedImage );
-    void SetMovingImage( Image& movingImage );
-    void SetFixedMask( Image& fixedMask );
-    void SetMovingMask( Image& movingMask );
+    void SetFixedImage( Image* fixedImage );
+    void SetMovingImage( Image* movingImage );
+    void SetFixedMask( Image* fixedMask );
+    void SetMovingMask( Image* movingMask );
 
     Image* GetFixedImage( void );
 
@@ -52,28 +55,52 @@ class SELX_EXPORT SimpleElastix
     void Run( void );
 
     // Get result
-    Image GetResultImage( void );
+    void GetResultImage( void );
     ParameterMapType GetTransformParameterMap( void );
     ParameterMapListType GetTransformParameterMapList( void );
 
     // Logging
     void LogToConsoleOn( void );
     void LogToConsoleOff( void );
-    void LogFileName( const std::string filename );
+    void LogFileName( const std::string filename ); 
 
   protected:
 
+    template< class TImageType >
+    static typename TImageType::Pointer CastImageToITK( Image* image )
+    {
+      typename TImageType::Pointer itkImage = dynamic_cast< TImageType* >( image->GetITKBase() );
+ 
+      if ( itkImage.IsNull() )
+      {
+        sitkExceptionMacro( "Error casting image to internal type." );
+      }
+
+      return itkImage;
+    }
+
+    template< class TImageType >
+    static Image CastITKToImage( TImageType *img )
+    {
+      return Image(img);
+    }
+
   private:
 
-    ElastixLibType*         m_Elastix;
+    // Member function dispatching
+    typedef Image (Self::*MemberFunctionType)( const Image& image1 );
+    friend struct detail::MemberFunctionAddressor<MemberFunctionType>;
+    std::auto_ptr<detail::MemberFunctionFactory<MemberFunctionType> > m_MemberFactory;
 
-    Image*                  m_FixedImage;
-    Image*                  m_MovingImage;
-    ParameterMapListType    m_ParameterMapList;
-    std::string             m_LogFileName;
-    bool                    m_LogToConsole;
-    Image*                  m_FixedMask;
-    Image*                  m_MovingMask;
+    // This class holds configuration and data that is passed to elastix API when Run()
+    ElastixLibType*        m_Elastix;
+    Image*                 m_FixedImage;
+    Image*                 m_MovingImage;
+    ParameterMapListType   m_ParameterMapList;
+    std::string            m_LogFileName;
+    bool                   m_LogToConsole;
+    Image*                 m_FixedMask;
+    Image*                 m_MovingMask;
 
 };
 
