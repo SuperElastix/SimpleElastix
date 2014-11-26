@@ -3,16 +3,21 @@
 
 #include "selxSimpleElastix.h"
 
-// tmp
-#include "itkImage.h"
-#include "itkImageFileReader.h"
 
 namespace itk {
   namespace simple {
 
+
+
 SimpleElastix
 ::SimpleElastix( void )
 {
+  // Register this class with SimpleITK
+  //m_DualMemberFactory.reset( new detail::DualMemberFunctionFactory< MemberFunctionType >( this ) );
+  //m_DualMemberFactory->RegisterMemberFunctions< PixelIDTypeList, PixelIDTypeList, 3, SimpleElastixAddressor< MemberFunctionType > >();
+  //m_DualMemberFactory->RegisterMemberFunctions< PixelIDTypeList, PixelIDTypeList, 2, SimpleElastixAddressor< MemberFunctionType > >();
+
+  // This class holds data and configuration that is passed to elastix API when executed
   this->m_Elastix = new ElastixLibType();
   this->m_FixedMask = 0;
   this->m_MovingImage = 0;
@@ -23,11 +28,14 @@ SimpleElastix
   this->m_LogToConsole = false;
 }
 
+
 SimpleElastix
 ::~SimpleElastix( void )
 {
   delete this->m_Elastix;
 }
+
+
 
 const std::string 
 SimpleElastix
@@ -37,6 +45,8 @@ SimpleElastix
   return name;
 }
 
+
+
 void 
 SimpleElastix
 ::SetFixedImage( Image* fixedImage )
@@ -44,26 +54,34 @@ SimpleElastix
   this->m_FixedImage = fixedImage;
 }
 
-void 
+
+
+void
 SimpleElastix
 ::SetMovingImage( Image* movingImage )
 {
   this->m_MovingImage = movingImage;
 }
 
-void 
+
+
+void
 SimpleElastix
 ::SetFixedMask( Image* fixedMask )
 {
   this->m_FixedMask = fixedMask;
 }
 
-void 
+
+
+void
 SimpleElastix
 ::SetMovingMask( Image* movingMask )
 {
   this->m_MovingMask = movingMask;
 }
+
+
 
 Image*
 SimpleElastix
@@ -72,12 +90,16 @@ SimpleElastix
   return this->m_FixedImage;
 }
 
+
+
 void
 SimpleElastix
-::SetParameterMap( ParameterMapListType parameterMapList )
+::SetParameterMapList( ParameterMapListType parameterMapList )
 {
   this->m_ParameterMapList = parameterMapList;
 }
+
+
 
 void
 SimpleElastix
@@ -85,28 +107,34 @@ SimpleElastix
 {
   ParameterMapListType parameterMapList;
   parameterMapList.push_back( parameterMap );
-  this->SetParameterMap( parameterMapList );
+  this->SetParameterMapList( parameterMapList );
 }
+
+
 
 void
 SimpleElastix
-::AppendParameterMap( ParameterMapListType parameterMapList )
+::AddParameterMapList( ParameterMapListType parameterMapList )
 {
   this->m_ParameterMapList.insert( this->m_ParameterMapList.end(), 
                                    parameterMapList.begin(),
                                    parameterMapList.end() );
 }
 
+
+
 void
 SimpleElastix
-::AppendParameterMap( ParameterMapType parameterMap )
+::AddParameterMap( ParameterMapType parameterMap )
 {
   ParameterMapListType parameterMapList;
   parameterMapList.push_back( parameterMap );
-  this->AppendParameterMap( parameterMapList );
+  this->AddParameterMapList( parameterMapList );
 }
 
-SimpleElastix::ParameterMapListType
+
+
+typename SimpleElastix::ParameterMapListType
 SimpleElastix
 ::GetParameterMapList( void )
 {
@@ -114,19 +142,24 @@ SimpleElastix
 }
 
 
-SimpleElastix::ParameterMapType
+
+typename SimpleElastix::ParameterMapType
 SimpleElastix
 ::GetParameterMap( int n )
 {
   return this->m_ParameterMapList[ n ];
 }
 
-SimpleElastix::ParameterMapType
+
+
+typename SimpleElastix::ParameterMapType
 SimpleElastix
 ::GetParameterMap( void )
 {
   return this->GetParameterMap( this->m_ParameterMapList.size()-1 );
 }
+
+
 
 int
 SimpleElastix
@@ -135,7 +168,9 @@ SimpleElastix
   return this->m_ParameterMapList.size();
 }
 
-SimpleElastix::ParameterMapType
+
+
+typename SimpleElastix::ParameterMapType
 SimpleElastix
 ::ReadParameterFile( const std::string filename)
 {
@@ -153,73 +188,38 @@ SimpleElastix
   return parser->GetParameterMap();
 }
 
-void
+
+/*
+Image
 SimpleElastix
-::Run( void )
+::Execute( void )
 {
 
-  itk::DataObject::Pointer fixedImage = 0;
-  if( this->m_FixedImage->GetITKBase() )
-  {
-    typedef itk::ImageFileReader< TFixedImage > ReaderType;
-   
-    ReaderType::Pointer reader = ReaderType::New();
-    reader->SetFileName("01001_t1_cma.hdr");
+  const PixelIDValueEnum FixedImagePixelType = this->m_FixedImage->GetPixelID();
+  const unsigned int FixedImageDimension = this->m_FixedImage->GetDimension();
+  const PixelIDValueEnum MovingImagePixelType = this->m_FixedImage->GetPixelID();
 
-    fixedImage = static_cast< typename itk::DataObject::Pointer >( reader->GetOutput() );
-    fixedImage->SetRequestedRegionToLargestPossibleRegion();
-    fixedImage->Update();
-  }
-  else
+  if (this->m_DualMemberFactory->HasMemberFunction( FixedImagePixelType, MovingImagePixelType,  FixedImageDimension ) )
   {
-    sitkExceptionMacro( << "Fixed image is not set. Use SetFixedImage() or run Help() to get information on how to use this module." );
-  }
-
-  itk::DataObject::Pointer movingImage = 0;
-  if( this->m_MovingImage->GetITKBase() )
-  {
-    // TODO: Template casting away
-    itk::simple::CastImageFilter caster;
-    caster.SetOutputPixelType( itk::simple::sitkFloat32 );
-    (*this->m_MovingImage) = caster.Execute( (*this->m_MovingImage) );
-
-    TMovingImage::Pointer itkImage = CastImageToITK< TMovingImage >( this->m_MovingImage );
-    movingImage = static_cast< typename itk::DataObject::Pointer >( itkImage );
-  }
-  else
-  {
-    sitkExceptionMacro( << "Moving image is not set. Use SetMovingImage() or run Help() to get information on how to use this module." );
-  }
-
-  itk::DataObject::Pointer fixedMask = 0;
-  itk::DataObject::Pointer movingMask = 0;
-
-  int isError = 1;
-  try
-  {
-    isError = this->m_Elastix->RegisterImages(
-      fixedImage,
-      movingImage,
-      this->m_ParameterMapList,
-      this->m_LogFileName,
-      this->m_LogFileName != "",
-      this->m_LogToConsole,
-      fixedMask,
-      movingMask
+    return this->m_DualMemberFactory->GetMemberFunction(
+      FixedImagePixelType, 
+      MovingImagePixelType, 
+      FixedImageDimension
+    )
+    ( 
+      this->m_FixedImage, 
     );
   }
-  catch( itk::ExceptionObject &e )
-  {
-    sitkExceptionMacro( << e.what() );
-  }
 
-  if( isError != 0 )
-  {
-    sitkExceptionMacro( << "Errors occured during registration. Switch on logging to inspect." );
-  }
+  sitkExceptionMacro( << "SimpleElastix does not support the combination of fixed image type \""
+                      << itk::simple::GetPixelIDValueAsString (FixedImagePixelType) << "\" and moving image type \""
+                      << itk::simple::GetPixelIDValueAsString (MovingImagePixelType) << "\"." );
+
 }
+*/
 
-void
+
+Image*
 SimpleElastix
 ::GetResultImage( void )
 {
@@ -234,12 +234,16 @@ SimpleElastix
   }
 }
 
+
+
 void
 SimpleElastix
 ::LogToConsoleOn( void )
 {
   this->m_LogToConsole = true;
 }
+
+
 
 void
 SimpleElastix
@@ -248,6 +252,8 @@ SimpleElastix
   this->m_LogToConsole = false;
 }
 
+
+
 void
 SimpleElastix
 ::LogFileName( const std::string filename )
@@ -255,14 +261,18 @@ SimpleElastix
   this->m_LogFileName = filename;
 }
 
-SimpleElastix::ParameterMapType
+
+
+typename SimpleElastix::ParameterMapType
 SimpleElastix
 ::GetTransformParameterMap( void )
 {
   return this->m_Elastix->GetTransformParameterMap();
 }
 
-SimpleElastix::ParameterMapListType
+
+
+typename SimpleElastix::ParameterMapListType
 SimpleElastix
 ::GetTransformParameterMapList( void )
 {
@@ -270,13 +280,15 @@ SimpleElastix
 }
 
 /** Procedural interface */
+/*
 
-SimpleElastix::ParameterMapType
+typename ::ParameterMapType
 ReadParameterFile( const std::string filename )
 {
-  SimpleElastix elastix;
+   elastix;
   return elastix.ReadParameterFile( filename );
 }
+*/
 
 } // end namespace simple
 } // end namespace itk
