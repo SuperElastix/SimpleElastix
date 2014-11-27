@@ -4,6 +4,7 @@ include( ${ELASTIX_USE_FILE} )
 
 set( SimpleElastix
   selxSimpleElastix.cxx
+  selxSimpleElastix.hxx
 )
 
 add_library( SimpleElastix ${SimpleElastix} )

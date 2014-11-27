@@ -11,7 +11,7 @@ SimpleElastix
 
 Previously, using elastix and transformix on large datasets would incur a significant overhead from scripting command line invocations and arguments to copying images and transform parameter files across folders. With SimpleElastix this complexity is easier to manage and more memory and disk I/O efficient. 
 
-How does SimpleElastix accomplish this? Let's look at some code. Say you need to compare the volume, mean intensity and standard deviation of (possibly multiple) anatomical structures across a population of images using an atlas segmentation. The following lines of python code does this:
+What can SimpleElastix do for you? Let's look at some code. Say you need to compare the volume, mean intensity and standard deviation of (possibly multiple) anatomical structures across a population of images using an atlas segmentation. The following lines of python code does this:
 
 ```python
 import SimpleITK as sitk

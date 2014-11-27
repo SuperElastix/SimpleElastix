@@ -2,7 +2,7 @@
 #define __selxsimpleelastix_cxx_
 
 #include "selxSimpleElastix.h"
-
+#include "selxSimpleElastix.hxx"
 
 namespace itk {
   namespace simple {
@@ -13,12 +13,11 @@ SimpleElastix
 ::SimpleElastix( void )
 {
   // Register this class with SimpleITK
-  //m_DualMemberFactory.reset( new detail::DualMemberFunctionFactory< MemberFunctionType >( this ) );
-  //m_DualMemberFactory->RegisterMemberFunctions< PixelIDTypeList, PixelIDTypeList, 3, SimpleElastixAddressor< MemberFunctionType > >();
-  //m_DualMemberFactory->RegisterMemberFunctions< PixelIDTypeList, PixelIDTypeList, 2, SimpleElastixAddressor< MemberFunctionType > >();
+  m_DualMemberFactory.reset( new detail::DualMemberFunctionFactory< MemberFunctionType >( this ) );
+  m_DualMemberFactory->RegisterMemberFunctions< PixelIDTypeList, PixelIDTypeList, 3, SimpleElastixAddressor< MemberFunctionType > >();
+  m_DualMemberFactory->RegisterMemberFunctions< PixelIDTypeList, PixelIDTypeList, 2, SimpleElastixAddressor< MemberFunctionType > >();
 
   // This class holds data and configuration that is passed to elastix API when executed
-  this->m_Elastix = new ElastixLibType();
   this->m_FixedMask = 0;
   this->m_MovingImage = 0;
   this->m_FixedMask = 0;
@@ -32,7 +31,6 @@ SimpleElastix
 SimpleElastix
 ::~SimpleElastix( void )
 {
-  delete this->m_Elastix;
 }
 
 
@@ -79,15 +77,6 @@ SimpleElastix
 ::SetMovingMask( Image* movingMask )
 {
   this->m_MovingMask = movingMask;
-}
-
-
-
-Image*
-SimpleElastix
-::GetFixedImage( void )
-{
-  return this->m_FixedImage;
 }
 
 
@@ -145,18 +134,9 @@ SimpleElastix
 
 typename SimpleElastix::ParameterMapType
 SimpleElastix
-::GetParameterMap( int n )
-{
-  return this->m_ParameterMapList[ n ];
-}
-
-
-
-typename SimpleElastix::ParameterMapType
-SimpleElastix
 ::GetParameterMap( void )
 {
-  return this->GetParameterMap( this->m_ParameterMapList.size()-1 );
+  return this->m_ParameterMapList[ this->m_ParameterMapList.size()-1 ];
 }
 
 
@@ -172,7 +152,7 @@ SimpleElastix
 
 typename SimpleElastix::ParameterMapType
 SimpleElastix
-::ReadParameterFile( const std::string filename)
+::ReadParameterFile( const std::string filename )
 {
   ParameterFileParserPointer parser = ParameterFileParserType::New();
   parser->SetParameterFileName( filename );
@@ -189,49 +169,27 @@ SimpleElastix
 }
 
 
-/*
+
 Image
 SimpleElastix
 ::Execute( void )
 {
-
   const PixelIDValueEnum FixedImagePixelType = this->m_FixedImage->GetPixelID();
   const unsigned int FixedImageDimension = this->m_FixedImage->GetDimension();
   const PixelIDValueEnum MovingImagePixelType = this->m_FixedImage->GetPixelID();
 
+  std::cout << "Getting member function from factory ..." << std::endl;
   if (this->m_DualMemberFactory->HasMemberFunction( FixedImagePixelType, MovingImagePixelType,  FixedImageDimension ) )
   {
-    return this->m_DualMemberFactory->GetMemberFunction(
-      FixedImagePixelType, 
-      MovingImagePixelType, 
-      FixedImageDimension
-    )
-    ( 
-      this->m_FixedImage, 
-    );
+    std::cout << "Executing " << std::endl;
+    return this->m_DualMemberFactory->GetMemberFunction( FixedImagePixelType, MovingImagePixelType, FixedImageDimension ) // args to member factory
+                                                       ( this->m_FixedImage );                                            // args to member function
   }
 
   sitkExceptionMacro( << "SimpleElastix does not support the combination of fixed image type \""
-                      << itk::simple::GetPixelIDValueAsString (FixedImagePixelType) << "\" and moving image type \""
-                      << itk::simple::GetPixelIDValueAsString (MovingImagePixelType) << "\"." );
+                      << GetPixelIDValueAsString(FixedImagePixelType) << "\" and moving image type \""
+                      << GetPixelIDValueAsString(MovingImagePixelType) << "\"." );
 
-}
-*/
-
-
-Image*
-SimpleElastix
-::GetResultImage( void )
-{
-  if( this->m_Elastix->GetResultImage().IsNotNull() )
-  {
-    // TODO:
-    //return CastITKToImage( this->m_Elastix->GetResultImage() );
-  }
-  else
-  {
-    std::cout << "No result image found. Errors occured during registration or you need to call Run()." << std::endl;
-  }
 }
 
 
@@ -267,7 +225,7 @@ typename SimpleElastix::ParameterMapType
 SimpleElastix
 ::GetTransformParameterMap( void )
 {
-  return this->m_Elastix->GetTransformParameterMap();
+  return this->GetTransformParameterMapList()[ this->GetTransformParameterMapList().size()-1 ];
 }
 
 
@@ -276,7 +234,7 @@ typename SimpleElastix::ParameterMapListType
 SimpleElastix
 ::GetTransformParameterMapList( void )
 {
-  return this->m_Elastix->GetTransformParameterMapList();
+  return this->GetTransformParameterMapList();
 }
 
 /** Procedural interface */
