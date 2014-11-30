@@ -120,7 +120,7 @@ class SELX_EXPORT SimpleElastix
 
 };
 
-// SELX_EXPORT elastix::ELASTIX::ParameterMapType ReadParameterFile( const std::string filename );
+SELX_EXPORT SimpleElastix::ParameterMapType ReadParameterFile( const std::string filename );
 
 /** Procedural Interface 
 

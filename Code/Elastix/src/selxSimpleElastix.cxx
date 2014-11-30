@@ -189,7 +189,6 @@ SimpleElastix
   sitkExceptionMacro( << "SimpleElastix does not support the combination of fixed image type \""
                       << GetPixelIDValueAsString(FixedImagePixelType) << "\" and moving image type \""
                       << GetPixelIDValueAsString(MovingImagePixelType) << "\"." );
-
 }
 
 
@@ -237,16 +236,21 @@ SimpleElastix
   return this->GetTransformParameterMapList();
 }
 
-/** Procedural interface */
-/*
 
-typename ::ParameterMapType
+
+/**
+ * Procedural interface 
+ */
+
+
+
+typename SimpleElastix::ParameterMapType
 ReadParameterFile( const std::string filename )
 {
-   elastix;
+  SimpleElastix elastix;
   return elastix.ReadParameterFile( filename );
 }
-*/
+
 
 } // end namespace simple
 } // end namespace itk
