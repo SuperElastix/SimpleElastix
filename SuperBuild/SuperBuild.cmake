@@ -279,7 +279,7 @@ endif()
 #------------------------------------------------------------------------------
 
 include(External_Elastix)
-list(APPEND ${CMAKE_PROJECT_NAME}_DEPENDENCIES ELASTIX)
+list(APPEND ${CMAKE_PROJECT_NAME}_DEPENDENCIES elastix)
 
 
 #------------------------------------------------------------------------------
@@ -334,7 +334,7 @@ ExternalProject_Add(${proj}
     -DWRAP_LUA:BOOL=${WRAP_LUA}
     -DWRAP_PYTHON:BOOL=${WRAP_PYTHON}
     -DWRAP_RUBY:BOOL=${WRAP_RUBY}
-    -DWRAP_JAVA:BOOL=${WRAP_JAVA}
+    -DWRAP_JAVA:BOOL=OFF # ${WRAP_JAVA} fails out of the box. Disabled until upstream fix
     -DWRAP_TCL:BOOL=${WRAP_TCL}
     -DWRAP_CSHARP:BOOL=${WRAP_CSHARP}
     -DWRAP_R:BOOL=${WRAP_R}
@@ -363,7 +363,7 @@ include(External_SimpleITKExamples)
 #------------------------------------------------------------------------------
 # List of external projects
 #------------------------------------------------------------------------------
-set(external_project_list ITK Swig SimpleITKExamples PCRE ${CMAKE_PROJECT_NAME})
+set(external_project_list ITK Swig SimpleITKExamples PCRE elastix ${CMAKE_PROJECT_NAME})
 
 #-----------------------------------------------------------------------------
 # Dump external project dependencies

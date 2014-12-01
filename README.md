@@ -1,7 +1,7 @@
 SimpleElastix
 =============
 
-[Elastix](elastix.isi.uu.nl/download/elastix_manual_v4.7.pdf "elastix manual") is a powerful, state-of-the-art medical image registration library. The goal of SimpleElastix is to bring elatix's robust medical image registration algorithms to a wider audience by integrating [elastix](http://elastix.isi.uu.nl/ "Elastix website") with [SimpleITK](https://github.com/SimpleITK/SimpleITK "SimpleITK github repository"). SimpleElastix provides
+[Elastix](elastix.isi.uu.nl/download/elastix_manual_v4.7.pdf "elastix manual") is a powerful, state-of-the-art medical image registration library. The goal of SimpleElastix is to bring these robust medical image registration algorithms to a wider audience by integrating [elastix](http://elastix.isi.uu.nl/ "Elastix website") with [SimpleITK](https://github.com/SimpleITK/SimpleITK "SimpleITK github repository"). This package provides
 
 - elastix and transformix bindings for Python, Java, R, Ruby, Octave, Lua, Tcl and C#.
 - A user-friendly API that aligns with the design philosophy of SimpleITK, developed specifically for rapid prototyping and use in scripting languages. If you are interested, [The Design of SimpleITK](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3874546/ "PubMed") is a great read.
@@ -11,7 +11,7 @@ SimpleElastix
 
 Previously, using elastix and transformix on large datasets would incur a significant overhead from scripting command line invocations and arguments to copying images and transform parameter files across folders. With SimpleElastix this complexity is easier to manage and more memory and disk I/O efficient. 
 
-What can SimpleElastix do for you? Let's look at some code. Say you need to compare the volume, mean intensity and standard deviation of (possibly multiple) anatomical structures across a population of images using an atlas segmentation. The following lines of python code does this:
+Let's look at some code. Say you need to compare the volume, mean intensity and standard deviation of (possibly multiple) anatomical structures across a population of images using an atlas segmentation. This is accomplished using the following lines of Python code:
 
 ```python
 import SimpleITK as sitk
@@ -31,7 +31,7 @@ selx.SetParameterMap('defaultNonrigidRegistration')
 for fixedImage in population
   # Register images
   selx.SetFixedImage(sitk.ReadImage(fixedImage))
-  selx.Run()
+  selx.Execute()
 
   # Transform label map using the deformation field from above and compute statistics
   resultLabel = sitk.SimpleTransformix(movingLabel, selx.GetTransformParameters())
@@ -87,7 +87,7 @@ selx.SetMovingImage(image4d)
 p = selx.GetDefaultGroupwiseNonRigidParameters()
 p['MaximumNumberOfIterations'] = '1024'
 selx.SetParameterMap(p)
-selx.Run()
+selx.Execute()
 ```
 
 ### Parameter Maps
@@ -115,7 +115,7 @@ plist[1]['Transform'] = 'BSplineTransform'
 
 # Passing the above list will cause elastix to run an affine initialization followed by a nonrigid registration
 selx.SetParameterMap( plist ) 
-selx.Run()  
+selx.Execute()  
 ```
 
 At the moment, the elastix library API does not support using multiple fixed and moving images so SimpleElastix doesn't either.

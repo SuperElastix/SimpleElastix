@@ -109,7 +109,7 @@ enum PixelIDValueEnum {
   sitkLabelUInt64 = PixelIDToPixelIDValue< LabelPixelID<uint64_t> >::Result, //< RLE label of unsigned 64 bit integers
 };
 
-
+const std::string SITKCommon_EXPORT GetPixelIDValueAsElastixParameter( PixelIDValueType type );
 
 const std::string SITKCommon_EXPORT GetPixelIDValueAsString( PixelIDValueType type );
 const std::string SITKCommon_EXPORT GetPixelIDValueAsString( PixelIDValueEnum type );

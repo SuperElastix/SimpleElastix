@@ -25,11 +25,15 @@ class SELX_EXPORT SimpleElastix
     typedef BasicPixelIDTypeList  PixelIDTypeList;
 
     // typedefs inherited from elastix library api
-    typedef elastix::ELASTIX                      ElastixLibType;
-    typedef ElastixLibType::ParameterMapType      ParameterMapType;
-    typedef ElastixLibType::ParameterMapListType  ParameterMapListType;
-    typedef itk::ParameterFileParser              ParameterFileParserType;
-    typedef ParameterFileParserType::Pointer      ParameterFileParserPointer;
+    typedef elastix::ELASTIX                                ElastixLibType;
+    typedef itk::ParameterFileParser::ParameterMapType      ParameterMapType;
+    typedef ParameterMapType::iterator                      ParameterMapIterator;
+    typedef std::vector< ParameterMapType >                 ParameterMapListType;
+    typedef ParameterMapListType::iterator                  ParameterMapListIterator;
+    typedef std::string                                     ParameterKeyType;
+    typedef itk::ParameterFileParser::ParameterValuesType   ParameterValuesType;
+    typedef itk::ParameterFileParser                        ParameterFileParserType;
+    typedef ParameterFileParserType::Pointer                ParameterFileParserPointer;
 
     // To be wrapped by SWIG
 
@@ -64,6 +68,8 @@ class SELX_EXPORT SimpleElastix
     void LogFileName( const std::string filename ); 
  
   private:
+
+    void Put(ParameterMapType* parameterMap, std::string key, std::string value);
 
     template< class TImageType >
     static typename TImageType::Pointer CastImageToITK( Image* image )
@@ -102,7 +108,6 @@ class SELX_EXPORT SimpleElastix
       };
     #endif
 
-
     // Functions to register SimpleElastix with SimpleITK member factory
     typedef Image ( Self::*MemberFunctionType )( const Image* fixedImage );
     std::auto_ptr< detail::DualMemberFunctionFactory< MemberFunctionType > > m_DualMemberFactory;
@@ -130,5 +135,16 @@ SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, ParameterMapType
 
 } // end namespace simple
 } // end namespace itk
+
+// Avoid dependency on c++0x and above
+namespace std
+{
+  template < typename T > std::string to_string( const T& n )
+  {
+    std::ostringstream stm;
+    stm << n;
+    return stm.str();
+  }
+}
 
 #endif // __selxsimpleelastix_h_

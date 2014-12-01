@@ -4,7 +4,7 @@
 set(proj SimpleITKExamples)
 
 # Set dependency list
-set(SimpleITKExamples_DEPENDENCIES "SimpleITK" "ELASTIX")
+set(SimpleITKExamples_DEPENDENCIES "SimpleITK" "elastix")
 
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${proj}-build/CMakeCacheInit.txt" "${ep_common_cache}" )
 

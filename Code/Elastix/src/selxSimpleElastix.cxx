@@ -178,10 +178,8 @@ SimpleElastix
   const unsigned int FixedImageDimension = this->m_FixedImage->GetDimension();
   const PixelIDValueEnum MovingImagePixelType = this->m_FixedImage->GetPixelID();
 
-  std::cout << "Getting member function from factory ..." << std::endl;
   if (this->m_DualMemberFactory->HasMemberFunction( FixedImagePixelType, MovingImagePixelType,  FixedImageDimension ) )
   {
-    std::cout << "Executing " << std::endl;
     return this->m_DualMemberFactory->GetMemberFunction( FixedImagePixelType, MovingImagePixelType, FixedImageDimension ) // args to member factory
                                                        ( this->m_FixedImage );                                            // args to member function
   }
@@ -234,6 +232,21 @@ SimpleElastix
 ::GetTransformParameterMapList( void )
 {
   return this->GetTransformParameterMapList();
+}
+
+void
+SimpleElastix
+::Put(ParameterMapType* parameterMap, ParameterKeyType key, const std::string value)
+{
+  ParameterValuesType parameterValue;
+  parameterValue.push_back( value );
+  std::pair< ParameterKeyType, ParameterValuesType > parameter = std::make_pair< ParameterKeyType, ParameterValuesType >( key, parameterValue );
+  std::pair< ParameterMapIterator, bool > result;
+  result = parameterMap->insert( parameter );
+  if( !result.second )
+  {
+    result.first->second = parameterValue;
+  }
 }
 
 
