@@ -133,4 +133,4 @@ ccmake ../SimpleElastix/SuperBuild
 make -j4
 ```
 
-SimpleElastix will be compiled along with any dependencies (elastix, ITK, SimpleITK, SWIG and target language dependencies) are downloaded on the fly.
+SimpleElastix will be compiled along with any dependencies (elastix, ITK, SimpleITK, SWIG and target language dependencies). These are downloaded on the fly.

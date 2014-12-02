@@ -37,18 +37,14 @@ SimpleElastix::ExecuteInternal( void )
     movingMask = this->m_MovingMask->GetITKBase();
   }
 
-  // Parameter file configurations
-  for( unsigned int i = 0; i < this->m_ParameterMapList.size(); ++i )
-  {
-    // Parameter file must match fixed and moving image dimensions and pixel types
-    this->Put( &this->m_ParameterMapList[ i ], "FixedInternalImagePixelType", GetPixelIDValueAsElastixParameter( this->m_FixedImage->GetPixelID() ) );
-    this->Put( &this->m_ParameterMapList[ i ], "MovingInternalImagePixelType", GetPixelIDValueAsElastixParameter( this->m_MovingImage->GetPixelID() ) );
-    this->Put( &this->m_ParameterMapList[ i ], "FixedImageDimension", std::to_string( this->m_FixedImage->GetDimension() ) );
-    this->Put( &this->m_ParameterMapList[ i ], "MovingImageDimension", std::to_string( this->m_MovingImage->GetDimension() ) );
+  // Parameter file must match fixed and moving image dimensions and pixel types
+  this->Put( "FixedInternalImagePixelType", GetPixelIDValueAsElastixParameter( this->m_FixedImage->GetPixelID() ) );
+  this->Put( "MovingInternalImagePixelType", GetPixelIDValueAsElastixParameter( this->m_MovingImage->GetPixelID() ) );
+  this->Put( "FixedImageDimension", std::to_string( this->m_FixedImage->GetDimension() ) );
+  this->Put( "MovingImageDimension", std::to_string( this->m_MovingImage->GetDimension() ) );
 
-    // Elastix library always uses direction cosines
-    this->Put( &this->m_ParameterMapList[ i ], "UseDirectionCosines", "true" );
-  }
+  // Elastix library always uses direction cosines
+  this->Put( "UseDirectionCosines", "true" );
 
   // Do the (possibly multiple) registrations
   int isError = 1;
@@ -77,7 +73,7 @@ SimpleElastix::ExecuteInternal( void )
   {
     TResultImage* itkResultImage = static_cast< TResultImage* >( elastix->GetResultImage().GetPointer() );
     this->m_ResultImage = Image( itkResultImage );
-    this->m_TransformParameters = elastix->GetTransformParameterMapList();
+    this->SetParameterMapList( elastix->GetTransformParameterMapList() );
   }
 
   delete elastix;
