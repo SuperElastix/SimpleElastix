@@ -9,6 +9,7 @@ before_install:
   - date -u
   - uname -a
   - $CXX --version
+  - sudo add-apt-repository ppa:kalakris/cmake
   - sudo apt-get -qq update
   - sudo apt-get install cmake swig monodevelop r-base r-base-dev ruby python python-dev tcl tcl-dev tk tk-dev
   - cd ..
