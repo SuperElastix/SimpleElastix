@@ -1,0 +1,20 @@
+language: cpp
+
+compiler:
+  - gcc
+  - clang
+
+before_install:
+  - pwd
+  - date -u
+  - uname -a
+  - $CXX --version
+  - sudo apt-get -qq update
+  - sudo apt-get install cmake swig monodevelop r-base r-base-dev ruby python python-dev tcl tcl-dev tk tk-dev
+  - cd ..
+
+script:
+  - mkdir SimpleElastix-SuperBuild
+  - cd SimpleElastix-SuperBuild
+  - cmake -DBUILD_EXAMPLES:BOOL=OFF -DBUILD_TESTING:BOOL=OFF -DWRAP_PYTHON:BOOL=ON -DWRAP_JAVA:BOOL=OFF -DWRAP_R:BOOL=OFF -DWRAP_CSHARP:BOOL=OFF -DWRAP_LUA:BOOL=OFF -DWRAP_TCL=BOOL=OFF -DWRAP_RUBY:BOOL=OFF ../SimpleElastix
+  - make -j2
