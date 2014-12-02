@@ -9,9 +9,9 @@
 namespace itk {
   namespace simple {
 
-template<typename TFixedImage, typename TMovingImage>
+template<typename TResultImage >
 Image
-SimpleElastix::ExecuteInternal( const Image* fixedImageDummy )
+SimpleElastix::ExecuteInternal( void )
 {
   // Assert images are set
   if( this->m_FixedImage == 0 )
@@ -24,7 +24,7 @@ SimpleElastix::ExecuteInternal( const Image* fixedImageDummy )
     sitkExceptionMacro( << "Moving image is not set. Use SetMovingImage() or run Help() to get information on how to use this module." );
   }
 
-  // Masks are optional
+  // Get masks if set (masks are optional)
   itk::DataObject::Pointer fixedMask = 0;
   if( this->m_FixedMask != 0 )
   {
@@ -37,22 +37,22 @@ SimpleElastix::ExecuteInternal( const Image* fixedImageDummy )
     movingMask = this->m_MovingMask->GetITKBase();
   }
 
-  // Ensure parameterfile matches image types and dimensions
-  const std::string FixedImagePixelType = GetPixelIDValueAsElastixParameter( this->m_FixedImage->GetPixelID() );
-  const std::string MovingImagePixelType = GetPixelIDValueAsElastixParameter( this->m_FixedImage->GetPixelID() );
-  const std::string FixedImageDimension = std::to_string( this->m_FixedImage->GetDimension() );
-  const std::string MovingImageDimension = std::to_string( this->m_MovingImage->GetDimension() );
+  // Parameter file configurations
   for( unsigned int i = 0; i < this->m_ParameterMapList.size(); ++i )
   {
-    //Put( &this->m_ParameterMapList[ i ], "FixedInternalImagePixelType", FixedImagePixelType);
-    //Put( &this->m_ParameterMapList[ i ], "MovingInternalImagePixelType", MovingImagePixelType);
-    //Put( &this->m_ParameterMapList[ i ], "FixedImageDimension", FixedImageDimension);
-    //Put( &this->m_ParameterMapList[ i ], "MovingImageDimension", FixedImageDimension);
+    // Parameter file must match fixed and moving image dimensions and pixel types
+    this->Put( &this->m_ParameterMapList[ i ], "FixedInternalImagePixelType", GetPixelIDValueAsElastixParameter( this->m_FixedImage->GetPixelID() ) );
+    this->Put( &this->m_ParameterMapList[ i ], "MovingInternalImagePixelType", GetPixelIDValueAsElastixParameter( this->m_MovingImage->GetPixelID() ) );
+    this->Put( &this->m_ParameterMapList[ i ], "FixedImageDimension", std::to_string( this->m_FixedImage->GetDimension() ) );
+    this->Put( &this->m_ParameterMapList[ i ], "MovingImageDimension", std::to_string( this->m_MovingImage->GetDimension() ) );
+
+    // Elastix library always uses direction cosines
+    this->Put( &this->m_ParameterMapList[ i ], "UseDirectionCosines", "true" );
   }
 
   // Do the (possibly multiple) registrations
   int isError = 1;
-  ElastixLibType* elastix = new ElastixLibType();
+  libelastix* elastix = new libelastix();
   try
   {
     isError = elastix->RegisterImages(
@@ -60,7 +60,7 @@ SimpleElastix::ExecuteInternal( const Image* fixedImageDummy )
       this->m_MovingImage->GetITKBase(),
       this->m_ParameterMapList,
       this->m_LogFileName,
-      this->m_LogFileName != "",
+      this->m_LogFileName != "output_path_not_set",
       this->m_LogToConsole,
       fixedMask,
       movingMask
@@ -68,32 +68,27 @@ SimpleElastix::ExecuteInternal( const Image* fixedImageDummy )
   }
   catch( itk::ExceptionObject &e )
   {
-    if( elastix )
-    {
-      delete elastix;
-      elastix = NULL;
-    }
-
+    delete elastix;
+    elastix = NULL;
     sitkExceptionMacro( << "Errors occured during registration: " << e.what() );
   }
 
   if( isError == 0 && elastix->GetResultImage().IsNotNull() )
   {
-    // TODO: Cast and set this->m_ResultImage
+    TResultImage* itkResultImage = static_cast< TResultImage* >( elastix->GetResultImage().GetPointer() );
+    this->m_ResultImage = Image( itkResultImage );
     this->m_TransformParameters = elastix->GetTransformParameterMapList();
   }
-  else
+
+  delete elastix;
+  elastix = NULL;
+
+  if( isError != 0 )
   {
     sitkExceptionMacro( << "Errors occured during registration. Set LogToConsoleOn() or LogToFile(\"path/to/file\") to inspect errors." );
   }
 
-  if( elastix )
-  {
-    delete elastix;
-    elastix = NULL;
-  }
-
-  return *fixedImageDummy;
+  return this->m_ResultImage;
 }
 
 

@@ -157,25 +157,33 @@ const std::string GetPixelIDValueAsElastixParameter( PixelIDValueType type )
     }
   else if ( type == sitkUInt8 )
     {
-    return "unsigned short";
+    return "unsigned char";
     }
   else if ( type == sitkInt8 )
     {
-    return "short";
+    return "char";
     }
   else if ( type ==  sitkUInt16 )
     {
-    return "unsigned int";
+    return "unsigned short";
     }
   else if ( type == sitkInt16 )
     {
-    return "int";
+    return "short";
     }
   else if ( type == sitkUInt32 )
     {
-    return "unsigned long";
+    return "unsigned int";
     }
   else if ( type == sitkInt32 )
+    {
+    return "int";
+    }
+  else if ( type == sitkUInt64 )
+    {
+    return "unsigned long";
+    }
+  else if ( type == sitkInt64 )
     {
     return "long";
     }
@@ -189,7 +197,8 @@ const std::string GetPixelIDValueAsElastixParameter( PixelIDValueType type )
     }
   else
     {
-    return "Unsupported pixel type. For elastix support, cast image to short, unsigned short, int, unsigned int, long, unsigned long, float or double.";
+    return "Unsupported pixel type. For elastix support, cast image to sitkUInt8, sitkInt8, sitkUInt16, "
+           "sitkInt16, sitkUInt32, sitkInt32, sitkInt64, sitkUInt64, sitkFloat32 or sitkFloat64 (double).";
     }
 }
 

@@ -1,9 +1,9 @@
 SimpleElastix
 =============
 
-[Elastix](elastix.isi.uu.nl/download/elastix_manual_v4.7.pdf "elastix manual") is a powerful, state-of-the-art medical image registration library. The goal of SimpleElastix is to bring these robust medical image registration algorithms to a wider audience by integrating [elastix](http://elastix.isi.uu.nl/ "Elastix website") with [SimpleITK](https://github.com/SimpleITK/SimpleITK "SimpleITK github repository"). This package provides
+The goal of SimpleElastix is to bring the robust medical image registration algorithms of [elastix](http://elastix.isi.uu.nl/ "Elastix website") to a wider audience by integrating elastix with [SimpleITK](https://github.com/SimpleITK/SimpleITK "SimpleITK github repository"). This package provides
 
-- elastix and transformix bindings for Python, Java, R, Ruby, Octave, Lua, Tcl and C#.
+- elastix and transformix bindings for Python, Java, R, Ruby, Octave, Lua, Tcl and C# (see [elastix manual](elastix.isi.uu.nl/download/elastix_manual_v4.7.pdf "elastix manual" for supported algorithms).
 - A user-friendly API that aligns with the design philosophy of SimpleITK, developed specifically for rapid prototyping and use in scripting languages. If you are interested, [The Design of SimpleITK](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3874546/ "PubMed") is a great read.
 - Pre-configured parameter files that should serve as good starting points for new users.
 - The complete set of SimpleITK image processing algorithms.
@@ -29,7 +29,7 @@ selx.SetParameterMap('defaultNonrigidRegistration')
 
 # Warp the segmentation to each image in the population
 for fixedImage in population
-  # Register images
+  # Register imagee
   selx.SetFixedImage(sitk.ReadImage(fixedImage))
   selx.Execute()
 

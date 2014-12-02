@@ -2,18 +2,19 @@
 #define __selxsimpleelastix_h_
 
 // SimpleITK
-#include "sitkImage.h"
-#include "sitkPixelIDTokens.h"
-#include "sitkDualMemberFunctionFactory.h"
 #include "sitkSimpleElastix.h"
+#include "sitkPixelIDTokens.h"
+#include "sitkImage.h"
+#include "sitkMemberFunctionFactory.h"
 
 // SimpleElastix
+#include "selxParameterMapInterface.h"
 #include "elastixlib.h"
 
 namespace itk {
   namespace simple {
 
-class SELX_EXPORT SimpleElastix
+class SELX_EXPORT SimpleElastix : ParameterMapInterface
 {
   public:
 
@@ -25,7 +26,7 @@ class SELX_EXPORT SimpleElastix
     typedef BasicPixelIDTypeList  PixelIDTypeList;
 
     // typedefs inherited from elastix library api
-    typedef elastix::ELASTIX                                ElastixLibType;
+    typedef elastix::ELASTIX                                libelastix;
     typedef itk::ParameterFileParser::ParameterMapType      ParameterMapType;
     typedef ParameterMapType::iterator                      ParameterMapIterator;
     typedef std::vector< ParameterMapType >                 ParameterMapListType;
@@ -45,72 +46,56 @@ class SELX_EXPORT SimpleElastix
     void SetFixedMask( Image* fixedMask );
     void SetMovingMask( Image* movingMask );
 
-    // Parameter Maps
+    // Register images
+    Image Execute( void );
+
+    // Get result
+    Image GetResultImage( void );
+    ParameterMapType GetParameterMap( void );
+    ParameterMapListType GetParameterMapList( void );
+
+    // TODO: Move to common class
+    void LogToConsoleOn( void );
+    void LogToConsoleOff( void );
+    void LogFileName( const std::string filename );
+
+    // TODO: Move to parameter map class
     void SetParameterMapList( ParameterMapListType parameterMapList );
     void SetParameterMap( ParameterMapType parameterMap );
     void AddParameterMapList( ParameterMapListType parameterMapList );
     void AddParameterMap( ParameterMapType parameterMap );
-    ParameterMapListType GetParameterMapList( void );
-    ParameterMapType GetParameterMap( void );
     int GetNumberOfParameterMaps( void );
     ParameterMapType ReadParameterFile( const std::string filename );
 
-    // Register images
-    Image Execute( void );
-
-    // Get resultpyh
+    // TODO: Make transformix class
     ParameterMapType GetTransformParameterMap( void );
     ParameterMapListType GetTransformParameterMapList( void );
-
-    // Logging
-    void LogToConsoleOn( void );
-    void LogToConsoleOff( void );
-    void LogFileName( const std::string filename ); 
  
   private:
 
     void Put(ParameterMapType* parameterMap, std::string key, std::string value);
 
-    template< class TImageType >
-    static typename TImageType::Pointer CastImageToITK( Image* image )
-    {
-      typename TImageType::Pointer itkImage = dynamic_cast< TImageType* >( image->GetITKBase() );
- 
-      if ( itkImage.IsNull() )
-      {
-        sitkExceptionMacro( "Error casting image to internal type." );
-      }
-
-      return itkImage;
-    }
-
-    template< class TImageType >
-    static Image CastITKToImage( TImageType* itkImage )
-    {
-      return Image( itkImage );
-    }
-
-    template< typename TFixedImage, typename TMovingImage >
-    Image ExecuteInternal( const Image* fixedImage );
+    template< typename TResultImage >
+    Image ExecuteInternal( void );
 
     // An addressor of this class to be utilized with registering member functions with the factory.
     #ifndef SWIG
       template < class TMemberFunctionPointer >
       struct SimpleElastixAddressor
       {
-        typedef typename ::detail::FunctionTraits<TMemberFunctionPointer>::ClassType ObjectType;
+        typedef typename ::detail::FunctionTraits< TMemberFunctionPointer >::ClassType ObjectType;
 
-        template< typename TFixedImage, typename TMovingImage >
+        template< typename TResultImage >
         TMemberFunctionPointer operator() ( void ) const
         {
-          return &ObjectType::template ExecuteInternal< TFixedImage, TMovingImage >;
+          return &ObjectType::template ExecuteInternal< TResultImage >;
         }
       };
     #endif
 
     // Functions to register SimpleElastix with SimpleITK member factory
-    typedef Image ( Self::*MemberFunctionType )( const Image* fixedImage );
-    std::auto_ptr< detail::DualMemberFunctionFactory< MemberFunctionType > > m_DualMemberFactory;
+    typedef Image ( Self::*MemberFunctionType )( void );
+    std::auto_ptr< detail::MemberFunctionFactory< MemberFunctionType > > m_MemberFactory;
 
     // This class holds data and configuration that is passed to elastix API when run
     Image*                 m_FixedImage;

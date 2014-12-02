@@ -13,17 +13,18 @@ SimpleElastix
 ::SimpleElastix( void )
 {
   // Register this class with SimpleITK
-  m_DualMemberFactory.reset( new detail::DualMemberFunctionFactory< MemberFunctionType >( this ) );
-  m_DualMemberFactory->RegisterMemberFunctions< PixelIDTypeList, PixelIDTypeList, 3, SimpleElastixAddressor< MemberFunctionType > >();
-  m_DualMemberFactory->RegisterMemberFunctions< PixelIDTypeList, PixelIDTypeList, 2, SimpleElastixAddressor< MemberFunctionType > >();
+  m_MemberFactory.reset( new detail::MemberFunctionFactory< MemberFunctionType >( this ) );
+  m_MemberFactory->RegisterMemberFunctions< PixelIDTypeList, 3, SimpleElastixAddressor< MemberFunctionType > >();
+  m_MemberFactory->RegisterMemberFunctions< PixelIDTypeList, 2, SimpleElastixAddressor< MemberFunctionType > >();
 
   // This class holds data and configuration that is passed to elastix API when executed
   this->m_FixedMask = 0;
   this->m_MovingImage = 0;
   this->m_FixedMask = 0;
   this->m_MovingMask = 0;
+  this->m_ResultImage = Image();
   this->m_ParameterMapList = ParameterMapListType();
-  this->m_LogFileName = "";
+  this->m_LogFileName = "output_path_not_set";
   this->m_LogToConsole = false;
 }
 
@@ -176,17 +177,24 @@ SimpleElastix
 {
   const PixelIDValueEnum FixedImagePixelType = this->m_FixedImage->GetPixelID();
   const unsigned int FixedImageDimension = this->m_FixedImage->GetDimension();
-  const PixelIDValueEnum MovingImagePixelType = this->m_FixedImage->GetPixelID();
 
-  if (this->m_DualMemberFactory->HasMemberFunction( FixedImagePixelType, MovingImagePixelType,  FixedImageDimension ) )
+  if (this->m_MemberFactory->HasMemberFunction( FixedImagePixelType, FixedImageDimension ) )
   {
-    return this->m_DualMemberFactory->GetMemberFunction( FixedImagePixelType, MovingImagePixelType, FixedImageDimension ) // args to member factory
-                                                       ( this->m_FixedImage );                                            // args to member function
+    return this->m_MemberFactory->GetMemberFunction( FixedImagePixelType, FixedImageDimension )();
   }
 
-  sitkExceptionMacro( << "SimpleElastix does not support the combination of fixed image type \""
-                      << GetPixelIDValueAsString(FixedImagePixelType) << "\" and moving image type \""
-                      << GetPixelIDValueAsString(MovingImagePixelType) << "\"." );
+  sitkExceptionMacro( << "SimpleElastix does not support image type \""
+                      << GetPixelIDValueAsString(FixedImagePixelType) << "\" ("
+                      << GetPixelIDValueAsElastixParameter(FixedImagePixelType << ")." );
+}
+
+
+
+Image 
+SimpleElastix
+::GetResultImage( void )
+{
+  return this->m_ResultImage;
 }
 
 
