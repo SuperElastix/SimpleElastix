@@ -18,4 +18,4 @@ script:
   - mkdir SimpleElastix-build
   - cd SimpleElastix-build
   - cmake -DBUILD_EXAMPLES:BOOL=OFF -DBUILD_TESTING:BOOL=OFF -DWRAP_PYTHON:BOOL=ON -DWRAP_JAVA:BOOL=OFF -DWRAP_R:BOOL=OFF -DWRAP_CSHARP:BOOL=OFF -DWRAP_LUA:BOOL=OFF -DWRAP_TCL=BOOL=OFF -DWRAP_RUBY:BOOL=OFF ../SimpleElastix/SuperBuild
-  - make -j2
+  - make -j2 | grep -v '^--' | grep -v '^Installing'
