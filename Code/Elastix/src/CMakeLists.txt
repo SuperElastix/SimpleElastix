@@ -5,6 +5,7 @@ include( ${ELASTIX_USE_FILE} )
 set( SimpleElastix
   selxSimpleElastix.cxx
   selxSimpleElastix.hxx
+  selxParameterMapInterface.cxx
 )
 
 add_library( SimpleElastix ${SimpleElastix} )

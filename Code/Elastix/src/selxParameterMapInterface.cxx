@@ -1,6 +1,7 @@
 #ifndef __selxparametermapinterface_cxx_
 #define __selxparametermapinterface_cxx_
 
+#include "SimpleITK.h"
 #include "selxParameterMapInterface.h"
 
 namespace itk {
@@ -12,7 +13,7 @@ ParameterMapInterface
 ::ParameterMapInterface( void )
 {
     // This class holds image data that is passed to elastix API when executed
-    this->m_ParameterMapList = new ParameterMapListType();
+    this->m_ParameterMapList = ParameterMapListType();
 }
 
 
@@ -20,8 +21,6 @@ ParameterMapInterface
 ParameterMapInterface
 ::~ParameterMapInterface( void )
 {
-    // This class holds image data that is passed to elastix API when executed
-    delete this->ParameterMapList;
 }
 
 
@@ -63,23 +62,77 @@ void
 ParameterMapInterface
 ::AddParameterMap( ParameterMapType parameterMap )
 {
-  this->Create( parameterMapList );
+  this->Create( parameterMap );
 }
 
 
 
-int
+ParameterMapInterface::ParameterMapListType
 ParameterMapInterface
-::GetNumberOfParameterMaps( void )
+::GetParameterMapList( void )
 {
-  return this->ReadParameterMapList.size();
+  return this->ReadParameterMapList();
 }
 
 
 
 ParameterMapInterface::ParameterMapType
 ParameterMapInterface
-::ReadParameterFile( const std::string filename )
+::GetParameterMap( unsigned int n )
+{
+  return this->ReadParameterMap( n );
+}
+
+
+
+ParameterMapInterface::ParameterMapType
+ParameterMapInterface
+::GetParameterMap( void )
+{
+  return this->ReadParameterMap( this->GetNumberOfParameterMaps()-1 );
+}
+
+
+
+void
+ParameterMapInterface
+::DeleteParameterMapList( void )
+{
+    this->Delete();
+}
+
+
+
+void
+ParameterMapInterface
+::DeleteParameterMap( unsigned int n )
+{
+    this->Delete( n );
+}
+
+
+
+void
+ParameterMapInterface
+::DeleteParameterMap( void )
+{
+    this->DeleteParameterMap( this->GetNumberOfParameterMaps()-1 );
+}
+
+
+
+unsigned int
+ParameterMapInterface
+::GetNumberOfParameterMaps( void )
+{
+  return this->ReadParameterMapList().size();
+}
+
+
+
+ParameterMapInterface::ParameterMapType
+ParameterMapInterface
+::ParameterFileReader( const std::string filename )
 {
   ParameterFileParserPointer parser = ParameterFileParserType::New();
   parser->SetParameterFileName( filename );
@@ -98,7 +151,7 @@ ParameterMapInterface
 
 
 /**
- * CRUD internal interface 
+ * CRUD-style internal interface 
  */
 
 
@@ -107,16 +160,9 @@ void
 ParameterMapInterface
 ::Create( ParameterMapListType parameterMapList )
 {
-    if( this->ReadParameterMapList().size() == 0 )
-    {
-        this->ReadParameterMapList().push_back( this->m_ParameterMapList.end(), 
-                                                parameterMapList.begin(), 
-                                                parameterMapList.end() );
-    }
-    else
-    {
-        sitkExceptinMacro( << "Error creating new parameter map list: Parameter maps already exist." );
-    }
+    this->ReadParameterMapList().insert( this->ReadParameterMapList().end(), 
+                                         parameterMapList.begin(), 
+                                         parameterMapList.end() );
 }
 
 
@@ -134,13 +180,11 @@ ParameterMapInterface
 
 void
 ParameterMapInterface
-::Create( unsigned int n, std::string key, ParameterValuesType value )
+::Create( std::string key, ParameterValuesType value )
 {
-    std::pair< ParameterMapIterator, bool > isError;
-    isError = this->ReadParameterMap( n ).emplace( key, value );
-    if( !isError.second ) 
+    for( unsigned int i = 0; i < this->ReadParameterMapList().size(); ++i )
     {
-        sitkExceptinMacro( << "Error creating parameter: Parameter already exists." );
+        this->Create( i, key, value );
     }
 }
 
@@ -148,11 +192,13 @@ ParameterMapInterface
 
 void
 ParameterMapInterface
-::Create( std::string key, ParameterValuesType value )
+::Create( unsigned int n, std::string key, ParameterValuesType value )
 {
-    for( unsigned int i = 0; i < this->ReadParameterMapList().size() )
+    std::pair< ParameterMapIterator, bool > isError;
+    isError = this->ReadParameterMap( n ).insert( std::make_pair( key, value ) );
+    if( !isError.second ) 
     {
-        this->Create( i, std::string key, ParameterValuesType value );
+        sitkExceptionMacro( << "Error creating parameter: Parameter already exists." );
     }
 }
 
@@ -163,7 +209,7 @@ ParameterMapInterface
 ::Create( unsigned int n, std::string key, std::string value )
 {
     ParameterValuesType vectorValue;
-    vectorValue.push_back( value )
+    vectorValue.push_back( value );
     this->Create( n, key, vectorValue );
 }
 
@@ -174,7 +220,7 @@ ParameterMapInterface
 ::Create( std::string key, std::string value )
 {
     ParameterValuesType vectorValue;
-    vectorValue.push_back( value )
+    vectorValue.push_back( value );
     this->Create( key, vectorValue );
 }
 
@@ -195,31 +241,22 @@ ParameterMapInterface
 {
     if( !(this->m_ParameterMapList.size() < n) )
     {
-        sitkExceptinMacro( << "Error: Parameter map id exceeds number of parameter maps in list." );
+        sitkExceptionMacro( << "Error: Parameter map id exceeds number of parameter maps in list." );
     }
     return this->m_ParameterMapList[ n ];
 }
 
 
 
-typename ParameterMapInterface::ParameterMapType
-ParameterMapInterface
-::ReadParameterMap( void )
-{
-    return this->m_ParameterMapList[ this->ParameterMapList.size()-1 ];
-}
-
-
-
 typename ParameterMapInterface::ParameterValuesType
 ParameterMapInterface
-::ReadParameter( unsigned int n, std::string key );
+::ReadParameter( unsigned int n, std::string key )
 {
-    if( !(this->m_ParameterMapList.size() < n) )
+    if( !(this->ReadParameterMapList().size() < n) )
     {
-        sitkExceptinMacro( << "Error: Parameter map id exceeds number of parameter maps in list." );
+        sitkExceptionMacro( << "Error: Parameter map id exceeds number of parameter maps in list." );
     }
-    return this->m_ParameterMapList[ n ][ key ];
+    return this->ReadParameterMap( n )[ key ];
 }
 
 
@@ -228,7 +265,7 @@ typename ParameterMapInterface::ParameterValuesType
 ParameterMapInterface
 ::ReadParameter( std::string key )
 {
-    return this->m_ParameterMapList[ this->ParameterMapList.size()-1 ][ key ];
+    return this->ReadParameterMap( this->GetNumberOfParameterMaps()-1 )[ key ];
 }
 
 
@@ -237,18 +274,23 @@ void
 ParameterMapInterface
 ::Update( unsigned int n, ParameterMapType parameterMap )
 {
-    ParameterMapIterator iterator = this->parameterMap.begin();
-    ParameterMapIterator iteratorEnd = this->parameterMap.end();
+    if( !(this->GetNumberOfParameterMaps() < n) )
+    {
+        sitkExceptionMacro( << "Error: Parameter map id exceeds number of parameter maps in list." );
+    }
+
+    ParameterMapIterator iterator = parameterMap.begin();
+    ParameterMapIterator iteratorEnd = parameterMap.end();
     while( iterator != iteratorEnd )
     {
-        ParameterMapIterator pos = find( iterator->first );
+        ParameterMapIterator pos = this->ReadParameterMap( n ).find( iterator->first );
         if( pos != iteratorEnd )
         {
             this->ReadParameterMap( n )[ iterator->first ] = iterator->second;
         }
         else
         {
-            sitkExceptinMacro( << "Error updating parameter: \"" << iterator->first << "\" does not exist in parameter map " << n << "." );
+            sitkExceptionMacro( << "Error updating parameter: \"" << iterator->first << "\" does not exist in parameter map " << n << "." );
         }
         
     }
@@ -273,8 +315,8 @@ ParameterMapInterface
 ::Update( unsigned int n, std::string key, ParameterValuesType value )
 {
     ParameterMapType parameterMap;
-    parameterMap.emplace( key, value );
-    this->Update( n, parameterMap )
+    parameterMap.insert( std::make_pair( key, value ) );
+    this->Update( n, parameterMap );
 }
 
 
@@ -284,13 +326,12 @@ ParameterMapInterface
 ::Update( std::string key, ParameterValuesType value )
 {
     ParameterMapType parameterMap;
-    parameterMap.emplace( key, value );
+    parameterMap.insert( std::make_pair( key, value )  );
 
     for( unsigned int i = 0; this->ReadParameterMapList().size(); ++i )
     {
-        this->Update( n, parameterMap );
+        this->Update( i, parameterMap );
     }
-    
 }
 
 
@@ -300,8 +341,8 @@ ParameterMapInterface
 ::Update( unsigned int n, std::string key, std::string value )
 {
     ParameterValuesType vectorValue;
-    vectorValue.push_back( key, value );
-    this->Update( n, vectorValue )
+    vectorValue.push_back( value );
+    this->Update( n, key, vectorValue );
 }
 
 
@@ -311,8 +352,8 @@ ParameterMapInterface
 ::Update( std::string key, std::string value )
 {
     ParameterValuesType vectorValue;
-    vectorValue.push_back( key, value );
-    this->Update( vectorValue )
+    vectorValue.push_back( value );
+    this->Update( key, vectorValue );
 }
 
 
@@ -322,6 +363,19 @@ ParameterMapInterface
 ::Delete( void )
 {
     this->ReadParameterMapList().clear();
+}
+
+
+
+void 
+ParameterMapInterface
+::Delete( unsigned int n )
+{
+    if( !(this->GetNumberOfParameterMaps() < n) )
+    {
+        sitkExceptionMacro( << "Error: Parameter map id exceeds number of parameter maps in list." );
+    }
+    this->ReadParameterMapList().erase( this->ReadParameterMapList().begin()+n );
 }
 
 
@@ -372,7 +426,7 @@ ParameterMapInterface
 ::Put( unsigned int n, std::string key, ParameterValuesType value )
 {
     this->Delete( n, key );
-    this->Create( n, key );
+    this->Create( n, key, value );
 }
 
 
@@ -383,7 +437,7 @@ ParameterMapInterface
 {
     for( unsigned int i = 0; i < this->ReadParameterMapList().size(); ++i )
     {
-        this->Put( i, key, value )
+        this->Put( i, key, value );
     }
 }
 
@@ -394,7 +448,7 @@ ParameterMapInterface
 ::Put( unsigned int n, std::string key, std::string value )
 {
     this->Delete( n, key );
-    this->Create( n, key );
+    this->Create( n, key, value );
 }
 
 
@@ -405,7 +459,7 @@ ParameterMapInterface
 {
     for( unsigned int i = 0; i < this->ReadParameterMapList().size(); ++i )
     {
-        this->Put( i, key, value )
+        this->Put( i, key, value );
     }
 }
 
@@ -421,7 +475,7 @@ typename ParameterMapInterface::ParameterMapType
 ReadParameterFile( const std::string filename )
 {
   ParameterMapInterface parameterMapInterface;
-  return parameterMapInterface.ReadParameterFile( filename );
+  return parameterMapInterface.ParameterFileReader( filename );
 }
 
 

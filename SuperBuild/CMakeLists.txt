@@ -9,6 +9,8 @@ project ( SuperBuildSimpleITK )
 # Global configuration
 #
 
+set(CMAKE_INSTALL_MESSAGE LAZY)
+
 # Add needed flag for gnu on linux like enviroments
 if(NOT APPLE AND "${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
   if(NOT "${CMAKE_CXX_FLAGS}" MATCHES "-fPIC")

@@ -128,52 +128,84 @@ SimpleElastix
 
 void
 SimpleElastix
-::LogFileName( const std::string filename )
+::SetLogFileName( const std::string filename )
 {
   this->m_LogFileName = filename;
 }
 
 
 
-typename ParameterMapInterface::ParameterMapListType
-SimpleElastix
-::GetParameterMapList( void )
-{
-  return this->ReadParameterMapList();
-}
-
-
-
-typename ParameterMapInterface::ParameterMapType
-ParameterMapInterface
-::GetParameterMap( void )
-{
-  return this->ReadParameterMap();
-}
-
-
-
-/*
-void
-SimpleElastix
-::Put(ParameterMapType* parameterMap, ParameterKeyType key, const std::string value)
-{
-  ParameterValuesType parameterValue;
-  parameterValue.push_back( value );
-  std::pair< ParameterKeyType, ParameterValuesType > parameter = std::make_pair< ParameterKeyType, ParameterValuesType >( key, parameterValue );
-  std::pair< ParameterMapIterator, bool > result;
-  result = parameterMap->insert( parameter );
-  if( !result.second )
-  {
-    result.first->second = parameterValue;
-  }
-}*/
-
-
-
 /**
  * Procedural interface 
  */
+
+
+
+Image
+elastix( Image fixedImage, Image movingImage, ParameterMapInterface::ParameterMapType parameterMap, bool logToConsole, std::string logFileName )
+{
+  ParameterMapInterface::ParameterMapListType parameterMapList;
+  parameterMapList.push_back( parameterMap );
+  return elastix( fixedImage, movingImage, parameterMapList, logToConsole, logFileName );
+}
+
+
+Image
+elastix( Image fixedImage, Image movingImage, ParameterMapInterface::ParameterMapListType parameterMapList, bool logToConsole, std::string logFileName )
+{
+  SimpleElastix elastix;
+  elastix.SetFixedImage( &fixedImage );
+  elastix.SetMovingImage( &movingImage );
+  elastix.SetParameterMapList( parameterMapList );
+
+  if( logToConsole )
+  {
+    elastix.LogToConsoleOn();
+  }
+
+  if( logFileName != "" )
+  {
+    elastix.SetLogFileName( logFileName );
+  }
+
+  return elastix.Execute();
+}
+
+
+
+Image
+elastix( Image fixedImage, Image movingImage, ParameterMapInterface::ParameterMapType parameterMap, Image fixedMask, Image movingMask, bool logToConsole, std::string logFileName )
+{
+  ParameterMapInterface::ParameterMapListType parameterMapList;
+  parameterMapList.push_back( parameterMap );
+  return elastix( fixedImage, movingImage, parameterMapList, fixedMask, movingMask, logToConsole, logFileName );
+}
+
+
+
+Image
+elastix( Image fixedImage, Image movingImage, ParameterMapInterface::ParameterMapListType parameterMapList, Image fixedMask, Image movingMask, bool logToConsole, std::string logFileName )
+{
+  SimpleElastix elastix;
+  elastix.SetFixedImage( &fixedImage );
+  elastix.SetMovingImage( &movingImage );
+  elastix.SetParameterMapList( parameterMapList );
+  elastix.SetFixedMask( &fixedMask );
+  elastix.SetMovingMask( &movingMask );
+
+  if( logToConsole )
+  {
+    elastix.LogToConsoleOn();
+  }
+
+  if( logFileName != "" )
+  {
+    elastix.SetLogFileName( logFileName );
+  }
+
+  return elastix.Execute();
+}
+
 
 
 } // end namespace simple

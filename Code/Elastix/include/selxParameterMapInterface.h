@@ -1,6 +1,10 @@
 #ifndef __selxparametermapinterface_h_
 #define __selxparametermapinterface_h_
 
+// SimpleITK
+#include "sitkSimpleElastix.h"
+
+// SimpleElastix
 #include "elastixlib.h"
 
 namespace itk {
@@ -30,37 +34,51 @@ class ParameterMapInterface
     void AddParameterMapList( ParameterMapListType parameterMapList );
     void AddParameterMap( ParameterMapType parameterMap );
 
-    ParameterMapListType& GetParameterMapList( void );
+    ParameterMapListType GetParameterMapList( void );
+    ParameterMapType GetParameterMap( unsigned int n );
     ParameterMapType GetParameterMap( void );
 
     void DeleteParameterMapList( void );
+    void DeleteParameterMap( unsigned int n );
     void DeleteParameterMap( void );
+
+    ParameterMapType ParameterFileReader( const std::string filename );
+    unsigned int GetNumberOfParameterMaps( void );
+    
+/*
+    ParameterMapType GetDefaultRigidParameterMap( void );
+    ParameterMapType GetDefaultAffineParameterMap( void );
+    ParameterMapType GetDefaultNonRigidAffineParameterMap( void );
+    ParameterMapType GetDefaultGroupwiseNonRigidParameterMap( void );
+*/
 
   protected:
 
-    int GetNumberOfParameterMaps( void );
-    ParameterMapType ReadParameterFile( const std::string filename );
+    
 
-    void Create( ParameterMapListType parameterMapList );
-    void Create( ParameterMapType parameterMap );
-    void Create( unsigned int n, std::string key, ParameterValuesType value );
-    void Create( std::string key, ParameterValuesType value );
-    void Create( unsigned int n, std::string key, std::string value );
-    void Create( std::string key, std::string value );
+    // CRUD internal interface
 
-    ParameterMapListType ReadParameterMapList( void );
-    ParameterMapType ReadParameterMap( void );
-    std::string ReadParameter( std::string key );
-    std::string ReadParameter( unsigned int n, std::string key );
+    void Create( ParameterMapListType parameterMapList );                       // Create parameter map list
+    void Create( ParameterMapType parameterMap );                               // Append parameter map to list
+    void Create( unsigned int n, std::string key, ParameterValuesType value );  // Create parameter in nth map
+    void Create( std::string key, ParameterValuesType value );                  // Create parameter in all maps
+    void Create( unsigned int n, std::string key, std::string value );          // Create parameter in nth map (casts to vector)
+    void Create( std::string key, std::string value );                          // Create parameter in all maps (casts to vector)
 
-    void Update( unsigned int n, ParameterMapType parameterMap );
-    void Update( ParameterMapType parameterMap );
-    void Update( unsigned int n, ParameterValuesType value );
-    void Update( ParameterValuesType value );
-    void Update( unsigned int n, std::string key, std::string value );
-    void Update( std::string key, std::string value );
+    ParameterMapListType ReadParameterMapList( void );                          // Return parameter map list
+    ParameterMapType ReadParameterMap( unsigned int n );                        // Return nth parameter map
+    ParameterValuesType ReadParameter( unsigned int n, std::string key );       // Return parameter "key" in nth map
+    ParameterValuesType ReadParameter( std::string key );                       // Return parameter "key" in last map
+
+    void Update( unsigned int n, ParameterMapType parameterMap );               // Update nth map with entries in parameterMap
+    void Update( ParameterMapType parameterMap );                               // Update all map with entries in parameterMap
+    void Update( unsigned int n, std::string key, ParameterValuesType value );  // Update nth map
+    void Update( std::string key, ParameterValuesType value );                  // Update all maps
+    void Update( unsigned int n, std::string key, std::string value );          // Update nth map (casts to vector)
+    void Update( std::string key, std::string value );                          // Update all maps (casts to vector)
 
     void Delete( void );
+    void Delete( unsigned int n );
     void Delete( unsigned int n, std::string key );
     void Delete( std::string key );
 
@@ -71,10 +89,12 @@ class ParameterMapInterface
     void Put( unsigned int n, std::string key, std::string value );
     void Put( std::string key, std::string value );
 
-    // TODO: pass to elastix api via getter
+    // TODO: Make private
     ParameterMapListType m_ParameterMapList;
 
 };
+
+SELX_EXPORT typename ParameterMapInterface::ParameterMapType ReadParameterFile( const std::string filename );
 
 } // end namespace simple
 } // end namespace itk

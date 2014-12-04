@@ -3,7 +3,7 @@ SimpleElastix
 
 The goal of SimpleElastix is to bring the robust medical image registration algorithms of [elastix](http://elastix.isi.uu.nl/ "Elastix website") to a wider audience by integrating elastix with [SimpleITK](https://github.com/SimpleITK/SimpleITK "SimpleITK github repository"). This package provides
 
-- elastix and transformix bindings for Python, Java, R, Ruby, Octave, Lua, Tcl and C# (see [elastix manual](elastix.isi.uu.nl/download/elastix_manual_v4.7.pdf "elastix manual" for supported algorithms).
+- elastix and transformix bindings for Python, Java, R, Ruby, Octave, Lua, Tcl and C# (see [elastix manual](elastix.isi.uu.nl/download/elastix_manual_v4.7.pdf "elastix manual" for a list of supported algorithms).
 - A user-friendly API that aligns with the design philosophy of SimpleITK, developed specifically for rapid prototyping and use in scripting languages. If you are interested, [The Design of SimpleITK](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3874546/ "PubMed") is a great read.
 - Pre-configured parameter files that should serve as good starting points for new users.
 - The complete set of SimpleITK image processing algorithms.
@@ -27,9 +27,9 @@ selx = sitk.SimpleElastix();
 selx.SetMovingImage(movingImage)
 selx.SetParameterMap('defaultNonrigidRegistration')
 
-# Warp the segmentation to each image in the population
+# Do the processing
 for fixedImage in population
-  # Register imagee
+  # Register images
   selx.SetFixedImage(sitk.ReadImage(fixedImage))
   selx.Execute()
 
@@ -48,7 +48,9 @@ SimpleElastix provides a procedural inteface that aligns well with the design ph
 ```python
 import SimpleElastix as sitk
 
-resultImage = sitk.SimpleElastix(sitk.ReadImage(fixedImage), sitk.ReadImage(movingImage), sitk.ReadParameterFile('pf.txt'))
+resultImage = sitk.SimpleElastix(sitk.ReadImage(fixedImage), 
+                                 sitk.ReadImage(movingImage),
+                                 sitk.ReadParameterFile('pf.txt'))
 ```
 
 Loading images that already recide in memory does not count extra towards your RAM limit as only pointers are passed. In the next example, we first perform affine initialization and feed the resulting image to a non-rigid registration algorithm. The same fixed image is used in both registrations. 
@@ -57,8 +59,14 @@ Loading images that already recide in memory does not count extra towards your R
 import SimpleElastix as sitk
 
 fixedImage = sitk.ReadImage('fixedImage.hdr');
-affineMovingImage = sitk.SimpleElastix(fixedImage, sitk.ReadImage('movingImage.hdr'), 'defaultAffineParameterMap')
-registeredImage = sitk.SimpleElastix(fixedImage, affineMovingImage, 'defaultNonrigidParameterMap')
+
+affineMovingImage = sitk.SimpleElastix(fixedImage, 
+                                       sitk.ReadImage('movingImage.hdr'),
+                                       'defaultAffineParameterMap')
+
+registeredImage = sitk.SimpleElastix(fixedImage,
+                                     affineMovingImage,
+                                     'defaultNonrigidParameterMap')
 ```
 
 
@@ -133,4 +141,9 @@ ccmake ../SimpleElastix/SuperBuild
 make -j4
 ```
 
-SimpleElastix will be compiled along with any dependencies (elastix, ITK, SimpleITK, SWIG and target language dependencies). These are downloaded on the fly.
+SimpleElastix will be compiled along with any dependencies (elastix, ITK, SimpleITK, SWIG and target language dependencies, these are downloaded on the fly). Note that this project takes a long time to build. On a quad-core machine it takes around and hour and if your machine has less than 16 GB RAM you will have to compile with even fewer cores. Because of the extreme build time and memory consumption I prefer to build with clang.
+
+About
+-----
+
+If you are interested in my work you are most welcome to visit [my website](https://kaspermarstal.github.io).

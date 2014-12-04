@@ -14,7 +14,7 @@
 namespace itk { 
   namespace simple {
 
-class SELX_EXPORT SimpleElastix : ParameterMapInterface
+class SELX_EXPORT SimpleElastix : public ParameterMapInterface
 {
   public:
 
@@ -28,7 +28,7 @@ class SELX_EXPORT SimpleElastix : ParameterMapInterface
     // typedefs inherited from elastix library api
     typedef elastix::ELASTIX libelastix;
 
-    // To be wrapped by SWIG
+    /** To be wrapped by SWIG */ 
 
     const std::string GetName( void );
 
@@ -43,14 +43,12 @@ class SELX_EXPORT SimpleElastix : ParameterMapInterface
 
     // Get result
     Image GetResultImage( void );
-    ParameterMapType GetParameterMap( void );
-    ParameterMapListType GetParameterMapList( void );
 
     // TODO: Move to common class
     void LogToConsoleOn( void );
     void LogToConsoleOff( void );
-    void LogFileName( const std::string filename );
- 
+    void SetLogFileName( const std::string filename );
+
   private:
 
     template< typename TResultImage >
@@ -86,15 +84,11 @@ class SELX_EXPORT SimpleElastix : ParameterMapInterface
 
 };
 
-
-SELX_EXPORT ParameterMapInterface::ParameterMapType ReadParameterFile( const std::string filename );
-
-/** Procedural Interface 
-
-
-SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, ParameterMapType parameterMap, bool logToConsole = false, std::string logFileName = "" );
-SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, ParameterMapType parameterMap, Image fixedMask, Image movingMask, bool logToConsole = false, std::string logFileName = "" );
-*/
+// Procedural Interface 
+SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, ParameterMapInterface::ParameterMapType parameterMap, bool logToConsole = false, std::string logFileName = "" );
+SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, ParameterMapInterface::ParameterMapListType parameterMapList, bool logToConsole = false, std::string logFileName = "" );
+SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, ParameterMapInterface::ParameterMapType parameterMap, Image fixedMask, Image movingMask, bool logToConsole = false, std::string logFileName = "" );
+SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, ParameterMapInterface::ParameterMapListType parameterMapList, Image fixedMask, Image movingMask, bool logToConsole = false, std::string logFileName = "" );
 
 } // end namespace simple
 } // end namespace itk
