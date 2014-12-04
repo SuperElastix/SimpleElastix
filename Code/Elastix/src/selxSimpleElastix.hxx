@@ -13,7 +13,7 @@ template<typename TResultImage >
 Image
 SimpleElastix::ExecuteInternal( void )
 {
-  // Assert images are set
+  // Assert fixed and moving image is set
   if( this->m_FixedImage == 0 )
   {
     sitkExceptionMacro( << "Fixed image is not set. Use SetFixedImage() or run Help() to get information on how to use this module." );
@@ -24,7 +24,13 @@ SimpleElastix::ExecuteInternal( void )
     sitkExceptionMacro( << "Moving image is not set. Use SetMovingImage() or run Help() to get information on how to use this module." );
   }
 
-  // Get masks if set (masks are optional)
+  // Assert that at least one parameter map is set
+  if( !(this->ReadParameterMapList().size() > 0) )
+  {
+    sitkExceptionMacro( << "Parameter map not set. Use SetParameterMap() or run Help() to get information on how to use this module." );
+  }
+
+  // Get masks if set (optional)
   itk::DataObject::Pointer fixedMask = 0;
   if( this->m_FixedMask != 0 )
   {
@@ -41,7 +47,7 @@ SimpleElastix::ExecuteInternal( void )
   this->Put( "FixedInternalImagePixelType", GetPixelIDValueAsElastixParameter( this->m_FixedImage->GetPixelID() ) );
   this->Put( "MovingInternalImagePixelType", GetPixelIDValueAsElastixParameter( this->m_MovingImage->GetPixelID() ) );
   this->Put( "FixedImageDimension", std::to_string( this->m_FixedImage->GetDimension() ) );
-  this->Put( "MovingImageDimension", std::to_string( this->m_MovingImage->GetDimension() ) );
+  this->Put( "MovingImageDimension", std::to_string( this->m_MovingImage->GetDimension() ) ); 
 
   // Elastix library always uses direction cosines
   this->Put( "UseDirectionCosines", "true" );
