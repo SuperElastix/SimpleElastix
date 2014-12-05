@@ -1,7 +1,7 @@
 SimpleElastix
 =============
 
-The goal of SimpleElastix is to bring the robust medical image registration algorithms of [elastix](http://elastix.isi.uu.nl/ "Elastix website") to a wider audience by integrating elastix with [SimpleITK](https://github.com/SimpleITK/SimpleITK "SimpleITK github repository"). This package provides
+The goal of SimpleElastix is to bring the robust medical image registration algorithms of [elastix](http://elastix.isi.uu.nl/ "Elastix website") library to a wider audience by integrating elastix with [SimpleITK](https://github.com/SimpleITK/SimpleITK "SimpleITK github repository"). This package provides
 
 - elastix and transformix bindings for Python, Java, R, Ruby, Octave, Lua, Tcl and C# (see [elastix manual](elastix.isi.uu.nl/download/elastix_manual_v4.7.pdf "elastix manual" for a list of supported algorithms).
 - A user-friendly API that aligns with the design philosophy of SimpleITK, developed specifically for rapid prototyping and use in scripting languages. If you are interested, [The Design of SimpleITK](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3874546/ "PubMed") is a great read.
@@ -72,7 +72,7 @@ registeredImage = sitk.SimpleElastix(fixedImage,
 
 ### Object Oriented Interface
 
-While the procedural interface may be useful in rapid prototyping, it trades off code simplicity for flexibility. In the above example, the final deformation field cannot be retrived and applied to another image since portable language wrapping dictates only one return object per function call (in this case the image). This is a problem if you want to subsequently warp segmentations as we did in the first example. Further, image quality is reduced from resampling resulting image twice. To this end, SimpleElastix also comes with a powerful object oriented interface suitable for more advanced use cases and scripting purposes. In the next example, we perform true groupwise registration as described in [Metz et al 2012](http://#).
+While the procedural interface may be useful in rapid prototyping, it trades off code simplicity for flexibility. In the example above, the final deformation field cannot be retrived and applied to another image. This is a problem if you want to subsequently warp segmentations as we did in the first example. Further, image quality is reduced from resampling resulting image twice. To this end, SimpleElastix also comes with a powerful object oriented interface suitable for more advanced use cases and scripting purposes. In the next example, we perform true groupwise registration as described in [Metz et al 2012](http://#).
 
 ```python
 import SimpleITK as sitk
@@ -83,7 +83,7 @@ vectorOfImages = sitk.VectorOfImages()
 vectorOfImages = [vectorOfImages.push_back(sitk.ReadImage(image)) for image in population]
 image4d = sitk.JoinSeriesFilter(vectorOfImages)
 
-# We instantiate an elastix object that will hold data and configuration  
+# We instantiate an elastix object 
 selx = sitk.SimpleElastix()
 
 # The groupwise transform works only on the moving image. However, a 
@@ -141,7 +141,7 @@ ccmake ../SimpleElastix/SuperBuild
 make -j4
 ```
 
-SimpleElastix will be compiled along with any dependencies (elastix, ITK, SimpleITK, SWIG and target language dependencies, these are downloaded on the fly). Note that this project takes a long time to build. On a quad-core machine it takes around and hour and if your machine has less than 16 GB RAM you will have to compile with even fewer cores. Because of the extreme build time and memory consumption I prefer to build with clang.
+SimpleElastix will be compiled along with any dependencies (elastix, ITK, SimpleITK, SWIG and target language dependencies, these are downloaded on the fly). Note that this project takes a long time to build. On a quad-core machine it takes around and hour and if your machine has less than 16 GB RAM you will have to compile with even fewer cores. Because of the extreme memory consumption I prefer to build with clang.
 
 About
 -----

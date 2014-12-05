@@ -60,7 +60,7 @@ SimpleElastix::ExecuteInternal( void )
     isError = elastix->RegisterImages(
       this->m_FixedImage->GetITKBase(),
       this->m_MovingImage->GetITKBase(),
-      this->m_ParameterMapList,
+      this->ReadParameterMapList(),
       this->m_LogFileName,
       this->m_LogFileName != "output_path_not_set",
       this->m_LogToConsole,
@@ -79,15 +79,20 @@ SimpleElastix::ExecuteInternal( void )
   {
     TResultImage* itkResultImage = static_cast< TResultImage* >( elastix->GetResultImage().GetPointer() );
     this->m_ResultImage = Image( itkResultImage );
-    this->SetParameterMapList( elastix->GetTransformParameterMapList() );
+    this->SetTransformParameterMapList( elastix->GetTransformParameterMapList() );
   }
 
   delete elastix;
   elastix = NULL;
 
+  if( isError == -1 )
+  {
+    sitkExceptionMacro( << "Errors occured during registration: Output directory does not exist." );
+  }
+
   if( isError != 0 )
   {
-    sitkExceptionMacro( << "Errors occured during registration. Set LogToConsoleOn() or LogToFile(\"path/to/file\") to inspect errors." );
+    sitkExceptionMacro( << "Errors occured during registration. Set LogToConsoleOn() or LogToFile(\"path/to/file\") for detailed error messages." );
   }
 
   return this->m_ResultImage;
