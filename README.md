@@ -28,9 +28,9 @@ selx.SetMovingImage(movingImage)
 selx.SetParameterMap('defaultNonrigidRegistration')
 
 # Do the processing
-for fixedImageFilename in population
+for filename in population
   # Register images
-  fixedImage = sitk.ReadImage(fixedImage)
+  fixedImage = sitk.ReadImage(filename)
   selx.SetFixedImage(fixedImage)
   selx.Execute()
 
