@@ -9,7 +9,7 @@ The goal of SimpleElastix is to bring the robust medical image registration algo
 - The complete set of SimpleITK image processing algorithms.
 - SuperBuild that automatically compiles and installs SimpleElastix and any dependencies.
 
-Previously, using elastix and transformix on large datasets would incur a significant overhead from scripting command line invocations and arguments to copying images and transform parameter files across folders. With SimpleElastix this complexity is easier to manage and more memory and disk I/O efficient. 
+Previously, using elastix and transformix on large datasets would incur a significant overhead, from scripting command line invocations and arguments to copying images and transform parameter files across folders. With SimpleElastix this complexity is easier to manage and more memory and disk I/O efficient. 
 
 Let's look at some code. Say you need to compare the volume, mean intensity and standard deviation of (possibly multiple) anatomical structures across a population of images using an atlas segmentation. This is accomplished using the following lines of Python code:
 
@@ -28,14 +28,15 @@ selx.SetMovingImage(movingImage)
 selx.SetParameterMap('defaultNonrigidRegistration')
 
 # Do the processing
-for fixedImage in population
+for fixedImageFilename in population
   # Register images
-  selx.SetFixedImage(sitk.ReadImage(fixedImage))
+  fixedImage = sitk.ReadImage(fixedImage)
+  selx.SetFixedImage(fixedImage)
   selx.Execute()
 
   # Transform label map using the deformation field from above and compute statistics
   resultLabel = sitk.SimpleTransformix(movingLabel, selx.GetTransformParameters())
-  sitk.LabelStatisticsImageFilter(selx.GetResultImage(), resultLabel)
+  sitk.LabelStatisticsImageFilter(fixedImage, resultLabel)
 ```
 
 That was easy. The example demonstrates the efficiency of combining SimpleElastix's object oriented interface (the way we used elastix to register images) and procedural interface (the way we used transformix to warp labels) with SimpleITK (the way we computed statistics). For more examples, see below or the [Examples/SimpleElastix](https://github.com/kaspermarstal/SimpleElastix/tree/SimpleElastix/Examples/SimpleElastix "SimpleElastix examples") directory. 
