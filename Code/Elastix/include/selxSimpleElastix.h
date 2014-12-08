@@ -72,6 +72,7 @@ class SELX_EXPORT SimpleElastix
     void SetTransformParameterMap( ParameterMapType parameterMap );
     ParameterMapListType GetTransformParameterMapList( void );
 
+    ParameterMapType GetDefaultParameterMap( const std::string name );
     ParameterMapType ParameterFileReader( const std::string filename );
 
   private:
