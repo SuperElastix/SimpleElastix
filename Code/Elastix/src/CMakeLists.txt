@@ -5,7 +5,6 @@ include( ${ELASTIX_USE_FILE} )
 set( SimpleElastix
   selxSimpleElastix.cxx
   selxSimpleElastix.hxx
-  selxParameterMapInterface.cxx
 )
 
 add_library( SimpleElastix ${SimpleElastix} )
@@ -15,6 +14,7 @@ sitk_install_exported_target( SimpleElastix )
 
 set( SimpleTransformix
   selxSimpleTransformix.cxx
+  selxSimpleTransformix.hxx
 )
 
 add_library( SimpleTransformix ${SimpleTransformix} )

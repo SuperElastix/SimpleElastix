@@ -17,14 +17,17 @@ SimpleElastix
   m_MemberFactory->RegisterMemberFunctions< PixelIDTypeList, 3, SimpleElastixAddressor< MemberFunctionType > >();
   m_MemberFactory->RegisterMemberFunctions< PixelIDTypeList, 2, SimpleElastixAddressor< MemberFunctionType > >();
 
-  // This class holds image data that is passed to elastix API when executed
+  // This class holds configuration and pointers to data that is passed to elastix API when run
   this->m_FixedMask = 0;
   this->m_MovingImage = 0;
+  this->m_ParameterMaps = ParameterMapListType();
+  this->m_TransformParameterMaps = ParameterMapListType();
   this->m_FixedMask = 0;
   this->m_MovingMask = 0;
   this->m_ResultImage = Image();
-  this->m_LogFileName = "output_path_not_set";
-  this->m_LogToConsole = false;
+  this->m_OutputFolder = "";
+  this->m_LogToDisk = false;
+  this->m_LogToConsole = true;
 }
 
 
@@ -74,7 +77,7 @@ SimpleElastix
 
 void
 SimpleElastix
-::SetMovingMask()
+::SetMovingMask( Image* movingMask )
 {
   this->m_MovingMask = movingMask;
 }
@@ -83,7 +86,7 @@ SimpleElastix
 
 void
 SimpleElastix
-::DeleteFixedMask( void )
+::ClearFixedMask( void )
 {
   this->m_FixedMask = 0;
 }
@@ -92,99 +95,9 @@ SimpleElastix
 
 void
 SimpleElastix
-::DeleteMovingMask( void )
+::ClearMovingMask( void )
 {
   this->m_MovingMask = 0;
-}
-
-
-
-void
-SimpleElastix
-::SetParameterMapList( ParameterMapListType parameterMapList )
-{
-  this->Put( parameterMapList );
-}
-
-
-
-void
-SimpleElastix
-::SetParameterMap( ParameterMapType parameterMap )
-{
-  this->Put( parameterMap );
-}
-
-
-
-void
-SimpleElastix
-::AddParameterMapList( ParameterMapListType parameterMapList )
-{
-  this->Create( parameterMapList );
-}
-
-
-
-void
-SimpleElastix
-::AddParameterMap( ParameterMapType parameterMap )
-{
-  this->Create( parameterMap );
-}
-
-
-
-SimpleElastix::ParameterMapListType
-SimpleElastix
-::GetParameterMapList( void )
-{
-  return this->ReadParameterMapList();
-}
-
-
-
-SimpleElastix::ParameterMapType
-SimpleElastix
-::GetParameterMap( unsigned int n )
-{
-  return this->ReadParameterMap( n );
-}
-
-
-
-SimpleElastix::ParameterMapType
-SimpleElastix
-::GetParameterMap( void )
-{
-  return this->ReadParameterMap( this->GetNumberOfParameterMaps()-1 );
-}
-
-
-
-void
-SimpleElastix
-::DeleteParameterMapList( void )
-{
-    this->Delete();
-}
-
-
-
-void
-SimpleElastix
-::DeleteParameterMap( unsigned int n )
-{
-    this->Delete( this->ReadParameterMapList(), n );
-}
-
-
-
-void
-SimpleElastix
-::DeleteParameterMap( void )
-{
-    this->DeleteParameterMap( this->GetNumberOfParameterMaps()-1 );
 }
 
 
@@ -201,9 +114,10 @@ SimpleElastix
     return this->m_MemberFactory->GetMemberFunction( FixedImagePixelEnum, FixedImageDimension )();
   }
 
-  sitkExceptionMacro( << "SimpleElastix does not support image type \""
+  sitkExceptionMacro( << "SimpleElastix does not support the combination of image type \""
                       << GetPixelIDValueAsString( FixedImagePixelEnum ) << "\" ("
-                      << GetPixelIDValueAsElastixParameter( FixedImagePixelEnum ) << ")." );
+                      << GetPixelIDValueAsElastixParameter( FixedImagePixelEnum ) << ") and dimension "
+                      << FixedImageDimension << "." );
 }
 
 
@@ -214,6 +128,52 @@ SimpleElastix
 {
   return this->m_ResultImage;
 }
+
+
+
+void
+SimpleElastix
+::SetOutputFolder( const std::string folder )
+{
+  this->m_OutputFolder = folder;
+}
+
+
+
+void
+SimpleElastix
+::LogToDisk( bool logToDisk )
+{
+  this->m_LogToDisk = logToDisk;
+}
+
+
+
+void
+SimpleElastix
+::LogToDiskOn( void )
+{
+  this->m_LogToDisk = true;
+}
+
+
+
+void
+SimpleElastix
+::LogToDiskOff( void )
+{
+  this->m_LogToDisk = false;
+}
+
+
+
+void
+SimpleElastix
+::LogToConsole( bool logToConsole )
+{
+  this->m_LogToConsole = logToConsole;
+}
+
 
 
 
@@ -237,67 +197,179 @@ SimpleElastix
 
 void
 SimpleElastix
-::SetLogFileName( const std::string filename )
+::SetParameterMapList( ParameterMapListType parameterMapList )
 {
-  this->m_LogFileName = filename;
+  this->m_ParameterMaps = parameterMapList;
 }
 
 
 
-/**
- * Procedural interface 
- */
-
-
-
-Image
-elastix( Image fixedImage, Image movingImage, ParameterMapInterface::ParameterMapType parameterMap, bool logToConsole, bool outputToFolder, std::string logFileName )
+void
+SimpleElastix
+::SetParameterMap( ParameterMapType parameterMap )
 {
-  ParameterMapInterface::ParameterMapListType parameterMapList;
+  ParameterMapListType parameterMapList;
   parameterMapList.push_back( parameterMap );
-  return elastix( fixedImage, movingImage, parameterMapList, logToConsole, logFileName );
+  this->SetParameterMapList( parameterMapList );
 }
 
 
+
+SimpleElastix::ParameterMapListType
+SimpleElastix
+::GetParameterMapList( void )
+{
+  return this->m_ParameterMaps;
+}
+
+
+
+void
+SimpleElastix
+::SetTransformParameterMapList( ParameterMapListType parameterMapList )
+{
+  this->m_TransformParameterMaps = parameterMapList;
+}
+
+
+
+void
+SimpleElastix
+::SetTransformParameterMap( ParameterMapType parameterMap )
+{
+  ParameterMapListType parameterMapList;
+  parameterMapList.push_back( parameterMap );
+  this->SetTransformParameterMapList( parameterMapList );
+}
+
+
+
+SimpleElastix::ParameterMapListType
+SimpleElastix
+::GetTransformParameterMapList( void )
+{
+  return this->m_TransformParameterMaps;
+}
+
+
+
+
+SimpleElastix::ParameterMapType
+SimpleElastix
+::ParameterFileReader( const std::string filename )
+{
+  ParameterFileParserPointer parser = ParameterFileParserType::New();
+  parser->SetParameterFileName( filename );
+  try
+  {
+    parser->ReadParameterFile();
+  }
+  catch( itk::ExceptionObject &e )
+  {
+    std::cout << e.what() << std::endl;
+  }
+
+  return parser->GetParameterMap();
+}
+
+
+
+SimpleElastix::ParameterMapType
+SimpleElastix
+::GetDefaultParameterMap( const std::string name )
+{
+  ParameterMapType parameterMap;
+
+  parameterMap["Optimizer"]                     = "AdaptiveStochasticGradientDescent";
+  parameterMap["Interpolator"]                  = "LinearInterpolator";
+  parameterMap["ResampleInterpolator"]          = "FinalBSplineResampleInterpolator";
+
+  switch name
+  {
+    case "rigid":
+        parameterMap[ "Registration" ]          = "MultiResolutionRegistration";
+        parameterMap[ "Transform" ]             = "AffineTransform";
+        parameterMap[ "Metric" ]                = "MattesMutualInformationMetric";
+        parameterMap[ "MaximumNumberOfSamples"] = "8192";
+
+      break;
+    case "nonrigid":
+        parameterMap[ "Registration" ]          = "MultiMetricMultiResolutionRegistration";
+      break;
+    case "groupwise":
+        parameterMap[ "Registration" ]          = "MultiResolutionRegistration";
+      break;
+    default :
+      sitkExceptionMacro( "No default parameter map named \"" << name << "\"." );
+  }
+
+
+  return parameterMap;
+}
+
+
+
+// Procedural interface 
+
+
+
 Image
-elastix( Image fixedImage, Image movingImage, ParameterMapInterface::ParameterMapListType parameterMapList, bool logToConsole, bool outputToFolder, std::string logFileName )
+elastix( Image fixedImage, Image movingImage, std::string defaultParameterMapName, bool logToConsole, bool logToDisk, std::string outputFolder )
+{
+  SimpleElastix::ParameterMapListType parameterMapList;
+  return elastix( fixedImage, movingImage, GetDefaultParameterMap( defaultParameterMapName ), logToConsole, logToDisk, outputFolder );
+}
+
+
+
+Image
+elastix( Image fixedImage, Image movingImage, std::string defaultParameterMapName, bool logToConsole, bool logToDisk, std::string outputFolder )
+{
+  SimpleElastix::ParameterMapListType parameterMapList;
+  parameterMapList.push_back( parameterMap );
+  return elastix( fixedImage, movingImage, parameterMapList, logToConsole, logToDisk, outputFolder );
+}
+
+
+
+Image
+elastix( Image fixedImage, Image movingImage, SimpleElastix::ParameterMapListType parameterMapList, bool logToConsole, bool logToDisk, std::string outputFolder )
 {
   SimpleElastix selx;
   selx.SetFixedImage( &fixedImage );
   selx.SetMovingImage( &movingImage );
   selx.SetParameterMapList( parameterMapList );
-
-  if( logToConsole )
-  {
-    selx.LogToConsoleOn();
-  }
-
-  if( outputToFolder )
-  {
-    selx.OutoutToFolderOn();
-  }
-
-  if( logFileName != "" )
-  {
-     selx.SetLogFileName( logFileName );
-  }
+  selx.SetOutputFolder( outputFolder );
+  selx.LogToDisk( logToDisk );
+  selx.LogToConsole( logToConsole );
 
   return selx.Execute();
-
-
-
-Image
-elastix( Image fixedImage, Image movingImage, ParameterMapInterface::ParameterMapType parameterMap, Image fixedMask, Image movingMask, bool logToConsole, bool outputToFolder, std::string logFileName )
-{
-  ParameterMapInterface::ParameterMapListType parameterMapList;
-  parameterMapList.push_back( parameterMap );
-  return elastix( fixedImage, movingImage, parameterMapList, fixedMask, movingMask, logToConsole, logFileName );
 }
 
 
 
 Image
-elastix( Image fixedImage, Image movingImage, ParameterMapInterface::ParameterMapListType parameterMapList, Image fixedMask, Image movingMask, bool logToConsole, bool outputToFolder, std::string logFileName )
+elastix( Image fixedImage, Image movingImage, std::string defaultParameterMapName, Image fixedMask, Image movingMask, bool logToConsole, bool logToDisk, std::string outputFolder )
+{
+  SimpleElastix::ParameterMapListType parameterMapList;
+  return elastix( fixedImage, movingImage, GetDefaultParameterMap( defaultParameterMapName ), fixedMask, movingMask, logToConsole, logToDisk, outputFolder );
+}
+
+
+
+
+Image
+elastix( Image fixedImage, Image movingImage, SimpleElastix::ParameterMapType parameterMap, Image fixedMask, Image movingMask, bool logToConsole, bool logToDisk, std::string outputFolder )
+{
+  SimpleElastix::ParameterMapListType parameterMapList;
+  parameterMapList.push_back( parameterMap );
+  return elastix( fixedImage, movingImage, parameterMapList, fixedMask, movingMask, logToConsole, logToDisk, outputFolder );
+}
+
+
+
+Image
+elastix( Image fixedImage, Image movingImage, SimpleElastix::ParameterMapListType parameterMapList, Image fixedMask, Image movingMask, bool logToConsole, bool logToDisk, std::string outputFolder )
 {
   SimpleElastix selx;
   selx.SetFixedImage( &fixedImage );
@@ -305,23 +377,20 @@ elastix( Image fixedImage, Image movingImage, ParameterMapInterface::ParameterMa
   selx.SetParameterMapList( parameterMapList );
   selx.SetFixedMask( &fixedMask );
   selx.SetMovingMask( &movingMask );
-
-  if( logToConsole )
-  {
-    selx.LogToConsoleOn();
-  }
-
-  if( outputToFolder )
-  {
-    selx.OutoutToFolderOn();
-  }
-
-  if( logFileName != "" )
-  {
-     selx.SetLogFileName( logFileName );
-  }
+  selx.SetOutputFolder( outputFolder );
+  selx.LogToDisk( logToDisk );
+  selx.LogToConsole( logToConsole );
 
   return selx.Execute();
+}
+
+
+
+typename SimpleElastix::ParameterMapType
+ReadParameterFile( const std::string filename )
+{
+  SimpleElastix selx;
+  return selx.ParameterFileReader( filename );
 }
 
 

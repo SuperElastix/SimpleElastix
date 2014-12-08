@@ -2,7 +2,6 @@
 #define __selxsimpleelastix_hxx_
 
 #include "selxSimpleElastix.h"
-#include "itkImageFileReader.h"
 #include "itkImage.h"
 #include "sitkPixelIDValues.h"
  
@@ -25,12 +24,24 @@ SimpleElastix::ExecuteInternal( void )
   }
 
   // Assert that at least one parameter map is set
-  if( !(this->ReadParameterMapList().size() > 0) )
+  if( this->m_ParameterMaps.size() == 0 )
   {
     sitkExceptionMacro( << "Parameter map not set. Use SetParameterMap() or run Help() to get information on how to use this module." );
   }
 
-  // Get masks if set (optional)
+  for( unsigned int i = 0; i < this->m_ParameterMaps.size(); ++i )
+  {
+    // Parameter file must match fixed and moving image dimensions and pixel types
+    this->m_ParameterMaps[ i ][ "FixedInternalImagePixelType" ] = ParameterValuesType( 1, GetPixelIDValueAsElastixParameter( this->m_FixedImage->GetPixelID() ) );
+    this->m_ParameterMaps[ i ][ "MovingInternalImagePixelType" ] = ParameterValuesType( 1, GetPixelIDValueAsElastixParameter( this->m_MovingImage->GetPixelID() ) );
+    this->m_ParameterMaps[ i ][ "FixedImageDimension" ] = ParameterValuesType( 1, std::to_string( this->m_FixedImage->GetDimension() ) );
+    this->m_ParameterMaps[ i ][ "MovingImageDimension" ] = ParameterValuesType( 1, std::to_string( this->m_MovingImage->GetDimension() ) );
+
+    // Elastix library always uses direction cosines
+    this->m_ParameterMaps[ i ][ "UseDirectionCosines" ] = ParameterValuesType( 1, "true" );
+  }
+
+  // Get masks (optional)
   itk::DataObject::Pointer fixedMask = 0;
   if( this->m_FixedMask != 0 )
   {
@@ -43,15 +54,6 @@ SimpleElastix::ExecuteInternal( void )
     movingMask = this->m_MovingMask->GetITKBase();
   }
 
-  // Parameter file must match fixed and moving image dimensions and pixel types
-  this->Put( "FixedInternalImagePixelType", GetPixelIDValueAsElastixParameter( this->m_FixedImage->GetPixelID() ) );
-  this->Put( "MovingInternalImagePixelType", GetPixelIDValueAsElastixParameter( this->m_MovingImage->GetPixelID() ) );
-  this->Put( "FixedImageDimension", std::to_string( this->m_FixedImage->GetDimension() ) );
-  this->Put( "MovingImageDimension", std::to_string( this->m_MovingImage->GetDimension() ) ); 
-
-  // Elastix library always uses direction cosines
-  this->Put( "UseDirectionCosines", "true" );
-
   // Do the (possibly multiple) registrations
   int isError = 1;
   libelastix* elastix = new libelastix();
@@ -60,9 +62,9 @@ SimpleElastix::ExecuteInternal( void )
     isError = elastix->RegisterImages(
       this->m_FixedImage->GetITKBase(),
       this->m_MovingImage->GetITKBase(),
-      this->ReadParameterMapList(),
-      this->m_LogFileName,
-      this->m_LogFileName != "output_path_not_set",
+      this->m_ParameterMaps,
+      this->m_OutputFolder,
+      this->m_LogToDisk,
       this->m_LogToConsole,
       fixedMask,
       movingMask
@@ -75,25 +77,39 @@ SimpleElastix::ExecuteInternal( void )
     sitkExceptionMacro( << "Errors occured during registration: " << e.what() );
   }
 
-  if( isError == 0 && elastix->GetResultImage().IsNotNull() )
-  {
-    TResultImage* itkResultImage = static_cast< TResultImage* >( elastix->GetResultImage().GetPointer() );
-    this->m_ResultImage = Image( itkResultImage );
-    this->SetTransformParameterMapList( elastix->GetTransformParameterMapList() );
-  }
-
-  delete elastix;
-  elastix = NULL;
-
-  if( isError == -1 )
+  if( isError == -2 )
   {
     sitkExceptionMacro( << "Errors occured during registration: Output directory does not exist." );
   }
 
   if( isError != 0 )
   {
-    sitkExceptionMacro( << "Errors occured during registration. Set LogToConsoleOn() or LogToFile(\"path/to/file\") for detailed error messages." );
+    sitkExceptionMacro( << "Errors occured during registration." );
   }
+
+  if( elastix->GetTransformParameterMapList().size() == 0 )
+  {
+    this->m_TransformParameterMaps = elastix->GetTransformParameterMapList();
+  }
+  else
+  {
+    // We continue execution in case the result image can be read
+    std::cout << "Errors occured during registration: Could not read transform parameters." << std::endl;
+  }
+
+  if( elastix->GetResultImage().IsNotNull() )
+  {
+    TResultImage* itkResultImage = static_cast< TResultImage* >( elastix->GetResultImage().GetPointer() );
+    this->m_ResultImage = Image( itkResultImage );
+  }
+  else
+  {
+    // We continue execution in case transform parameters was read
+    std::cout << "Errors occured during registration: Could not read output image." << std::endl;;
+  }
+
+  delete elastix;
+  elastix = NULL;
 
   return this->m_ResultImage;
 }

@@ -8,19 +8,26 @@
 #include "sitkMemberFunctionFactory.h"
 
 // SimpleElastix
-#include "selxParameterMapInterface.h"
 #include "elastixlib.h"
 
 namespace itk { 
   namespace simple {
 
-class SELX_EXPORT SimpleElastix : public ParameterMapInterface
+class SELX_EXPORT SimpleElastix
 {
   public:
 
-    typedef SimpleElastix Self;
     SimpleElastix( void );
     ~SimpleElastix( void );
+    typedef SimpleElastix Self;
+    typedef itk::ParameterFileParser::ParameterMapType      ParameterMapType;
+    typedef ParameterMapType::iterator                      ParameterMapIterator;
+    typedef std::vector< ParameterMapType >                 ParameterMapListType;
+    typedef ParameterMapListType::iterator                  ParameterMapListIterator;
+    typedef std::string                                     ParameterKeyType;
+    typedef itk::ParameterFileParser::ParameterValuesType   ParameterValuesType;
+    typedef itk::ParameterFileParser                        ParameterFileParserType;
+    typedef ParameterFileParserType::Pointer                ParameterFileParserPointer;
  
     // typedefs inherited from SimpleITK
     typedef BasicPixelIDTypeList PixelIDTypeList;
@@ -38,21 +45,8 @@ class SELX_EXPORT SimpleElastix : public ParameterMapInterface
 
     void SetFixedMask( Image* fixedMask );
     void SetMovingMask( Image* movingMask );
-    void DeleteFixedMask( void );
-    void DeleteMovingMask( void );
-
-    // Parameter Maps
-    void SetParameterMapList( ParameterMapListType parameterMapList );
-    void SetParameterMap( ParameterMapType parameterMap );
-
-    void AddParameterMapList( ParameterMapListType parameterMapList );
-    void AddParameterMap( ParameterMapType parameterMap );
-
-    ParameterMapListType GetParameterMapList( void );
-    ParameterMapType GetParameterMap( unsigned int n );
-
-    void DeleteParameterMapList( void );
-    void DeleteParameterMap( unsigned int n );
+    void ClearFixedMask( void );
+    void ClearMovingMask( void );
 
     // Register images
     Image Execute( void );
@@ -60,17 +54,32 @@ class SELX_EXPORT SimpleElastix : public ParameterMapInterface
     // Get result
     Image GetResultImage( void );
 
-    // TODO: Move to common class
+    // Output
+    void SetOutputFolder( const std::string folder );
+    void LogToDisk( bool );
+    void LogToDiskOn( void );
+    void LogToDiskOff( void );
+    void LogToConsole( bool );
     void LogToConsoleOn( void );
     void LogToConsoleOff( void );
-    void SetLogFileName( const std::string filename );
+
+    // Paramete Map interface
+    void SetParameterMapList( ParameterMapListType parameterMapList );
+    void SetParameterMap( ParameterMapType parameterMap );
+    ParameterMapListType GetParameterMapList( void );
+
+    void SetTransformParameterMapList( ParameterMapListType parameterMapList );
+    void SetTransformParameterMap( ParameterMapType parameterMap );
+    ParameterMapListType GetTransformParameterMapList( void );
+
+    ParameterMapType ParameterFileReader( const std::string filename );
 
   private:
 
     template< typename TResultImage >
     Image ExecuteInternal( void );
 
-    // An addressor of this class to be utilized with registering member functions with the factory.
+    // Addressor of this class for member function factory
     #ifndef SWIG
       template < class TMemberFunctionPointer >
       struct SimpleElastixAddressor
@@ -89,24 +98,39 @@ class SELX_EXPORT SimpleElastix : public ParameterMapInterface
     typedef Image ( Self::*MemberFunctionType )( void );
     std::auto_ptr< detail::MemberFunctionFactory< MemberFunctionType > > m_MemberFactory;
 
-    // This class holds data and configuration that is passed to elastix API when run
+    // This class holds configuration and pointers to data that is passed to elastix API when run
     Image*                 m_FixedImage;
     Image*                 m_MovingImage;
-    std::string            m_LogFileName;
+    std::string            m_OutputFolder;
+    bool                   m_LogToDisk;
     bool                   m_LogToConsole;
     Image*                 m_FixedMask;
     Image*                 m_MovingMask;
     Image                  m_ResultImage;
+    ParameterMapListType   m_ParameterMaps;
+    ParameterMapListType   m_TransformParameterMaps;
 
 };
 
 // Procedural Interface 
-SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, ParameterMapInterface::ParameterMapType parameterMap, bool logToConsole = false, bool outputToFolder = false, std::string logFileName = "" );
-SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, ParameterMapInterface::ParameterMapListType parameterMapList, bool logToConsole = false, bool outputToFolder = false, std::string logFileName = "" );
-SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, ParameterMapInterface::ParameterMapType parameterMap, Image fixedMask, Image movingMask, bool logToConsole = false, bool outputToFolder = false, std::string logFileName = "" );
-SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, ParameterMapInterface::ParameterMapListType parameterMapList, Image fixedMask, Image movingMask, bool logToConsole = false, bool outputToFolder = false, std::string logFileName = "" );
+SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, SimpleElastix::ParameterMapType parameterMap, bool logToConsole = false, bool logToDisk = false, std::string outputFolder = "" );
+SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, SimpleElastix::ParameterMapListType parameterMapList, bool logToConsole = false, bool logToDisk = false, std::string outputFolder = "" );
+SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, SimpleElastix::ParameterMapType parameterMap, Image fixedMask, Image movingMask, bool logToConsole = false, bool logToDisk = false, std::string outputFolder = "" );
+SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, SimpleElastix::ParameterMapListType parameterMapList, Image fixedMask, Image movingMask, bool logToConsole = false, bool logToDisk = false, std::string outputFolder = "" );
+SELX_EXPORT SimpleElastix::ParameterMapType ReadParameterFile( const std::string filename );
 
 } // end namespace simple
 } // end namespace itk
+
+// This would be the only feature depending on C++11 so we choose to avoid this dependency
+namespace std
+{
+  template < typename T > std::string to_string( const T& n )
+  {
+    std::ostringstream stm;
+    stm << n;
+    return stm.str();
+  }
+}
 
 #endif // __selxsimpleelastix_h_
