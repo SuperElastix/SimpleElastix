@@ -1,10 +1,11 @@
 CMAKE_MINIMUM_REQUIRED( VERSION 2.8.11 )
 
 set( proj elastix )
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${proj}-build/CMakeCacheInit.txt" "${ep_common_cache}" )
+
 set( ELASTIX_DEPENDENCIES "ITK")
 set( ELASTIX_REPOSITORY git://github.com/kaspermarstal/elastix.git )
-
-file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${proj}-build/CMakeCacheInit.txt" "${ep_common_cache}" )
+set( ELASTIX_PIXELTYPES "short;float" )
 
 ExternalProject_Add( ${proj} 
   GIT_REPOSITORY ${ELASTIX_REPOSITORY}
@@ -17,7 +18,10 @@ ExternalProject_Add( ${proj}
   -C "${CMAKE_CURRENT_BINARY_DIR}/${proj}-build/CMakeCacheInit.txt"
   -DELASTIX_BUILD_TESTING:BOOL=OFF
   -DELASTIX_BUILD_EXECUTABLE:BOOL=OFF
-  -DELASTIX_BUILD_SHARED_LIBS:BOOL=OFF
+  -DELASTIX_BUILD_SHARED_LIBS:BOOL=ON
+  "-DELASTIX_IMAGE_2D_PIXELTYPES:STRING=${ELASTIX_PIXELTYPES}"
+  "-DELASTIX_IMAGE_3D_PIXELTYPES:STRING=${ELASTIX_PIXELTYPES}"
+  "-DELASTIX_IMAGE_4D_PIXELTYPES:STRING=${ELASTIX_PIXELTYPES}"
   -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
   -DITK_DIR:PATH=${ITK_DIR}
   # Elastix components configuration
@@ -32,7 +36,7 @@ ExternalProject_Add( ${proj}
   -DUSE_BSplineInterpolator:BOOL=ON                                           
   -DUSE_BSplineInterpolatorFloat:BOOL=ON                                           
   -DUSE_BSplineResampleInterpolator:BOOL=ON                                           
-  -DUSE_BSplineResampleInterpolatoFloat:BOOL=ON                                           
+  -DUSE_BSplineResampleInterpolatorFloat:BOOL=ON                                           
   -DUSE_BSplineStackTransform:BOOL=ON                                           
   -DUSE_BSplineTransformWithDiffusion:BOOL=ON                                           
   -DUSE_CMAEvolutionStrategy:BOOL=ON                                           
@@ -43,7 +47,7 @@ ExternalProject_Add( ${proj}
   -DUSE_DeformationFieldTransform:BOOL=ON                                           
   -DUSE_DisplacementMagnitudePenalty:BOOL=ON                                           
   -DUSE_DistancePreservingRigidityPenalty:BOOL=ON                                           
-  -DUSE_EulerTransformElastix:BOOL= ON                                           
+  -DUSE_EulerTransformElastix:BOOL=ON                                           
   -DUSE_FiniteDifferenceGradientDescent:BOOL=ON                                           
   -DUSE_FixedGenericPyramid:BOOL=ON                                           
   -DUSE_FixedRecursivePyramid:BOOL=ON                                           

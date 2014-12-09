@@ -41,7 +41,7 @@ if ( WRAP_LUA OR WRAP_PYTHON OR WRAP_JAVA OR WRAP_CSHARP OR WRAP_TCL OR WRAP_R O
 
   include( ${ITK_USE_FILE} )
   include( ${ELASTIX_USE_FILE} )
-  list( APPEND SimpleITK_LIBRARIES SimpleElastix )
+  list( APPEND SimpleITK_LIBRARIES SimpleElastix SimpleTransformix )
 
 
 endif()
