@@ -78,6 +78,7 @@
 #include <SimpleITK.h>
 #include <sitkImageOperators.h>
 #include <selxSimpleElastix.h>
+#include <selxSimpleTransformix.h>
 %}
 
 // Language Specific Sections
@@ -152,7 +153,6 @@ namespace std
 %include "sitkVersorTransform.h"
 %include "sitkVersorRigid3DTransform.h"
 
-
 // Basic Filter Base
 %include "sitkProcessObject.h"
 %include "sitkImageFilter.h"
@@ -165,8 +165,8 @@ namespace std
 %template(ImageFilter_5) itk::simple::ImageFilter<5>;
 
 // Elastix
-%template(ParameterMap) std::map< std::string, std::vector< std::string > >;
-%template(ParameterMapList) std::vector< std::map< std::string, std::vector< std::string > > >;
+%template(ParameterMapType) std::map< std::string, std::vector< std::string > >;
+%template(ParameterMapListType) std::vector< std::map< std::string, std::vector< std::string > > >;
 %include "selxSimpleElastix.h"
 %include "selxSimpleTransformix.h"
 
@@ -188,12 +188,10 @@ namespace std
 // Registration
 %include "sitkImageRegistrationMethod.h"
 
-
 // Only C# can handle import filter
 #if SWIGCSHARP
 %include "sitkImportImageFilter.h"
 #endif
-
 
 #if SWIGPYTHON
 %include "sitkPyCommand.h"

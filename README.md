@@ -3,7 +3,7 @@ SimpleElastix
 
 The goal of SimpleElastix is to bring the robust medical image registration algorithms of the [elastix](http://elastix.isi.uu.nl/ "Elastix website") library to a wider audience by integrating elastix with [SimpleITK](https://github.com/SimpleITK/SimpleITK "SimpleITK github repository"). This package provides
 
-- elastix and transformix bindings for Python, Java, R, Ruby, Octave, Lua, Tcl and C# (see [elastix manual](elastix.isi.uu.nl/download/elastix_manual_v4.7.pdf "elastix manual" for a list of supported algorithms).
+- elastix and transformix bindings for Python, Java, R, Ruby, Octave, Lua, Tcl and C# (see [elastix manual](http://elastix.isi.uu.nl/download/elastix_manual_v4.7.pdf "elastix manual" for a list of supported algorithms).
 - A user-friendly API that aligns with the design philosophy of SimpleITK, developed specifically for rapid prototyping and use in scripting languages. If you are interested, [The Design of SimpleITK](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3874546/ "PubMed") is a great read.
 - Pre-configured parameter files that should serve as good starting points for new users.
 - The complete set of SimpleITK image processing algorithms.
@@ -25,10 +25,9 @@ population = ['image1.hdr', 'image2.hdr', ... , 'imageN.hdr']
 
 selx = sitk.SimpleElastix()
 selx.SetMovingImage(movingImage)
-selx.SetParameterMap('defaultNonrigidRegistration')
+selx.SetParameterMap(selx.GetDefaultParameterMap('nonrigid'))
 selx.LogToConsoleOff()
 
-# Do the processing
 for filename in population
   # Register images
   fixedImage = sitk.ReadImage(filename)
@@ -64,11 +63,11 @@ fixedImage = sitk.ReadImage('fixedImage.hdr');
 
 affineMovingImage = sitk.SimpleElastix(fixedImage, 
                                        sitk.ReadImage('movingImage.hdr'),
-                                       'defaultAffineParameterMap')
+                                       'affine')
 
 registeredImage = sitk.SimpleElastix(fixedImage,
                                      affineMovingImage,
-                                     'defaultNonrigidParameterMap')
+                                     'nonrigid')
 ```
 
 
@@ -81,7 +80,7 @@ import SimpleITK as sitk
 
 # First we concatenate the ND images into one (N+1)D image
 population = ['image1.hdr', 'image2.hdr', ... , 'imageN.hdr']
-vectorOfImages = sitk.VectorOfImages()
+vectorOfImages = sitk.VectorOfImage()
 vectorOfImages = [vectorOfImages.push_back(sitk.ReadImage(image)) for image in population]
 image4d = sitk.JoinSeriesFilter(vectorOfImages)
 
@@ -143,7 +142,7 @@ ccmake ../SimpleElastix/SuperBuild
 make -j4
 ```
 
-SimpleElastix will be compiled along with any dependencies (elastix, ITK, SimpleITK, SWIG and target language dependencies, these are downloaded on the fly). Note that this project takes a long time to build. On a quad-core machine it takes around and hour and if your machine has less than 16 GB RAM you will have to compile with even fewer cores. Because of the extreme memory consumption I prefer to build with clang.
+SimpleElastix will be compiled along with any dependencies (elastix, ITK, SimpleITK, SWIG and target language dependencies, these are downloaded on the fly). Note that this project takes a long time to build. On a quad-core machine it takes around and hour and requires 16 GB RAM. Because of the extreme memory requirements I prefer to build with clang.
 
 About
 -----
