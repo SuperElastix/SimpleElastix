@@ -19,6 +19,7 @@ class SELX_EXPORT SimpleElastix
 
     SimpleElastix( void );
     ~SimpleElastix( void );
+
     typedef SimpleElastix Self;
     typedef itk::ParameterFileParser::ParameterMapType      ParameterMapType;
     typedef ParameterMapType::iterator                      ParameterMapIterator;
@@ -114,16 +115,17 @@ class SELX_EXPORT SimpleElastix
 };
 
 // Procedural Interface 
+SELX_EXPORT SimpleElastix::ParameterMapType ReadParameterFile( const std::string filename );
+SELX_EXPORT SimpleElastix::ParameterMapType GetDefaultParameterMap( const std::string filename );
 SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, SimpleElastix::ParameterMapType parameterMap, bool logToConsole = false, bool logToDisk = false, std::string outputFolder = "" );
 SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, SimpleElastix::ParameterMapListType parameterMapList, bool logToConsole = false, bool logToDisk = false, std::string outputFolder = "" );
 SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, SimpleElastix::ParameterMapType parameterMap, Image fixedMask, Image movingMask, bool logToConsole = false, bool logToDisk = false, std::string outputFolder = "" );
 SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, SimpleElastix::ParameterMapListType parameterMapList, Image fixedMask, Image movingMask, bool logToConsole = false, bool logToDisk = false, std::string outputFolder = "" );
-SELX_EXPORT SimpleElastix::ParameterMapType ReadParameterFile( const std::string filename );
 
 } // end namespace simple
 } // end namespace itk
 
-// This would be the only feature depending on C++11 so we choose to avoid this dependency
+// This would be the only feature depending on C++11
 namespace std
 {
   template < typename T > std::string to_string( const T& n )

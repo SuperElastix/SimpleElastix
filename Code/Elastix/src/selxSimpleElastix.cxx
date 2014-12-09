@@ -18,7 +18,7 @@ SimpleElastix
   m_MemberFactory->RegisterMemberFunctions< PixelIDTypeList, 2, SimpleElastixAddressor< MemberFunctionType > >();
 
   // This class holds configuration and pointers to data that is passed to elastix API when run
-  this->m_FixedMask = 0;
+  this->m_FixedImage = 0;
   this->m_MovingImage = 0;
   this->m_ParameterMaps = ParameterMapListType();
   this->m_TransformParameterMaps = ParameterMapListType();
@@ -29,6 +29,7 @@ SimpleElastix
   this->m_LogToDisk = false;
   this->m_LogToConsole = true;
 }
+
 
 
 SimpleElastix
@@ -278,49 +279,36 @@ SimpleElastix::ParameterMapType
 SimpleElastix
 ::GetDefaultParameterMap( const std::string name )
 { 
+
   // Defaults
   unsigned int resolution          = 3;
   unsigned int dimension           = 3;
-  std::vector<unsigned int> pixdim = std::vector<unsigned int>( res, 1 );
-  std::vector<unsigned int> siz    = std::vector<unsigned int>( res, 256 );
-  std::vector<unsigned int> knots  = std::vector<unsigned int>( res, 16 );
+  std::vector<unsigned int> siz    = std::vector<unsigned int>( resolution, 256 );
+  std::vector<unsigned int> knots  = std::vector<unsigned int>( resolution, 16 );
 
   // Image parameters
   if( this->m_FixedImage != 0 )
   {
     siz = this->m_FixedImage->GetSize();
-    dim = this->m_FixedImage->GetDimension();
-
-    if( this->m_FixedImage->HasMetaDataKey( "PixelSpacing" ) )
-    {
-      // pixdim = this->m_FixedImage->GetMetaData( "PixelSpacing" );
-    }
-  }
-  else
-  {
-    std::cout << "WARNING: Some parameters depend on information from the fixed image which as not been set. "
-              << "This parameter file uses default parameters that are not compatible with 2D images."
-              << std::endl;
+    dimension = this->m_FixedImage->GetDimension();
   }
 
-  // Parameters that depend on size, resolution and pixel dimensions
-  unsigned int i = 0;
-  ParameterMapType parameterMap;
-  ParameterValuesType finalGridSpacingInVoxels    = ParameterValuesType();
-  ParameterValuesType gridSpacingSchedule         = ParameterValuesType();
-  ParameterValuesType movingImagePyramidSchedule  = ParameterValuesType();
+  // Parameters that depend on size and number of resolutions
+  ParameterMapType parameterMap                     = ParameterMapType();
+  ParameterValuesType finalGridSpacingInVoxels      = ParameterValuesType();
+  ParameterValuesType gridSpacingSchedule           = ParameterValuesType();
+  ParameterValuesType movingImagePyramidSchedule    = ParameterValuesType();
   for( unsigned int dim = 0; dim < dimension; ++dim )
   {
-    finalGridSpacingInVoxels.push_back( siz[ dim ] / knots[ dime ] / pixdim[ dim ] )
+    finalGridSpacingInVoxels.push_back( std::to_string( siz[ dim ] / knots[ dim ] ) );
     for( unsigned int res = 0; res < resolution; ++res )
     {
-      gridSpacingSchedule.push_front( pow( 2, dim ) );                      // (4, 4, 4, 2, 2, 2, 1, 1, 1)
-      movingImagePyramidSchedule .push_front( to_string( pow( 2, dim ) ) ); // (4, 4, 4, 2, 2, 2, 1, 1, 1)
+      gridSpacingSchedule.insert( gridSpacingSchedule.begin(), std::to_string( pow( 2, dim ) ) );               // (4, 4, 4, 2, 2, 2, 1, 1, 1)
+      movingImagePyramidSchedule.insert( movingImagePyramidSchedule.begin(), std::to_string( pow( 2, dim ) ) ); // (4, 4, 4, 2, 2, 2, 1, 1, 1)
     }
   }
 
   // Common Components
-  ParameterMapType parameterMap;
   parameterMap[ "FixedImagePyramid" ]               = ParameterValuesType( 1, "FixedSmoothingImagePyramid" );
   parameterMap[ "MovingImagePyramid" ]              = ParameterValuesType( 1, "MovingSmoothingImagePyramid" );
   parameterMap[ "Interpolator "]                    = ParameterValuesType( 1, "LinearInterpolator");
@@ -329,11 +317,11 @@ SimpleElastix
   parameterMap[ "FinalBSplineInterpolationOrder" ]  = ParameterValuesType( 1, "2" );
   parameterMap[ "FixedImagePyramidSchedule"]        = ParameterValuesType( resolution * dimension, "0" );
   parameterMap[ "MovingImagePyramidSchedule"]       = movingImagePyramidSchedule;
-  parameterMap[ "NumberOfResolutions" ]             = ParameterValuesType( 1, to_string( res ) );
+  parameterMap[ "NumberOfResolutions" ]             = ParameterValuesType( 1, std::to_string( resolution ) );
 
   // Image Sampler
-  parameterMap[ "ImageSampler" ]                    = ParameterValuesType( 1, "Random" );
-  parametermap[ "NumberOfSpatialSamples"]           = ParameterValuesType( 1, "4096" );
+  parameterMap[ "ImageSampler" ]                    = ParameterValuesType( 1, "Random" ); 
+  parameterMap[ "NumberOfSpatialSamples"]           = ParameterValuesType( 1, "4096" );
   parameterMap[ "CheckNumberOfSamples" ]            = ParameterValuesType( 1, "true" );
   parameterMap[ "MaximumNumberOfSamplingAttemts" ]  = ParameterValuesType( 1, "8" );
   parameterMap[ "NewSamplesEveryIteration" ]        = ParameterValuesType( 1, "true");
@@ -342,40 +330,55 @@ SimpleElastix
   parameterMap[ "MaximumNumberOfIterations" ]       = ParameterValuesType( 1, "256" );
   parameterMap[ "NumberOfSamplesForExactGradient" ] = ParameterValuesType( 1, "4096" );
   parameterMap[ "DefaultPixelValue" ]               = ParameterValuesType( 1, "0" );
+  parameterMap[ "AutomaticParameterEstimation" ]    = ParameterValuesType( 1, "true" );
 
-  // Special parameters
-  switch name
+  if( name == "translation" )
   {
-    case "defaultRigidParameterMap":
-      break;
-    case "defaultAffineParameterMap":
-      parameterMap[ "Registration" ]                = ParameterValuesType( "MultiResolutionRegistration" );
-      parameterMap[ "Transform" ]                   = ParameterValuesType( "AffineTransform" );
-      parameterMap[ "Metric" ]                      = ParameterValuesType( "MattesMutualInformationMetric" );
-      parameterMap[ "MaximumNumberOfSamples"]       = ParameterValuesType( "8192" );
-      break;
-    case "defaultNonRigidParameterMap":
-      parameterMap[ "Registration" ]                = ParameterValuesType( "MultiMetricMultiResolutionRegistration" );
-      parameterMap[ "Transform" ]                   = ParameterValuesType( "BSplineTransform" );
-      parameterMap[ "FinalGridSpacingInVoxels" ]    = finalGridSpacingInVoxels;
-      parameterMap[ "GridSpacingSchedule" ]         = gridSpacingSchedule;
-      break;
-    case "defaultGroupwiseParameterMap":
-      parameterMap[ "Registration" ]                = ParameterValuesType( "MultiResolutionRegistration" );
-      parameterMap[ "Transform" ]                   = ParameterValuesType( "BSplineStackTransform" );
-      parameterMap[ "Metric" ]                      = ParameterValuesType( "VarianceOverLastDimensionMetric" );
-      parameterMap[ "FinalGridSpacingInVoxels" ]    = finalGridSpacingInVoxels;
-      parameterMap[ "GridSpacingSchedule" ]         = gridSpacingSchedule;
-      break;
-    default :
-      sitkExceptionMacro( "No default parameter map named \"" << name << "\"." );
+    parameterMap[ "Registration" ]                  = ParameterValuesType( 1, "MultiResolutionRegistration" );
+    parameterMap[ "Transform" ]                     = ParameterValuesType( 1, "TranslationTransform" );
+    parameterMap[ "Metric" ]                        = ParameterValuesType( 1, "MattesMutualInformationMetric" );
+  }
+  else if( name == "rigid" )
+  {
+    parameterMap[ "Registration" ]                  = ParameterValuesType( 1, "MultiResolutionRegistration" );
+    parameterMap[ "Transform" ]                     = ParameterValuesType( 1, "EulerTransform" );
+    parameterMap[ "Metric" ]                        = ParameterValuesType( 1, "MattesMutualInformationMetric" );
+  }
+  else if( name == "affine" )
+  {
+    parameterMap[ "Registration" ]                  = ParameterValuesType( 1, "MultiResolutionRegistration" );
+    parameterMap[ "Transform" ]                     = ParameterValuesType( 1, "AffineTransform" );
+    parameterMap[ "Metric" ]                        = ParameterValuesType( 1, "MattesMutualInformationMetric" );
+  }
+  else if( name == "nonrigid" )
+  {
+    parameterMap[ "Registration" ]                  = ParameterValuesType( 1, "MultiMetricMultiResolutionRegistration" );
+    parameterMap[ "Transform" ]                     = ParameterValuesType( 1, "BSplineTransform" );
+    parameterMap[ "Metric" ]                        = ParameterValuesType( 1, "MattesMutualInformationMetric" );
+    parameterMap[ "Metric" ]                        .push_back( "TransformBendingEnergyPenalty" );
+    parameterMap[ "Metric0Weight" ]                 = ParameterValuesType( 1, "0.01" );
+    parameterMap[ "Metric1Weight" ]                 = ParameterValuesType( 1, "0.99" );
+    parameterMap[ "FinalGridSpacingInVoxels" ]      = finalGridSpacingInVoxels;
+    parameterMap[ "GridSpacingSchedule" ]           = gridSpacingSchedule;
+  }
+  else if( name == "groupwise" )
+  {
+    parameterMap[ "Registration" ]                  = ParameterValuesType( 1, "MultiResolutionRegistration" );
+    parameterMap[ "Transform" ]                     = ParameterValuesType( 1, "BSplineStackTransform" );
+    parameterMap[ "Metric" ]                        = ParameterValuesType( 1, "VarianceOverLastDimensionMetric" );
+    parameterMap[ "FinalGridSpacingInVoxels" ]      = finalGridSpacingInVoxels;
+    parameterMap[ "GridSpacingSchedule" ]           = gridSpacingSchedule;
+  }
+  else
+  {
+    sitkExceptionMacro( "No default parameter map named \"" << name << "\"." );
   }
 
   // Required for 2D
-  if( dim == 2 )
+  if( dimension == 2 )
   {
-    parameterMap[ "FixedImagePyramid" ]             = ParameterValuesType( "FixedRecursiveImagePyramid" );
-    parameterMap[ "MovingImagePyramid" ]            = ParameterValuesType( "MovingRecursiveImagePyramid" );    
+    parameterMap[ "FixedImagePyramid" ]             = ParameterValuesType( 1, "FixedRecursiveImagePyramid" );
+    parameterMap[ "MovingImagePyramid" ]            = ParameterValuesType( 1, "MovingRecursiveImagePyramid" );    
   }
 
   return parameterMap;
@@ -387,17 +390,37 @@ SimpleElastix
 
 
 
-Image
-elastix( Image fixedImage, Image movingImage, std::string defaultParameterMapName, bool logToConsole, bool logToDisk, std::string outputFolder )
+typename SimpleElastix::ParameterMapType
+ReadParameterFile( const std::string filename )
 {
-  SimpleElastix::ParameterMapListType parameterMapList;
-  return elastix( fixedImage, movingImage, GetDefaultParameterMap( defaultParameterMapName ), logToConsole, logToDisk, outputFolder );
+  SimpleElastix selx;
+  return selx.ParameterFileReader( filename );
+}
+
+
+
+SimpleElastix::ParameterMapType
+GetDefaultParameterMap( std::string defaultParameterMapName )
+{
+  SimpleElastix selx;
+  SimpleElastix::ParameterMapType parameterMap = selx.GetDefaultParameterMap( defaultParameterMapName );
+  return parameterMap;
 }
 
 
 
 Image
 elastix( Image fixedImage, Image movingImage, std::string defaultParameterMapName, bool logToConsole, bool logToDisk, std::string outputFolder )
+{
+  SimpleElastix selx;
+  SimpleElastix::ParameterMapType parameterMap = selx.GetDefaultParameterMap( defaultParameterMapName );
+  return elastix( fixedImage, movingImage, parameterMap, logToConsole, logToDisk, outputFolder );
+}
+
+
+
+Image
+elastix( Image fixedImage, Image movingImage, SimpleElastix::ParameterMapType parameterMap, bool logToConsole, bool logToDisk, std::string outputFolder )
 {
   SimpleElastix::ParameterMapListType parameterMapList;
   parameterMapList.push_back( parameterMap );
@@ -425,8 +448,9 @@ elastix( Image fixedImage, Image movingImage, SimpleElastix::ParameterMapListTyp
 Image
 elastix( Image fixedImage, Image movingImage, std::string defaultParameterMapName, Image fixedMask, Image movingMask, bool logToConsole, bool logToDisk, std::string outputFolder )
 {
-  SimpleElastix::ParameterMapListType parameterMapList;
-  return elastix( fixedImage, movingImage, GetDefaultParameterMap( defaultParameterMapName ), fixedMask, movingMask, logToConsole, logToDisk, outputFolder );
+  SimpleElastix selx;
+  SimpleElastix::ParameterMapType parameterMap = selx.GetDefaultParameterMap( defaultParameterMapName );
+  return elastix( fixedImage, movingImage, parameterMap, fixedMask, movingMask, logToConsole, logToDisk, outputFolder );
 }
 
 
@@ -457,16 +481,6 @@ elastix( Image fixedImage, Image movingImage, SimpleElastix::ParameterMapListTyp
 
   return selx.Execute();
 }
-
-
-
-typename SimpleElastix::ParameterMapType
-ReadParameterFile( const std::string filename )
-{
-  SimpleElastix selx;
-  return selx.ParameterFileReader( filename );
-}
-
 
 
 } // end namespace simple

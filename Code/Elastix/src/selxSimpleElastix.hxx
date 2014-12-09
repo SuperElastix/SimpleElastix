@@ -87,7 +87,7 @@ SimpleElastix::ExecuteInternal( void )
     sitkExceptionMacro( << "Errors occured during registration." );
   }
 
-  if( elastix->GetTransformParameterMapList().size() == 0 )
+  if( elastix->GetTransformParameterMapList().size() > 0 )
   {
     this->m_TransformParameterMaps = elastix->GetTransformParameterMapList();
   }
