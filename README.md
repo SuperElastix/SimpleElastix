@@ -39,7 +39,9 @@ for filename in population
   sitk.LabelStatisticsImageFilter(fixedImage, resultLabel)
 ```
 
-That was easy. The example demonstrates the efficiency of combining SimpleElastix's object oriented interface (the way we used elastix to register images) and procedural interface (the way we used transformix to warp labels) with SimpleITK (the way we computed statistics). For more examples, see below or the [Examples/SimpleElastix](https://github.com/kaspermarstal/SimpleElastix/tree/SimpleElastix/Examples/SimpleElastix "SimpleElastix examples") directory. 
+That was easy. The example demonstrates the efficiency of combining SimpleElastix's object oriented interface (the way we used elastix to register images) and procedural interface (the way we used transformix to warp labels) with SimpleITK (the way we computed statistics). For more examples, see below or the [Examples/SimpleElastix](https://github.com/kaspermarstal/SimpleElastix/tree/SimpleElastix/Examples/SimpleElastix "SimpleElastix examples") directory.
+
+Another advantage of using SimpleElastix for your image registration tasks is that SimpleITK exposes convenient native ITK methods for manipulating data in image coordinate system. For example, SimpleITK's `Image()` class gives you direct access to `GetDirection()`, `GetOrigin()`, `TransformContinuousIndexToPhysicalPoint()`, `TransformIndexToPhysicalPoint()` etc. of the underlying ITK implementation.
 
 
 ### Procedural Interface
@@ -142,7 +144,7 @@ ccmake ../SimpleElastix/SuperBuild
 make -j4
 ```
 
-SimpleElastix will be compiled along with any dependencies (elastix, ITK, SimpleITK, SWIG and target language dependencies, these are downloaded on the fly). Note that this project takes a long time to build. On a quad-core machine it takes around and hour and requires 16 GB RAM. Because of the extreme memory requirements I prefer to build with clang.
+SimpleElastix will be compiled along with any dependencies (elastix, ITK, SimpleITK, SWIG and most target language dependencies are downloaded and installed on the fly). Note that this project takes a long time to build. On a quad-core machine it takes around and hour and requires 16 GB RAM. Because of the extreme memory requirements I prefer to build with clang.
 
 About
 -----

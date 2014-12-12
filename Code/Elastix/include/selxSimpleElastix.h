@@ -54,6 +54,7 @@ class SELX_EXPORT SimpleElastix
 
     // Get result
     Image GetResultImage( void );
+    std::vector< std::map< std::string, std::vector< std::string > > > GetTransformParameterMapList( void );
 
     // Output
     void SetOutputFolder( const std::string folder );
@@ -65,13 +66,9 @@ class SELX_EXPORT SimpleElastix
     void LogToConsoleOff( void );
 
     // Paramete Map interface
-    void SetParameterMapList( ParameterMapListType parameterMapList );
-    void SetParameterMap( ParameterMapType parameterMap );
-    ParameterMapListType GetParameterMapList( void );
-
-    void SetTransformParameterMapList( ParameterMapListType parameterMapList );
-    void SetTransformParameterMap( ParameterMapType parameterMap );
-    ParameterMapListType GetTransformParameterMapList( void );
+    void SetParameterMapList( std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList );
+    void SetParameterMap( std::map< std::string, std::vector< std::string > > parameterMap );
+    std::vector< std::map< std::string, std::vector< std::string > > > GetParameterMapList( void );
 
     ParameterMapType GetDefaultParameterMap( const std::string name );
     ParameterMapType ParameterFileReader( const std::string filename );
@@ -115,8 +112,8 @@ class SELX_EXPORT SimpleElastix
 };
 
 // Procedural Interface 
-SELX_EXPORT SimpleElastix::ParameterMapType ReadParameterFile( const std::string filename );
-SELX_EXPORT SimpleElastix::ParameterMapType GetDefaultParameterMap( const std::string filename );
+SELX_EXPORT std::map< std::string, std::vector< std::string > > GetDefaultParameterMap( const std::string filename );
+SELX_EXPORT std::map< std::string, std::vector< std::string > > ReadParameterFile( const std::string filename );
 SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, SimpleElastix::ParameterMapType parameterMap, bool logToConsole = false, bool logToDisk = false, std::string outputFolder = "" );
 SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, SimpleElastix::ParameterMapListType parameterMapList, bool logToConsole = false, bool logToDisk = false, std::string outputFolder = "" );
 SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, SimpleElastix::ParameterMapType parameterMap, Image fixedMask, Image movingMask, bool logToConsole = false, bool logToDisk = false, std::string outputFolder = "" );
@@ -125,12 +122,11 @@ SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, SimpleElastix::P
 } // end namespace simple
 } // end namespace itk
 
-// This would be the only feature depending on C++11
 namespace std
 {
-  template < typename T > std::string to_string( const T& n )
+  template < typename T > string to_string( const T& n )
   {
-    std::ostringstream stm;
+    ostringstream stm;
     stm << n;
     return stm.str();
   }

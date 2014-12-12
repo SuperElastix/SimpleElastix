@@ -19,6 +19,7 @@ class SELX_EXPORT SimpleTransformix
 
     SimpleTransformix( void );
     ~SimpleTransformix( void );
+    
     typedef SimpleTransformix Self;
     typedef itk::ParameterFileParser::ParameterMapType      ParameterMapType;
     typedef ParameterMapType::iterator                      ParameterMapIterator;
@@ -57,9 +58,9 @@ class SELX_EXPORT SimpleTransformix
     void LogToConsoleOn( void );
     void LogToConsoleOff( void );
 
-    void SetTransformParameterMapList( ParameterMapListType parameterMapList );
-    void SetTransformParameterMap( ParameterMapType parameterMap );
-    ParameterMapListType GetTransformParameterMapList( void );
+    void SetTransformParameterMapList( std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList );
+    void SetTransformParameterMap( std::map< std::string, std::vector< std::string > > parameterMap );
+    std::vector< std::map< std::string, std::vector< std::string > > > GetTransformParameterMapList( void );
 
     ParameterMapType ParameterFileReader( const std::string filename );
 
@@ -98,7 +99,7 @@ class SELX_EXPORT SimpleTransformix
 };
 
 // Procedural Interface 
-SELX_EXPORT Image transformix( Image inputImage, SimpleTransformix::ParameterMapType parameterMap, bool logToConsole = false, bool logToDisk = false, std::string outputFolder = "" );
+SELX_EXPORT Image transformix( Image inputImage, std::map< std::string, std::vector< std::string > > parameterMap, bool logToConsole = false, bool logToDisk = false, std::string outputFolder = "" );
 SELX_EXPORT Image transformix( Image fixedImage, SimpleTransformix::ParameterMapListType parameterMapList, bool logToConsole = false, bool logToDisk = false, std::string outputFolder = "" );
 
 

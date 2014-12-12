@@ -281,6 +281,8 @@ endif()
 include(External_Elastix)
 list(APPEND ${CMAKE_PROJECT_NAME}_DEPENDENCIES elastix)
 
+include(External_NodeJS)
+
 
 #------------------------------------------------------------------------------
 # SimpleITK

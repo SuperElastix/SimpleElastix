@@ -71,7 +71,6 @@
 %ignore itk::simple::Image::GetBufferAsDouble;
 #endif
 
-
 // This section is copied verbatim into the generated source code.
 // Any include files, definitions, etc. need to go here.
 %{
@@ -111,8 +110,6 @@ namespace std
   %template(DoubleDoubleMap) map<double, double>;
 }
 
-
-
 // define these preprocessor directives to nothing for the swig interface
 #define SITKCommon_EXPORT
 #define SITKCommon_HIDDEN
@@ -126,6 +123,7 @@ namespace std
 #define SITKIO_HIDDEN
 #define SITKRegistration_EXPORT
 #define SITKRegistration_HIDDEN
+
 
 
 // Any new classes need to have an "%include" statement to be wrapped.

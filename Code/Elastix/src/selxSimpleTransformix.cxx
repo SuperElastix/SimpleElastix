@@ -149,7 +149,7 @@ SimpleTransformix
 
 void
 SimpleTransformix
-::SetTransformParameterMapList( ParameterMapListType parameterMapList )
+::SetTransformParameterMapList( std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList )
 {
   this->m_TransformParameterMaps = parameterMapList;
 }
@@ -158,7 +158,7 @@ SimpleTransformix
 
 void
 SimpleTransformix
-::SetTransformParameterMap( ParameterMapType parameterMap )
+::SetTransformParameterMap( std::map< std::string, std::vector< std::string > > parameterMap )
 {
   ParameterMapListType parameterMapList;
   parameterMapList.push_back( parameterMap );
