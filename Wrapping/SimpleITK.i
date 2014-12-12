@@ -163,8 +163,8 @@ namespace std
 %template(ImageFilter_5) itk::simple::ImageFilter<5>;
 
 // Elastix
-%template(ParameterMapType) std::map< std::string, std::vector< std::string > >;
-%template(ParameterMapListType) std::vector< std::map< std::string, std::vector< std::string > > >;
+%template(ParameterMap) std::map< std::string, std::vector< std::string > >;
+%template(ParameterMapList) std::vector< std::map< std::string, std::vector< std::string > > >;
 %include "selxSimpleElastix.h"
 %include "selxSimpleTransformix.h"
 
