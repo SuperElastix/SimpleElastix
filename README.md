@@ -136,14 +136,9 @@ make -j4
 SimpleElastix will be compiled along with any dependencies (elastix, ITK, SimpleITK, SWIG and most target language dependencies are downloaded and installed on the fly). Note that this project takes a long time to build. On a quad-core machine it takes around and hour and requires 16 GB RAM. Because of the extreme memory requirements I prefer to build with clang.
 
 ### Building Manually
-This is not the recommended way of building SimpleElastix but it can be useful if you want to use a system version of ITK, SWIG or your own version of elastix.
+This is not the recommended way of building SimpleElastix but it can be useful if you want to use a system version of ITK, SWIG or your own version of elastix. 
 
-1. Setup the prerequisites, e.g.
-```
-sudo add-apt-repository ppa:kalakris/cmake -y
-sudo apt-get -qq update
-sudo apt-get install cmake swig monodevelop r-base r-base-dev ruby python python-dev tcl tcl-dev tk tk-dev
-```
+1. Setup the prerequisites, e.g. `sudo apt-get install cmake swig monodevelop r-base r-base-dev ruby python python-dev tcl tcl-dev tk tk-dev`
 2. Install the matching version of SWIG >= 2.0.12
 3. Download elastix
 4. Configure elastix using CMake
