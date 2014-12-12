@@ -138,11 +138,12 @@ SimpleElastix will be compiled along with any dependencies (elastix, ITK, Simple
 ### Building Manually
 This is not the recommended way of building SimpleElastix but it can be useful if you want to use a system version of ITK, SWIG or your own version of elastix. 
 
-1. Setup the prerequisites, e.g. `sudo apt-get install cmake swig monodevelop r-base r-base-dev ruby python python-dev tcl tcl-dev tk tk-dev`
+1. Setup the prerequisites
+ - e.g. `sudo apt-get install cmake swig monodevelop r-base r-base-dev ruby python python-dev tcl tcl-dev tk tk-dev`.
 2. Install the matching version of SWIG >= 2.0.12
 3. Download elastix
 4. Configure elastix using CMake
- - BUILD_TESTING=OFF, BUILD_EXECUTABLE=OFF, BUILD_SHARED_LIBRARIES=ON
+ - BUILD_TESTING=OFF, BUILD_EXECUTABLE=OFF, BUILD_SHARED_LIBRARIES=ON, USE_KNNGraphAlphaMutualInformationMetric=OFF 
  - Set appropriate ELASTIX_IMAGE_2/3/4D_PIXELTYPES and any components that you might require
 5. Build elastix
 6. Download the SimpleITK source code from the SourceForge page
