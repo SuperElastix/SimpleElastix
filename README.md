@@ -1,5 +1,7 @@
 SimpleElastix
 =============
+[![Build Status](https://travis-ci.org/kaspermarstal/SimpleElastix.svg?branch=SimpleElastix)](https://travis-ci.org/kaspermarstal/SimpleElastix)
+
 The goal of SimpleElastix is to bring the robust medical image registration algorithms of the [elastix](http://elastix.isi.uu.nl/ "Elastix website") library to a wider audience by integrating elastix with [SimpleITK](https://github.com/SimpleITK/SimpleITK "SimpleITK github repository"). This package provides
 
 - elastix and transformix bindings for Python, Java, R, Ruby, Octave, Lua, Tcl and C# (see [elastix manual](http://elastix.isi.uu.nl/download/elastix_manual_v4.7.pdf "elastix manual" for a list of supported algorithms).
@@ -8,9 +10,9 @@ The goal of SimpleElastix is to bring the robust medical image registration algo
 - Pre-configured parameter files that should serve as good starting points for new users.
 - The complete set of SimpleITK image processing algorithms.
 
-Elastix code is found in the [Code/Elastix](Code/Elastix) directory. Previously, using elastix and transformix on large datasets would incur a significant overhead, from scripting command line invocations and arguments to copying images and transform parameter files across folders. With SimpleElastix this complexity is easier to manage and more memory and disk I/O efficient. 
+Previously, using elastix and transformix on large datasets would incur a significant overhead, from scripting command line invocations and arguments to copying images and transform parameter files across folders. With SimpleElastix this complexity is easier to manage and more memory and disk I/O efficient. 
 
-Let's look at some code. Say you need to compare the volume, mean intensity and standard deviation of (possibly multiple) anatomical structures across a population of images using an atlas segmentation. This is accomplished using the following lines of Python code:
+Say you need to compare the volume, mean intensity and standard deviation of (possibly multiple) anatomical structures across a population of images using an atlas segmentation. This is accomplished using the following lines of Python code:
 
 ```python
 import SimpleITK as sitk
@@ -38,10 +40,7 @@ for filename in population
   sitk.LabelStatisticsImageFilter(fixedImage, resultLabel)
 ```
 
-That was easy. The example demonstrates the efficiency of combining SimpleElastix's object oriented interface (the way we used elastix to register images) and procedural interface (the way we used transformix to warp labels) with SimpleITK (the way we computed statistics). For more examples, see below or the [Examples/SimpleElastix](https://github.com/kaspermarstal/SimpleElastix/tree/SimpleElastix/Examples/SimpleElastix "SimpleElastix examples") directory.
-
-Another advantage of using SimpleElastix for your image registration tasks is that SimpleITK exposes convenient native ITK methods for manipulating data in the image coordinate system. For example, SimpleITK's `Image()` class gives you direct access to `GetDirection()`, `GetOrigin()`, `TransformContinuousIndexToPhysicalPoint()`, `TransformIndexToPhysicalPoint()` etc. of the underlying ITK implementation.
-
+That was easy. The example demonstrates the efficiency of combining SimpleElastix's object oriented interface (the way we used elastix to register images) and procedural interface (the way we used transformix to warp labels) with SimpleITK (the way we computed statistics). For more examples, see below or the [Examples/SimpleElastix](Examples/SimpleElastix) directory.
 
 ### Procedural Interface
 SimpleElastix provides a procedural inteface that aligns well with the design philosophy of SimpleITK and reduces registration to a one-liner. The procedural interface hides the elastix API's object oriented methods and directly invokes registration. 
@@ -161,7 +160,7 @@ Build SimpleITK
 
 ### Testing
 1. Install the built python package into the system Python by running `python setup.py install` in the `SimpleITK-build/Wrapping/PythonPackage` directory.
-2. Invoke the `simpleelastix.py` and `simpletransformix.py` in the [Examples/SimpleElastix](Examples/SimpleElastix) directory.
+2. Invoke the `simpleelastix.py` and `simpletransformix.py` in the [Testing/SimpleElastix](Testing/SimpleElastix) directory.
 
 ### Known Issues
 When your python process exists you will most likely get a `*** Error in 'python': double free or corruption (!prev): 0x0000000001fb4f70 ***
