@@ -35,7 +35,6 @@ target_link_libraries ( ImageRegistrationMethod1 ${SimpleITK_LIBRARIES} )
 add_executable ( ImageRegistrationMethod2 ImageRegistrationMethod2.cxx )
 target_link_libraries ( ImageRegistrationMethod2 ${SimpleITK_LIBRARIES} )
 
-
 add_executable ( DemonsRegistration1 DemonsRegistration1.cxx )
 target_link_libraries ( DemonsRegistration1 ${SimpleITK_LIBRARIES} )
 
@@ -48,3 +47,5 @@ add_subdirectory(Segmentation)
 if ( BUILD_TESTING )
   add_subdirectory( test )
 endif()
+
+add_subdirectory(SimpleElastix)
