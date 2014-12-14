@@ -10,8 +10,6 @@ The goal of SimpleElastix is to bring the robust medical image registration algo
 - Pre-configured parameter files that should serve as good starting points for new users.
 - The complete set of SimpleITK image processing algorithms.
 
-Previously, using elastix and transformix on large datasets would incur a significant overhead, from scripting command line invocations and arguments to copying images and transform parameter files across folders. With SimpleElastix this complexity is easier to manage and more memory and disk I/O efficient. 
-
 Say you need to compare the volume, mean intensity and standard deviation of (possibly multiple) anatomical structures across a population of images using an atlas segmentation. This is accomplished using the following lines of Python code:
 
 ```python
@@ -40,7 +38,7 @@ for filename in population
   sitk.LabelStatisticsImageFilter(fixedImage, resultLabel)
 ```
 
-That was easy. The example demonstrates the efficiency of combining SimpleElastix's object oriented interface (the way we used elastix to register images) and procedural interface (the way we used transformix to warp labels) with SimpleITK (the way we computed statistics). For more examples, see below or the [Examples/SimpleElastix](Examples/SimpleElastix) directory.
+That was easy. The example demonstrates the efficiency of combining SimpleElastix's object oriented interface (the way we used elastix to register images) and procedural interface (the way we used transformix to warp labels) with SimpleITK (the way we computed statistics). Previously, using elastix and transformix on large datasets would incur a significant overhead, from scripting command line invocations and arguments to copying images and transform parameter files across folders. With SimpleElastix this complexity is easier to manage and more memory and disk I/O efficient. For more examples see below or the [Examples/SimpleElastix](Examples/SimpleElastix) directory.
 
 ### Procedural Interface
 SimpleElastix provides a procedural inteface that aligns well with the design philosophy of SimpleITK and reduces registration to a one-liner. The procedural interface hides the elastix API's object oriented methods and directly invokes registration. 
@@ -75,7 +73,7 @@ vectorOfImages = sitk.VectorOfImage()
 vectorOfImages = [vectorOfImages.push_back(sitk.ReadImage(image)) for image in population]
 image4d = sitk.JoinSeriesFilter(vectorOfImages)
 
-# We instantiate an elastix object 
+# Instantiate an elastix object 
 selx = sitk.SimpleElastix()
 
 # The groupwise transform works only on the moving image. However, a 
@@ -84,24 +82,24 @@ selx.SetFixedImage(image4d)
 selx.SetMovingImage(image4d)
 
 # Customize the preconfigured groupwise parameter map and run the registration
-p = selx.GetDefaultGroupwiseNonRigidParameters()
+p = selx.GetDefaultParameterMap('groupwise')
 p['MaximumNumberOfIterations'] = '1024'
 selx.SetParameterMap(p)
 selx.Execute()
 ```
 
 ### Parameter Maps
-In addition to loading your own parameter files from disk, you can construct parameter maps programmatically from SimpleElastix's parameter map interface that works seamlessly with native types of your target language language. In python, a parameter map is a dictionary-like structure that you can call `keys(), clear()`, `has_key()` on etc and even iterate over. 
+In addition to loading your own parameter files from disk, you can construct parameter maps programmatically from SimpleElastix's parameter map interface that works seamlessly with native types of your target language. In python, a parameter map is a dictionary-like structure that you can call `keys(), clear()`, `has_key()` on etc and even iterate over. 
 
 ```python
 import SimpleITK as sitk
 selx = sitk.SimpleElastix()
 
-# The dictionary-like object that works as you'd expect
+# The dictionary-like object works as you'd expect
 p = sitk.ParameterMap()
-p['Registration'] = 'MultiMetricMultiResolutionRegistration'
+p['Registration'] = ['MultiMetricMultiResolutionRegistration']
 p['Metric'] = ['NormalizedMutualInformation', 'TransformBendingEnergyPenalty']
-p['Transform'] = 'AffineTransform'
+p['Transform'] = ['AffineTransform']
 p['FixedImagePyramidSchedule'] = ['8', '4', '2', '1']
 
 # Lists of parameter maps can be encapsulated in a C-style vector. Running SimpleElastix with a
@@ -109,10 +107,9 @@ p['FixedImagePyramidSchedule'] = ['8', '4', '2', '1']
 plist = ParameterMapList()
 plist.push_back(p)
 
-# The following call will initialize a new parameter map at position two in the list
+# The following call will initialize a new parameter map with a nonrigid transform at position two in the list
+p['Transform'] = ['BSplineTransform']
 plist.push_back(sitk.ParameterMap())
-plist[1]['Transform'] = 'BSplineTransform'
-# ... set rest of parameters, images etc
 
 # Passing the above list will cause elastix to run an affine initialization followed by a nonrigid registration
 selx.SetParameterMapList( plist ) 
@@ -132,13 +129,13 @@ ccmake ../SimpleElastix/SuperBuild
 make -j4
 ```
 
-SimpleElastix will be compiled along with any dependencies (elastix, ITK, SimpleITK, SWIG and most target language dependencies are downloaded and installed on the fly). Note that this project takes a long time to build. On a quad-core machine it takes around and hour and requires 16 GB RAM. Because of the extreme memory requirements I prefer to build with clang.
+The SuperBuild will download and install dependencies (elastix, ITK, SimpleITK and SWIG) and compile SimpleElastix. Target language dependencies need to be pre-installed, e.g. `sudo apt-get install cmake swig monodevelop r-base r-base-dev ruby python python-dev tcl tcl-dev tk tk-dev` if you are running Linux. Note that this project takes around an hour to build on a quad-core machine.
 
 ### Building Manually
 This is not the recommended way of building SimpleElastix but it can be useful if you want to use a system version of ITK, SWIG or your own version of elastix. 
 
 1. Setup the prerequisites
- - e.g. `sudo apt-get install cmake swig monodevelop r-base r-base-dev ruby python python-dev tcl tcl-dev tk tk-dev`.
+ - `sudo apt-get install cmake swig monodevelop r-base r-base-dev ruby python python-dev tcl tcl-dev tk tk-dev`.
 2. Install the matching version of SWIG >= 2.0.12
 3. Download elastix
 4. Configure elastix using CMake
@@ -159,12 +156,14 @@ Build SimpleITK
  - Be sure to configure the build settings exactly the same as ITK e.g. Release x64
 
 ### Testing
+Only Python wrappers has been tested extensively. Pull requests are welcome if you want to contribute with tests for other languages.
+
 1. Install the built python package into the system Python by running `python setup.py install` in the `SimpleITK-build/Wrapping/PythonPackage` directory.
 2. Invoke the `simpleelastix.py` and `simpletransformix.py` in the [Testing/SimpleElastix](Testing/SimpleElastix) directory.
 
 ### Known Issues
-When your python process exists you will most likely get a `*** Error in 'python': double free or corruption (!prev): 0x0000000001fb4f70 ***
-Aborted (core dumped)`. This is because the amount of information available to SWIG is insufficient to correctly free memory. If you have a fix, pull requests are very welcome.
+- On some setups SWIG tries to free memory twice and you may occasionally see a `*** Error in 'python': double free or corruption (!prev): 0x0000000001fb4f70 *** Aborted (core dumped)` error message or similar. If you have a fix, pull requests are very welcome.
+- Assigning a parameter in a list silently fails (e.g. `plist[1]['Transform'] = ['BSplineTrasnform']`). The issue has been reported to SWIG developers.
 
 ### About
 If you are interested in my work you are most welcome to visit [my website](https://kaspermarstal.github.io).

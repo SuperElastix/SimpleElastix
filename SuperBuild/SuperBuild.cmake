@@ -334,7 +334,7 @@ ExternalProject_Add(${proj}
     -DWRAP_LUA:BOOL=${WRAP_LUA}
     -DWRAP_PYTHON:BOOL=${WRAP_PYTHON}
     -DWRAP_RUBY:BOOL=${WRAP_RUBY}
-    -DWRAP_JAVA:BOOL=OFF # ${WRAP_JAVA} fails out of the box. Disabled until upstream fix
+    -DWRAP_JAVA:BOOL=${WRAP_JAVA}
     -DWRAP_TCL:BOOL=${WRAP_TCL}
     -DWRAP_CSHARP:BOOL=${WRAP_CSHARP}
     -DWRAP_R:BOOL=${WRAP_R}

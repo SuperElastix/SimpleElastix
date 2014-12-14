@@ -116,9 +116,10 @@ SimpleElastix
   }
 
   sitkExceptionMacro( << "SimpleElastix does not support the combination of image type \""
-                      << GetPixelIDValueAsString( FixedImagePixelEnum ) << "\" ("
-                      << GetPixelIDValueAsElastixParameter( FixedImagePixelEnum ) << ") and dimension "
-                      << FixedImageDimension << "." );
+                      << GetPixelIDValueAsString( FixedImagePixelEnum ) 
+                      << "and dimension "
+                      << FixedImageDimension << ". " 
+                      << GetPixelIDValueAsElastixParameter( FixedImagePixelEnum ) << std::endl );
 }
 
 
@@ -313,8 +314,8 @@ SimpleElastix
   {
     parameterMap[ "Registration" ]                  = ParameterValuesType( 1, "MultiMetricMultiResolutionRegistration" );
     parameterMap[ "Transform" ]                     = ParameterValuesType( 1, "BSplineTransform" );
+    parameterMap[ "Transform" ]                     .push_back( "TransformBendingEnergyPenalty" );
     parameterMap[ "Metric" ]                        = ParameterValuesType( 1, "MattesMutualInformationMetric" );
-    parameterMap[ "Metric" ]                        .push_back( "TransformBendingEnergyPenalty" );
     parameterMap[ "Metric0Weight" ]                 = ParameterValuesType( 1, "0.01" );
     parameterMap[ "Metric1Weight" ]                 = ParameterValuesType( 1, "0.99" );
     parameterMap[ "FinalGridSpacingInVoxels" ]      = finalGridSpacingInVoxels;

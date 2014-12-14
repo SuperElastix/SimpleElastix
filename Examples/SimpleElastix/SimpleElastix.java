@@ -25,7 +25,7 @@ class SimpleElastix {
     // Perform registration
     elastix.execute();
 
-    // Write result iamge
+    // Write result image
     ImageFileWriter writer = new ImageFileWriter();
     writer.setFileName(argv[3]);
     writer.execute(elastix.GetResultImage()); 
