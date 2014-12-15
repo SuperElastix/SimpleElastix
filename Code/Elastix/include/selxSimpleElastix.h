@@ -42,12 +42,26 @@ class SELX_EXPORT SimpleElastix
 
     // Images
     void SetFixedImage( Image* fixedImage );
-    void SetMovingImage( Image* movingImage );
+    Image* GetFixedImage( void );
 
+    void SetMovingImage( Image* movingImage );
+    Image* GetMovingImage( void );
+    
     void SetFixedMask( Image* fixedMask );
-    void SetMovingMask( Image* movingMask );
+    Image* GetFixedMask( void );
     void ClearFixedMask( void );
+
+    void SetMovingMask( Image* movingMask );
+    Image* GetMovingMask( void );
     void ClearMovingMask( void );
+
+    // Paramete Map interface (SWIG behaves better if external interface is explicitely typed out)
+    void SetParameterMapList( std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList );
+    void SetParameterMap( std::map< std::string, std::vector< std::string > > parameterMap );
+    std::vector< std::map< std::string, std::vector< std::string > > > GetParameterMapList( void );
+
+    std::map< std::string, std::vector< std::string > > GetDefaultParameterMap( const std::string name );
+    std::map< std::string, std::vector< std::string > > ParameterFileReader( const std::string filename );
 
     // Register images
     Image Execute( void );
@@ -64,14 +78,6 @@ class SELX_EXPORT SimpleElastix
     void LogToConsole( bool );
     void LogToConsoleOn( void );
     void LogToConsoleOff( void );
-
-    // Paramete Map interface
-    void SetParameterMapList( std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList );
-    void SetParameterMap( std::map< std::string, std::vector< std::string > > parameterMap );
-    std::vector< std::map< std::string, std::vector< std::string > > > GetParameterMapList( void );
-
-    ParameterMapType GetDefaultParameterMap( const std::string name );
-    ParameterMapType ParameterFileReader( const std::string filename );
 
   private:
 

@@ -197,8 +197,7 @@ const std::string GetPixelIDValueAsElastixParameter( PixelIDValueType type )
     }
   else
     {
-    return "Unsupported pixel type. For elastix support, cast image to sitkUInt8, sitkInt8, sitkUInt16, "
-           "sitkInt16, sitkUInt32, sitkInt32, sitkInt64, sitkUInt64, sitkFloat32 or sitkFloat64 (double).";
+    return "Unsupported pixel type.";
     }
 }
 

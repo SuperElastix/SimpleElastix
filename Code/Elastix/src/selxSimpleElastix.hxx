@@ -37,7 +37,7 @@ SimpleElastix::ExecuteInternal( void )
     this->m_ParameterMaps[ i ][ "FixedImageDimension" ] = ParameterValuesType( 1, std::to_string( this->m_FixedImage->GetDimension() ) );
     this->m_ParameterMaps[ i ][ "MovingImageDimension" ] = ParameterValuesType( 1, std::to_string( this->m_MovingImage->GetDimension() ) );
 
-    // Elastix library always uses direction cosines
+    // Elastix library always uses direction cosines so we might as well suppress warning message
     this->m_ParameterMaps[ i ][ "UseDirectionCosines" ] = ParameterValuesType( 1, "true" );
   }
 

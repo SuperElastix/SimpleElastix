@@ -52,28 +52,22 @@ class TestSimpleElastix(unittest.TestCase):
         plist = sitk.ParameterMapList()
 
         p1 = sitk.GetDefaultParameterMap('rigid')
-        plist.push_back(p1)
-        self.assertTrue(plist[0]['Transform'][0] == 'EulerTransform')
+        self.assertTrue(p1['Transform'][0] == 'EulerTransform')
 
         p2 = sitk.GetDefaultParameterMap('affine')
-        plist.push_back(p2)
-        self.assertTrue(plist[1]['Transform'][0] == 'AffineTransform')
+        self.assertTrue(p2['Transform'][0] == 'AffineTransform')
 
         p3 = sitk.GetDefaultParameterMap('nonrigid')
-        plist.push_back(p3)
-        self.assertTrue(plist[2]['Transform'][0] == 'BSplineTransform')
-        self.assertTrue(plist[2]['Transform'][1] == 'TransformBendingEnergyPenalty')
+        self.assertTrue(p3['Transform'][0] == 'BSplineTransform')
+        self.assertTrue(p3['Transform'][1] == 'TransformBendingEnergyPenalty')
 
         p4 = sitk.GetDefaultParameterMap('groupwise')
-        plist.push_back(p4)
-        self.assertTrue(plist[3]['Transform'] == 'VarianceOverLastDimensionMetric')
+        self.assertTrue(p4['Transform'][0] == 'BSplineStackTransform')
 
     def test_registration(self):
-        array = np.linspace(0, 59, 60 ).reshape(3,4,5)
-        fixedImage = sitk.GetImageFromArray(array, sitk.sitkInt16)
-
-        array = np.linspace(0, 59, 60 ).reshape(3,4,5)
-        movingImage = sitk.GetImageFromArray(array, sitk.sitkInt16)
+        array = np.linspace(0, 119, 120).reshape(4,5,6).astype(np.int16)
+        fixedImage = sitk.GetImageFromArray(array)
+        movingImage = sitk.GetImageFromArray(array)
 
         selx = sitk.SimpleElastix()
         selx.SetFixedImage(fixedImage)
@@ -81,8 +75,9 @@ class TestSimpleElastix(unittest.TestCase):
         selx.SetParameterMap(sitk.GetDefaultParameterMap('affine'))
         selx.Execute()
 
+        print fixedImage.GetSize()
         resultImage = selx.GetResultImage()
-        self.assertTrue(sum(abs(resultImage-fixedImage)) < 1e-3)
+        self.assertTrue(sum(abs(resultImage-fixedImage)) < 1)
 
 
 if __name__ == '__main__':
