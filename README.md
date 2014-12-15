@@ -4,7 +4,7 @@ SimpleElastix
 
 The goal of SimpleElastix is to bring the robust medical image registration algorithms of the [elastix](http://elastix.isi.uu.nl/ "Elastix website") library to a wider audience by integrating elastix with [SimpleITK](https://github.com/SimpleITK/SimpleITK "SimpleITK github repository"). This package provides
 
-- elastix and transformix bindings for Python, Java, R, Ruby, Octave, Lua, Tcl and C# (see [elastix manual](http://elastix.isi.uu.nl/download/elastix_manual_v4.7.pdf "elastix manual" for a list of supported algorithms).
+- elastix and transformix bindings for Python, Java, R, Ruby, Octave, Lua, Tcl and C# (see [elastix manual](http://elastix.isi.uu.nl/download/elastix_manual_v4.7.pdf "elastix manual") for a list of supported algorithms).
 - A SuperBuild that automatically compiles and installs SimpleElastix and any dependencies.
 - A user-friendly API that aligns with the design philosophy of SimpleITK, developed specifically for rapid prototyping and use in scripting languages. If you are interested, [The Design of SimpleITK](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3874546/ "PubMed") is a great read.
 - Pre-configured parameter files that should serve as good starting points for new users.
@@ -25,7 +25,6 @@ population = ['image1.hdr', 'image2.hdr', ... , 'imageN.hdr']
 selx = sitk.SimpleElastix()
 selx.SetMovingImage(movingImage)
 selx.SetParameterMap(selx.GetDefaultParameterMap('nonrigid'))
-selx.LogToConsoleOff()
 
 for filename in population
   # Register images
@@ -55,7 +54,6 @@ Loading images that already recide in memory does not count extra towards your R
 import SimpleElastix as sitk
 
 fixedImage = sitk.ReadImage('fixedImage.hdr');
-
 affineMovingImage = sitk.SimpleElastix(fixedImage, sitk.ReadImage('movingImage.hdr'), 'affine')
 registeredImage = sitk.SimpleElastix(fixedImage, affineMovingImage, 'nonrigid')
 ```
@@ -89,7 +87,7 @@ selx.Execute()
 ```
 
 ### Parameter Maps
-In addition to loading your own parameter files from disk, you can construct parameter maps programmatically from SimpleElastix's parameter map interface that works seamlessly with native types of your target language. In python, a parameter map is a dictionary-like structure that you can call `keys(), clear()`, `has_key()` on etc and even iterate over. 
+In addition to loading your own parameter files from disk, you can construct parameter maps programmatically from SimpleElastix's parameter map interface. This interface that works seamlessly with native types of your target language. In python, a parameter map is a dictionary-like structure that you can call `keys(), clear()`, `has_key()` on etc and even iterate over. 
 
 ```python
 import SimpleITK as sitk
@@ -107,7 +105,7 @@ p['FixedImagePyramidSchedule'] = ['8', '4', '2', '1']
 plist = ParameterMapList()
 plist.push_back(p)
 
-# The following call will initialize a new parameter map with a nonrigid transform at position two in the list
+# The following calls will initialize a new parameter map with a nonrigid transform at position two in the list
 p['Transform'] = ['BSplineTransform']
 plist.push_back(sitk.ParameterMap())
 
