@@ -93,19 +93,21 @@ SimpleElastix::ExecuteInternal( void )
   }
   else
   {
-    // We continue execution in case the result image can be read
-    std::cout << "Errors occured during registration: Could not read transform parameters." << std::endl;
+    sitkExceptionMacro( "Errors occured during registration: Could not read transform parameters." );
+  }
+
+  if( this->m_LogToConsole && this->m_TransformParameterMaps[ this->m_ParameterMaps.size()-1 ].count( "WriteResultImage" ) > 0 )
+  {
+    if( this->m_TransformParameterMaps[ this->m_ParameterMaps.size()-1 ][ "WriteResultImage" ][ 0 ] == "false" )
+    {
+      std::cout << "WARNING: Result image cannot be read since WriteResultImage is set to \"false\". " << std::endl; 
+    }
   }
 
   if( elastix->GetResultImage().IsNotNull() )
   {
     TResultImage* itkResultImage = static_cast< TResultImage* >( elastix->GetResultImage().GetPointer() );
     this->m_ResultImage = Image( itkResultImage );
-  }
-  else
-  {
-    // We continue execution in case transform parameters was read
-    std::cout << "Errors occured during registration: Could not read output image." << std::endl;;
   }
 
   delete elastix;

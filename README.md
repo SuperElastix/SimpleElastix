@@ -60,7 +60,7 @@ registeredImage = sitk.SimpleElastix(fixedImage, affineMovingImage, 'nonrigid')
 
 
 ### Object Oriented Interface
-While the procedural interface may be useful in rapid prototyping, it trades off flexibility for code simplicity. In the example above, the final deformation field cannot be retrived and applied to another image. This is a problem if you want to subsequently warp segmentations as we did in the first example. Further, image quality is reduced from resampling the resulting image twice. To this end, SimpleElastix also comes with a powerful object oriented interface suitable for more advanced use cases and scripting purposes. In the next example, we perform groupwise registration as described in [Metz et al 2012](http://#) where the true mean frame of reference is implicitely defined.
+While the procedural interface may be useful in rapid prototyping, it trades off flexibility for code simplicity. In the example above, the final deformation field cannot be retrived and applied to another image. This is a problem if you want to subsequently warp segmentations as we did in the first example. Further, image quality is reduced from resampling the resulting image twice. To this end, SimpleElastix also comes with a powerful object oriented interface suitable for more advanced use cases and scripting purposes. In the next example, we perform groupwise registration.
 
 ```python
 import SimpleITK as sitk
@@ -100,12 +100,14 @@ p['Metric'] = ['NormalizedMutualInformation', 'TransformBendingEnergyPenalty']
 p['Transform'] = ['AffineTransform']
 p['FixedImagePyramidSchedule'] = ['8', '4', '2', '1']
 
-# Lists of parameter maps can be encapsulated in a C-style vector. Running SimpleElastix with a
-# list of parameter maps will run multiple registrations consecutively in one go. 
+# Lists of parameter maps can be encapsulated in a C-style vector. Running 
+# SimpleElastix with a list of parameter maps will run multiple registrations 
+# consecutively in one go. 
 plist = ParameterMapList()
 plist.push_back(p)
 
-# The following calls will initialize a new parameter map with a nonrigid transform at position two in the list
+# The following calls will initialize a new parameter map with a nonrigid 
+# transform at position two in the list
 p['Transform'] = ['BSplineTransform']
 plist.push_back(sitk.ParameterMap())
 
@@ -117,7 +119,7 @@ selx.Execute()
 At the moment, the elastix library API does not support using multiple fixed and moving images so SimpleElastix doesn't either.
 
 ### Building with the SuperBuild
-SimpleElastix integrates elastix and transformix with the SimpleITK SuperBuild. Simply clone this repository and invoke the SuperBuild (may take up to an hour on a quad-core machine).
+SimpleElastix integrates elastix and transformix with the SimpleITK SuperBuild. Simply clone this repository and invoke the SuperBuild.
 
 ```
 git clone https://github.com/kaspermarstal/SimpleElastix

@@ -276,7 +276,7 @@ SimpleElastix
     parameterMap[ "Metric" ]                        = ParameterValuesType( 1, "VarianceOverLastDimensionMetric" );
     parameterMap[ "FinalGridSpacingInVoxels" ]      = finalGridSpacingInVoxels;
     parameterMap[ "GridSpacingSchedule" ]           = gridSpacingSchedule;
-    parameterMap[ "MaximumNumberOfIterations" ]     = ParameterValuesType( 1, "256" );
+    parameterMap[ "MaximumNumberOfIterations" ]     = ParameterValuesType( 1, "512" );
   }
   else
   {
@@ -330,7 +330,7 @@ SimpleElastix
   sitkExceptionMacro( << "SimpleElastix does not support the combination of image type \""
                       << GetPixelIDValueAsString( FixedImagePixelEnum ) << "and dimension "
                       << FixedImageDimension << ". For elastix support, recompile elastix "
-                      << "with the desired pixel type and cast SimpleITK image. Supported types are "
+                      << "with the desired pixel type and cast the SimpleITK image. Supported types are "
                       << "sitkUInt8, sitkInt8, sitkUInt16, sitkInt16, sitkUInt32, sitkInt32, "
                       << "sitkInt64, sitkUInt64, sitkFloat32 or sitkFloat64" );
 }
@@ -435,11 +435,58 @@ ReadParameterFile( const std::string filename )
 
 
 Image
+elastix( Image fixedImage, Image movingImage, std::string defaultParameterMapName )
+{
+  return elastix( fixedImage, movingImage, GetDefaultParameterMap( defaultParameterMapName ), false, false, "" );
+}
+
+
+
+Image
+elastix( Image fixedImage, Image movingImage, std::map< std::string, std::vector< std::string > > parameterMap )
+{
+  return elastix( fixedImage, movingImage, parameterMap, false, false, "" );
+}
+
+
+
+Image
+elastix( Image fixedImage, Image movingImage, std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList )
+{
+  return elastix( fixedImage, movingImage, parameterMapList, false, false, "");
+}
+
+
+
+Image
+elastix( Image fixedImage, Image movingImage, std::string defaultParameterMapName, Image fixedMask, Image movingMask )
+{
+  return elastix( fixedImage, movingImage, defaultParameterMapName, fixedMask, movingMask, false, false, "" );
+}
+
+
+
+
+Image
+elastix( Image fixedImage, Image movingImage, std::map< std::string, std::vector< std::string > > parameterMap, Image fixedMask, Image movingMask )
+{
+  return elastix( fixedImage, movingImage, parameterMap, fixedMask, movingMask, false, false, "");
+}
+
+
+
+Image
+elastix( Image fixedImage, Image movingImage, std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList, Image fixedMask, Image movingMask )
+{
+  return elastix( fixedImage, movingImage, parameterMapList, fixedMask, movingMask, false, false, "");
+}
+
+
+
+Image
 elastix( Image fixedImage, Image movingImage, std::string defaultParameterMapName, bool logToConsole, bool logToDisk, std::string outputFolder )
 {
-  SimpleElastix selx;
-  SimpleElastix::ParameterMapType parameterMap = selx.GetDefaultParameterMap( defaultParameterMapName );
-  return elastix( fixedImage, movingImage, parameterMap, logToConsole, logToDisk, outputFolder );
+  return elastix( fixedImage, movingImage, GetDefaultParameterMap( defaultParameterMapName ), logToConsole, logToDisk, outputFolder );
 }
 
 
@@ -473,9 +520,7 @@ elastix( Image fixedImage, Image movingImage, std::vector< std::map< std::string
 Image
 elastix( Image fixedImage, Image movingImage, std::string defaultParameterMapName, Image fixedMask, Image movingMask, bool logToConsole, bool logToDisk, std::string outputFolder )
 {
-  SimpleElastix selx;
-  SimpleElastix::ParameterMapType parameterMap = selx.GetDefaultParameterMap( defaultParameterMapName );
-  return elastix( fixedImage, movingImage, parameterMap, fixedMask, movingMask, logToConsole, logToDisk, outputFolder );
+  return elastix( fixedImage, movingImage, GetDefaultParameterMap( defaultParameterMapName ), fixedMask, movingMask, logToConsole, logToDisk, outputFolder );
 }
 
 

@@ -120,10 +120,18 @@ class SELX_EXPORT SimpleElastix
 // Procedural Interface 
 SELX_EXPORT std::map< std::string, std::vector< std::string > > GetDefaultParameterMap( const std::string filename );
 SELX_EXPORT std::map< std::string, std::vector< std::string > > ReadParameterFile( const std::string filename );
-SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, SimpleElastix::ParameterMapType parameterMap, bool logToConsole = false, bool logToDisk = false, std::string outputFolder = "" );
-SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, SimpleElastix::ParameterMapListType parameterMapList, bool logToConsole = false, bool logToDisk = false, std::string outputFolder = "" );
-SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, SimpleElastix::ParameterMapType parameterMap, Image fixedMask, Image movingMask, bool logToConsole = false, bool logToDisk = false, std::string outputFolder = "" );
-SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, SimpleElastix::ParameterMapListType parameterMapList, Image fixedMask, Image movingMask, bool logToConsole = false, bool logToDisk = false, std::string outputFolder = "" );
+SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, std::string defaultParameterMapName);
+SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, std::map< std::string, std::vector< std::string > > parameterMap);
+SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList);
+SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, std::string defaultParameterMapName, Image fixedMask, Image movingMask);
+SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, std::map< std::string, std::vector< std::string > > parameterMap, Image fixedMask, Image movingMask);
+SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList, Image fixedMask, Image movingMask);
+SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, std::string defaultParameterMapName, bool logToConsole, bool logToDisk, std::string outputFolder );
+SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, std::map< std::string, std::vector< std::string > > parameterMap, bool logToConsole, bool logToDisk, std::string outputFolder );
+SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList, bool logToConsole, bool logToDisk, std::string outputFolder );
+SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, std::string defaultParameterMapName, Image fixedMask, Image movingMask, bool logToConsole, bool logToDisk, std::string outputFolder );
+SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, std::map< std::string, std::vector< std::string > >, Image fixedMask, Image movingMask, bool logToConsole, bool logToDisk, std::string outputFolder );
+SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList, Image fixedMask, Image movingMask, bool logToConsole, bool logToDisk, std::string outputFolder );
 
 } // end namespace simple
 } // end namespace itk

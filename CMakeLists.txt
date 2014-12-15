@@ -391,12 +391,12 @@ include(CTest)
 # Use elastix
 
 if( NOT EXISTS ${ELASTIX_USE_FILE} )
-  set( ELASTIX_USE_FILE ${ELASTIX_BUILD_DIR}/UseElastix.cmake )
+  set( ELASTIX_USE_FILE ${ELASTIX_DIR}/UseElastix.cmake )
 endif()
 
 if( NOT EXISTS ${ELASTIX_USE_FILE} )
-  set( ELASTIX_BUILD_DIR "" CACHE PATH "Path to elastix build folder" )
-  message(FATAL_ERROR "Could not find UseElastix.cmake. Point ELASTIX_BUILD_DIR to folder containing UseElastix.cmake or use SuperBuild.")
+  set( ELASTIX_DIR "" CACHE PATH "Path to elastix build folder" )
+  message(FATAL_ERROR "Could not find UseElastix.cmake. Point ELASTIX_DIR to folder containing UseElastix.cmake or use SuperBuild.")
 endif()
 
 if( ELASTIX_BUILD_EXECUTABLE )
