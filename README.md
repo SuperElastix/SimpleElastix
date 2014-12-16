@@ -3,7 +3,7 @@ SimpleElastix
 [![Build Status](https://travis-ci.org/kaspermarstal/SimpleElastix.svg?branch=SimpleElastix)](https://travis-ci.org/kaspermarstal/SimpleElastix)
 
 Medical image registration is the process of transforming images into a common coordinate system so corresponding pixels represent homologous biological
-points. This is a prerequisite for a wide range of medical image analysis tasks and a key algorithmic component to statistical analysis and machine learning in medical image processing. The goal of SimpleElastix is to bring the robust medical image registration algorithms of the [elastix](http://elastix.isi.uu.nl/ "Elastix website") library to a wider audience by integrating elastix with [SimpleITK](https://github.com/SimpleITK/SimpleITK "SimpleITK github repository"). This package provides
+points. This is a prerequisite for a wide range of medical image analysis tasks and a key algorithmic component for statistical analysis and machine learning in medical image processing. The goal of SimpleElastix is to bring the robust medical image registration algorithms of the [elastix](http://elastix.isi.uu.nl/ "Elastix website") library to a wider audience by integrating elastix with [SimpleITK](https://github.com/SimpleITK/SimpleITK "SimpleITK github repository"). This package provides
 
 - elastix and transformix bindings for Python, Java, R, Ruby, Octave, Lua, Tcl and C# (see [elastix manual](http://elastix.isi.uu.nl/download/elastix_manual_v4.7.pdf "elastix manual") for a list of supported algorithms).
 - A SuperBuild that automatically compiles and installs SimpleElastix and any dependencies.
@@ -157,10 +157,12 @@ Build SimpleITK
  - Be sure to configure the build settings exactly the same as ITK e.g. Release x64
 
 ### Testing
-Only Python wrappers has been tested extensively. Pull requests are welcome if you want to contribute with tests for other languages.
+Only Python wrappers has been tested extensively. To run these tests,
 
 1. Install the built python package into the system Python by running `python setup.py install` in the `SimpleITK-build/Wrapping/PythonPackage` directory.
-2. Invoke the `simpleelastix.py` and `simpletransformix.py` in the [Testing/SimpleElastix](Testing/SimpleElastix) directory.
+2. Invoke the `selxSimpleElastixTest.py` and `selxSimpleTrasnformixTest.py` in the [Testing/Unit](Testing/Unit) directory.
+
+Pull requests are welcome if you want to contribute with tests for other languages. 
 
 ### Known Issues
 - On some setups SWIG tries to free memory twice and you may occasionally see a `*** Error in 'python': double free or corruption (!prev): 0x0000000001fb4f70 *** Aborted (core dumped)` error message or similar. If you have a fix, pull requests are very welcome.
