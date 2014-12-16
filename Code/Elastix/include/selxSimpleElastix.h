@@ -41,17 +41,17 @@ class SELX_EXPORT SimpleElastix
     const std::string GetName( void );
 
     // Images
-    void SetFixedImage( Image* fixedImage );
+    void SetFixedImage( Image fixedImage );
     Image* GetFixedImage( void );
 
-    void SetMovingImage( Image* movingImage );
+    void SetMovingImage( Image movingImage );
     Image* GetMovingImage( void );
     
-    void SetFixedMask( Image* fixedMask );
+    void SetFixedMask( Image fixedMask );
     Image* GetFixedMask( void );
     void ClearFixedMask( void );
 
-    void SetMovingMask( Image* movingMask );
+    void SetMovingMask( Image movingMask );
     Image* GetMovingMask( void );
     void ClearMovingMask( void );
 
@@ -59,6 +59,8 @@ class SELX_EXPORT SimpleElastix
     void SetParameterMapList( std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList );
     void SetParameterMap( std::map< std::string, std::vector< std::string > > parameterMap );
     std::vector< std::map< std::string, std::vector< std::string > > > GetParameterMapList( void );
+    void PrettyPrint( std::map< std::string, std::vector< std::string > > parameterMap );
+    void PrettyPrint( std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList );
 
     std::map< std::string, std::vector< std::string > > GetDefaultParameterMap( const std::string name );
     std::map< std::string, std::vector< std::string > > ParameterFileReader( const std::string filename );

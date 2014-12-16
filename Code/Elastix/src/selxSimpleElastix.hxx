@@ -91,7 +91,7 @@ SimpleElastix::ExecuteInternal( void )
   }
   else
   {
-    sitkExceptionMacro( "Errors occured during registration: Could not read transform parameters." );
+    sitkExceptionMacro( "Errors occured during registration: Could not read final transform parameters." );
   }
 
   if( this->m_LogToConsole && this->m_TransformParameterMaps[ this->m_ParameterMaps.size()-1 ].count( "WriteResultImage" ) > 0 )

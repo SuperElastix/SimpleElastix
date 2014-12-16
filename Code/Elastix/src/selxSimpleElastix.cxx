@@ -51,9 +51,9 @@ SimpleElastix
 
 void 
 SimpleElastix
-::SetFixedImage( Image* fixedImage )
+::SetFixedImage( Image fixedImage )
 {
-  this->m_FixedImage = fixedImage;
+  this->m_FixedImage = &fixedImage;
 }
 
 
@@ -69,9 +69,9 @@ SimpleElastix
 
 void
 SimpleElastix
-::SetMovingImage( Image* movingImage )
+::SetMovingImage( Image movingImage )
 {
-  this->m_MovingImage = movingImage;
+  this->m_MovingImage = &movingImage;
 }
 
 
@@ -87,9 +87,9 @@ SimpleElastix
 
 void
 SimpleElastix
-::SetFixedMask( Image* fixedMask )
+::SetFixedMask( Image fixedMask )
 {
-  this->m_FixedMask = fixedMask;
+  this->m_FixedMask = &fixedMask;
 }
 
 
@@ -114,9 +114,9 @@ SimpleElastix
 
 void
 SimpleElastix
-::SetMovingMask( Image* movingMask )
+::SetMovingMask( Image movingMask )
 {
-  this->m_MovingMask = movingMask;
+  this->m_MovingMask = &movingMask;
 }
 
 
@@ -152,8 +152,8 @@ void
 SimpleElastix
 ::SetParameterMap( std::map< std::string, std::vector< std::string > > parameterMap )
 {
-  ParameterMapListType parameterMapList;
-  parameterMapList.push_back( parameterMap );
+  ParameterMapListType parameterMapList = ParameterMapListType( 1 );
+  parameterMapList[ 0 ] = parameterMap;
   this->SetParameterMapList( parameterMapList );
 }
 
@@ -311,6 +311,52 @@ SimpleElastix
   }
 
   return parser->GetParameterMap();
+}
+
+
+
+void
+SimpleElastix
+::PrettyPrint( std::map< std::string, std::vector< std::string > > parameterMap )
+{
+  ParameterMapListType parameterMapList = ParameterMapListType( 1 );
+  parameterMapList[ 0 ] = parameterMap;
+  PrettyPrint( parameterMapList );
+}
+
+
+
+void
+SimpleElastix
+::PrettyPrint( std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList )
+{
+  for( unsigned int i = 0; i < parameterMapList.size(); ++i )
+  {
+    ParameterMapType::iterator parameterMapIterator = parameterMapList[ 0 ].begin();
+    ParameterMapType::iterator parameterMapIteratorEnd = parameterMapList[ 0 ].end();
+    while( parameterMapIterator != parameterMapIteratorEnd )
+    {
+      std::cout << "(" << parameterMapIterator->first;
+      ParameterValuesType parameterMapValues = parameterMapIterator->second;
+      
+      for(unsigned int j = 0; j < parameterMapValues.size(); ++j)
+      {
+        std::stringstream stream( parameterMapValues[ j ] );
+        float number;
+        stream >> number;
+        if( stream.fail() ) {
+           std::cout << " \"" << parameterMapValues[ j ] << "\"";
+        }
+        else
+        {
+          std::cout << " " << number;
+        }      
+      }
+      
+      std::cout << ")" << std::endl;
+      parameterMapIterator++;
+    }
+  }
 }
 
 
@@ -494,8 +540,8 @@ elastix( Image fixedImage, Image movingImage, std::string defaultParameterMapNam
 Image
 elastix( Image fixedImage, Image movingImage, std::map< std::string, std::vector< std::string > > parameterMap, bool logToConsole, bool logToDisk, std::string outputFolder )
 {
-  SimpleElastix::ParameterMapListType parameterMapList;
-  parameterMapList.push_back( parameterMap );
+  SimpleElastix::ParameterMapListType parameterMapList = SimpleElastix::ParameterMapListType( 1 );
+  parameterMapList[ 0 ] = parameterMap;
   return elastix( fixedImage, movingImage, parameterMapList, logToConsole, logToDisk, outputFolder );
 }
 
@@ -505,8 +551,8 @@ Image
 elastix( Image fixedImage, Image movingImage, std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList, bool logToConsole, bool logToDisk, std::string outputFolder )
 {
   SimpleElastix selx;
-  selx.SetFixedImage( &fixedImage );
-  selx.SetMovingImage( &movingImage );
+  selx.SetFixedImage( fixedImage );
+  selx.SetMovingImage( movingImage );
   selx.SetParameterMapList( parameterMapList );
   selx.SetOutputFolder( outputFolder );
   selx.LogToDisk( logToDisk );
@@ -529,8 +575,8 @@ elastix( Image fixedImage, Image movingImage, std::string defaultParameterMapNam
 Image
 elastix( Image fixedImage, Image movingImage, std::map< std::string, std::vector< std::string > > parameterMap, Image fixedMask, Image movingMask, bool logToConsole, bool logToDisk, std::string outputFolder )
 {
-  SimpleElastix::ParameterMapListType parameterMapList;
-  parameterMapList.push_back( parameterMap );
+  SimpleElastix::ParameterMapListType parameterMapList = SimpleElastix::ParameterMapListType( 1 );
+  parameterMapList[ 0 ] = parameterMap;
   return elastix( fixedImage, movingImage, parameterMapList, fixedMask, movingMask, logToConsole, logToDisk, outputFolder );
 }
 
@@ -540,11 +586,11 @@ Image
 elastix( Image fixedImage, Image movingImage, std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList, Image fixedMask, Image movingMask, bool logToConsole, bool logToDisk, std::string outputFolder )
 {
   SimpleElastix selx;
-  selx.SetFixedImage( &fixedImage );
-  selx.SetMovingImage( &movingImage );
+  selx.SetFixedImage( fixedImage );
+  selx.SetMovingImage( movingImage );
   selx.SetParameterMapList( parameterMapList );
-  selx.SetFixedMask( &fixedMask );
-  selx.SetMovingMask( &movingMask );
+  selx.SetFixedMask( fixedMask );
+  selx.SetMovingMask( movingMask );
   selx.SetOutputFolder( outputFolder );
   selx.LogToDisk( logToDisk );
   selx.LogToConsole( logToConsole );

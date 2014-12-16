@@ -93,22 +93,22 @@ class TestSimpleElastix(unittest.TestCase):
         fixedImage = sitk.GetImageFromArray(array)
         movingImage = sitk.GetImageFromArray(array)
         
-        p = sitk.GetDefaultParameterMap('affine')
-        p['MaximumNumberOfIterations'] = ['0']
+        resultImage = sitk.elastix(fixedImage,movingImage,'affine')
+        a = np.ndarray.flatten(sitk.GetArrayFromImage(resultImage))
+        b = np.ndarray.flatten(array)
 
-        resultImage = sitk.elastix(fixedImage,movingImage,p)
-        print sum(abs(resultImage-fixedImage))
+         # Last pixel of each row is round to floor due to linear interpolator edgecase
+        self.assertTrue(sum(abs(a-b)) < 100.01)
+        self.assertTrue(sum(abs(a-b)) > 99.99)
+
+        # Running twice should produce the same result
+        resultImage2 = sitk.elastix(fixedImage,movingImage,'affine')
+        self.assertTrue(sum(abs(resultImage-resultImage2)) < 1e-16)
 
     def test_oo_interface(self):
         array = np.linspace(0, 119, 120).reshape(4,5,6).astype(np.int16)
         fixedImage = sitk.GetImageFromArray(array)
         movingImage = sitk.GetImageFromArray(array)
-        
-        print "testing fixed image before registration"
-        self.assertImageNDArrayEquals(fixedImage,array)
-
-        print "testing moving image before registration"
-        self.assertImageNDArrayEquals(movingImage,array)
 
         selx = sitk.SimpleElastix()
         selx.SetFixedImage(fixedImage)
@@ -117,20 +117,16 @@ class TestSimpleElastix(unittest.TestCase):
         selx.LogToConsoleOff()
         selx.Execute()
 
-        print "execute 2"
-        selx.Execute()
+        resultImage = selx.GetResultImage()
+        a = np.ndarray.flatten(sitk.GetArrayFromImage(resultImage))
+        b = np.ndarray.flatten(array)
 
-        print "testing moving image after registration"
-        self.assertImageNDArrayEquals(movingImage,array)
+        # Last pixel of each row is round to floor due to linear interpolator edgecase
+        self.assertTrue(sum(abs(a-b)) < 100.01)
+        self.assertTrue(sum(abs(a-b)) > 99.99)
 
-        print "testing fixed image after registration"
-        self.assertImageNDArrayEquals(fixedImage,array)
-
-        
-
-        # print fixedImage.GetSize()
-        # resultImage = selx.GetResultImage()
-        # self.assertTrue(sum(abs(resultImage-fixedImage)) < 1)
+        # Fixed image buffered region is emptied when running registration so can't run twice
+        # fixedImage-resultImage
 
 
 if __name__ == '__main__':
