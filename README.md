@@ -2,7 +2,8 @@ SimpleElastix
 =============
 [![Build Status](https://travis-ci.org/kaspermarstal/SimpleElastix.svg?branch=SimpleElastix)](https://travis-ci.org/kaspermarstal/SimpleElastix)
 
-SimpleElastix is a software package for finding anatomical correspondence between medical images. The goal of SimpleElastix is to bring the robust medical image registration algorithms of the [elastix](http://elastix.isi.uu.nl/ "Elastix website") library to a wider audience by integrating elastix with [SimpleITK](https://github.com/SimpleITK/SimpleITK "SimpleITK github repository"). This package provides
+Medical image registration is the process of transforming images into a common coordinate system so corresponding pixels represent homologous biological
+points. This is a prerequisite for a wide range of medical image analysis tasks and a key algorithmic component to statistical analysis and machine learning in medical image processing. The goal of SimpleElastix is to bring the robust medical image registration algorithms of the [elastix](http://elastix.isi.uu.nl/ "Elastix website") library to a wider audience by integrating elastix with [SimpleITK](https://github.com/SimpleITK/SimpleITK "SimpleITK github repository"). This package provides
 
 - elastix and transformix bindings for Python, Java, R, Ruby, Octave, Lua, Tcl and C# (see [elastix manual](http://elastix.isi.uu.nl/download/elastix_manual_v4.7.pdf "elastix manual") for a list of supported algorithms).
 - A SuperBuild that automatically compiles and installs SimpleElastix and any dependencies.

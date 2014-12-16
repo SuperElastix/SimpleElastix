@@ -56,10 +56,10 @@ SimpleElastix::ExecuteInternal( void )
 
   // Do the (possibly multiple) registrations
   int isError = 1;
-  libelastix* elastix = new libelastix();
+  libelastix elastix;
   try
   {
-    isError = elastix->RegisterImages(
+    isError = elastix.RegisterImages(
       this->m_FixedImage->GetITKBase(),
       this->m_MovingImage->GetITKBase(),
       this->m_ParameterMaps,
@@ -72,8 +72,6 @@ SimpleElastix::ExecuteInternal( void )
   }
   catch( itk::ExceptionObject &e )
   {
-    delete elastix;
-    elastix = NULL;
     sitkExceptionMacro( << "Errors occured during registration: " << e.what() );
   }
 
@@ -87,9 +85,9 @@ SimpleElastix::ExecuteInternal( void )
     sitkExceptionMacro( << "Errors occured during registration." );
   }
 
-  if( elastix->GetTransformParameterMapList().size() > 0 )
+  if( elastix.GetTransformParameterMapList().size() > 0 )
   {
-    this->m_TransformParameterMaps = elastix->GetTransformParameterMapList();
+    this->m_TransformParameterMaps = elastix.GetTransformParameterMapList();
   }
   else
   {
@@ -104,14 +102,11 @@ SimpleElastix::ExecuteInternal( void )
     }
   }
 
-  if( elastix->GetResultImage().IsNotNull() )
+  if( elastix.GetResultImage().IsNotNull() )
   {
-    TResultImage* itkResultImage = static_cast< TResultImage* >( elastix->GetResultImage().GetPointer() );
+    TResultImage* itkResultImage = static_cast< TResultImage* >( elastix.GetResultImage().GetPointer() );
     this->m_ResultImage = Image( itkResultImage );
   }
-
-  delete elastix;
-  elastix = NULL;
 
   return this->m_ResultImage;
 }

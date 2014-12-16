@@ -85,7 +85,7 @@ class TestSimpleElastix(unittest.TestCase):
         p5 = sitk.GetDefaultParameterMap('groupwise')
         self.assertTrue(p5['Registration'][0] == 'MultiResolutionRegistration')
         self.assertTrue(p5['Transform'][0] == 'BSplineStackTransform')
-        self.assertTrue(p5['Metric'][0] == '')
+        self.assertTrue(p5['Metric'][0] == 'VarianceOverLastDimensionMetric')
         self.assertTrue(p5['MaximumNumberOfIterations'][0] == '512')
 
     def test_proc_interface(self):
@@ -104,27 +104,28 @@ class TestSimpleElastix(unittest.TestCase):
         fixedImage = sitk.GetImageFromArray(array)
         movingImage = sitk.GetImageFromArray(array)
         
+        print "testing fixed image before registration"
+        self.assertImageNDArrayEquals(fixedImage,array)
 
+        print "testing moving image before registration"
+        self.assertImageNDArrayEquals(movingImage,array)
 
+        selx = sitk.SimpleElastix()
+        selx.SetFixedImage(fixedImage)
+        selx.SetMovingImage(movingImage)
+        selx.SetParameterMap(sitk.GetDefaultParameterMap('affine'))
+        selx.LogToConsoleOff()
+        selx.Execute()
 
-        # print "testing fixed image before registration"
-        # self.assertImageNDArrayEquals(fixedImage,array)
+        print "execute 2"
+        selx.Execute()
 
-        # print "testing moving image before registration"
-        # self.assertImageNDArrayEquals(movingImage,array)
+        print "testing moving image after registration"
+        self.assertImageNDArrayEquals(movingImage,array)
 
-        # selx = sitk.SimpleElastix()
-        # selx.SetFixedImage(fixedImage)
-        # selx.SetMovingImage(movingImage)
-        # selx.SetParameterMap(sitk.GetDefaultParameterMap('affine'))
-        # selx.LogToConsoleOff()
-        # selx.Execute()
+        print "testing fixed image after registration"
+        self.assertImageNDArrayEquals(fixedImage,array)
 
-        # print "testing fixed image after registration"
-        # self.assertImageNDArrayEquals(fixedImage,array)
-
-        # print "testing moving image after registration"
-        # self.assertImageNDArrayEquals(movingImage,array)
         
 
         # print fixedImage.GetSize()
