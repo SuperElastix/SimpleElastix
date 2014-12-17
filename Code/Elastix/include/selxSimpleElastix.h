@@ -21,49 +21,50 @@ class SELX_EXPORT SimpleElastix
     ~SimpleElastix( void );
 
     typedef SimpleElastix Self;
-    typedef itk::ParameterFileParser::ParameterMapType      ParameterMapType;
-    typedef ParameterMapType::iterator                      ParameterMapIterator;
-    typedef std::vector< ParameterMapType >                 ParameterMapListType;
-    typedef ParameterMapListType::iterator                  ParameterMapListIterator;
-    typedef std::string                                     ParameterKeyType;
-    typedef itk::ParameterFileParser::ParameterValuesType   ParameterValuesType;
-    typedef itk::ParameterFileParser                        ParameterFileParserType;
-    typedef ParameterFileParserType::Pointer                ParameterFileParserPointer;
  
     // typedefs inherited from SimpleITK
     typedef BasicPixelIDTypeList PixelIDTypeList;
 
     // typedefs inherited from elastix library api
     typedef elastix::ELASTIX libelastix;
+    typedef itk::ParameterFileParser::ParameterMapType      ParameterMapType;
+    typedef ParameterMapType::iterator                      ParameterMapIterator;
+    typedef ParameterMapType::const_iterator                ParameterMapConstIterator;
+    typedef std::vector< ParameterMapType >                 ParameterMapListType;
+    typedef ParameterMapListType::iterator                  ParameterMapListIterator;
+    typedef ParameterMapListType::const_iterator            ParameterMapListonstIterator;
+    typedef std::string                                     ParameterKeyType;
+    typedef itk::ParameterFileParser::ParameterValuesType   ParameterValuesType;
+    typedef itk::ParameterFileParser                        ParameterFileParserType;
+    typedef ParameterFileParserType::Pointer                ParameterFileParserPointer;
 
     /** To be wrapped by SWIG */ 
 
     const std::string GetName( void );
 
     // Images
-    void SetFixedImage( Image fixedImage );
-    Image* GetFixedImage( void );
+    void SetFixedImage( const Image& fixedImage );
+    Image GetFixedImage( void );
 
-    void SetMovingImage( Image movingImage );
-    Image* GetMovingImage( void );
+    void SetMovingImage( const Image& movingImage );
+    Image GetMovingImage( void );
     
-    void SetFixedMask( Image fixedMask );
-    Image* GetFixedMask( void );
-    void ClearFixedMask( void );
+    void SetFixedMask( const Image& fixedMask );
+    Image GetFixedMask( void );
+    void DeleteFixedMask( void );
 
-    void SetMovingMask( Image movingMask );
-    Image* GetMovingMask( void );
-    void ClearMovingMask( void );
+    void SetMovingMask( const Image& movingMask );
+    Image GetMovingMask( void );
+    void DeleteMovingMask( void );
 
     // Paramete Map interface (SWIG behaves better if external interface is explicitely typed out)
-    void SetParameterMapList( std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList );
-    void SetParameterMap( std::map< std::string, std::vector< std::string > > parameterMap );
+    void SetParameterMapList( std::vector< std::map< std::string, std::vector< std::string > > > const parameterMapList );
+    void SetParameterMap( std::map< std::string, std::vector< std::string > > const parameterMap );
     std::vector< std::map< std::string, std::vector< std::string > > > GetParameterMapList( void );
-    void PrettyPrint( std::map< std::string, std::vector< std::string > > parameterMap );
-    void PrettyPrint( std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList );
-
-    std::map< std::string, std::vector< std::string > > GetDefaultParameterMap( const std::string name );
     std::map< std::string, std::vector< std::string > > ParameterFileReader( const std::string filename );
+    std::map< std::string, std::vector< std::string > > GetDefaultParameterMap( const std::string name );
+    void PrettyPrint( std::map< std::string, std::vector< std::string > > const parameterMap );
+    void PrettyPrint( std::vector< std::map< std::string, std::vector< std::string > > > const parameterMapList );
 
     // Register images
     Image Execute( void );
@@ -73,15 +74,15 @@ class SELX_EXPORT SimpleElastix
     std::vector< std::map< std::string, std::vector< std::string > > > GetTransformParameterMapList( void );
 
     // Output
-    void SetOutputFolder( const std::string folder );
-    void LogToDisk( bool );
-    void LogToDiskOn( void );
-    void LogToDiskOff( void );
+    void LogToFolder( const std::string folder );
+    void LogToFolderOff( void );
     void LogToConsole( bool );
     void LogToConsoleOn( void );
     void LogToConsoleOff( void );
 
   private:
+
+    bool isEmpty( const Image& image );
 
     template< typename TResultImage >
     Image ExecuteInternal( void );
@@ -105,14 +106,13 @@ class SELX_EXPORT SimpleElastix
     typedef Image ( Self::*MemberFunctionType )( void );
     std::auto_ptr< detail::MemberFunctionFactory< MemberFunctionType > > m_MemberFactory;
 
-    // This class holds configuration and pointers to data that is passed to elastix API when run
-    Image*                 m_FixedImage;
-    Image*                 m_MovingImage;
+    // This class holds data that is passed to elastix API when run
+    Image                  m_FixedImage;
+    Image                  m_MovingImage;
     std::string            m_OutputFolder;
-    bool                   m_LogToDisk;
     bool                   m_LogToConsole;
-    Image*                 m_FixedMask;
-    Image*                 m_MovingMask;
+    Image                  m_FixedMask;
+    Image                  m_MovingMask;
     Image                  m_ResultImage;
     ParameterMapListType   m_ParameterMaps;
     ParameterMapListType   m_TransformParameterMaps;
@@ -122,18 +122,18 @@ class SELX_EXPORT SimpleElastix
 // Procedural Interface 
 SELX_EXPORT std::map< std::string, std::vector< std::string > > GetDefaultParameterMap( const std::string filename );
 SELX_EXPORT std::map< std::string, std::vector< std::string > > ReadParameterFile( const std::string filename );
-SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, std::string defaultParameterMapName);
-SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, std::map< std::string, std::vector< std::string > > parameterMap);
-SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList);
-SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, std::string defaultParameterMapName, Image fixedMask, Image movingMask);
-SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, std::map< std::string, std::vector< std::string > > parameterMap, Image fixedMask, Image movingMask);
-SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList, Image fixedMask, Image movingMask);
-SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, std::string defaultParameterMapName, bool logToConsole, bool logToDisk, std::string outputFolder );
-SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, std::map< std::string, std::vector< std::string > > parameterMap, bool logToConsole, bool logToDisk, std::string outputFolder );
-SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList, bool logToConsole, bool logToDisk, std::string outputFolder );
-SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, std::string defaultParameterMapName, Image fixedMask, Image movingMask, bool logToConsole, bool logToDisk, std::string outputFolder );
-SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, std::map< std::string, std::vector< std::string > >, Image fixedMask, Image movingMask, bool logToConsole, bool logToDisk, std::string outputFolder );
-SELX_EXPORT Image elastix( Image fixedImage, Image movingImage, std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList, Image fixedMask, Image movingMask, bool logToConsole, bool logToDisk, std::string outputFolder );
+SELX_EXPORT Image elastix( const Image& fixedImage, const Image& movingImage, std::string defaultParameterMapName);
+SELX_EXPORT Image elastix( const Image& fixedImage, const Image& movingImage, std::map< std::string, std::vector< std::string > > parameterMap);
+SELX_EXPORT Image elastix( const Image& fixedImage, const Image& movingImage, std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList);
+SELX_EXPORT Image elastix( const Image& fixedImage, const Image& movingImage, std::string defaultParameterMapName, const Image& fixedMask, const Image& movingMask);
+SELX_EXPORT Image elastix( const Image& fixedImage, const Image& movingImage, std::map< std::string, std::vector< std::string > > parameterMap, const Image& fixedMask, const Image& movingMask);
+SELX_EXPORT Image elastix( const Image& fixedImage, const Image& movingImage, std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList, const Image& fixedMask, const Image& movingMask);
+SELX_EXPORT Image elastix( const Image& fixedImage, const Image& movingImage, std::string defaultParameterMapName, bool logToConsole, std::string outputFolder );
+SELX_EXPORT Image elastix( const Image& fixedImage, const Image& movingImage, std::map< std::string, std::vector< std::string > > parameterMap, bool logToConsole, std::string outputFolder );
+SELX_EXPORT Image elastix( const Image& fixedImage, const Image& movingImage, std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList, bool logToConsole, std::string outputFolder );
+SELX_EXPORT Image elastix( const Image& fixedImage, const Image& movingImage, std::string defaultParameterMapName, const Image& fixedMask, const Image& movingMask, bool logToConsole, std::string outputFolder );
+SELX_EXPORT Image elastix( const Image& fixedImage, const Image& movingImage, std::map< std::string, std::vector< std::string > >, const Image& fixedMask, const Image& movingMask, bool logToConsole, std::string outputFolder );
+SELX_EXPORT Image elastix( const Image& fixedImage, const Image& movingImage, std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList, const Image& fixedMask, const Image& movingMask, bool logToConsole, std::string outputFolder );
 
 } // end namespace simple
 } // end namespace itk

@@ -13,12 +13,12 @@ Image
 SimpleElastix::ExecuteInternal( void )
 {
   // Assert fixed and moving image is set
-  if( this->m_FixedImage == 0 )
+  if( isEmpty( this->m_FixedImage ) )
   {
     sitkExceptionMacro( << "Fixed image is not set. Use SetFixedImage() or run Help() to get information on how to use this module." );
   }
 
-  if( this->m_MovingImage == 0 )
+  if( isEmpty( this->m_MovingImage ) )
   {
     sitkExceptionMacro( << "Moving image is not set. Use SetMovingImage() or run Help() to get information on how to use this module." );
   }
@@ -32,10 +32,10 @@ SimpleElastix::ExecuteInternal( void )
   for( unsigned int i = 0; i < this->m_ParameterMaps.size(); ++i )
   {
     // Parameter file must match fixed and moving image dimensions and pixel types
-    this->m_ParameterMaps[ i ][ "FixedInternalImagePixelType" ] = ParameterValuesType( 1, GetPixelIDValueAsElastixParameter( this->m_FixedImage->GetPixelID() ) );
-    this->m_ParameterMaps[ i ][ "MovingInternalImagePixelType" ] = ParameterValuesType( 1, GetPixelIDValueAsElastixParameter( this->m_MovingImage->GetPixelID() ) );
-    this->m_ParameterMaps[ i ][ "FixedImageDimension" ] = ParameterValuesType( 1, std::to_string( this->m_FixedImage->GetDimension() ) );
-    this->m_ParameterMaps[ i ][ "MovingImageDimension" ] = ParameterValuesType( 1, std::to_string( this->m_MovingImage->GetDimension() ) );
+    this->m_ParameterMaps[ i ][ "FixedInternalImagePixelType" ] = ParameterValuesType( 1, GetPixelIDValueAsElastixParameter( this->m_FixedImage.GetPixelID() ) );
+    this->m_ParameterMaps[ i ][ "MovingInternalImagePixelType" ] = ParameterValuesType( 1, GetPixelIDValueAsElastixParameter( this->m_MovingImage.GetPixelID() ) );
+    this->m_ParameterMaps[ i ][ "FixedImageDimension" ] = ParameterValuesType( 1, std::to_string( this->m_FixedImage.GetDimension() ) );
+    this->m_ParameterMaps[ i ][ "MovingImageDimension" ] = ParameterValuesType( 1, std::to_string( this->m_MovingImage.GetDimension() ) );
 
     // Elastix library always uses direction cosines so we might as well suppress warning message
     this->m_ParameterMaps[ i ][ "UseDirectionCosines" ] = ParameterValuesType( 1, "true" );
@@ -43,16 +43,20 @@ SimpleElastix::ExecuteInternal( void )
 
   // Get masks (optional)
   itk::DataObject::Pointer fixedMask = 0;
-  if( this->m_FixedMask != 0 )
+  if( !this->isEmpty( this->m_FixedMask ) )
   {
-    fixedMask = this->m_FixedMask->GetITKBase();
+    fixedMask = this->m_FixedMask.GetITKBase();
   }
 
   itk::DataObject::Pointer movingMask = 0;
-  if( this->m_MovingMask != 0 )
+  if( !this->isEmpty( this->m_MovingMask ) )
   {
-    movingMask = this->m_MovingMask->GetITKBase();
+    movingMask = this->m_MovingMask.GetITKBase();
   }
+
+
+  bool res = this->m_OutputFolder != "";
+  std::cout << "this->m_OutputFolder != \"\": " << res << std::endl;
 
   // Do the (possibly multiple) registrations
   int isError = 1;
@@ -60,11 +64,11 @@ SimpleElastix::ExecuteInternal( void )
   try
   {
     isError = elastix.RegisterImages(
-      this->m_FixedImage->GetITKBase(),
-      this->m_MovingImage->GetITKBase(),
+      this->m_FixedImage.GetITKBase(),
+      this->m_MovingImage.GetITKBase(),
       this->m_ParameterMaps,
       this->m_OutputFolder,
-      this->m_LogToDisk,
+      this->m_OutputFolder != "",
       this->m_LogToConsole,
       fixedMask,
       movingMask
