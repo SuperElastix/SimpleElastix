@@ -54,10 +54,6 @@ SimpleElastix::ExecuteInternal( void )
     movingMask = this->m_MovingMask.GetITKBase();
   }
 
-
-  bool res = this->m_OutputFolder != "";
-  std::cout << "this->m_OutputFolder != \"\": " << res << std::endl;
-
   // Do the (possibly multiple) registrations
   int isError = 1;
   libelastix elastix;
