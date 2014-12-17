@@ -165,8 +165,7 @@ Only Python wrappers has been tested extensively. To run these tests,
 Pull requests are welcome if you want to contribute with tests for other languages. 
 
 ### Known Issues
-- On some setups SWIG tries to free memory twice and you may occasionally see a `*** Error in 'python': double free or corruption (!prev): 0x0000000001fb4f70 *** Aborted (core dumped)` error message or similar. If you have a fix, pull requests are very welcome.
-- Assigning a parameter in a list silently fails (e.g. `plist[1]['Transform'] = ['BSplineTrasnform']`). The issue has been reported to SWIG developers.
+- Assigning a parameter in a parameter map list silently fails (e.g. `plist[1]['Transform'] = ['BSplineTrasnform']`). A temporary workaround is to assign the value directly to the parameter map before adding the map to the list.
 
 ### About
 If you are interested in my work you are most welcome to visit [my website](https://kaspermarstal.github.io).
