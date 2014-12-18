@@ -2,8 +2,7 @@ SimpleElastix
 =============
 [![Build Status](https://travis-ci.org/kaspermarstal/SimpleElastix.svg?branch=SimpleElastix)](https://travis-ci.org/kaspermarstal/SimpleElastix)
 
-Medical image registration is the process of transforming images into a common coordinate system so corresponding pixels represent homologous biological
-points. This is a prerequisite for a wide range of medical image analysis tasks and a key algorithmic component for statistical analysis and machine learning in medical image processing. The goal of SimpleElastix is to bring the robust medical image registration algorithms of the [elastix](http://elastix.isi.uu.nl/ "Elastix website") library to a wider audience by integrating elastix with [SimpleITK](https://github.com/SimpleITK/SimpleITK "SimpleITK github repository"). This package provides
+Medical image registration is the process of transforming images into a common coordinate system so corresponding pixels represent homologous biological points. This is a prerequisite for a wide range of medical image analysis tasks and a key algorithmic component for statistical analysis and machine learning in medical image processing. The goal of SimpleElastix is to bring the robust medical image registration algorithms of the [elastix](http://elastix.isi.uu.nl/ "Elastix website") library to a wider audience by integrating elastix with [SimpleITK](https://github.com/SimpleITK/SimpleITK "SimpleITK github repository"). This package provides
 
 - elastix and transformix bindings for Python, Java, R, Ruby, Octave, Lua, Tcl and C# (see [elastix manual](http://elastix.isi.uu.nl/download/elastix_manual_v4.7.pdf "elastix manual") for a list of supported algorithms).
 - A SuperBuild that automatically compiles and installs SimpleElastix and any dependencies.
@@ -41,7 +40,7 @@ for filename in population
 That was easy. The example demonstrates the efficiency of combining SimpleElastix's object oriented interface (the way we used elastix to register images) and procedural interface (the way we used transformix to warp labels) with SimpleITK (the way we computed statistics). Previously, using elastix and transformix on large datasets would incur a significant overhead, from scripting command line invocations and arguments to copying images and transform parameter files across folders. With SimpleElastix this complexity is easier to manage and more memory and disk I/O efficient. For more examples see below or the [Examples/SimpleElastix](Examples/SimpleElastix) directory.
 
 ### Procedural Interface
-SimpleElastix provides a procedural inteface that aligns well with the design philosophy of SimpleITK and reduces registration to a one-liner. The procedural interface hides the elastix API's object oriented methods and directly invokes registration. 
+SimpleElastix provides a procedural inteface that aligns well with the design philosophy of SimpleITK. This directly invokes registration much like the elastix command line interface. 
 
 ```python
 import SimpleElastix as sitk
@@ -107,14 +106,14 @@ plist = ParameterMapList()
 plist.push_back(p)
 
 # The following calls will initialize a new parameter map with a nonrigid 
-# transform at position two in the list (this is just an example, more parameters
-# like pyramid type, metric type etc would need to be added)
+# transform at position two in the list (more parameters like pyramid type, 
+# metric type etc would need to be added ofc)
 p['Transform'] = ['BSplineTransform']
 plist.push_back(sitk.ParameterMap())
 
 # Passing the above list will cause elastix to run an affine initialization
 # followed by a nonrigid registration 
-selx.SetParameterMapList( plist ) 
+selx.SetParameterMapList(plist) 
 selx.Execute()  
 ```
 
