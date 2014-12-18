@@ -471,55 +471,6 @@ ReadParameterFile( const std::string filename )
 
 
 Image
-elastix( const Image& fixedImage, const Image& movingImage, const std::string defaultParameterMapName )
-{
-  return elastix( fixedImage, movingImage, GetDefaultParameterMap( defaultParameterMapName ), false, "" );
-}
-
-
-
-Image
-elastix( const Image& fixedImage, const Image& movingImage, const std::map< std::string, std::vector< std::string > > parameterMap )
-{
-  return elastix( fixedImage, movingImage, parameterMap, false, "" );
-}
-
-
-
-Image
-elastix( const Image& fixedImage, const Image& movingImage, const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList )
-{
-  return elastix( fixedImage, movingImage, parameterMapList, false, "" );
-}
-
-
-
-Image
-elastix( const Image& fixedImage, const Image& movingImage, const std::string defaultParameterMapName, const Image& fixedMask, const Image& movingMask )
-{
-  return elastix( fixedImage, movingImage, defaultParameterMapName, fixedMask, movingMask, false, "" );
-}
-
-
-
-
-Image
-elastix( const Image& fixedImage, const Image& movingImage, const std::map< std::string, std::vector< std::string > > parameterMap, const Image& fixedMask, const Image& movingMask )
-{
-  return elastix( fixedImage, movingImage, parameterMap, fixedMask, movingMask, false, "" );
-}
-
-
-
-Image
-elastix( const Image& fixedImage, const Image& movingImage, const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList, const Image& fixedMask, const Image& movingMask )
-{
-  return elastix( fixedImage, movingImage, parameterMapList, fixedMask, movingMask, false, "" );
-}
-
-
-
-Image
 elastix( const Image& fixedImage, const Image& movingImage, const std::string defaultParameterMapName, const bool logToConsole, const std::string outputFolder )
 {
   return elastix( fixedImage, movingImage, GetDefaultParameterMap( defaultParameterMapName ), logToConsole, outputFolder );

@@ -54,6 +54,9 @@ SimpleElastix::ExecuteInternal( void )
     movingMask = this->m_MovingMask.GetITKBase();
   }
 
+  Image tmp = this->m_FixedImage;
+  tmp.SetOrigin( tmp.GetOrigin() ); // triggers unique for write
+
   // Do the (possibly multiple) registrations
   int isError = 1;
   libelastix elastix;
@@ -74,6 +77,8 @@ SimpleElastix::ExecuteInternal( void )
   {
     sitkExceptionMacro( << "Errors occured during registration: " << e.what() );
   }
+
+  this->m_FixedImage = tmp;
 
   if( isError == -2 )
   {
