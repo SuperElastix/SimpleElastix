@@ -80,9 +80,8 @@ selx = sitk.SimpleElastix()
 selx.SetFixedImage(image4d) 
 selx.SetMovingImage(image4d)
 
-# Customize the preconfigured groupwise parameter map and run the registration
+# Add preconfigured groupwise parameter map and run the registration
 p = selx.GetDefaultParameterMap('groupwise')
-p['MaximumNumberOfIterations'] = '1024'
 selx.SetParameterMap(p)
 selx.Execute()
 ```
@@ -108,11 +107,13 @@ plist = ParameterMapList()
 plist.push_back(p)
 
 # The following calls will initialize a new parameter map with a nonrigid 
-# transform at position two in the list
+# transform at position two in the list (this is just an example, more parameters
+# like pyramid type, metric type etc would need to be added)
 p['Transform'] = ['BSplineTransform']
 plist.push_back(sitk.ParameterMap())
 
-# Passing the above list will cause elastix to run an affine initialization followed by a nonrigid registration
+# Passing the above list will cause elastix to run an affine initialization
+# followed by a nonrigid registration 
 selx.SetParameterMapList( plist ) 
 selx.Execute()  
 ```
@@ -165,7 +166,7 @@ Only Python wrappers has been tested extensively. To run these tests,
 Pull requests are welcome if you want to contribute with tests for other languages. 
 
 ### Known Issues
-- Assigning a parameter in a parameter map list silently fails (e.g. `plist[1]['Transform'] = ['BSplineTrasnform']`). A temporary workaround is to assign the value directly to the parameter map before adding the map to the list.
+- Assigning a parameter in a parameter map list silently fails (e.g. `plist[1]['Transform'] = ['BSplineTrasnform']`). A workaround is to assign the value directly to the parameter map before adding the map to the list.
 
 ### About
 If you are interested in my work you are most welcome to visit [my website](https://kaspermarstal.github.io).
