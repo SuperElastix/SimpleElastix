@@ -106,8 +106,7 @@ plist = ParameterMapList()
 plist.push_back(p)
 
 # The following calls will initialize a new parameter map with a nonrigid 
-# transform at position two in the list (more parameters like pyramid type, 
-# metric type etc would need to be added ofc)
+# transform at position two in the list
 plist.push_back(sitk.GetDefaultParameterMap('nonrigid'))
 
 # Passing the above list will cause elastix to run an affine initialization
