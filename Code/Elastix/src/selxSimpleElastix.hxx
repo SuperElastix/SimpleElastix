@@ -54,13 +54,20 @@ SimpleElastix::ExecuteInternal( void )
     movingMask = this->m_MovingMask.GetITKBase();
   }
 
+  // BUG: Fixed image buffer is empty after elastix has run.
+  // We pass a deep copy as a temporary workaround until the issue is fixed
+  Image fixedImage = this->m_FixedImage;
+
+  // The following call invokes Image::MakeUniqueForWrite()
+  fixedImage.SetOrigin( fixedImage.GetOrigin() );
+
   // Do the (possibly multiple) registrations
   int isError = 1;
   libelastix elastix;
   try
   {
     isError = elastix.RegisterImages(
-      this->m_FixedImage.GetITKBase(),
+      fixedImage.GetITKBase(),
       this->m_MovingImage.GetITKBase(),
       this->m_ParameterMaps,
       this->m_OutputFolder,

@@ -202,13 +202,13 @@ SimpleElastix
 { 
 
   // Defaults
-  unsigned int resolution          = 3;
+  unsigned int resolutions         = 4;
   unsigned int dimension           = 3;
-  std::vector<unsigned int> siz    = std::vector<unsigned int>( resolution, 256 );
-  std::vector<unsigned int> knots  = std::vector<unsigned int>( resolution, 16 );
+  std::vector<unsigned int> siz    = std::vector<unsigned int>( dimension, 256 );
+  std::vector<unsigned int> knots  = std::vector<unsigned int>( dimension, 16 );
 
   // Image parameters
-  if( isEmpty( this->m_FixedImage ) )
+  if( !isEmpty( this->m_FixedImage ) )
   {
     siz = this->m_FixedImage.GetSize();
     dimension = this->m_FixedImage.GetDimension();
@@ -216,17 +216,21 @@ SimpleElastix
 
   // Parameters that depend on size and number of resolutions
   ParameterMapType parameterMap                     = ParameterMapType();
-  ParameterValuesType finalGridSpacingInVoxels      = ParameterValuesType();
   ParameterValuesType gridSpacingSchedule           = ParameterValuesType();
   ParameterValuesType imagePyramidSchedule          = ParameterValuesType();
+  for( unsigned int res = 0; res < resolutions; ++res )
+  {
+    for( unsigned int dim = 0; dim < dimension; ++dim )
+    {
+      gridSpacingSchedule.insert( gridSpacingSchedule.begin(), std::to_string( pow( 2, res ) ) ); 
+      imagePyramidSchedule.insert( imagePyramidSchedule.begin(), std::to_string( pow( 2, res ) ) ); 
+    }
+  }
+
+  ParameterValuesType finalGridSpacingInVoxels      = ParameterValuesType();
   for( unsigned int dim = 0; dim < dimension; ++dim )
   {
     finalGridSpacingInVoxels.push_back( std::to_string( siz[ dim ] / knots[ dim ] ) );
-    for( unsigned int res = 0; res < resolution; ++res )
-    {
-      gridSpacingSchedule.insert( gridSpacingSchedule.begin(), std::to_string( pow( 2, dim ) ) );   // (4, 4, 4, 2, 2, 2, 1, 1, 1)
-      imagePyramidSchedule.insert( imagePyramidSchedule.begin(), std::to_string( pow( 2, dim ) ) ); // (4, 4, 4, 2, 2, 2, 1, 1, 1)
-    }
   }
 
   // Common Components
@@ -234,14 +238,15 @@ SimpleElastix
   parameterMap[ "MovingImagePyramid" ]              = ParameterValuesType( 1, "MovingSmoothingImagePyramid" );
   parameterMap[ "Interpolator"]                     = ParameterValuesType( 1, "LinearInterpolator");
   parameterMap[ "Optimizer" ]                       = ParameterValuesType( 1, "AdaptiveStochasticGradientDescent" );
-  parameterMap[ "ResampleInterpolator"]             = ParameterValuesType( 1, "FinalBSplineResampleInterpolator" );
+  parameterMap[ "Resampler"]                        = ParameterValuesType( 1, "DefaultResampler" );
+  parameterMap[ "ResampleInterpolator"]             = ParameterValuesType( 1, "FinalBSplineInterpolator" );
   parameterMap[ "FinalBSplineInterpolationOrder" ]  = ParameterValuesType( 1, "2" );
-  parameterMap[ "FixedImagePyramidSchedule"]        = imagePyramidSchedule;
-  parameterMap[ "MovingImagePyramidSchedule"]       = imagePyramidSchedule;
-  parameterMap[ "NumberOfResolutions" ]             = ParameterValuesType( 1, std::to_string( resolution ) );
+  parameterMap[ "FixedImagePyramidSchedule" ]       = imagePyramidSchedule;
+  parameterMap[ "MovingImagePyramidSchedule" ]      = imagePyramidSchedule;
+  parameterMap[ "NumberOfResolutions" ]             = ParameterValuesType( 1, std::to_string( resolutions ) );
 
   // Image Sampler
-  parameterMap[ "ImageSampler" ]                    = ParameterValuesType( 1, "Random" ); 
+  parameterMap[ "ImageSampler" ]                    = ParameterValuesType( 1, "RandomCoordinate" ); 
   parameterMap[ "NumberOfSpatialSamples"]           = ParameterValuesType( 1, "4096" );
   parameterMap[ "CheckNumberOfSamples" ]            = ParameterValuesType( 1, "true" );
   parameterMap[ "MaximumNumberOfSamplingAttempts" ] = ParameterValuesType( 1, "8" );
@@ -280,8 +285,8 @@ SimpleElastix
   {
     parameterMap[ "Registration" ]                  = ParameterValuesType( 1, "MultiMetricMultiResolutionRegistration" );
     parameterMap[ "Transform" ]                     = ParameterValuesType( 1, "BSplineTransform" );
-    parameterMap[ "Transform" ]                       .push_back( "TransformBendingEnergyPenalty" );
     parameterMap[ "Metric" ]                        = ParameterValuesType( 1, "AdvancedMattesMutualInformation" );
+    parameterMap[ "Metric" ]                         .push_back( "TransformBendingEnergyPenalty" );
     parameterMap[ "Metric0Weight" ]                 = ParameterValuesType( 1, "0.001" );
     parameterMap[ "Metric1Weight" ]                 = ParameterValuesType( 1, "0.999" );
     parameterMap[ "FinalGridSpacingInVoxels" ]      = finalGridSpacingInVoxels;
@@ -378,7 +383,7 @@ SimpleElastix
                       << FixedImageDimension << ". For elastix support, recompile elastix "
                       << "with the desired pixel type and cast the SimpleITK image. Supported types are "
                       << "sitkUInt8, sitkInt8, sitkUInt16, sitkInt16, sitkUInt32, sitkInt32, "
-                      << "sitkInt64, sitkUInt64, sitkFloat32 or sitkFloat64" );
+                      << "sitkInt64, sitkUInt64, sitkFloat32 or sitkFloat64." );
 }
 
 
@@ -441,7 +446,7 @@ bool
 SimpleElastix
 ::isEmpty( const Image& image )
 {
-  return ( image.GetWidth() == 0 && image.GetHeight() == 0 );
+  return( image.GetWidth() == 0 && image.GetHeight() == 0 );
 }
 
 
