@@ -13,7 +13,7 @@ Image
 SimpleTransformix::ExecuteInternal( void )
 {
   // Assert fixed and moving image is set
-  if( this->m_InputImage == 0 )
+  if( isEmpty( this->m_InputImage ) )
   {
     sitkExceptionMacro( << "Input image is not set. Use SetInputImage() or run Help() to get information on how to use this module." );
   }
@@ -30,10 +30,10 @@ SimpleTransformix::ExecuteInternal( void )
   try
   {
     isError = transformix->TransformImage(
-      this->m_InputImage->GetITKBase(),
+      this->m_InputImage.GetITKBase(),
       this->m_TransformParameterMaps,
       this->m_OutputFolder,
-      this->m_LogToDisk,
+      this->m_OutputFolder != "",
       this->m_LogToConsole
     );
   }

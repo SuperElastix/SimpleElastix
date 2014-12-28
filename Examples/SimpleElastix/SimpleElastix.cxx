@@ -4,8 +4,6 @@
 #include <iostream>
 #include <stdlib.h>
 
-
-// create convenient namespace alias
 namespace sitk = itk::simple;
 
 int main ( int argc, char* argv[] ) {
@@ -22,10 +20,8 @@ int main ( int argc, char* argv[] ) {
   sitk::ImageFileReader reader;
   reader.SetFileName( std::string( argv[1] ) );
   elastix.SetFixedImage( reader.Execute() );
-
   reader.SetFileName( std::string( argv[2] ) );
   elastix.SetMovingImage( reader.Execute() );
-
   elastix.SetParameterMap( sitk.ReadParameterFile( std::string( argv[3] ) ) );
 
   // Perform registration

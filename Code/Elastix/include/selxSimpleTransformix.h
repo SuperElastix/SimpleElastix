@@ -19,41 +19,40 @@ class SELX_EXPORT SimpleTransformix
 
     SimpleTransformix( void );
     ~SimpleTransformix( void );
-    
+
     typedef SimpleTransformix Self;
-    typedef itk::ParameterFileParser::ParameterMapType      ParameterMapType;
-    typedef ParameterMapType::iterator                      ParameterMapIterator;
-    typedef std::vector< ParameterMapType >                 ParameterMapListType;
-    typedef ParameterMapListType::iterator                  ParameterMapListIterator;
-    typedef std::string                                     ParameterKeyType;
-    typedef itk::ParameterFileParser::ParameterValuesType   ParameterValuesType;
-    typedef itk::ParameterFileParser                        ParameterFileParserType;
-    typedef ParameterFileParserType::Pointer                ParameterFileParserPointer;
- 
+
     // typedefs inherited from SimpleITK
     typedef BasicPixelIDTypeList PixelIDTypeList;
 
     // typedefs inherited from elastix library api
     typedef transformix::TRANSFORMIX libtransformix;
+    typedef itk::ParameterFileParser::ParameterMapType      ParameterMapType;
+    typedef ParameterMapType::iterator                      ParameterMapIterator;
+    typedef ParameterMapType::const_iterator                ParameterMapConstIterator;
+    typedef std::vector< ParameterMapType >                 ParameterMapListType;
+    typedef ParameterMapListType::iterator                  ParameterMapListIterator;
+    typedef ParameterMapListType::const_iterator            ParameterMapListonstIterator;
+    typedef std::string                                     ParameterKeyType;
+    typedef itk::ParameterFileParser::ParameterValuesType   ParameterValuesType;
+    typedef itk::ParameterFileParser                        ParameterFileParserType;
+    typedef ParameterFileParserType::Pointer                ParameterFileParserPointer;
 
     /** To be wrapped by SWIG */ 
 
     const std::string GetName( void );
 
     // Images
-    void SetInputImage( Image* fixedImage );
+    void SetInputImage( const Image& inputImage );
+    Image& GetInputImage( void );
+    Image& GetResultImage( void );
 
     // Warp images
     Image Execute( void );
 
-    // Get result
-    Image GetResultImage( void );
-
     // Output
-    void SetOutputFolder( const std::string folder );
-    void LogToDisk( bool );
-    void LogToDiskOn( void );
-    void LogToDiskOff( void );
+    void LogToFolder( const std::string folder );
+    void LogToFolderOff( void );
     void LogToConsole( bool );
     void LogToConsoleOn( void );
     void LogToConsoleOff( void );
@@ -65,6 +64,8 @@ class SELX_EXPORT SimpleTransformix
     ParameterMapType ParameterFileReader( const std::string filename );
 
   private:
+
+    bool isEmpty( const Image& image );
 
     template< typename TResultImage >
     Image ExecuteInternal( void );
@@ -89,18 +90,17 @@ class SELX_EXPORT SimpleTransformix
     std::auto_ptr< detail::MemberFunctionFactory< MemberFunctionType > > m_MemberFactory;
 
     // This class holds configuration and pointers to data that is passed to transformix API when run
-    Image*                 m_InputImage;
+    Image                  m_InputImage;
     Image                  m_ResultImage;
     std::string            m_OutputFolder;
-    bool                   m_LogToDisk;
     bool                   m_LogToConsole;
     ParameterMapListType   m_TransformParameterMaps;
 
 };
 
 // Procedural Interface 
-SELX_EXPORT Image transformix( Image inputImage, std::map< std::string, std::vector< std::string > > parameterMap, bool logToConsole = false, bool logToDisk = false, std::string outputFolder = "" );
-SELX_EXPORT Image transformix( Image fixedImage, SimpleTransformix::ParameterMapListType parameterMapList, bool logToConsole = false, bool logToDisk = false, std::string outputFolder = "" );
+SELX_EXPORT Image transformix( const Image& inputImage, std::map< std::string, std::vector< std::string > > parameterMap, bool logToConsole = false, std::string outputFolder = "" );
+SELX_EXPORT Image transformix( const Image& fixedImage, SimpleTransformix::ParameterMapListType parameterMapList, bool logToConsole = false, std::string outputFolder = "" );
 
 
 } // end namespace simple

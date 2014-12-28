@@ -44,20 +44,20 @@ class SELX_EXPORT SimpleElastix
 
     // Images
     void SetFixedImage( const Image& fixedImage );
-    Image GetFixedImage( void );
+    Image& GetFixedImage( void );
 
     void SetMovingImage( const Image& movingImage );
-    Image GetMovingImage( void );
+    Image& GetMovingImage( void );
     
     void SetFixedMask( const Image& fixedMask );
-    Image GetFixedMask( void );
+    Image& GetFixedMask( void );
     void DeleteFixedMask( void );
 
     void SetMovingMask( const Image& movingMask );
-    Image GetMovingMask( void );
+    Image& GetMovingMask( void );
     void DeleteMovingMask( void );
 
-    // Paramete Map interface (SWIG behaves better the types are explicitely typed out)
+    // Paramete Map interface
     void SetParameterMapList( std::vector< std::map< std::string, std::vector< std::string > > > const parameterMapList );
     void SetParameterMap( std::map< std::string, std::vector< std::string > > const parameterMap );
     std::vector< std::map< std::string, std::vector< std::string > > > GetParameterMapList( void );
@@ -70,7 +70,7 @@ class SELX_EXPORT SimpleElastix
     Image Execute( void );
 
     // Get result
-    Image GetResultImage( void );
+    Image& GetResultImage( void );
     std::vector< std::map< std::string, std::vector< std::string > > > GetTransformParameterMapList( void );
 
     // Output
@@ -132,14 +132,16 @@ SELX_EXPORT Image elastix( const Image& fixedImage, const Image& movingImage, co
 } // end namespace simple
 } // end namespace itk
 
-namespace std
-{
-  template < typename T > string to_string( const T& n )
+#if __cplusplus <= 199711L
+  namespace std
   {
-    ostringstream stm;
-    stm << n;
-    return stm.str();
+    template < typename T > string to_string( const T& n )
+    {
+      ostringstream stm;
+      stm << n;
+      return stm.str();
+    }
   }
-}
+#endif
 
 #endif // __selxsimpleelastix_h_

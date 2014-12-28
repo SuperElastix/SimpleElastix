@@ -18,11 +18,10 @@ SimpleTransformix
   m_MemberFactory->RegisterMemberFunctions< PixelIDTypeList, 2, SimpleTransformixAddressor< MemberFunctionType > >();
 
   // This class holds configuration and pointers to data that is passed to Transformix API when run
-  this->m_InputImage = 0;
+  this->m_InputImage = Image();
   this->m_TransformParameterMaps = ParameterMapListType();
   this->m_ResultImage = Image();
   this->m_OutputFolder = "";
-  this->m_LogToDisk = false;
   this->m_LogToConsole = true;
 }
 
@@ -47,9 +46,28 @@ SimpleTransformix
 
 void 
 SimpleTransformix
-::SetInputImage( Image* inputImage )
+::SetInputImage( const Image& inputImage )
 {
   this->m_InputImage = inputImage;
+}
+
+
+
+Image&
+SimpleTransformix
+::GetInputImage( void )
+{
+  return this->m_InputImage;
+}
+
+
+
+
+Image&
+SimpleTransformix
+::GetResultImage( void )
+{
+  return this->m_ResultImage;
 }
 
 
@@ -58,8 +76,8 @@ Image
 SimpleTransformix
 ::Execute( void )
 {
-  const PixelIDValueEnum InputImagePixelEnum = this->m_InputImage->GetPixelID();
-  const unsigned int InputImageDimension = this->m_InputImage->GetDimension();
+  const PixelIDValueEnum InputImagePixelEnum = this->m_InputImage.GetPixelID();
+  const unsigned int InputImageDimension = this->m_InputImage.GetDimension();
 
   if (this->m_MemberFactory->HasMemberFunction( InputImagePixelEnum, InputImageDimension ) )
   {
@@ -74,47 +92,20 @@ SimpleTransformix
 
 
 
-Image 
-SimpleTransformix
-::GetResultImage( void )
-{
-  return this->m_ResultImage;
-}
-
-
-
 void
 SimpleTransformix
-::SetOutputFolder( const std::string folder )
+::LogToFolder( const std::string folder )
 {
   this->m_OutputFolder = folder;
 }
 
 
 
-void
+void 
 SimpleTransformix
-::LogToDisk( bool logToDisk )
+::LogToFolderOff()
 {
-  this->m_LogToDisk = logToDisk;
-}
-
-
-
-void
-SimpleTransformix
-::LogToDiskOn( void )
-{
-  this->m_LogToDisk = true;
-}
-
-
-
-void
-SimpleTransformix
-::LogToDiskOff( void )
-{
-  this->m_LogToDisk = false;
+  this->m_OutputFolder = "";
 }
 
 
@@ -125,7 +116,6 @@ SimpleTransformix
 {
   this->m_LogToConsole = logToConsole;
 }
-
 
 
 
@@ -195,25 +185,36 @@ SimpleTransformix
 }
 
 
+bool
+SimpleTransformix
+::isEmpty( const Image& image )
+{
+  return( image.GetWidth() == 0 && image.GetHeight() == 0 );
+}
+
+
+
+// Procedural interface
+
+
 
 Image
-transformix( Image inputImage, SimpleTransformix::ParameterMapType parameterMap, bool logToConsole, bool logToDisk, std::string outputFolder )
+transformix( const Image& inputImage, SimpleTransformix::ParameterMapType parameterMap, bool logToConsole, std::string outputFolder )
 {
   SimpleTransformix::ParameterMapListType parameterMapList;
   parameterMapList.push_back( parameterMap );
-  return transformix( inputImage, parameterMapList, logToConsole, logToDisk, outputFolder );
+  return transformix( inputImage, parameterMapList, logToConsole, outputFolder );
 }
 
 
 
 Image
-transformix( Image inputImage, SimpleTransformix::ParameterMapListType parameterMapList, bool logToConsole, bool logToDisk, std::string outputFolder )
+transformix( const Image& inputImage, SimpleTransformix::ParameterMapListType parameterMapList, bool logToConsole, std::string outputFolder )
 {
   SimpleTransformix stfx;
-  stfx.SetInputImage( &inputImage );
+  stfx.SetInputImage( inputImage );
   stfx.SetTransformParameterMapList( parameterMapList );
-  stfx.SetOutputFolder( outputFolder );
-  stfx.LogToDisk( logToDisk );
+  stfx.LogToFolder( outputFolder );
   stfx.LogToConsole( logToConsole );
 
   return stfx.Execute();

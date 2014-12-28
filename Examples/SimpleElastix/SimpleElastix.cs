@@ -2,7 +2,7 @@ using System;
 using itk.simple;
 
 namespace itk.simple.examples {
-    class SimpleGaussian {
+    class SimpleElastix {
         static void Main(string[] args) {
             try {
                 if (args.Length < 4) {
@@ -16,10 +16,8 @@ namespace itk.simple.examples {
                 ImageFileReader reader = new ImageFileReader();
                 reader.SetFileName(args[0]);
                 elastix.SetFixedImage(reader.Execute());
-
                 reader.SetFileName(args[1]);
                 elastix.SetMovingImage(reader.Execute());
-
                 elastix.SetParameterMap(ReadParameterFile(args[2]))
 
                 // Perform Registration

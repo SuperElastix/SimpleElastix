@@ -57,7 +57,7 @@ SimpleElastix
 
 
 
-Image
+Image&
 SimpleElastix
 ::GetFixedImage( void )
 {
@@ -75,7 +75,7 @@ SimpleElastix
 
 
 
-Image
+Image&
 SimpleElastix
 ::GetMovingImage( void )
 {
@@ -93,7 +93,7 @@ SimpleElastix
 
 
 
-Image
+Image&
 SimpleElastix
 ::GetFixedMask( void )
 {
@@ -120,7 +120,7 @@ SimpleElastix
 
 
 
-Image
+Image&
 SimpleElastix
 ::GetMovingMask( void )
 {
@@ -388,7 +388,7 @@ SimpleElastix
 
 
 
-Image 
+Image&
 SimpleElastix
 ::GetResultImage( void )
 {

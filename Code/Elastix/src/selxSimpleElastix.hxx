@@ -89,7 +89,7 @@ SimpleElastix::ExecuteInternal( void )
 
   if( isError != 0 )
   {
-    sitkExceptionMacro( << "Errors occured during registration." );
+    sitkExceptionMacro( << "Errors occured during registration. Set LogToConsoleOn() or LogToFolder(outputFolder) for detailed information." );
   }
 
   if( elastix.GetTransformParameterMapList().size() > 0 )
@@ -113,6 +113,7 @@ SimpleElastix::ExecuteInternal( void )
   {
     TResultImage* itkResultImage = static_cast< TResultImage* >( elastix.GetResultImage().GetPointer() );
     this->m_ResultImage = Image( itkResultImage );
+    this->m_ResultImage.SetOrigin( this->m_ResultImage.GetOrigin() );
   }
 
   return this->m_ResultImage;

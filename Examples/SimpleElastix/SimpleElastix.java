@@ -16,7 +16,6 @@ class SimpleElastix {
     org.itk.simple.ImageFileReader reader = new org.itk.simple.ImageFileReader();
     reader.setFileName(argv[0]);
     elastix.SetFixedImage(reader.execute());
-
     reader.setFileName(argv[1]);
     elastix.SetMovingImage(reader.execute());
 

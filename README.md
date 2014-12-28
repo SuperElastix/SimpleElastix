@@ -86,7 +86,7 @@ selx.Execute()
 ```
 
 ### Parameter Maps
-In addition to loading your own parameter files from disk, you can construct parameter maps programmatically from SimpleElastix's parameter map interface. This interface that works seamlessly with native types of your target language. In python, a parameter map is a dictionary-like structure that you can call `keys(), clear()`, `has_key()` on etc and even iterate over. 
+In addition to loading your own parameter files from disk, you can construct parameter maps programmatically from SimpleElastix's parameter map interface. This interface works seamlessly with native types of your target language. In python, a parameter map is a dictionary-like structure that you can call `keys(), clear()`, `has_key()` on etc and even iterate over. 
 
 ```python
 import SimpleITK as sitk
