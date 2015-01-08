@@ -133,7 +133,7 @@ The SuperBuild will download and install dependencies (elastix, ITK, SimpleITK a
 SimpleElastix has been tried and tested on Ubuntu 14.10 with GCC 4.9.2. Other platforms may experience issues related to SWIG wrapping. 
 
 ### Building Manually
-This is not the recommended way of building SimpleElastix but it can be useful if you want to use a system version of ITK, SWIG or your own version of elastix. 
+This is not the recommended way of building SimpleElastix but it can be useful if you want to use a system version of ITK, SWIG or your own version of elastix (in this case check out the necessary changes to elastix source code at https://github.com/kaspermarstal/elastix). 
 
 1. Setup the prerequisites
  - `sudo apt-get install cmake swig monodevelop r-base r-base-dev ruby python python-dev tcl tcl-dev tk tk-dev`.
