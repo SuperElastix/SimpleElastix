@@ -156,7 +156,7 @@ This is not the recommended way of building SimpleElastix but it can be useful i
  - Be sure to note the build settings e.g. Release x64
 10. Configure SimpleITK using CMake
  - Set ITK_DIR to the location of the ITK build location from the previous steps
- - SET ELASTIX_DIR to the location of the elastix build location from the previous steps
+ - Set ELASTIX_DIR to the location of the elastix build location from the previous steps
 Build SimpleITK
  - Be sure to configure the build settings exactly the same as ITK e.g. Release x64
 
