@@ -50,11 +50,7 @@ class TestSimpleElastix(unittest.TestCase):
         plist.pop()
         self.assertTrue(plist.size() == 1)
 
-        # TODO: Report to SWIG dev that plist[1]['key'] = ['value'] does not work
-
     def test_defaultparametermaps(self):
-        plist = sitk.ParameterMapList()
-
         p1 = sitk.GetDefaultParameterMap('translation')
         self.assertTrue(p1['Registration'][0] == 'MultiResolutionRegistration')
         self.assertTrue(p1['Transform'][0] == 'TranslationTransform')
@@ -87,47 +83,6 @@ class TestSimpleElastix(unittest.TestCase):
         self.assertTrue(p5['Transform'][0] == 'BSplineStackTransform')
         self.assertTrue(p5['Metric'][0] == 'VarianceOverLastDimensionMetric')
         self.assertTrue(p5['MaximumNumberOfIterations'][0] == '512')
-
-    def test_proc_interface(self):
-        array = np.linspace(0, 119, 120).reshape(4,5,6).astype(np.int16)
-        fixedImage = sitk.GetImageFromArray(array)
-        movingImage = sitk.GetImageFromArray(array)
-        
-        resultImage = sitk.elastix(fixedImage,movingImage,'affine')
-        a = np.ndarray.flatten(sitk.GetArrayFromImage(resultImage))
-        b = np.ndarray.flatten(array)
-
-         # Last pixel of each row is round to floor due to linear interpolator edgecase
-        self.assertTrue(sum(abs(a-b)) < 100.01)
-        self.assertTrue(sum(abs(a-b)) > 99.99)
-
-        # Running twice should produce the same result
-        resultImage2 = sitk.elastix(fixedImage,movingImage,'affine')
-        self.assertTrue(sum(abs(resultImage-resultImage2)) < 1e-16)
-
-    def test_oo_interface(self):
-        array = np.linspace(0, 119, 120).reshape(4,5,6).astype(np.int16)
-        fixedImage = sitk.GetImageFromArray(array)
-        movingImage = sitk.GetImageFromArray(array)
-
-        selx = sitk.SimpleElastix()
-        selx.SetFixedImage(fixedImage)
-        selx.SetMovingImage(movingImage)
-        selx.SetParameterMap(sitk.GetDefaultParameterMap('affine'))
-        selx.LogToConsoleOff()
-        selx.Execute()
-
-        resultImage = selx.GetResultImage()
-        a = np.ndarray.flatten(sitk.GetArrayFromImage(resultImage))
-        b = np.ndarray.flatten(array)
-
-        # Last pixel of each row is round to floor due to linear interpolator edgecase
-        self.assertTrue(sum(abs(a-b)) < 100.01)
-        self.assertTrue(sum(abs(a-b)) > 99.99)
-
-        # Fixed image buffered region is emptied when running registration so can't run twice
-        # fixedImage-resultImage
-
 
 if __name__ == '__main__':
     unittest.main()

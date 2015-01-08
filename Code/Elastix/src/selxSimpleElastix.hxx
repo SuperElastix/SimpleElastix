@@ -8,7 +8,7 @@
 namespace itk {
   namespace simple {
 
-template<typename TResultImage >
+template< typename TResultImage >
 Image
 SimpleElastix::ExecuteInternal( void )
 {
@@ -23,7 +23,7 @@ SimpleElastix::ExecuteInternal( void )
     sitkExceptionMacro( << "Moving image is not set. Use SetMovingImage() or run Help() to get information on how to use this module." );
   }
 
-  // Assert that at least one parameter map is set
+  // Assert at least one parameter map is set
   if( this->m_ParameterMaps.size() == 0 )
   {
     sitkExceptionMacro( << "Parameter map not set. Use SetParameterMap() or run Help() to get information on how to use this module." );
@@ -55,10 +55,10 @@ SimpleElastix::ExecuteInternal( void )
   }
 
   // BUG: Fixed image buffer is empty after elastix has run.
-  // We pass a deep copy as a temporary workaround until the issue is fixed
+  // We pass a copy as a temporary workaround until the issue is fixed
   Image fixedImage = this->m_FixedImage;
 
-  // The following call invokes Image::MakeUniqueForWrite()
+  // The following call invokes a deep copy
   fixedImage.SetOrigin( fixedImage.GetOrigin() );
 
   // Do the (possibly multiple) registrations

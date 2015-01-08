@@ -285,8 +285,8 @@ SimpleElastix
   {
     parameterMap[ "Registration" ]                  = ParameterValuesType( 1, "MultiMetricMultiResolutionRegistration" );
     parameterMap[ "Transform" ]                     = ParameterValuesType( 1, "BSplineTransform" );
+    parameterMap[ "Transform" ]                       .push_back( "TransformBendingEnergyPenalty" );
     parameterMap[ "Metric" ]                        = ParameterValuesType( 1, "AdvancedMattesMutualInformation" );
-    parameterMap[ "Metric" ]                         .push_back( "TransformBendingEnergyPenalty" );
     parameterMap[ "Metric0Weight" ]                 = ParameterValuesType( 1, "0.001" );
     parameterMap[ "Metric1Weight" ]                 = ParameterValuesType( 1, "0.999" );
     parameterMap[ "FinalGridSpacingInVoxels" ]      = finalGridSpacingInVoxels;
