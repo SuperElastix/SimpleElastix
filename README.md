@@ -60,24 +60,28 @@ registeredImage = sitk.SimpleElastix(fixedImage, affineMovingImage, 'nonrigid')
 
 
 ### Object Oriented Interface
-While the procedural interface may be useful in rapid prototyping, it trades off flexibility for code simplicity. In the example above, the final deformation field cannot be retrived and applied to another image. This is a problem if you want to subsequently warp segmentations as we did in the first example. Further, image quality is reduced from resampling the resulting image twice. To this end, SimpleElastix also comes with a powerful object oriented interface suitable for more advanced use cases and scripting purposes. In the next example, we perform groupwise registration.
+While the procedural interface may be useful in rapid prototyping, it trades off flexibility for code simplicity. In the example above, the final deformation field cannot be retrived and applied to another image. This is a problem if you want to subsequently warp segmentations as we did in the first example. Further, image quality is reduced from resampling the resulting image twice. To this end, SimpleElastix also comes with a powerful object oriented interface suitable for more advanced use cases and scripting purposes. In the next example, we perform groupwise registration of 2D images (SimpleITK does not support 4D images yet).
 
 ```python
 import SimpleITK as sitk
 
 # First we concatenate the ND images into one (N+1)D image
-population = ['image1.hdr', 'image2.hdr', ... , 'imageN.hdr']
-vectorOfImages = sitk.VectorOfImage()
-vectorOfImages = [vectorOfImages.push_back(sitk.ReadImage(image)) for image in population]
-image4d = sitk.JoinSeriesFilter(vectorOfImages)
+population = ['image1.hdr', ..., 'imageN.hdr']
+vectorOfImage = sitk.vectorOfImage()
+
+for filename in population
+  vectorOfImage.push_back(sitk.ReadImage(filename))
+
+image3d = sitk.JoinSeries(vectorOfImage)
 
 # Instantiate an elastix object 
 selx = sitk.SimpleElastix()
 
 # The groupwise transform works only on the moving image. However, a 
 # dummy fixed image is needed to prevent elastix from throwing errors
-selx.SetFixedImage(image4d) 
-selx.SetMovingImage(image4d)
+# (remember this does not consume extra memory)
+selx.SetFixedImage(image3d) 
+selx.SetMovingImage(image3d)
 
 # Add preconfigured groupwise parameter map and run the registration
 p = selx.GetDefaultParameterMap('groupwise')
