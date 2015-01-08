@@ -130,6 +130,8 @@ make -j4
 
 The SuperBuild will download and install dependencies (elastix, ITK, SimpleITK and SWIG) and compile SimpleElastix. Target language dependencies need to be pre-installed, e.g. `sudo apt-get install cmake swig monodevelop r-base r-base-dev ruby python python-dev tcl tcl-dev tk tk-dev` if you are running Linux. Note that this project takes around an hour to build on a quad-core machine.
 
+SimpleElastix has been tried and tested on Ubuntu 14.10 with GCC 4.9.2. Other platforms may experience issues related to SWIG wrapping. 
+
 ### Building Manually
 This is not the recommended way of building SimpleElastix but it can be useful if you want to use a system version of ITK, SWIG or your own version of elastix. 
 
@@ -153,14 +155,6 @@ This is not the recommended way of building SimpleElastix but it can be useful i
  - SET ELASTIX_DIR to the location of the elastix build location from the previous steps
 Build SimpleITK
  - Be sure to configure the build settings exactly the same as ITK e.g. Release x64
-
-### Testing
-Only Python wrappers has been tested extensively. To run these tests,
-
-1. Install the built python package into the system Python by running `python setup.py install` in the `SimpleITK-build/Wrapping/PythonPackage` directory.
-2. Invoke the `selxSimpleElastixTest.py` and `selxSimpleTrasnformixTest.py` in the [Testing/Unit](Testing/Unit) directory.
-
-Pull requests are welcome if you want to contribute with tests for other languages. 
 
 ### Known Issues
 - Assigning a parameter in a parameter map list silently fails (e.g. `plist[1]['Transform'] = ['BSplineTrasnform']`). A workaround is to assign the value directly to the parameter map before adding the map to the list.
