@@ -4,12 +4,14 @@ class SimpleTransformix {
  
   public static void main(String argv[]) {
 
+    // If you get "no SimpleITKJava in java.library.path" point java.library.path to lib/libSimpeITKJava.jnilib
+
     if ( argv.length < 4 ) {
-      System.out.println("Usage: java SimpleElastix <fixedImage> <movingImage> <inputImage> <parameterFile> <output>");
+      System.out.println("Usage: java -cp SimpleTransformixJava.jar SimpleTransformix <fixedImage> <movingImage> <parameterFile> <inputImage> <output>");
       return;
     }
 
-    // Make transform parameter map list
+    // Make transform
     org.itk.simple.ImageFileReader reader = new org.itk.simple.ImageFileReader();
     reader.setFileName(argv[0]);
     org.itk.simple.SimpleElastix elastix = new org.itk.simple.SimpleElastix();
@@ -17,6 +19,7 @@ class SimpleTransformix {
     reader.setFileName(argv[1]);
     elastix.setMovingImage(reader.execute());
     elastix.setParameterMap(elastix.readParameterFile(argv[2]));
+    elastix.logToConsoleOn();
     elastix.execute();
 
     // Instantiate transformix
@@ -26,13 +29,14 @@ class SimpleTransformix {
     reader.setFileName(argv[3]);
     transformix.setInputImage(reader.execute());
     transformix.setTransformParameterMapList(elastix.getTransformParameterMapList());
-
+    transformix.logToConsoleOn();
+    
     // Perform warp
     transformix.execute();
 
     // Write result image
     ImageFileWriter writer = new ImageFileWriter();
-    writer.setFileName(argv[3]);
+    writer.setFileName(argv[4]);
     writer.execute(transformix.getResultImage()); 
 
   }

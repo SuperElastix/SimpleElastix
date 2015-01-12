@@ -134,7 +134,7 @@ make -j4
 
 The SuperBuild will download and install dependencies (elastix, ITK, SimpleITK and SWIG) and compile SimpleElastix. Target language dependencies need to be pre-installed, e.g. `sudo apt-get install cmake swig monodevelop r-base r-base-dev ruby python python-dev tcl tcl-dev tk tk-dev` if you are running Linux. Note that this project takes around an hour to build on a quad-core machine.
 
-SimpleElastix has been tried and tested on Ubuntu 14.10 with GCC 4.9.2 and Mac OSX Yosemite with clang 600.0.56.
+SimpleElastix has been tried and tested on Ubuntu 14.10 with GCC 4.9.2 and Clang 3.4.4 and Mac OSX Yosemite with Apple Clang 600.0.56.
 
 ### Building Manually
 This is not the recommended way of building SimpleElastix but it can be useful if you want to use a system version of ITK, SWIG or your own version of elastix (in this case check out the necessary changes to elastix source code at https://github.com/kaspermarstal/elastix). 
@@ -149,7 +149,7 @@ This is not the recommended way of building SimpleElastix but it can be useful i
 5. Build elastix
 6. Download the SimpleITK source code from the SourceForge page
 7. Download the matching version of ITK
- - e.g. SimpleITK 0.9 uses ITK 4.6.1 (tag v4.6.1)
+ - e.g. SimpleITK 0.9 uses ITK 4.7 (tag v4.7)
 8. Configure ITK using CMake
  - BUILD_EXAMPLES=OFF, BUILD_TESTING=OFF, BUILD_SHARED_LIBS=OFF, ITK_USE_REVIEW=ON, ITK_WRAP_*=OFF
 9. Build ITK

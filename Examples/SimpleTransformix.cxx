@@ -15,14 +15,15 @@ int main ( int argc, char* argv[] ) {
     return 1;
   }
 
-  // Make transform parameter map list
-  SimpleElastix elastix;
-  ImageFileReader reader;
+  // Make transform
+  sitk::SimpleElastix elastix;
+  sitk::ImageFileReader reader;
   reader.SetFileName( std::string( argv[1] ) );
   elastix.SetFixedImage( reader.Execute() );
   reader.SetFileName( std::string( argv[2] ) );
   elastix.SetMovingImage( reader.Execute() );
   elastix.SetParameterMap( sitk::ReadParameterFile( std::string( argv[3] ) ) );
+  elastix.LogToConsoleOn();
   elastix.Execute();
 
   // Instantiate transformix
@@ -31,20 +32,18 @@ int main ( int argc, char* argv[] ) {
   // Read input
   reader.SetFileName( std::string( argv[4] ) );
   transformix.SetInputImage( reader.Execute() );
-  transfornux.SetTransformParameterMapList( elastix.GetTransformParameterMapList() )
+  transformix.SetTransformParameterMapList( elastix.GetTransformParameterMapList() );
+  transformix.LogToConsoleOn();
 
   // Perform warp
-  transformix.Execute()
+  transformix.Execute();
 
   // Write result image
-  ImageFileWriter writer;
-  writer.SetFileName( std::string( argv[4] ) );
+  sitk::ImageFileWriter writer;
+  writer.SetFileName( std::string( argv[5] ) );
   writer.Execute( transformix.GetResultImage() );
 
   return 0;
-}
 
-    
-} // namespace itk
-} // namespace simple
+}
 

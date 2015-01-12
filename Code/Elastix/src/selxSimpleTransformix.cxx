@@ -22,7 +22,7 @@ SimpleTransformix
   this->m_TransformParameterMaps = ParameterMapListType();
   this->m_ResultImage = Image();
   this->m_OutputFolder = "";
-  this->m_LogToConsole = true;
+  this->m_LogToConsole = false;
 }
 
 

@@ -34,7 +34,5 @@ int main ( int argc, char* argv[] ) {
   writer.SetFileName( std::string( argv[4] ) );
   writer.Execute( elastix.GetResultImage() );
 
-  elastix.PrettyPrint( elastix.GetTransformParameterMapList() );
-
   return 0;
 }

@@ -37,8 +37,8 @@ SimpleElastix::ExecuteInternal( void )
     this->m_ParameterMaps[ i ][ "ResultImagePixelType" ] = ParameterValuesType( 1, GetPixelIDValueAsElastixParameter( this->m_FixedImage.GetPixelID() ) );
     this->m_ParameterMaps[ i ][ "FixedImageDimension" ] = ParameterValuesType( 1, std::to_string( this->m_FixedImage.GetDimension() ) );
     this->m_ParameterMaps[ i ][ "MovingImageDimension" ] = ParameterValuesType( 1, std::to_string( this->m_MovingImage.GetDimension() ) );
-
-    // Always uses direction cosines
+    
+    // Always use direction cosines
     this->m_ParameterMaps[ i ][ "UseDirectionCosines" ] = ParameterValuesType( 1, "true" );
   }
 
@@ -57,18 +57,18 @@ SimpleElastix::ExecuteInternal( void )
 
   // BUG: Fixed image buffer is empty after elastix has run.
   // We pass a copy as a temporary workaround until the issue is fixed
-  Image fixedImage = this->m_FixedImage;
+  //Image fixedImage = this->m_FixedImage;
 
   // The following call invokes a deep copy
-  fixedImage.SetOrigin( fixedImage.GetOrigin() );
+  //fixedImage.SetOrigin( fixedImage.GetOrigin() );
 
   // Do the (possibly multiple) registrations
   int isError = 1;
-  libelastix elastix;
+  libelastix* elastix = new libelastix();
   try
   {
-    isError = elastix.RegisterImages(
-      fixedImage.GetITKBase(),
+    isError = elastix->RegisterImages(
+      this->m_FixedImage.GetITKBase(),
       this->m_MovingImage.GetITKBase(),
       this->m_ParameterMaps,
       this->m_OutputFolder,
@@ -80,44 +80,51 @@ SimpleElastix::ExecuteInternal( void )
   }
   catch( itk::ExceptionObject &e )
   {
+    delete elastix;
     sitkExceptionMacro( << "Errors occured during registration: " << e.what() );
   }
 
   if( isError == -2 )
   {
+    delete elastix;
     sitkExceptionMacro( << "Errors occured during registration: Output directory does not exist." );
   }
 
   if( isError != 0 )
   {
+    delete elastix;
     sitkExceptionMacro( << "Errors occured during registration. Set LogToConsoleOn() or LogToFolder(outputFolder) for detailed information." );
   }
 
-  if( elastix.GetTransformParameterMapList().size() > 0 )
+  if( elastix->GetTransformParameterMapList().size() > 0 )
   {
-    this->m_TransformParameterMaps = elastix.GetTransformParameterMapList();
+    this->m_TransformParameterMaps = elastix->GetTransformParameterMapList();
   }
   else
   {
+    delete elastix;
     sitkExceptionMacro( "Errors occured during registration: Could not read final transform parameters." );
   }
 
+  // Some day this will save someone a LOT of time ...
   if( this->m_LogToConsole && this->m_TransformParameterMaps[ this->m_ParameterMaps.size()-1 ].count( "WriteResultImage" ) > 0 )
   {
     if( this->m_TransformParameterMaps[ this->m_ParameterMaps.size()-1 ][ "WriteResultImage" ][ 0 ] == "false" )
     {
-      std::cout << "WARNING: Result image cannot be read since WriteResultImage is set to \"false\". " << std::endl; 
+      std::cout << "WARNING: Result image cannot be perhaps because WriteResultImage is set to \"false\". " << std::endl; 
     }
   }
 
-  if( elastix.GetResultImage().IsNotNull() )
+  // We let the proram continue even if result image can't be read; user might have 
+  // supplied (WriteResultImage "false") and plans to warp image with transformix
+  if( elastix->GetResultImage().IsNotNull() )
   {
-    TResultImage* itkResultImage = static_cast< TResultImage* >( elastix.GetResultImage().GetPointer() );
+    TResultImage* itkResultImage = static_cast< TResultImage* >( elastix->GetResultImage().GetPointer() );
     this->m_ResultImage = Image( itkResultImage );
-
-    // The following call invokes a deep copy
-    this->m_ResultImage.SetOrigin( this->m_ResultImage.GetOrigin() );
   }
+
+  delete elastix;
+  elastix = NULL;
 
   return this->m_ResultImage;
 }

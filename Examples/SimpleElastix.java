@@ -4,8 +4,10 @@ class SimpleElastix {
  
   public static void main(String argv[]) {
 
+    // If you get "no SimpleITKJava in java.library.path" point java.library.path to lib/libSimpeITKJava.jnilib
+
     if ( argv.length < 4 ) {
-      System.out.println("Usage: java SimpleElastix <fixedImage> <movingImage> <parameterFile> <output>");
+      System.out.println("Usage: java -cp SimpleElastixJava.jar SimpleElastix <fixedImage> <movingImage> <parameterFile> <output>");
       return;
     }
 
@@ -19,6 +21,7 @@ class SimpleElastix {
     reader.setFileName(argv[1]);
     elastix.setMovingImage(reader.execute());
     elastix.setParameterMap(elastix.readParameterFile(argv[2]));
+    elastix.logToConsoleOn();
 
     // Perform registration
     elastix.execute();
@@ -28,5 +31,8 @@ class SimpleElastix {
     writer.setFileName(argv[3]);
     writer.execute(elastix.getResultImage()); 
 
+    elastix.prettyPrint(elastix.getTransformParameterMapList());
+
   }
+
 }

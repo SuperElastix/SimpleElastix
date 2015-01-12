@@ -100,8 +100,7 @@ class SELX_EXPORT SimpleTransformix
 
 // Procedural Interface 
 SELX_EXPORT Image transformix( const Image& inputImage, std::map< std::string, std::vector< std::string > > parameterMap, bool logToConsole = false, std::string outputFolder = "" );
-SELX_EXPORT Image transformix( const Image& fixedImage, SimpleTransformix::ParameterMapListType parameterMapList, bool logToConsole = false, std::string outputFolder = "" );
-
+SELX_EXPORT Image transformix( const Image& inputImage, SimpleTransformix::ParameterMapListType parameterMapList, bool logToConsole = false, std::string outputFolder = "" );
 
 } // end namespace simple
 } // end namespace itk

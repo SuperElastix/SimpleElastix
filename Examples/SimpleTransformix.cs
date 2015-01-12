@@ -9,7 +9,7 @@ namespace itk.simple.examples {
                     Console.WriteLine("Usage: SimpleElastix <fixedImage> <movingImage> <inputImage> <parameterFile> <output>");
                     return;
                 }
-                // Make transform parameter map
+                // Make transform
                 SimpleElastix elastix;
                 ImageFileReader reader = new ImageFileReader();
                 reader.SetFileName(args[0]);

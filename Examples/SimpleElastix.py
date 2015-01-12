@@ -5,12 +5,13 @@ import sys
 selx = sitk.SimpleElastix()
 
 # Read Input
-selx.SetFixedImage(sitk.ReadImage(sys.argv[1]))
-selx.SetMovingImage(sitk.ReadImage(sys.argv[2]))
-selx.SetParameterMap(sitk.ReadParameterFile(sys.argv[3]))
+selx.SetFixedImage(sitk.ReadImage(str(sys.argv[1])))
+selx.SetMovingImage(sitk.ReadImage(str(sys.argv[2])))
+selx.SetParameterMap(sitk.ReadParameterFile(str(sys.argv[3])))
+selx.LogToConsoleOn()
 
 # Perform registration
 selx.Execute()
 
 # Write result image
-sitk.WriteImage(selx.GetResultImage(), sys.argv[4])
+sitk.WriteImage(selx.GetResultImage(), str(sys.argv[4]))
