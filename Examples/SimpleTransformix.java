@@ -29,9 +29,9 @@ class SimpleTransformix {
     reader.setFileName(argv[3]);
     transformix.setInputImage(reader.execute());
     transformix.setTransformParameterMapList(elastix.getTransformParameterMapList());
-    transformix.logToConsoleOn();
-    
+
     // Perform warp
+    transformix.logToConsoleOn();
     transformix.execute();
 
     // Write result image

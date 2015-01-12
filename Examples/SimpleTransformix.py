@@ -17,6 +17,7 @@ transformix.SetInputImage(sitk.ReadImage(str(sys.argv[4])))
 transformix.SetParameterMapList(elastix.GetTransformParameterMapList())
 
 # Perform warp
+transformix.LogToConsoleOn()
 transformix.Execute()
 
 # Write result image

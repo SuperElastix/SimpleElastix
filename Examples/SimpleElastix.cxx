@@ -24,9 +24,9 @@ int main ( int argc, char* argv[] ) {
   reader.SetFileName( std::string( argv[2] ) );
   elastix.SetMovingImage( reader.Execute() );
   elastix.SetParameterMap( sitk::ReadParameterFile( std::string( argv[3] ) ) );
-  elastix.LogToConsoleOn();
 
   // Perform registration
+  elastix.LogToConsoleOn();
   elastix.Execute();
 
   // Write result image

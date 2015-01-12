@@ -33,9 +33,9 @@ int main ( int argc, char* argv[] ) {
   reader.SetFileName( std::string( argv[4] ) );
   transformix.SetInputImage( reader.Execute() );
   transformix.SetTransformParameterMapList( elastix.GetTransformParameterMapList() );
-  transformix.LogToConsoleOn();
 
   // Perform warp
+  transformix.LogToConsoleOn();
   transformix.Execute();
 
   // Write result image

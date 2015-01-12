@@ -16,22 +16,23 @@ namespace itk.simple.examples {
                 elastix.SetFixedImage(reader.Execute());
                 reader.SetFileName(args[1]);
                 elastix.SetMovingImage(reader.Execute());
-                elastix.SetParameterMap(ReadParameterFile(args[3]))
-                elastix.Execute()
+                elastix.SetParameterMap(ReadParameterFile(args[3]));
+                elastix.Execute();
 
                 // Instantiate transformix
-                SimpleTransformix transformix
+                SimpleTransformix transformix;
 
                 // Read input
-                reader.SetFileName(args[4])
-                transformix.SetInputImage(reader.execute())
-                transformix.SetTransformParameterMapList(elastix.GetTransformParameterMapList())
+                reader.SetFileName(args[4]);
+                transformix.SetInputImage(reader.execute());
+                transformix.SetTransformParameterMapList(elastix.GetTransformParameterMapList());
 
                 // Perform warp
-                transformix.Execute()
+                transformix.LogToConsoleOn();
+                transformix.Execute();
 
                 // Write result image
-                sitk.WriteImage(transformix.GetResultImage(), args[5])
+                sitk.WriteImage(transformix.GetResultImage(), args[5]);
                 
 
             } catch (Exception ex) {

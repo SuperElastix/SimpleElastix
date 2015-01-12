@@ -21,9 +21,9 @@ class SimpleElastix {
     reader.setFileName(argv[1]);
     elastix.setMovingImage(reader.execute());
     elastix.setParameterMap(elastix.readParameterFile(argv[2]));
-    elastix.logToConsoleOn();
 
     // Perform registration
+    elastix.logToConsoleOn();
     elastix.execute();
 
     // Write result image

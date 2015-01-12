@@ -18,10 +18,11 @@ namespace itk.simple.examples {
                 elastix.SetFixedImage(reader.Execute());
                 reader.SetFileName(args[1]);
                 elastix.SetMovingImage(reader.Execute());
-                elastix.SetParameterMap(ReadParameterFile(args[2]))
+                elastix.SetParameterMap(ReadParameterFile(args[2]));
 
                 // Perform Registration
-                elastix.Execute()
+                elastix.LogToConsoleOn();
+                elastix.Execute();
 
                 // Write output image
                 ImageFileWriter writer = new ImageFileWriter();

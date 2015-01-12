@@ -57,10 +57,10 @@ SimpleElastix::ExecuteInternal( void )
 
   // BUG: Fixed image buffer is empty after elastix has run.
   // We pass a copy as a temporary workaround until the issue is fixed
-  //Image fixedImage = this->m_FixedImage;
+  Image fixedImage = this->m_FixedImage;
 
   // The following call invokes a deep copy
-  //fixedImage.SetOrigin( fixedImage.GetOrigin() );
+  fixedImage.SetOrigin( fixedImage.GetOrigin() );
 
   // Do the (possibly multiple) registrations
   int isError = 1;
@@ -68,7 +68,7 @@ SimpleElastix::ExecuteInternal( void )
   try
   {
     isError = elastix->RegisterImages(
-      this->m_FixedImage.GetITKBase(),
+      fixedImage.GetITKBase(),
       this->m_MovingImage.GetITKBase(),
       this->m_ParameterMaps,
       this->m_OutputFolder,
