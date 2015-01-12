@@ -178,7 +178,7 @@ SimpleElastix
 
 std::map< std::string, std::vector< std::string > >
 SimpleElastix
-::ParameterFileReader( const std::string filename )
+::ReadParameterFile( const std::string filename )
 {
   ParameterFileParserPointer parser = ParameterFileParserType::New();
   parser->SetParameterFileName( filename );
@@ -469,7 +469,7 @@ std::map< std::string, std::vector< std::string > >
 ReadParameterFile( const std::string filename )
 {
   SimpleElastix selx;
-  SimpleElastix::ParameterMapType parameterMap = selx.ParameterFileReader( filename );
+  SimpleElastix::ParameterMapType parameterMap = selx.ReadParameterFile( filename );
   return parameterMap;
 }
 

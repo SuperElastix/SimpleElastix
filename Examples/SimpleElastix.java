@@ -15,11 +15,10 @@ class SimpleElastix {
     // Read input
     org.itk.simple.ImageFileReader reader = new org.itk.simple.ImageFileReader();
     reader.setFileName(argv[0]);
-    elastix.SetFixedImage(reader.execute());
+    elastix.setFixedImage(reader.execute());
     reader.setFileName(argv[1]);
-    elastix.SetMovingImage(reader.execute());
-
-    elastix.SetParameterMap(ReadParameterFile(argv[2]));
+    elastix.setMovingImage(reader.execute());
+    elastix.setParameterMap(elastix.readParameterFile(argv[2]));
 
     // Perform registration
     elastix.execute();
@@ -27,8 +26,7 @@ class SimpleElastix {
     // Write result image
     ImageFileWriter writer = new ImageFileWriter();
     writer.setFileName(argv[3]);
-    writer.execute(elastix.GetResultImage()); 
+    writer.execute(elastix.getResultImage()); 
 
   }
-
 }

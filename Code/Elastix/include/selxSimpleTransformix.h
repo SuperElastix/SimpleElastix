@@ -61,7 +61,7 @@ class SELX_EXPORT SimpleTransformix
     void SetTransformParameterMap( std::map< std::string, std::vector< std::string > > parameterMap );
     std::vector< std::map< std::string, std::vector< std::string > > > GetTransformParameterMapList( void );
 
-    ParameterMapType ParameterFileReader( const std::string filename );
+    ParameterMapType ReadParameterFile( const std::string filename );
 
   private:
 
@@ -106,4 +106,4 @@ SELX_EXPORT Image transformix( const Image& fixedImage, SimpleTransformix::Param
 } // end namespace simple
 } // end namespace itk
 
-#endif // __selxsimpleelastix_h_
+#endif // __selxsimpletransformix_h_

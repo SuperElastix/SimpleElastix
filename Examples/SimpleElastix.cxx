@@ -28,7 +28,6 @@ int main ( int argc, char* argv[] ) {
 
   // Perform registration
   elastix.Execute();
-  elastix.Execute();
 
   // Write result image
   sitk::ImageFileWriter writer;

@@ -168,7 +168,7 @@ SimpleTransformix
 
 SimpleTransformix::ParameterMapType
 SimpleTransformix
-::ParameterFileReader( const std::string filename )
+::ReadParameterFile( const std::string filename )
 {
   ParameterFileParserPointer parser = ParameterFileParserType::New();
   parser->SetParameterFileName( filename );

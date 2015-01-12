@@ -10,13 +10,13 @@ class SimpleTransformix {
     }
 
     // Make transform parameter map list
-    org.itk.simple.SimpleElastix elastix = new org.itk.simple.SimpleElastix();
     org.itk.simple.ImageFileReader reader = new org.itk.simple.ImageFileReader();
     reader.setFileName(argv[0]);
-    elastix.SetFixedImage(reader.execute());
+    org.itk.simple.SimpleElastix elastix = new org.itk.simple.SimpleElastix();
+    elastix.setFixedImage(reader.execute());
     reader.setFileName(argv[1]);
-    elastix.SetMovingImage(reader.execute());
-    elastix.SetParameterMap(ReadParameterFile(argv[2]));
+    elastix.setMovingImage(reader.execute());
+    elastix.setParameterMap(elastix.readParameterFile(argv[2]));
     elastix.execute();
 
     // Instantiate transformix
@@ -24,16 +24,16 @@ class SimpleTransformix {
 
     // Read input
     reader.setFileName(argv[3]);
-    transformix.SetInputImage(reader.execute());
-    transformix.SetTransformParameterMapList(elastix.GetTransformParameterMapList())
+    transformix.setInputImage(reader.execute());
+    transformix.setTransformParameterMapList(elastix.getTransformParameterMapList());
 
     // Perform warp
-    transformix.execute()
+    transformix.execute();
 
     // Write result image
     ImageFileWriter writer = new ImageFileWriter();
     writer.setFileName(argv[3]);
-    writer.execute(transformix.GetResultImage()); 
+    writer.execute(transformix.getResultImage()); 
 
   }
 
