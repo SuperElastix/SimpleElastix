@@ -10,7 +10,7 @@ Medical image registration is the process of transforming images into a common c
 - A SuperBuild that automatically compiles and installs SimpleElastix and any dependencies.
 - The complete set of SimpleITK image processing algorithms.
 
-Say you need to compare the volume, mean intensity and standard deviation of (possibly multiple) anatomical structures across a population of images using an atlas segmentation. This is accomplished using the following lines of Python code:
+Enough talk, time for some examples! Say you need to compare the volume, mean intensity and standard deviation of (possibly multiple) anatomical structures across a population of images using an atlas segmentation. This is accomplished using the following lines of Python code:
 
 ```python
 import SimpleITK as sitk
