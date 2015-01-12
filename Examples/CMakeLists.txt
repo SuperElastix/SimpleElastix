@@ -11,7 +11,24 @@ if(NOT SimpleITK_SOURCE_DIR)
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
   set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
+
+  # SimpleElastix dependencies
+  # selxSimpleElastix.h or selxSimpleTransformix.h requires
+  # ITK_USE_FILE and ELASTIX_USE_FILE in addition to SimpleITK
+  if( NOT EXISTS ${ELASTIX_USE_FILE} )
+    set( ELASTIX_USE_FILE ${ELASTIX_DIR}/UseElastix.cmake )
+  endif()
+  if( NOT EXISTS ${ELASTIX_USE_FILE} )
+    set( ELASTIX_DIR "" CACHE PATH "Path to elastix build folder" )
+    message(FATAL_ERROR "Could not find UseElastix.cmake. Point ELASTIX_DIR to folder containing UseElastix.cmake or use SuperBuild.")
+  endif()
+  include( ${ELASTIX_USE_FILE} )
+
+  find_package( ITK REQUIRED )
+  include( ${ITK_USE_FILE} )
 endif()
+
+
 
 # Add individual cxx executables
 add_executable ( SimpleGaussian SimpleGaussian.cxx )
@@ -42,10 +59,19 @@ add_executable ( DemonsRegistration2 DemonsRegistration2.cxx )
 target_link_libraries ( DemonsRegistration2 ${SimpleITK_LIBRARIES} )
 
 # Add subdirectories
-add_subdirectory(Segmentation)
+add_subdirectory( Segmentation )
 
 if ( BUILD_TESTING )
   add_subdirectory( test )
 endif()
 
-add_subdirectory(SimpleElastix)
+# SimpleElastix CXX Examples
+add_executable( SimpleElastixCXX SimpleElastix.cxx )
+target_link_libraries( SimpleElastixCXX ${SimpleITK_LIBRARIES} )
+
+#add_executable( SimpleTransformixCXX SimpleTransformix.cxx )
+#target_link_libraries( SimpleTransformixCXX ${SimpleITK_LIBRARIES} )
+
+# Java examples
+
+

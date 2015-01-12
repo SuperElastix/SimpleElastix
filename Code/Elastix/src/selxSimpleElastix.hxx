@@ -34,6 +34,8 @@ SimpleElastix::ExecuteInternal( void )
     // Parameter file must match fixed and moving image dimensions and pixel types
     this->m_ParameterMaps[ i ][ "FixedInternalImagePixelType" ] = ParameterValuesType( 1, GetPixelIDValueAsElastixParameter( this->m_FixedImage.GetPixelID() ) );
     this->m_ParameterMaps[ i ][ "MovingInternalImagePixelType" ] = ParameterValuesType( 1, GetPixelIDValueAsElastixParameter( this->m_MovingImage.GetPixelID() ) );
+    this->m_ParameterMaps[ i ][ "ResultImagePixelType" ] = ParameterValuesType( 1, GetPixelIDValueAsElastixParameter( this->m_FixedImage.GetPixelID() ) );
+
     this->m_ParameterMaps[ i ][ "FixedImageDimension" ] = ParameterValuesType( 1, std::to_string( this->m_FixedImage.GetDimension() ) );
     this->m_ParameterMaps[ i ][ "MovingImageDimension" ] = ParameterValuesType( 1, std::to_string( this->m_MovingImage.GetDimension() ) );
 
@@ -113,6 +115,8 @@ SimpleElastix::ExecuteInternal( void )
   {
     TResultImage* itkResultImage = static_cast< TResultImage* >( elastix.GetResultImage().GetPointer() );
     this->m_ResultImage = Image( itkResultImage );
+
+    // The following call invokes a deep copy
     this->m_ResultImage.SetOrigin( this->m_ResultImage.GetOrigin() );
   }
 

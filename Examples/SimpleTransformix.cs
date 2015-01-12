@@ -25,7 +25,7 @@ namespace itk.simple.examples {
                 // Read input
                 reader.SetFileName(args[4])
                 transformix.SetInputImage(reader.execute())
-                transformix.SetParameterMapList(elastix.GetParameterMapList())
+                transformix.SetTransformParameterMapList(elastix.GetTransformParameterMapList())
 
                 // Perform warp
                 transformix.Execute()

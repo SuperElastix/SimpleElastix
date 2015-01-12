@@ -25,6 +25,7 @@ class SimpleTransformix {
     // Read input
     reader.setFileName(argv[3]);
     transformix.SetInputImage(reader.execute());
+    transformix.SetTransformParameterMapList(elastix.GetTransformParameterMapList())
 
     // Perform warp
     transformix.execute()
