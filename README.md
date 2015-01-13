@@ -90,7 +90,7 @@ selx.Execute()
 ```
 
 ### Parameter Maps
-In addition to loading your own parameter files from disk, you can construct parameter maps programmatically from SimpleElastix's parameter map interface. This interface works seamlessly with native types of your target language. In python, a parameter map is a dictionary-like structure that you can call `keys(), clear()`, `has_key()` on etc and even iterate over. 
+In addition to the default parameter maps or loading your own parameter files from disk, you can construct parameter maps programmatically from SimpleElastix's parameter map interface. This interface works seamlessly with native types of your target language. In python, a parameter map is a dictionary-like structure that you can call `keys(), clear()`, `has_key()` on etc and even iterate over. 
 
 ```python
 import SimpleITK as sitk
@@ -99,7 +99,7 @@ selx = sitk.SimpleElastix()
 # The dictionary-like object works as you'd expect
 p = sitk.ParameterMap()
 p['Registration'] = ['MultiMetricMultiResolutionRegistration']
-p['Metric'] = ['NormalizedMutualInformation', 'TransformBendingEnergyPenalty']
+p['Metric'] = ['NormalizedMutualInformation']
 p['Transform'] = ['AffineTransform']
 p['FixedImagePyramidSchedule'] = ['8', '4', '2', '1']
 
@@ -113,8 +113,8 @@ plist.push_back(p)
 # transform at position two in the list
 plist.push_back(sitk.GetDefaultParameterMap('nonrigid'))
 
-# Passing the above list will cause elastix to run an affine initialization
-# followed by a nonrigid registration 
+# Passing the above list will cause elastix to run two rounds of registrations,
+# using the result of the affine initialization as input the nonrigid registration
 selx.SetParameterMapList(plist) 
 selx.Execute()  
 ```
