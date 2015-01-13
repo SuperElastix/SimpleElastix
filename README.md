@@ -66,13 +66,13 @@ While the procedural interface may be useful in rapid prototyping, it trades off
 import SimpleITK as sitk
 
 # First we concatenate the ND images into one (N+1)D image
-population = ['image1.hdr', ..., 'imageN.hdr']
+population = ['image2d1.hdr', ..., 'image2dN.hdr']
 vectorOfImage = sitk.vectorOfImage()
 
 for filename in population
   vectorOfImage.push_back(sitk.ReadImage(filename))
 
-image3d = sitk.JoinSeries(vectorOfImage)
+image = sitk.JoinSeries(vectorOfImage)
 
 # Instantiate an elastix object 
 selx = sitk.SimpleElastix()
@@ -80,8 +80,8 @@ selx = sitk.SimpleElastix()
 # The groupwise transform works only on the moving image. However, a 
 # dummy fixed image is needed to prevent elastix from throwing errors
 # (remember this does not consume extra memory)
-selx.SetFixedImage(image3d) 
-selx.SetMovingImage(image3d)
+selx.SetFixedImage(image) 
+selx.SetMovingImage(image)
 
 # Add preconfigured groupwise parameter map and run the registration
 p = selx.GetDefaultParameterMap('groupwise')
