@@ -37,7 +37,7 @@ for filename in population
   sitk.LabelStatisticsImageFilter(fixedImage, resultLabel)
 ```
 
-That was easy. The example demonstrates the efficiency of combining SimpleElastix's object oriented interface (the way we used elastix to register images) and procedural interface (the way we used transformix to warp labels) with SimpleITK (the way we computed statistics). Previously, using elastix and transformix on large datasets would incur a significant overhead, from scripting command line invocations and arguments to copying images and transform parameter files across folders. With SimpleElastix this complexity is easier to manage and more memory and disk I/O efficient. For more examples see below or the [Examples](Examples) directory. 
+That was easy. The example demonstrates the efficiency of combining SimpleElastix's object oriented interface (the way we used elastix to register images) and procedural interface (the way we used transformix to warp labels) with SimpleITK (the way we computed statistics). Previously, using elastix and transformix on large datasets would incur a significant overhead, from scripting command line invocations and arguments to copying images and transform parameter files across folders. With SimpleElastix this complexity is easier to manage and more memory and disk I/O efficient. For more examples see below or the [Examples/SimpleElastix](Examples/SimpleElastix) directory. 
 
 ### Procedural Interface
 SimpleElastix provides a procedural inteface that aligns well with the design philosophy of SimpleITK. This directly invokes registration much like the elastix command line interface. 
