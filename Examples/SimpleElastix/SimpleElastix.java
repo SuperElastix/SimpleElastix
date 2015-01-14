@@ -2,7 +2,7 @@ import org.itk.simple.*;
 
 class SimpleElastix {
  
-  public static void main(String argv[]) {
+  public static void main(String[] argv) {
 
     // If you get "no SimpleITKJava in java.library.path" point java.library.path to lib/libSimpeITKJava.jnilib
 
