@@ -132,4 +132,14 @@ SELX_EXPORT Image elastix( const Image& fixedImage, const Image& movingImage, co
 } // end namespace simple
 } // end namespace itk
 
+namespace std
+{
+  template < typename T > string to_string( const T& n )
+  {
+    ostringstream stm;
+    stm << n;
+    return stm.str();
+  }
+}
+
 #endif // __selxsimpleelastix_h_
