@@ -157,7 +157,7 @@ SimpleTransformix
 
 
 
-SimpleTransformix::ParameterMapListType
+std::vector< std::map< std::string, std::vector< std::string > > > 
 SimpleTransformix
 ::GetTransformParameterMapList( void )
 {
@@ -166,7 +166,7 @@ SimpleTransformix
 
 
 
-SimpleTransformix::ParameterMapType
+std::map< std::string, std::vector< std::string > > 
 SimpleTransformix
 ::ReadParameterFile( const std::string filename )
 {
@@ -199,7 +199,7 @@ SimpleTransformix
 
 
 Image
-transformix( const Image& inputImage, SimpleTransformix::ParameterMapType parameterMap, bool logToConsole, std::string outputFolder )
+transformix( const Image& inputImage, std::map< std::string, std::vector< std::string > > parameterMap, const bool logToConsole, const std::string outputFolder )
 {
   SimpleTransformix::ParameterMapListType parameterMapList;
   parameterMapList.push_back( parameterMap );
@@ -209,7 +209,7 @@ transformix( const Image& inputImage, SimpleTransformix::ParameterMapType parame
 
 
 Image
-transformix( const Image& inputImage, SimpleTransformix::ParameterMapListType parameterMapList, bool logToConsole, std::string outputFolder )
+transformix( const Image& inputImage, std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList, const bool logToConsole, const std::string outputFolder )
 {
   SimpleTransformix stfx;
   stfx.SetInputImage( inputImage );
