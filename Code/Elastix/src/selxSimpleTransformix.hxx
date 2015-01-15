@@ -1,6 +1,7 @@
 #ifndef __selxsimpletransformix_hxx_
 #define __selxsimpletransformix_hxx_
 
+#include "selxSimpleElastix.h"
 #include "selxSimpleTransformix.h"
 #include "itkImage.h"
 #include "sitkPixelIDValues.h"
