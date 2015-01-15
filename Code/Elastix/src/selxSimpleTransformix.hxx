@@ -35,10 +35,10 @@ SimpleTransformix::ExecuteInternal( void )
 
   // Do the tranformation
   int isError = 1;
-  libtransformix* transformix = new libtransformix();
+  libtransformix transformix = libtransformix();
   try
   {
-    isError = transformix->TransformImage(
+    isError = transformix.TransformImage(
       this->m_InputImage.GetITKBase(),
       this->m_TransformParameterMaps,
       this->m_OutputFolder,
@@ -48,26 +48,22 @@ SimpleTransformix::ExecuteInternal( void )
   }
   catch( itk::ExceptionObject &e )
   {
-    delete transformix;
-    transformix = NULL;
     sitkExceptionMacro( << "Errors occured during transformation: " << e.what() );
   }
 
   if( isError == -2 )
   {
-    delete transformix;
     sitkExceptionMacro( << "Errors occured during transformation: Output directory does not exist." );
   }
 
   if( isError != 0 )
   {
-    delete transformix;
     sitkExceptionMacro( << "Errors occured during transformation." );
   }
 
-  if( transformix->GetResultImage().IsNotNull() )
+  if( transformix.GetResultImage().IsNotNull() )
   {
-    TResultImage* itkResultImage = static_cast< TResultImage* >( transformix->GetResultImage().GetPointer() );
+    TResultImage* itkResultImage = static_cast< TResultImage* >( transformix.GetResultImage().GetPointer() );
     this->m_ResultImage = Image( itkResultImage );
   }
   else
@@ -80,13 +76,8 @@ SimpleTransformix::ExecuteInternal( void )
         std::cout << "WARNING: Result image cannot be read perhaps because WriteResultImage is set to \"false\". " << std::endl; 
       }
     }
-
-    delete transformix;
-    sitkExceptionMacro( << "Errors occured during registration: Could not read result image." );
+    sitkExceptionMacro( << "Errors occured during warping: Could not read result image." );
   }
-
-  delete transformix;
-  transformix = NULL;
 
   return this->m_ResultImage;
 }
