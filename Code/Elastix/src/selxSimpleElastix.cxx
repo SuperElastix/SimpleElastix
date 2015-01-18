@@ -48,11 +48,12 @@ SimpleElastix
 
 
 
-void 
+SimpleElastix::Self& 
 SimpleElastix
 ::SetFixedImage( const Image& fixedImage )
 {
   this->m_FixedImage = fixedImage;
+  return *this;
 }
 
 
@@ -66,11 +67,12 @@ SimpleElastix
 
 
 
-void
+SimpleElastix::Self& 
 SimpleElastix
 ::SetMovingImage( const Image& movingImage )
 {
   this->m_MovingImage = movingImage;
+  return *this;
 }
 
 
@@ -84,11 +86,12 @@ SimpleElastix
 
 
 
-void
+SimpleElastix::Self& 
 SimpleElastix
 ::SetFixedMask( const Image& fixedMask )
 {
   this->m_FixedMask = fixedMask;
+  return *this;
 }
 
 
@@ -102,20 +105,22 @@ SimpleElastix
 
 
 
-void
+SimpleElastix::Self& 
 SimpleElastix
 ::DeleteFixedMask( void )
 {
   this->m_FixedMask = Image();
+  return *this;
 }
 
 
 
-void
+SimpleElastix::Self& 
 SimpleElastix
 ::SetMovingMask( const Image& movingMask )
 {
   this->m_MovingMask = movingMask;
+  return *this;
 }
 
 
@@ -129,31 +134,34 @@ SimpleElastix
 
 
 
-void
+SimpleElastix::Self& 
 SimpleElastix
 ::DeleteMovingMask( void )
 {
   this->m_MovingMask = Image();
+  return *this;
 }
 
 
 
-void
+SimpleElastix::Self& 
 SimpleElastix
 ::SetParameterMapList( const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList )
 {
   this->m_ParameterMaps = parameterMapList;
+  return *this;
 }
 
 
 
-void
+SimpleElastix::Self& 
 SimpleElastix
 ::SetParameterMap( const std::map< std::string, std::vector< std::string > > parameterMap )
 {
   ParameterMapListType parameterMapList = ParameterMapListType( 1 );
   parameterMapList[ 0 ] = parameterMap;
   this->SetParameterMapList( parameterMapList );
+  return *this;
 }
 
 
@@ -319,18 +327,19 @@ SimpleElastix
 
 
 
-void
+SimpleElastix::Self& 
 SimpleElastix
 ::PrettyPrint( const std::map< std::string, std::vector< std::string > > parameterMap )
 {
   ParameterMapListType parameterMapList = ParameterMapListType( 1 );
   parameterMapList[ 0 ] = parameterMap;
   PrettyPrint( parameterMapList );
+  return *this;
 }
 
 
 
-void
+SimpleElastix::Self& 
 SimpleElastix
 ::PrettyPrint( const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList )
 {
@@ -362,6 +371,8 @@ SimpleElastix
       parameterMapIterator++;
     }
   }
+
+  return *this;
 }
 
 
@@ -397,47 +408,32 @@ SimpleElastix
 
 
 
-void
+SimpleElastix::Self& 
 SimpleElastix
 ::LogToFolder( const std::string folder )
 {
   this->m_OutputFolder = folder;
+  return *this;
 }
 
 
 
-void
+SimpleElastix::Self& 
 SimpleElastix
 ::LogToFolderOff( void )
 {
   this->m_OutputFolder = "";
+  return *this;
 }
 
 
 
-void
+SimpleElastix::Self& 
 SimpleElastix
 ::LogToConsole( bool logToConsole )
 {
   this->m_LogToConsole = logToConsole;
-}
-
-
-
-void
-SimpleElastix
-::LogToConsoleOn( void )
-{
-  this->m_LogToConsole = true;
-}
-
-
-
-void
-SimpleElastix
-::LogToConsoleOff( void )
-{
-  this->m_LogToConsole = false;
+  return *this;
 }
 
 
@@ -476,25 +472,25 @@ ReadParameterFile( const std::string filename )
 
 
 Image
-elastix( const Image& fixedImage, const Image& movingImage, const std::string defaultParameterMapName, const bool logToConsole, const std::string outputFolder )
+Elastix( const Image& fixedImage, const Image& movingImage, const std::string defaultParameterMapName, const bool logToConsole, const std::string outputFolder )
 {
-  return elastix( fixedImage, movingImage, GetDefaultParameterMap( defaultParameterMapName ), logToConsole, outputFolder );
+  return Elastix( fixedImage, movingImage, GetDefaultParameterMap( defaultParameterMapName ), logToConsole, outputFolder );
 }
 
 
 
 Image
-elastix( const Image& fixedImage, const Image& movingImage, const std::map< std::string, std::vector< std::string > > parameterMap, const bool logToConsole, const std::string outputFolder )
+Elastix( const Image& fixedImage, const Image& movingImage, const std::map< std::string, std::vector< std::string > > parameterMap, const bool logToConsole, const std::string outputFolder )
 {
   SimpleElastix::ParameterMapListType parameterMapList = SimpleElastix::ParameterMapListType( 1 );
   parameterMapList[ 0 ] = parameterMap;
-  return elastix( fixedImage, movingImage, parameterMapList, logToConsole, outputFolder );
+  return Elastix( fixedImage, movingImage, parameterMapList, logToConsole, outputFolder );
 }
 
 
 
 Image
-elastix( const Image& fixedImage, const Image& movingImage, const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList, const bool logToConsole, const std::string outputFolder )
+Elastix( const Image& fixedImage, const Image& movingImage, const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList, const bool logToConsole, const std::string outputFolder )
 {
   SimpleElastix selx;
   selx.SetFixedImage( fixedImage );
@@ -509,26 +505,26 @@ elastix( const Image& fixedImage, const Image& movingImage, const std::vector< s
 
 
 Image
-elastix( const Image& fixedImage, const Image& movingImage, const std::string defaultParameterMapName, const Image& fixedMask, const Image& movingMask, const bool logToConsole, const std::string outputFolder )
+Elastix( const Image& fixedImage, const Image& movingImage, const std::string defaultParameterMapName, const Image& fixedMask, const Image& movingMask, const bool logToConsole, const std::string outputFolder )
 {
-  return elastix( fixedImage, movingImage, GetDefaultParameterMap( defaultParameterMapName ), fixedMask, movingMask, logToConsole, outputFolder );
+  return Elastix( fixedImage, movingImage, GetDefaultParameterMap( defaultParameterMapName ), fixedMask, movingMask, logToConsole, outputFolder );
 }
 
 
 
 
 Image
-elastix( const Image& fixedImage, const Image& movingImage, const std::map< std::string, std::vector< std::string > > parameterMap, const Image& fixedMask, const Image& movingMask, bool logToConsole, std::string outputFolder )
+Elastix( const Image& fixedImage, const Image& movingImage, const std::map< std::string, std::vector< std::string > > parameterMap, const Image& fixedMask, const Image& movingMask, bool logToConsole, std::string outputFolder )
 {
   SimpleElastix::ParameterMapListType parameterMapList = SimpleElastix::ParameterMapListType( 1 );
   parameterMapList[ 0 ] = parameterMap;
-  return elastix( fixedImage, movingImage, parameterMapList, fixedMask, movingMask, logToConsole, outputFolder );
+  return Elastix( fixedImage, movingImage, parameterMapList, fixedMask, movingMask, logToConsole, outputFolder );
 }
 
 
 
 Image
-elastix( const Image& fixedImage, const Image& movingImage, const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList, const Image& fixedMask, const Image& movingMask, bool logToConsole, std::string outputFolder )
+Elastix( const Image& fixedImage, const Image& movingImage, const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList, const Image& fixedMask, const Image& movingMask, bool logToConsole, std::string outputFolder )
 {
   SimpleElastix selx;
   selx.SetFixedImage( fixedImage );

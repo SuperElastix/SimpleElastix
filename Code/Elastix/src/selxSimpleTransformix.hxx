@@ -28,7 +28,9 @@ SimpleTransformix::ExecuteInternal( void )
   for( unsigned int i = 0; i < this->m_TransformParameterMaps.size(); ++i )
   {
     // Parameter file must match input image dimensions and pixel type (InputImage == MovingImage)
+    this->m_TransformParameterMaps[ i ][ "FixedInternalImagePixelType" ] = ParameterValuesType( 1, GetPixelIDValueAsElastixParameter( this->m_InputImage.GetPixelID() ) );
     this->m_TransformParameterMaps[ i ][ "MovingInternalImagePixelType" ] = ParameterValuesType( 1, GetPixelIDValueAsElastixParameter( this->m_InputImage.GetPixelID() ) );
+    this->m_TransformParameterMaps[ i ][ "FixedImageDimension" ] = ParameterValuesType( 1, std::to_string( this->m_InputImage.GetDimension() ) );
     this->m_TransformParameterMaps[ i ][ "MovingImageDimension" ] = ParameterValuesType( 1, std::to_string( this->m_InputImage.GetDimension() ) );
     this->m_TransformParameterMaps[ i ][ "ResultImagePixelType" ] = ParameterValuesType( 1, GetPixelIDValueAsElastixParameter( this->m_InputImage.GetPixelID() ) );
   }

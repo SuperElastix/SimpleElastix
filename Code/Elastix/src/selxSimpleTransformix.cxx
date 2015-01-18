@@ -44,11 +44,12 @@ SimpleTransformix
 
 
 
-void 
+SimpleTransformix::Self&
 SimpleTransformix
 ::SetInputImage( const Image& inputImage )
 {
   this->m_InputImage = inputImage;
+  return *this;
 }
 
 
@@ -92,67 +93,54 @@ SimpleTransformix
 
 
 
-void
+SimpleTransformix::Self&
 SimpleTransformix
 ::LogToFolder( const std::string folder )
 {
   this->m_OutputFolder = folder;
+  return *this;
 }
 
 
 
-void 
+SimpleTransformix::Self&
 SimpleTransformix
 ::LogToFolderOff()
 {
   this->m_OutputFolder = "";
+  return *this;
 }
 
 
 
-void
+SimpleTransformix::Self&
 SimpleTransformix
 ::LogToConsole( bool logToConsole )
 {
   this->m_LogToConsole = logToConsole;
+  return *this;
 }
 
 
 
-void
-SimpleTransformix
-::LogToConsoleOn( void )
-{
-  this->m_LogToConsole = true;
-}
-
-
-
-void
-SimpleTransformix
-::LogToConsoleOff( void )
-{
-  this->m_LogToConsole = false;
-}
-
-
-
-void
+SimpleTransformix::Self&
 SimpleTransformix
 ::SetTransformParameterMapList( std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList )
 {
   this->m_TransformParameterMaps = parameterMapList;
+  return *this;
 }
 
 
 
-void
+SimpleTransformix::Self&
 SimpleTransformix
 ::SetTransformParameterMap( std::map< std::string, std::vector< std::string > > parameterMap )
 {
   ParameterMapListType parameterMapList;
   parameterMapList.push_back( parameterMap );
   this->SetTransformParameterMapList( parameterMapList );
+  return *this;
 }
 
 
@@ -199,17 +187,17 @@ SimpleTransformix
 
 
 Image
-transformix( const Image& inputImage, std::map< std::string, std::vector< std::string > > parameterMap, const bool logToConsole, const std::string outputFolder )
+Transformix( const Image& inputImage, std::map< std::string, std::vector< std::string > > parameterMap, const bool logToConsole, const std::string outputFolder )
 {
   SimpleTransformix::ParameterMapListType parameterMapList;
   parameterMapList.push_back( parameterMap );
-  return transformix( inputImage, parameterMapList, logToConsole, outputFolder );
+  return Transformix( inputImage, parameterMapList, logToConsole, outputFolder );
 }
 
 
 
 Image
-transformix( const Image& inputImage, std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList, const bool logToConsole, const std::string outputFolder )
+Transformix( const Image& inputImage, std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList, const bool logToConsole, const std::string outputFolder )
 {
   SimpleTransformix stfx;
   stfx.SetInputImage( inputImage );

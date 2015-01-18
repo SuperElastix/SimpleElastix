@@ -32,9 +32,15 @@ for filename in population
   selx.SetFixedImage(fixedImage)
   selx.Execute()
 
-  # Transform label map using the deformation field from above and compute statistics
-  resultLabel = sitk.SimpleTransformix(movingLabel, selx.GetTransformParameters())
-  sitk.LabelStatisticsImageFilter(fixedImage, resultLabel)
+  # Transform label map using the deformation field from above
+  resultLabel = sitk.Transformix(movingLabel, selx.GetTransformParameters())
+  LabelStatistics = sitk.LabelStatisticsImageFilter()
+
+  # Compute statistics for label 1
+  LabelStatistics.Execute(fixedImage, sitk.Cast(resultImage, sitk.sitkInt8))
+  LabelStatistics.GetCount(1)
+  LabelStatistics.GetMean(1)
+  # etc etc
 ```
 
 That was easy. The example demonstrates the efficiency of combining SimpleElastix's object oriented interface (the way we used elastix to register images) and procedural interface (the way we used transformix to warp labels) with SimpleITK (the way we computed statistics). Previously, using elastix and transformix on large datasets would incur a significant overhead, from scripting command line invocations and arguments to copying images and transform parameter files across folders. With SimpleElastix this complexity is easier to manage and more memory and disk I/O efficient. For more examples see below or the [Examples/SimpleElastix](Examples/SimpleElastix) directory. 
@@ -43,19 +49,19 @@ That was easy. The example demonstrates the efficiency of combining SimpleElasti
 SimpleElastix provides a procedural inteface that aligns well with the design philosophy of SimpleITK. This directly invokes registration much like the elastix command line interface. 
 
 ```python
-import SimpleElastix as sitk
+import SimpleITK as sitk
 
-resultImage = sitk.SimpleElastix(sitk.ReadImage(fixedImage), sitk.ReadImage(movingImage), sitk.ReadParameterFile('pf.txt'))
+resultImage = sitk.Elastix(sitk.ReadImage(fixedImage), sitk.ReadImage(movingImage), sitk.ReadParameterFile('pf.txt'))
 ```
 
 Loading images that already recide in memory does not count extra towards your RAM limit as only pointers are passed. In the next example, we first perform affine initialization and feed the resulting image to a non-rigid registration algorithm. The same fixed image is used in both registrations. 
 
 ```python
-import SimpleElastix as sitk
+import SimpleITK as sitk
 
 fixedImage = sitk.ReadImage('fixedImage.hdr');
-affineMovingImage = sitk.SimpleElastix(fixedImage, sitk.ReadImage('movingImage.hdr'), 'affine')
-registeredImage = sitk.SimpleElastix(fixedImage, affineMovingImage, 'nonrigid')
+affineMovingImage = sitk.Elastix(fixedImage, sitk.ReadImage('movingImage.hdr'), 'affine')
+registeredImage = sitk.Elastix(fixedImage, affineMovingImage, 'nonrigid')
 ```
 
 

@@ -43,12 +43,12 @@ class SELX_EXPORT SimpleTransformix
     const std::string GetName( void );
 
     // Images
-    void SetInputImage( const Image& inputImage );
+    Self& SetInputImage( const Image& inputImage );
     Image& GetInputImage( void );
 
     // Parameter map interface 
-    void SetTransformParameterMapList( std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList );
-    void SetTransformParameterMap( std::map< std::string, std::vector< std::string > > parameterMap );
+    Self& SetTransformParameterMapList( std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList );
+    Self& SetTransformParameterMap( std::map< std::string, std::vector< std::string > > parameterMap );
     std::map< std::string, std::vector< std::string > > ReadParameterFile( const std::string filename );
 
     // Warp images
@@ -60,11 +60,11 @@ class SELX_EXPORT SimpleTransformix
     
 
     // Output
-    void LogToFolder( const std::string folder );
-    void LogToFolderOff( void );
-    void LogToConsole( bool );
-    void LogToConsoleOn( void );
-    void LogToConsoleOff( void );
+    Self& LogToFolder( const std::string folder );
+    Self& LogToFolderOff( void );
+    Self& LogToConsole( bool );
+    Self& LogToConsoleOn( void ) { return this->LogToConsole( true ); }
+    Self& LogToConsoleOff( void ) { return this->LogToConsole( false ); }
 
   private:
 
@@ -102,8 +102,8 @@ class SELX_EXPORT SimpleTransformix
 };
 
 // Procedural Interface 
-SELX_EXPORT Image transformix( const Image& inputImage, const std::map< std::string, std::vector< std::string > > parameterMap, const bool logToConsole = false, const std::string outputFolder = "" );
-SELX_EXPORT Image transformix( const Image& inputImage, const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList, const bool logToConsole = false, const std::string outputFolder = "" );
+SELX_EXPORT Image Transformix( const Image& inputImage, const std::map< std::string, std::vector< std::string > > parameterMap, const bool logToConsole = false, const std::string outputFolder = "" );
+SELX_EXPORT Image Transformix( const Image& inputImage, const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList, const bool logToConsole = false, const std::string outputFolder = "" );
 
 } // end namespace simple
 } // end namespace itk
