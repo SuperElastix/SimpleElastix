@@ -30,13 +30,15 @@ if( WRAP_LUA OR WRAP_PYTHON OR WRAP_JAVA OR WRAP_CSHARP OR WRAP_TCL OR WRAP_R OR
 endif()
 
 # Java
-find_package( Java )
-if( JAVA_FOUND )
-  include( UseJava )
-  set(CMAKE_JAVA_INCLUDE_PATH ${SimpleITK_INSTALL_PREFIX}/SimpleITK-build/Wrapping)
-  add_jar( SimpleElastixJava SimpleElastix.java )
-  install_jar( SimpleElastixJava ${CMAKE_BINARY_DIR} )
+if( WRAP_JAVA )
+  find_package( Java )
+  if( JAVA_FOUND )
+    include( UseJava )
+    set(CMAKE_JAVA_INCLUDE_PATH ${SimpleITK_INSTALL_PREFIX}/SimpleITK-build/Wrapping)
+    add_jar( SimpleElastixJava SimpleElastix.java )
+    install_jar( SimpleElastixJava ${CMAKE_BINARY_DIR} )
 
-  add_jar( SimpleTransformixJava SimpleTransformix.java )
-  install_jar( SimpleTransformixJava ${CMAKE_BINARY_DIR} )
+    add_jar( SimpleTransformixJava SimpleTransformix.java )
+    install_jar( SimpleTransformixJava ${CMAKE_BINARY_DIR} )
+  endif()
 endif()
