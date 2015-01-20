@@ -34,12 +34,13 @@ for filename in population
 
   # Transform label map using the deformation field from above
   resultLabel = sitk.Transformix(movingLabel, selx.GetTransformParameters())
-  LabelStatistics = sitk.LabelStatisticsImageFilter()
 
   # Compute statistics for label 1
+  LabelStatistics = sitk.LabelStatisticsImageFilter()
   LabelStatistics.Execute(fixedImage, sitk.Cast(resultImage, sitk.sitkInt8))
   LabelStatistics.GetCount(1)
   LabelStatistics.GetMean(1)
+  LabelStatistics.GetVariance(1)
   # etc etc
 ```
 
@@ -134,11 +135,11 @@ SimpleElastix integrates elastix and transformix with the SimpleITK SuperBuild. 
 git clone https://github.com/kaspermarstal/SimpleElastix
 mkdir build
 cd build
-ccmake ../SimpleElastix/SuperBuild
+cmake ../SimpleElastix/SuperBuild
 make -j4
 ```
 
-The SuperBuild will download and install dependencies (elastix, ITK, SimpleITK and SWIG) and compile SimpleElastix. Target language dependencies need to be pre-installed, e.g. `sudo apt-get install cmake swig monodevelop r-base r-base-dev ruby python python-dev tcl tcl-dev tk tk-dev` if you are running Linux. Note that this project takes around an hour to build on a quad-core machine.
+The SuperBuild will download and install dependencies (elastix, ITK, SimpleITK and SWIG) and compile SimpleElastix. Target language dependencies need to be pre-installed, e.g. `sudo apt-get install cmake swig monodevelop r-base r-base-dev ruby python python-dev tcl tcl-dev tk tk-dev`. Note that this project takes around an hour to build on a quad-core machine.
 
 SimpleElastix has been tried and tested on Ubuntu 14.10 with GCC 4.9.2 and Clang 3.4.0 and Mac OSX Yosemite with Apple Clang 600.0.56.
 
