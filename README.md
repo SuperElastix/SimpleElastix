@@ -33,7 +33,7 @@ for filename in population
   selx.Execute()
 
   # Transform label map using the deformation field from above
-  resultLabel = sitk.Transformix(movingLabel, selx.GetTransformParameters())
+  resultLabel = sitk.Transformix(movingLabel, selx.GetTransformParameterMapList())
 
   # Compute statistics for label 1
   LabelStatistics = sitk.LabelStatisticsImageFilter()
