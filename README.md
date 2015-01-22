@@ -16,8 +16,8 @@ Enough talk, time for some examples! Say you need to compare the volume, mean in
 import SimpleITK as sitk
 
 # The atlas and associated segmentation is loaded once and held in memory
-movingImage = sitk.ReadImage('movingImage.hdr')
-movingLabel = sitk.ReadImage('movingLabel.hdr')
+movingImage = sitk.ReadImage('atlasImage.hdr')
+movingLabel = sitk.ReadImage('atlasLabel.hdr')
 
 # Images are loaded from disk one at a time
 population = ['image1.hdr', 'image2.hdr', ... , 'imageN.hdr']
@@ -37,7 +37,7 @@ for filename in population
 
   # Compute statistics for label 1
   LabelStatistics = sitk.LabelStatisticsImageFilter()
-  LabelStatistics.Execute(fixedImage, sitk.Cast(resultImage, sitk.sitkInt8))
+  LabelStatistics.Execute(fixedImage, sitk.Cast(resultLabel, sitk.sitkInt8))
   LabelStatistics.GetCount(1)
   LabelStatistics.GetMean(1)
   LabelStatistics.GetVariance(1)
@@ -141,7 +141,7 @@ make -j4
 
 The SuperBuild will download and install dependencies (elastix, ITK, SimpleITK and SWIG) and compile SimpleElastix. Target language dependencies need to be pre-installed, e.g. `sudo apt-get install cmake swig monodevelop r-base r-base-dev ruby python python-dev tcl tcl-dev tk tk-dev`. Note that this project takes around an hour to build on a quad-core machine.
 
-SimpleElastix has been tried and tested on Ubuntu 14.10 with GCC 4.9.2 and Clang 3.4.0 and Mac OSX Yosemite with Apple Clang 600.0.56.
+SimpleElastix has been tried and tested on Ubuntu 14.10 using GCC 4.9.2 and Clang 3.4.0, Mac OSX Yosemite using Apple Clang 600.0.56 and Windows 8.1 using Microsft Visual Studio 2012 C++ compiler.
 
 ### Building Manually
 This is not the recommended way of building SimpleElastix but it can be useful if you want to use a system version of ITK, SWIG or your own version of elastix (in this case check out the necessary changes to elastix source code at https://github.com/kaspermarstal/elastix). 
