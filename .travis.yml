@@ -11,7 +11,7 @@ before_install:
   - $CXX --version
   - sudo add-apt-repository ppa:kalakris/cmake -y
   - sudo apt-get -qq update
-  - sudo apt-get install -qq cmake swig monodevelop r-base r-base-dev ruby python python-dev tcl tcl-dev tk tk-dev
+  - sudo apt-get install -qq cmake swig python python-dev
   - cd ..
 
 script:
