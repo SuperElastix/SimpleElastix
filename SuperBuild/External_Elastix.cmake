@@ -3,7 +3,6 @@ CMAKE_MINIMUM_REQUIRED( VERSION 2.8.11 )
 set( proj elastix )
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${proj}-build/CMakeCacheInit.txt" "${ep_common_cache}" )
 
-set( ELASTIX_DEPENDENCIES "ITK")
 set( ELASTIX_REPOSITORY git://github.com/kaspermarstal/elastix.git )
 
 ExternalProject_Add( ${proj} 
@@ -96,9 +95,9 @@ ExternalProject_Add( ${proj}
   -DUSE_VarianceOverLastDimensionMetric:BOOL=ON                                           
   -DUSE_ViolaWellsMutualInformationMetric:BOOL=ON                                           
   -DUSE_WeightedCombinationTransformElastix:BOOL=ON    
-  DEPENDS
-  ${ELASTIX_DEPENDENCIES}
 )
+
+add_dependencies( elastix ITK )
 
 ExternalProject_Get_Property(elastix BINARY_DIR)
 set( ELASTIX_USE_FILE "${BINARY_DIR}/src/UseElastix.cmake" )
