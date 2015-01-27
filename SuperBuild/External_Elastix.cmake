@@ -94,7 +94,8 @@ ExternalProject_Add( ${proj}
   -DUSE_TranslationTransformElastix:BOOL=ON                                           
   -DUSE_VarianceOverLastDimensionMetric:BOOL=ON                                           
   -DUSE_ViolaWellsMutualInformationMetric:BOOL=ON                                           
-  -DUSE_WeightedCombinationTransformElastix:BOOL=ON    
+  -DUSE_WeightedCombinationTransformElastix:BOOL=ON
+  DEPENDS ${${CMAKE_PROJECT_NAME}_DEPENDENCIES}
 )
 
 add_dependencies( elastix ITK )
