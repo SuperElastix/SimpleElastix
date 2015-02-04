@@ -29,12 +29,13 @@ SimpleTransformix::ExecuteInternal( void )
   {
     // Parameter file must match input image dimensions and pixel type (InputImage == MovingImage)
     this->m_TransformParameterMaps[ i ][ "FixedInternalImagePixelType" ] = ParameterValuesType( 1, GetPixelIDValueAsElastixParameter( this->m_InputImage.GetPixelID() ) );
-    this->m_TransformParameterMaps[ i ][ "MovingInternalImagePixelType" ] = ParameterValuesType( 1, GetPixelIDValueAsElastixParameter( this->m_InputImage.GetPixelID() ) );
     this->m_TransformParameterMaps[ i ][ "FixedImageDimension" ] = ParameterValuesType( 1, std::to_string( this->m_InputImage.GetDimension() ) );
+    this->m_TransformParameterMaps[ i ][ "MovingInternalImagePixelType" ] = ParameterValuesType( 1, GetPixelIDValueAsElastixParameter( this->m_InputImage.GetPixelID() ) );
     this->m_TransformParameterMaps[ i ][ "MovingImageDimension" ] = ParameterValuesType( 1, std::to_string( this->m_InputImage.GetDimension() ) );
     this->m_TransformParameterMaps[ i ][ "ResultImagePixelType" ] = ParameterValuesType( 1, GetPixelIDValueAsElastixParameter( this->m_InputImage.GetPixelID() ) );
   }
 
+  // TODO: The call to transformix is responsible for a segfault when the SimpleITK class is cleaned up, e.g. python import SimpleITK -> quit()
   // Do the tranformation
   int isError = 1;
   libtransformix transformix = libtransformix();
@@ -75,7 +76,7 @@ SimpleTransformix::ExecuteInternal( void )
     {
       if( this->m_TransformParameterMaps[ this->m_TransformParameterMaps.size()-1 ][ "WriteResultImage" ][ 0 ] == "false" )
       {
-        std::cout << "WARNING: Result image cannot be read perhaps because WriteResultImage is set to \"false\". " << std::endl; 
+        std::cout << "WARNING: Result image cannot be read because WriteResultImage is set to \"false\". " << std::endl; 
       }
     }
     sitkExceptionMacro( << "Errors occured during warping: Could not read result image." );

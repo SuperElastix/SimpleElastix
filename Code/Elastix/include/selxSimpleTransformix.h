@@ -26,7 +26,7 @@ class SELX_EXPORT SimpleTransformix
     typedef BasicPixelIDTypeList PixelIDTypeList;
 
     // typedefs inherited from elastix library api
-    typedef transformix::TRANSFORMIX libtransformix;
+    typedef transformix::TRANSFORMIX                        libtransformix;
     typedef itk::ParameterFileParser::ParameterMapType      ParameterMapType;
     typedef ParameterMapType::iterator                      ParameterMapIterator;
     typedef ParameterMapType::const_iterator                ParameterMapConstIterator;
