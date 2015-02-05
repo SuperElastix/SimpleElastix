@@ -35,7 +35,7 @@ class SimpleTransformix {
     transformix.execute();
 
     // Write result image
-    ImageFileWriter writer = new ImageFileWriter();
+    ImageFileWriter writer = new org.itk.simple.ImageFileWriter();
     writer.setFileName(argv[4]);
     writer.execute(transformix.getResultImage()); 
 

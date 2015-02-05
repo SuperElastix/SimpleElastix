@@ -27,7 +27,7 @@ class SimpleElastix {
     elastix.execute();
 
     // Write result image
-    ImageFileWriter writer = new ImageFileWriter();
+    ImageFileWriter writer = new org.itk.simple.ImageFileWriter();
     writer.setFileName(argv[3]);
     writer.execute(elastix.getResultImage()); 
 

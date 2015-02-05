@@ -11,24 +11,19 @@ if(NOT SimpleITK_SOURCE_DIR)
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
   set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
-
-  # SimpleElastix dependencies
-  # selxSimpleElastix.h or selxSimpleTransformix.h requires
-  # ITK_USE_FILE and ELASTIX_USE_FILE in addition to SimpleITK
-  if( NOT EXISTS ${ELASTIX_USE_FILE} )
-    set( ELASTIX_USE_FILE ${ELASTIX_DIR}/UseElastix.cmake )
-  endif()
-  if( NOT EXISTS ${ELASTIX_USE_FILE} )
-    set( ELASTIX_DIR "" CACHE PATH "Path to elastix build folder" )
-    message(FATAL_ERROR "Could not find UseElastix.cmake. Point ELASTIX_DIR to folder containing UseElastix.cmake or use SuperBuild.")
-  endif()
-  include( ${ELASTIX_USE_FILE} )
-
-  find_package( ITK REQUIRED )
-  include( ${ITK_USE_FILE} )
 endif()
 
+find_package(ITK REQUIRED)
+include( ${ITK_USE_FILE} )
 
+if( NOT EXISTS ${ELASTIX_USE_FILE} )
+  set( ELASTIX_USE_FILE ${ELASTIX_DIR}/UseElastix.cmake )
+endif()
+if( NOT EXISTS ${ELASTIX_USE_FILE} )
+  set( ELASTIX_DIR "" CACHE PATH "Path to elastix build folder" )
+  message(FATAL_ERROR "Could not find UseElastix.cmake. Point ELASTIX_DIR to folder containing UseElastix.cmake or use SuperBuild.")
+endif()
+include( ${ELASTIX_USE_FILE} )
 
 # Add individual cxx executables
 add_executable ( SimpleGaussian SimpleGaussian.cxx )

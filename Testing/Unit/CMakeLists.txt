@@ -1,6 +1,7 @@
 # remove me
 set ( ITK_NO_IO_FACTORY_REGISTER_MANAGER 1 )
-include(${ITK_USE_FILE})
+include( ${ITK_USE_FILE} )
+include( ${ELASTIX_USE_FILE} )
 
 set ( SimpleITKUnitTestSourceBase
   SimpleITKTestHarness.cxx
