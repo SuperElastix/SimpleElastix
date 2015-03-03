@@ -327,13 +327,22 @@ SimpleElastix
 
 
 
+SimpleElastix::Self&
+SimpleElastix
+::PrettyPrint( void )
+{
+  this->PrettyPrint( this->GetParameterMapList() );
+}
+
+
+
 SimpleElastix::Self& 
 SimpleElastix
 ::PrettyPrint( const std::map< std::string, std::vector< std::string > > parameterMap )
 {
   ParameterMapListType parameterMapList = ParameterMapListType( 1 );
   parameterMapList[ 0 ] = parameterMap;
-  PrettyPrint( parameterMapList );
+  this->PrettyPrint( parameterMapList );
   return *this;
 }
 

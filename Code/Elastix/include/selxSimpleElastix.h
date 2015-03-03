@@ -63,6 +63,7 @@ class SELX_EXPORT SimpleElastix
     std::vector< std::map< std::string, std::vector< std::string > > > GetParameterMapList( void );
     std::map< std::string, std::vector< std::string > > GetDefaultParameterMap( const std::string name );
     std::map< std::string, std::vector< std::string > > ReadParameterFile( const std::string filename );
+    Self& PrettyPrint( void );
     Self& PrettyPrint( std::map< std::string, std::vector< std::string > > const parameterMap );
     Self& PrettyPrint( std::vector< std::map< std::string, std::vector< std::string > > > const parameterMapList );
 
