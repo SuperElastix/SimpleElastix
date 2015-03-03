@@ -50,6 +50,9 @@ class SELX_EXPORT SimpleTransformix
     Self& SetTransformParameterMapList( std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList );
     Self& SetTransformParameterMap( std::map< std::string, std::vector< std::string > > parameterMap );
     std::map< std::string, std::vector< std::string > > ReadParameterFile( const std::string filename );
+    Self& PrettyPrint( void );
+    Self& PrettyPrint( std::map< std::string, std::vector< std::string > > const parameterMap );
+    Self& PrettyPrint( std::vector< std::map< std::string, std::vector< std::string > > > const parameterMapList );
 
     // Warp images
     Image Execute( void );

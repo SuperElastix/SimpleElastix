@@ -173,6 +173,66 @@ SimpleTransformix
 }
 
 
+
+SimpleTransformix::Self& 
+SimpleTransformix
+::PrettyPrint( void )
+{
+  this->PrettyPrint( this->GetTransformParameterMapList() );
+}
+
+
+
+SimpleTransformix::Self& 
+SimpleTransformix
+::PrettyPrint( const std::map< std::string, std::vector< std::string > > parameterMap )
+{
+  ParameterMapListType parameterMapList = ParameterMapListType( 1 );
+  parameterMapList[ 0 ] = parameterMap;
+  this->PrettyPrint( parameterMapList );
+  return *this;
+}
+
+
+
+SimpleTransformix::Self& 
+SimpleTransformix
+::PrettyPrint( const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList )
+{
+  for( unsigned int i = 0; i < parameterMapList.size(); ++i )
+  {
+    std::cout << "ParameterMap " << i << ": " << std::endl;
+    ParameterMapConstIterator parameterMapIterator = parameterMapList[ i ].begin();
+    ParameterMapConstIterator parameterMapIteratorEnd = parameterMapList[ i ].end();
+    while( parameterMapIterator != parameterMapIteratorEnd )
+    {
+      std::cout << "  (" << parameterMapIterator->first;
+      ParameterValuesType parameterMapValues = parameterMapIterator->second;
+      
+      for(unsigned int j = 0; j < parameterMapValues.size(); ++j)
+      {
+        std::stringstream stream( parameterMapValues[ j ] );
+        float number;
+        stream >> number;
+        if( stream.fail() ) {
+           std::cout << " \"" << parameterMapValues[ j ] << "\"";
+        }
+        else
+        {
+          std::cout << " " << number;
+        }      
+      }
+      
+      std::cout << ")" << std::endl;
+      parameterMapIterator++;
+    }
+  }
+
+  return *this;
+}
+
+
+
 bool
 SimpleTransformix
 ::isEmpty( const Image& image )
