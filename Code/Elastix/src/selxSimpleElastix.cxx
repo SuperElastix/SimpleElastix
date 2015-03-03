@@ -346,8 +346,8 @@ SimpleElastix
   for( unsigned int i = 0; i < parameterMapList.size(); ++i )
   {
     std::cout << "ParameterMap " << i << ": " << std::endl;
-    ParameterMapConstIterator parameterMapIterator = parameterMapList[ 0 ].begin();
-    ParameterMapConstIterator parameterMapIteratorEnd = parameterMapList[ 0 ].end();
+    ParameterMapConstIterator parameterMapIterator = parameterMapList[ i ].begin();
+    ParameterMapConstIterator parameterMapIteratorEnd = parameterMapList[ i ].end();
     while( parameterMapIterator != parameterMapIteratorEnd )
     {
       std::cout << "  (" << parameterMapIterator->first;
@@ -392,7 +392,7 @@ SimpleElastix
   sitkExceptionMacro( << "SimpleElastix does not support the combination of image type \""
                       << GetPixelIDValueAsString( FixedImagePixelEnum ) << "and dimension "
                       << FixedImageDimension << ". For elastix support, recompile elastix "
-                      << "with the desired pixel type and cast the SimpleITK image. Supported types are "
+                      << "with the desired pixel type or cast the SimpleITK image. Supported types are "
                       << "sitkUInt8, sitkInt8, sitkUInt16, sitkInt16, sitkUInt32, sitkInt32, "
                       << "sitkInt64, sitkUInt64, sitkFloat32 or sitkFloat64." );
 }
