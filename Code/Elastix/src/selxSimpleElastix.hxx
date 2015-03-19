@@ -3,7 +3,6 @@
 
 #include "selxSimpleElastix.h"
 #include "itkImage.h"
-#include "sitkPixelIDValues.h"
  
 namespace itk {
   namespace simple {

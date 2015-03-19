@@ -71,6 +71,9 @@
 
 #include "sitkImageRegistrationMethod.h"
 
+#include "selxSimpleElastix.h"
+#include "selxSimpleTransformix.h"
+
 // These headers are auto-generated
 #include "SimpleITKBasicFiltersGeneratedHeaders.h"
 #endif

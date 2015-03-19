@@ -2,10 +2,9 @@
 #define __selxsimpletransformix_h_
 
 // SimpleITK
-#include "sitkSimpleElastix.h"
-#include "sitkPixelIDTokens.h"
-#include "sitkImage.h"
+#include "sitkCommon.h"
 #include "sitkMemberFunctionFactory.h"
+#include "sitkImage.h"
 
 // SimpleTransformix
 #include "transformixlib.h"
@@ -13,7 +12,7 @@
 namespace itk { 
   namespace simple {
 
-class SELX_EXPORT SimpleTransformix
+class SITKCommon_EXPORT SimpleTransformix
 {
   public:
 
@@ -105,8 +104,8 @@ class SELX_EXPORT SimpleTransformix
 };
 
 // Procedural Interface 
-SELX_EXPORT Image Transformix( const Image& inputImage, const std::map< std::string, std::vector< std::string > > parameterMap, const bool logToConsole = false, const std::string outputFolder = "" );
-SELX_EXPORT Image Transformix( const Image& inputImage, const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList, const bool logToConsole = false, const std::string outputFolder = "" );
+SITKCommon_EXPORT Image Transformix( const Image& inputImage, const std::map< std::string, std::vector< std::string > > parameterMap, const bool logToConsole = false, const std::string outputFolder = "" );
+SITKCommon_EXPORT Image Transformix( const Image& inputImage, const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList, const bool logToConsole = false, const std::string outputFolder = "" );
 
 } // end namespace simple
 } // end namespace itk
