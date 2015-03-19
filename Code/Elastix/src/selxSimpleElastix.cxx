@@ -332,6 +332,7 @@ SimpleElastix
 ::PrettyPrint( void )
 {
   this->PrettyPrint( this->GetParameterMapList() );
+  return *this;
 }
 
 

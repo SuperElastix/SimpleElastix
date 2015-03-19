@@ -179,6 +179,7 @@ SimpleTransformix
 ::PrettyPrint( void )
 {
   this->PrettyPrint( this->GetTransformParameterMapList() );
+  return *this;
 }
 
 
