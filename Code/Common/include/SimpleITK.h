@@ -56,6 +56,10 @@
 
 #include "sitkAdditionalProcedures.h"
 
+// SimpleElastix
+#include "sitkSimpleElastix.h"
+#include "sitkSimpleTransformix.h"
+
 // These headers are auto-generated
 #include "SimpleITKBasicFiltersGeneratedHeaders.h"
 #endif

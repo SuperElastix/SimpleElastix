@@ -79,7 +79,7 @@ endif()
 # SimpleITK options
 #------------------------------------------------------------------------------
 
-option( BUILD_EXAMPLES "Enable Building of the SimpleITK Examples as a separate project." ON )
+option( BUILD_EXAMPLES "Enable Building of the SimpleElastix Examples as a separate project." ON )
 
 # Set a default build type if none was specified
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -273,6 +273,28 @@ else()
   list(APPEND ${CMAKE_PROJECT_NAME}_DEPENDENCIES ITK)
 endif()
 
+#------------------------------------------------------------------------------
+# Elastix
+#------------------------------------------------------------------------------
+
+set(USE_SYSTEM_ELASTIX OFF CACHE BOOL "Use a pre-built version of elastix")
+mark_as_advanced(FORCE USE_SYSTEM_ELASTIX)
+if(USE_SYSTEM_ELASTIX)
+  if(NOT EXISTS ${ELASTIX_USE_FILE})
+    set(ELASTIX_USE_FILE ${ELASTIX_DIR}/UseElastix.cmake)
+  endif()
+  if( NOT EXISTS ${ELASTIX_USE_FILE} )
+    set(ELASTIX_DIR "" CACHE PATH "Path to folder containing UseElastix.cmake")
+    message(FATAL_ERROR "Could not find UseElastix.cmake. Point ELASTIX_DIR to folder containing UseElastix.cmake or set USE_SYSTEM_ELASTIX to OFF.")
+  endif()
+else()
+  include(External_Elastix)
+  list(APPEND ${CMAKE_PROJECT_NAME}_DEPENDENCIES elastix)
+endif()
+
+#------------------------------------------------------------------------------
+# SimpleITK
+#------------------------------------------------------------------------------
 
 get_cmake_property( _varNames VARIABLES )
 
@@ -313,6 +335,8 @@ ExternalProject_Add(${proj}
     ${ep_languages_args}
     # ITK
     -DITK_DIR:PATH=${ITK_DIR}
+    # Elastix
+    -DELASTIX_USE_FILE:PATH=${ELASTIX_USE_FILE}
     # Swig
     -DSWIG_DIR:PATH=${SWIG_DIR}
     -DSWIG_EXECUTABLE:PATH=${SWIG_EXECUTABLE}
@@ -350,7 +374,7 @@ include(External_SimpleITKExamples)
 #------------------------------------------------------------------------------
 # List of external projects
 #------------------------------------------------------------------------------
-set(external_project_list ITK Swig SimpleITKExamples PCRE ${CMAKE_PROJECT_NAME})
+set(external_project_list ITK Swig elastix SimpleITKExamples PCRE ${CMAKE_PROJECT_NAME})
 
 #-----------------------------------------------------------------------------
 # Dump external project dependencies

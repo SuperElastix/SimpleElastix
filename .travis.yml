@@ -1,0 +1,23 @@
+language: cpp
+
+compiler:
+  - clang
+  - gcc
+
+before_install:
+  - pwd
+  - date -u
+  - uname -a
+
+  # Out-of-source build
+  - cd ..
+  - mkdir SimpleElastix-build
+  - cd SimpleElastix-build
+
+before_script:
+  - export OMP_NUM_THREADS=2
+  - echo $OMP_NUM_THREADS
+
+script:
+  - cmake ../SimpleElastix/SuperBuild
+  - make --jobs=2 | grep -v '^--' | grep -v '^Installing'

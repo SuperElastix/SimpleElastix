@@ -164,13 +164,19 @@ namespace std
 %include "sitkImageSeriesReader.h"
 %include "sitkImageFileReader.h"
 
- // Basic Filters
+// Basic Filters
 %include "sitkHashImageFilter.h"
 %include "sitkStatisticsImageFilter.h"
 %include "sitkMeasurementMap.h"
 %include "sitkLabelStatisticsImageFilter.h"
 %include "sitkCastImageFilter.h"
 %include "sitkAdditionalProcedures.h"
+
+// SimpleElastix
+%template(ParameterMap) std::map< std::string, std::vector< std::string > >;
+%template(ParameterMapList) std::vector< std::map< std::string, std::vector< std::string > > >;
+%include "sitkSimpleElastix.h"
+%include "sitkSimpleTransformix.h"
 
 // Only C# can handle import filter
 #if SWIGCSHARP

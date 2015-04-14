@@ -51,7 +51,6 @@ include(sitkCheckRequiredFlags)
 
 find_package(ITK REQUIRED ) # the modules needed can be listed here as required components
 if(ITK_FOUND)
-
   # NOTE: We are purposely not calling UseITK yet. However, we must make
   # sure the requred compilation and linker flags are set. Since, we
   # are trying to encapsulate ITK, we need to very carefully control
@@ -66,11 +65,37 @@ if(ITK_FOUND)
   set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${ITK_REQUIRED_LINK_FLAGS}")
 
   link_directories( "${ITK_LIBRARY_DIRS}")
-
-
 endif()
 
+#----------------------------------------------------------
+# Configure elastix
 
+find_package( OpenMP )
+if( OPENMP_FOUND )
+  set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} " )
+  set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS} " )
+endif()
+
+# Find UseElastix.cmake 
+if( NOT EXISTS ${ELASTIX_USE_FILE} )
+  set( ELASTIX_USE_FILE ${ELASTIX_DIR}/UseElastix.cmake )
+endif()
+
+if( NOT EXISTS ${ELASTIX_USE_FILE} )
+  # UseElastix.cmake path NOT passed to build. Ask user to specify custom elastix install or use the SuperBuild.
+  set( ELASTIX_DIR "" CACHE PATH "Path to elastix build folder" )
+  message(FATAL_ERROR "Could not find UseElastix.cmake. Point ELASTIX_DIR to folder containing UseElastix.cmake or use SuperBuild.")
+endif()
+
+include( ${ELASTIX_USE_FILE} )
+
+# Check if shared libraries are available
+if( ELASTIX_BUILD_EXECUTABLE )
+  message(FATAL_ERROR "SimpleElastix requires elastix shared libraries, please set ELASTIX_BUILD_EXECUTABLE=OFF and rebuild elastix")
+endif()
+
+#----------------------------------------------------------
+# Set flags and directories
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${SimpleITK_REQUIRED_C_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SimpleITK_REQUIRED_CXX_FLAGS}")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
@@ -99,11 +124,13 @@ set ( SimpleITK_INCLUDE_DIRS
       ${CMAKE_SOURCE_DIR}/Code/Registration
       ${CMAKE_SOURCE_DIR}/Code/BasicFilters/include
       ${CMAKE_SOURCE_DIR}/Code/IO/include
+      ${CMAKE_SOURCE_DIR}/Code/Elastix/include
       ${CMAKE_BINARY_DIR}/Code/BasicFilters/include
       ${CMAKE_BINARY_DIR}/Code/Common/include
+      ${CMAKE_BINARY_DIR}/Code/Elastix/include
       )
 
-set ( SimpleITK_LIBRARIES SimpleITKCommon SimpleITKIO CACHE INTERNAL "" )
+set ( SimpleITK_LIBRARIES SimpleITKCommon SimpleITKIO SimpleElastix SimpleTransformix CACHE INTERNAL "" )
 
 # Be sure to clear these each time
 set ( GENERATED_TEST_LIST "" CACHE INTERNAL "" )
@@ -308,7 +335,7 @@ include_directories( ${SimpleITK_INCLUDE_DIRS} )
 set ( SimpleITK_DOC_FILES
   "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE"
   "${CMAKE_CURRENT_SOURCE_DIR}/NOTICE"
-  "${CMAKE_CURRENT_SOURCE_DIR}/Readme.md"
+  "${CMAKE_CURRENT_SOURCE_DIR}/README.md"
   )
 
 # add important files from ITK
@@ -484,6 +511,8 @@ file( GLOB __files
   ${CMAKE_SOURCE_DIR}/Code/BasicFilters/include/*.hxx
   ${CMAKE_SOURCE_DIR}/Code/Common/include/*.h
   ${CMAKE_SOURCE_DIR}/Code/Common/include/*.hxx
+  ${CMAKE_SOURCE_DIR}/Code/Elastix/include/*.h
+  ${CMAKE_SOURCE_DIR}/Code/Elastix/include/*.hxx
   ${CMAKE_SOURCE_DIR}/Code/IO/include/*.h
   ${CMAKE_SOURCE_DIR}/Code/IO/include/*.hxx
   ${CMAKE_SOURCE_DIR}/Code/Registration/include/*.h

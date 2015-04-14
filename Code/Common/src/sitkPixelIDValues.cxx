@@ -145,7 +145,65 @@ const std::string GetPixelIDValueAsString( PixelIDValueType type )
     {
     return "ERRONEOUS PIXEL ID!";
     }
+
 }
+
+const std::string GetPixelIDValueAsElastixParameter( PixelIDValueType type )
+{
+
+  if ( type == sitkUnknown )
+    {
+    // Unknow must be first because other enums may be -1 if they are
+    // not instantiated
+    return "Unknown pixel id";
+    }
+  else if ( type == sitkUInt8 )
+    {
+    return "unsigned char";
+    }
+  else if ( type == sitkInt8 )
+    {
+    return "char";
+   }
+  else if ( type ==  sitkUInt16 )
+    {
+    return "unsigned short";
+    }
+  else if ( type == sitkInt16 )
+    {
+    return "short";
+    }
+  else if ( type == sitkUInt32 )
+    {
+    return "unsigned int";
+    }
+  else if ( type == sitkInt32 )
+    {
+   return "int";
+    }
+   else if ( type == sitkUInt64 )
+    {
+    return "unsigned long";
+    }
+  else if ( type == sitkInt64 )
+    {
+    return "long";
+    }
+  else if ( type == sitkFloat32 )
+    {
+    return "float";
+    }
+  else if ( type == sitkFloat64 )
+    {
+    return "double";
+    }
+  else
+    {
+    return "Unsupported pixel type.";
+    }
+
+}
+
 
 std::ostream& operator<<(std::ostream& os, const PixelIDValueEnum id)
 {

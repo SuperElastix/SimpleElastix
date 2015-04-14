@@ -19,7 +19,9 @@ if ( WRAP_LUA OR WRAP_PYTHON OR WRAP_JAVA OR WRAP_CSHARP OR WRAP_TCL OR WRAP_R O
 
   file(GLOB SWIG_EXTRA_DEPS
     "${SimpleITK_SOURCE_DIR}/Code/Common/include/*.h"
-    "${SimpleITK_SOURCE_DIR}/Code/IO/include/*.h")
+    "${SimpleITK_SOURCE_DIR}/Code/IO/include/*.h"
+    "${SimpleITK_SOURCE_DIR}/Code/Elastix/include/*.h"
+    )
 
   # make a manual list of dependencies for the Swig.i files
   list( APPEND SWIG_EXTRA_DEPS "${SimpleITK_BINARY_DIR}/Code/BasicFilters/include/SimpleITKBasicFiltersGeneratedHeaders.i"
@@ -36,6 +38,8 @@ if ( WRAP_LUA OR WRAP_PYTHON OR WRAP_JAVA OR WRAP_CSHARP OR WRAP_TCL OR WRAP_R O
   if(${SITK_ULONG_SAME_AS_UINT64} )
     set ( CMAKE_SWIG_GLOBAL_FLAGS "-DSWIGWORDSIZE64" )
   endif()
+
+  include( ${ITK_USE_FILE} )
 
 endif()
 
