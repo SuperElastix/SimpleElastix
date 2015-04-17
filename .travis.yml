@@ -21,3 +21,7 @@ before_script:
 script:
   - cmake ../SimpleElastix/SuperBuild
   - make --jobs=2 | grep -v '^--' | grep -v '^Installing'
+
+notifications:
+  slack:
+    secure: h43Xu8fWhyJeuLNuvGHM5GglU5j03eDZD1obwAbe0Xccr/UyY0Cm7YA2sRtzCHKsEUaOheP6UeUuhLR9dQb0ByhDjMnEbZJViZoYzuTNaaP8Olv0GWe43CrMB2fQpOcGPfdzDNfmIrW/+kK9Yhq3Rw9UlE0O2Kk7DHebhxG2zIU=
