@@ -15,17 +15,6 @@ endif()
 
 find_package( ITK REQUIRED )
 include( ${ITK_USE_FILE} )
-
-if( NOT EXISTS ${ELASTIX_USE_FILE} )
-  set( ELASTIX_USE_FILE ${ELASTIX_DIR}/UseElastix.cmake )
-endif()
-
-if( NOT EXISTS ${ELASTIX_USE_FILE} )
-  # UseElastix.cmake path NOT passed to build. Ask user to specify custom elastix install or use the SuperBuild.
-  set( ELASTIX_DIR "" CACHE PATH "Path to elastix build folder" )
-  message(FATAL_ERROR "Could not find UseElastix.cmake. Point ELASTIX_DIR to folder containing UseElastix.cmake or use SuperBuild.")
-endif()
-
 include( ${ELASTIX_USE_FILE} )
 
 # Add individual cxx executables

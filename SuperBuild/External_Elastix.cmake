@@ -96,5 +96,5 @@ ExternalProject_Add( ${proj}
   DEPENDS ${${CMAKE_PROJECT_NAME}_DEPENDENCIES}
 )
 
-ExternalProject_Get_Property(elastix BINARY_DIR)
+ExternalProject_Get_Property( elastix BINARY_DIR )
 set( ELASTIX_USE_FILE "${BINARY_DIR}/src/UseElastix.cmake" )
