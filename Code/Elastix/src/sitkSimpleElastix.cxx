@@ -204,6 +204,45 @@ SimpleElastix
 
 
 
+SimpleElastix::Self&
+SimpleElastix
+::WriteParameterFile( std::map< std::string, std::vector< std::string > > const parameterMap, const std::string filename )
+{
+  std::ofstream parameterFile;
+  parameterFile.open( filename.c_str(), std::ofstream::out );
+
+  ParameterMapConstIterator parameterMapIterator = parameterMap.begin();
+  ParameterMapConstIterator parameterMapIteratorEnd = parameterMap.end();
+  while( parameterMapIterator != parameterMapIteratorEnd )
+  {
+    parameterFile << "(" << parameterMapIterator->first;
+
+    ParameterValuesType parameterMapValues = parameterMapIterator->second;
+    for( unsigned int i = 0; i < parameterMapValues.size(); ++i )
+    {
+      std::stringstream stream( parameterMapValues[ i ] );
+      float number;
+      stream >> number;
+      if( stream.fail() || stream.bad() ) {
+         parameterFile << " \"" << parameterMapValues[ i ] << "\"";
+      }
+      else
+      {
+        parameterFile << " " << number;
+      }      
+    }
+      
+    parameterFile << ")" << std::endl;
+    parameterMapIterator++;
+  }
+
+  parameterFile.close();
+
+  return *this;
+}
+
+
+
 std::map< std::string, std::vector< std::string > >
 SimpleElastix
 ::GetDefaultParameterMap( const std::string name )
@@ -478,6 +517,16 @@ ReadParameterFile( const std::string filename )
   SimpleElastix::ParameterMapType parameterMap = selx.ReadParameterFile( filename );
   return parameterMap;
 }
+
+
+
+void
+WriteParameterFile( std::map< std::string, std::vector< std::string > > const parameterMap, const std::string filename )
+{
+  SimpleElastix selx;
+  selx.WriteParameterFile( parameterMap, filename );
+}
+
 
 
 

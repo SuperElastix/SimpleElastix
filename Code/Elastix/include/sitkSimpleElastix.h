@@ -62,6 +62,7 @@ class SITKCommon_EXPORT SimpleElastix
     std::vector< std::map< std::string, std::vector< std::string > > > GetParameterMapList( void );
     std::map< std::string, std::vector< std::string > > GetDefaultParameterMap( const std::string name );
     std::map< std::string, std::vector< std::string > > ReadParameterFile( const std::string filename );
+    Self& WriteParameterFile( std::map< std::string, std::vector< std::string > > const parameterMap, const std::string filename );
     Self& PrettyPrint( void );
     Self& PrettyPrint( std::map< std::string, std::vector< std::string > > const parameterMap );
     Self& PrettyPrint( std::vector< std::map< std::string, std::vector< std::string > > > const parameterMapList );
@@ -122,6 +123,7 @@ class SITKCommon_EXPORT SimpleElastix
 // Procedural Interface 
 SITKCommon_EXPORT std::map< std::string, std::vector< std::string > > GetDefaultParameterMap( const std::string filename );
 SITKCommon_EXPORT std::map< std::string, std::vector< std::string > > ReadParameterFile( const std::string filename );
+SITKCommon_EXPORT void WriteParameterFile( std::map< std::string, std::vector< std::string > > const parameterMap, const std::string filename );
 SITKCommon_EXPORT void PrettyPrint( std::map< std::string, std::vector< std::string > > const parameterMap );
 SITKCommon_EXPORT void PrettyPrint( std::vector< std::map< std::string, std::vector< std::string > > > const parameterMapList );
 SITKCommon_EXPORT Image Elastix( const Image& fixedImage, const Image& movingImage, const std::string defaultParameterMapName, const bool logToConsole = false, const std::string outputFolder = "" );
