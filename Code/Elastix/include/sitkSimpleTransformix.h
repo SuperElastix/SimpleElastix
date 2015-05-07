@@ -46,7 +46,7 @@ class SITKCommon_EXPORT SimpleTransformix
     Image& GetInputImage( void );
 
     // Parameter map interface 
-    Self& SetTransformParameterMapList( std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList );
+    Self& SetTransformParameterMap( std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList );
     Self& SetTransformParameterMap( std::map< std::string, std::vector< std::string > > parameterMap );
     std::map< std::string, std::vector< std::string > > ReadParameterFile( const std::string filename );
     Self& WriteParameterFile( std::map< std::string, std::vector< std::string > > const parameterMap, const std::string filename );
@@ -59,9 +59,8 @@ class SITKCommon_EXPORT SimpleTransformix
 
     // Get result
     Image& GetResultImage( void );
-    std::vector< std::map< std::string, std::vector< std::string > > > GetTransformParameterMapList( void );
+    std::vector< std::map< std::string, std::vector< std::string > > > GetTransformParameterMap( void );
     
-
     // Output
     Self& LogToFolder( const std::string folder );
     Self& LogToFolderOff( void );

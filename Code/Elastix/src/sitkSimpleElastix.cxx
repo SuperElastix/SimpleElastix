@@ -146,7 +146,7 @@ SimpleElastix
 
 SimpleElastix::Self& 
 SimpleElastix
-::SetParameterMapList( const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList )
+::SetParameterMap( const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList )
 {
   this->m_ParameterMaps = parameterMapList;
   return *this;
@@ -160,7 +160,7 @@ SimpleElastix
 {
   ParameterMapListType parameterMapList = ParameterMapListType( 1 );
   parameterMapList[ 0 ] = parameterMap;
-  this->SetParameterMapList( parameterMapList );
+  this->SetParameterMap( parameterMapList );
   return *this;
 }
 
@@ -168,7 +168,7 @@ SimpleElastix
 
 std::vector< std::map< std::string, std::vector< std::string > > > 
 SimpleElastix
-::GetParameterMapList( void )
+::GetParameterMap( void )
 {
   return this->m_ParameterMaps;
 }
@@ -177,7 +177,7 @@ SimpleElastix
 
 std::vector< std::map< std::string, std::vector< std::string > > > 
 SimpleElastix
-::GetTransformParameterMapList( void )
+::GetTransformParameterMap( void )
 {
   return this->m_TransformParameterMaps;
 }
@@ -370,7 +370,7 @@ SimpleElastix::Self&
 SimpleElastix
 ::PrettyPrint( void )
 {
-  this->PrettyPrint( this->GetParameterMapList() );
+  this->PrettyPrint( this->GetParameterMap() );
   return *this;
 }
 
@@ -573,7 +573,7 @@ Elastix( const Image& fixedImage, const Image& movingImage, const std::vector< s
   SimpleElastix selx;
   selx.SetFixedImage( fixedImage );
   selx.SetMovingImage( movingImage );
-  selx.SetParameterMapList( parameterMapList );
+  selx.SetParameterMap( parameterMapList );
   selx.LogToFolder( outputFolder );
   selx.LogToConsole( logToConsole );
 
@@ -607,7 +607,7 @@ Elastix( const Image& fixedImage, const Image& movingImage, const std::vector< s
   SimpleElastix selx;
   selx.SetFixedImage( fixedImage );
   selx.SetMovingImage( movingImage );
-  selx.SetParameterMapList( parameterMapList );
+  selx.SetParameterMap( parameterMapList );
   selx.SetFixedMask( fixedMask );
   selx.SetMovingMask( movingMask );
   selx.LogToFolder( outputFolder );

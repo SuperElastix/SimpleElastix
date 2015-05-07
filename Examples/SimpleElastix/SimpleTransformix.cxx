@@ -30,7 +30,7 @@ int main ( int argc, char* argv[] ) {
   // Read input
   reader.SetFileName( std::string( argv[4] ) );
   transformix.SetInputImage( reader.Execute() );
-  transformix.SetTransformParameterMapList( elastix.GetTransformParameterMapList() );
+  transformix.SetTransformParameterMap( elastix.GetTransformParameterMap() );
 
   // Perform warp
   transformix.LogToConsoleOn();

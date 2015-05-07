@@ -125,7 +125,7 @@ SimpleTransformix
 
 SimpleTransformix::Self&
 SimpleTransformix
-::SetTransformParameterMapList( std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList )
+::SetTransformParameterMap( std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList )
 {
   this->m_TransformParameterMaps = parameterMapList;
   return *this;
@@ -139,7 +139,7 @@ SimpleTransformix
 {
   ParameterMapListType parameterMapList;
   parameterMapList.push_back( parameterMap );
-  this->SetTransformParameterMapList( parameterMapList );
+  this->SetTransformParameterMap( parameterMapList );
   return *this;
 }
 
@@ -147,7 +147,7 @@ SimpleTransformix
 
 std::vector< std::map< std::string, std::vector< std::string > > > 
 SimpleTransformix
-::GetTransformParameterMapList( void )
+::GetTransformParameterMap( void )
 {
   return this->m_TransformParameterMaps;
 }
@@ -217,7 +217,7 @@ SimpleTransformix::Self&
 SimpleTransformix
 ::PrettyPrint( void )
 {
-  this->PrettyPrint( this->GetTransformParameterMapList() );
+  this->PrettyPrint( this->GetTransformParameterMap() );
   return *this;
 }
 
@@ -301,7 +301,7 @@ Transformix( const Image& inputImage, std::vector< std::map< std::string, std::v
 {
   SimpleTransformix stfx;
   stfx.SetInputImage( inputImage );
-  stfx.SetTransformParameterMapList( parameterMapList );
+  stfx.SetTransformParameterMap( parameterMapList );
   stfx.LogToFolder( outputFolder );
   stfx.LogToConsole( logToConsole );
 

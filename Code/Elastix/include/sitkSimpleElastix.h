@@ -56,10 +56,10 @@ class SITKCommon_EXPORT SimpleElastix
     Image& GetMovingMask( void );
     Self& DeleteMovingMask( void );
 
-    // Paramete Map interface
-    Self& SetParameterMapList( std::vector< std::map< std::string, std::vector< std::string > > > const parameterMapList );
+    // Parameter Map interface
+    Self& SetParameterMap( std::vector< std::map< std::string, std::vector< std::string > > > const parameterMapList );
     Self& SetParameterMap( std::map< std::string, std::vector< std::string > > const parameterMap );
-    std::vector< std::map< std::string, std::vector< std::string > > > GetParameterMapList( void );
+    std::vector< std::map< std::string, std::vector< std::string > > > GetParameterMap( void );
     std::map< std::string, std::vector< std::string > > GetDefaultParameterMap( const std::string name );
     std::map< std::string, std::vector< std::string > > ReadParameterFile( const std::string filename );
     Self& WriteParameterFile( std::map< std::string, std::vector< std::string > > const parameterMap, const std::string filename );
@@ -72,7 +72,7 @@ class SITKCommon_EXPORT SimpleElastix
 
     // Get result
     Image& GetResultImage( void );
-    std::vector< std::map< std::string, std::vector< std::string > > > GetTransformParameterMapList( void );
+    std::vector< std::map< std::string, std::vector< std::string > > > GetTransformParameterMap( void );
 
     // Output
     Self& LogToFolder( const std::string folder );
