@@ -245,120 +245,110 @@ SimpleElastix
 
 std::map< std::string, std::vector< std::string > >
 SimpleElastix
-::GetDefaultParameterMap( const std::string name )
+::GetDefaultParameterMap( const std::string transform, const unsigned int numberOfResolutions, const double finalGridSpacingInPhysicalUnits )
 { 
-
-  // Defaults
-  unsigned int resolutions         = 4;
-  unsigned int dimension           = 3;
-  std::vector<unsigned int> siz    = std::vector<unsigned int>( dimension, 256 );
-  std::vector<unsigned int> knots  = std::vector<unsigned int>( dimension, 16 );
-
-  // Image parameters
-  if( !isEmpty( this->m_FixedImage ) )
-  {
-    siz = this->m_FixedImage.GetSize();
-    dimension = this->m_FixedImage.GetDimension();
-  }
 
   // Parameters that depend on size and number of resolutions
   ParameterMapType parameterMap                     = ParameterMapType();
-  ParameterValuesType gridSpacingSchedule           = ParameterValuesType();
-  ParameterValuesType imagePyramidSchedule          = ParameterValuesType();
-  for( unsigned int res = 0; res < resolutions; ++res )
-  {
-    for( unsigned int dim = 0; dim < dimension; ++dim )
-    {
-      gridSpacingSchedule.insert( gridSpacingSchedule.begin(), std::to_string( pow( 2, res ) ) ); 
-      imagePyramidSchedule.insert( imagePyramidSchedule.begin(), std::to_string( pow( 2, res ) ) ); 
-    }
-  }
-
-  ParameterValuesType finalGridSpacingInVoxels      = ParameterValuesType();
-  for( unsigned int dim = 0; dim < dimension; ++dim )
-  {
-    finalGridSpacingInVoxels.push_back( std::to_string( siz[ dim ] / knots[ dim ] ) );
-  }
 
   // Common Components
-  parameterMap[ "FixedImagePyramid" ]               = ParameterValuesType( 1, "FixedSmoothingImagePyramid" );
-  parameterMap[ "MovingImagePyramid" ]              = ParameterValuesType( 1, "MovingSmoothingImagePyramid" );
-  parameterMap[ "Interpolator"]                     = ParameterValuesType( 1, "LinearInterpolator");
-  parameterMap[ "Optimizer" ]                       = ParameterValuesType( 1, "AdaptiveStochasticGradientDescent" );
-  parameterMap[ "Resampler"]                        = ParameterValuesType( 1, "DefaultResampler" );
-  parameterMap[ "ResampleInterpolator"]             = ParameterValuesType( 1, "FinalBSplineInterpolator" );
-  parameterMap[ "FinalBSplineInterpolationOrder" ]  = ParameterValuesType( 1, "2" );
-  parameterMap[ "FixedImagePyramidSchedule" ]       = imagePyramidSchedule;
-  parameterMap[ "MovingImagePyramidSchedule" ]      = imagePyramidSchedule;
-  parameterMap[ "NumberOfResolutions" ]             = ParameterValuesType( 1, std::to_string( resolutions ) );
+  parameterMap[ "FixedImagePyramid" ]                 = ParameterValuesType( 1, "FixedSmoothingImagePyramid" );
+  parameterMap[ "MovingImagePyramid" ]                = ParameterValuesType( 1, "MovingSmoothingImagePyramid" );
+  parameterMap[ "Interpolator"]                       = ParameterValuesType( 1, "LinearInterpolator");
+  parameterMap[ "Optimizer" ]                         = ParameterValuesType( 1, "AdaptiveStochasticGradientDescent" );
+  parameterMap[ "Resampler"]                          = ParameterValuesType( 1, "DefaultResampler" );
+  parameterMap[ "ResampleInterpolator"]               = ParameterValuesType( 1, "FinalBSplineInterpolator" );
+  parameterMap[ "FinalBSplineInterpolationOrder" ]    = ParameterValuesType( 1, "2" );
+  parameterMap[ "NumberOfResolutions" ]               = ParameterValuesType( 1, std::to_string( numberOfResolutions ) );
 
   // Image Sampler
-  parameterMap[ "ImageSampler" ]                    = ParameterValuesType( 1, "RandomCoordinate" ); 
-  parameterMap[ "NumberOfSpatialSamples"]           = ParameterValuesType( 1, "4096" );
-  parameterMap[ "CheckNumberOfSamples" ]            = ParameterValuesType( 1, "true" );
-  parameterMap[ "MaximumNumberOfSamplingAttempts" ] = ParameterValuesType( 1, "8" );
-  parameterMap[ "NewSamplesEveryIteration" ]        = ParameterValuesType( 1, "true");
+  parameterMap[ "ImageSampler" ]                      = ParameterValuesType( 1, "RandomCoordinate" ); 
+  parameterMap[ "NumberOfSpatialSamples"]             = ParameterValuesType( 1, "2048" );
+  parameterMap[ "CheckNumberOfSamples" ]              = ParameterValuesType( 1, "true" );
+  parameterMap[ "MaximumNumberOfSamplingAttempts" ]   = ParameterValuesType( 1, "8" );
+  parameterMap[ "NewSamplesEveryIteration" ]          = ParameterValuesType( 1, "true");
 
   // Optimizer
-  parameterMap[ "NumberOfSamplesForExactGradient" ] = ParameterValuesType( 1, "4096" );
-  parameterMap[ "DefaultPixelValue" ]               = ParameterValuesType( 1, "0" );
-  parameterMap[ "AutomaticParameterEstimation" ]    = ParameterValuesType( 1, "true" );
+  parameterMap[ "NumberOfSamplesForExactGradient" ]   = ParameterValuesType( 1, "4096" );
+  parameterMap[ "DefaultPixelValue" ]                 = ParameterValuesType( 1, "0" );
+  parameterMap[ "AutomaticParameterEstimation" ]      = ParameterValuesType( 1, "true" );
 
   // Output
-  parameterMap[ "WriteResultImage" ]                = ParameterValuesType( 1, "true" );
+  parameterMap[ "WriteResultImage" ]                  = ParameterValuesType( 1, "true" );
 
-  if( name == "translation" )
+  // Transforms
+  if( transform == "translation" )
   {
-    parameterMap[ "Registration" ]                  = ParameterValuesType( 1, "MultiResolutionRegistration" );
-    parameterMap[ "Transform" ]                     = ParameterValuesType( 1, "TranslationTransform" );
-    parameterMap[ "Metric" ]                        = ParameterValuesType( 1, "AdvancedMattesMutualInformation" );
-    parameterMap[ "MaximumNumberOfIterations" ]     = ParameterValuesType( 1, "32" );
+    parameterMap[ "Registration" ]                    = ParameterValuesType( 1, "MultiResolutionRegistration" );
+    parameterMap[ "Transform" ]                       = ParameterValuesType( 1, "TranslationTransform" );
+    parameterMap[ "Metric" ]                          = ParameterValuesType( 1, "AdvancedMattesMutualInformation" );
+    parameterMap[ "MaximumNumberOfIterations" ]       = ParameterValuesType( 1, "64" );
   }
-  else if( name == "rigid" )
+  else if( transform == "rigid" )
   {
-    parameterMap[ "Registration" ]                  = ParameterValuesType( 1, "MultiResolutionRegistration" );
-    parameterMap[ "Transform" ]                     = ParameterValuesType( 1, "EulerTransform" );
-    parameterMap[ "Metric" ]                        = ParameterValuesType( 1, "AdvancedMattesMutualInformation" );
-    parameterMap[ "MaximumNumberOfIterations" ]     = ParameterValuesType( 1, "64" );
+    parameterMap[ "Registration" ]                    = ParameterValuesType( 1, "MultiResolutionRegistration" );
+    parameterMap[ "Transform" ]                       = ParameterValuesType( 1, "EulerTransform" );
+    parameterMap[ "Metric" ]                          = ParameterValuesType( 1, "AdvancedMattesMutualInformation" );
+    parameterMap[ "MaximumNumberOfIterations" ]       = ParameterValuesType( 1, "64" );
   }
-  else if( name == "affine" )
+  else if( transform == "affine" )
   {
-    parameterMap[ "Registration" ]                  = ParameterValuesType( 1, "MultiResolutionRegistration" );
-    parameterMap[ "Transform" ]                     = ParameterValuesType( 1, "AffineTransform" );
-    parameterMap[ "Metric" ]                        = ParameterValuesType( 1, "AdvancedMattesMutualInformation" );
-    parameterMap[ "MaximumNumberOfIterations" ]     = ParameterValuesType( 1, "128" );
+    parameterMap[ "Registration" ]                    = ParameterValuesType( 1, "MultiResolutionRegistration" );
+    parameterMap[ "Transform" ]                       = ParameterValuesType( 1, "AffineTransform" );
+    parameterMap[ "Metric" ]                          = ParameterValuesType( 1, "AdvancedMattesMutualInformation" );
+    parameterMap[ "MaximumNumberOfIterations" ]       = ParameterValuesType( 1, "128" );
   }
-  else if( name == "nonrigid" )
+  else if( transform == "nonrigid" )
   {
-    parameterMap[ "Registration" ]                  = ParameterValuesType( 1, "MultiMetricMultiResolutionRegistration" );
-    parameterMap[ "Transform" ]                     = ParameterValuesType( 1, "BSplineTransform" );
-    parameterMap[ "Metric" ]                        = ParameterValuesType( 1, "AdvancedMattesMutualInformation" );
-    parameterMap[ "Metric" ]                          .push_back( "TransformBendingEnergyPenalty" );
-    parameterMap[ "Metric0Weight" ]                 = ParameterValuesType( 1, "0.0001" );
-    parameterMap[ "Metric1Weight" ]                 = ParameterValuesType( 1, "0.9999" );
-    parameterMap[ "FinalGridSpacingInVoxels" ]      = finalGridSpacingInVoxels;
-    parameterMap[ "GridSpacingSchedule" ]           = gridSpacingSchedule;
-    parameterMap[ "MaximumNumberOfIterations" ]     = ParameterValuesType( 1, "256" );
+    parameterMap[ "Registration" ]                    = ParameterValuesType( 1, "MultiMetricMultiResolutionRegistration" );
+    parameterMap[ "Transform" ]                       = ParameterValuesType( 1, "BSplineTransform" );
+    parameterMap[ "Metric" ]                          = ParameterValuesType( 1, "AdvancedMattesMutualInformation" );
+    parameterMap[ "Metric" ]                            .push_back( "TransformBendingEnergyPenalty" );
+    parameterMap[ "Metric0Weight" ]                   = ParameterValuesType( 1, "0.0001" );
+    parameterMap[ "Metric1Weight" ]                   = ParameterValuesType( 1, "0.9999" );
+    parameterMap[ "MaximumNumberOfIterations" ]       = ParameterValuesType( 1, "256" );
   }
-  else if( name == "groupwise" )
+  else if( transform == "groupwise" )
   {
-    parameterMap[ "Registration" ]                  = ParameterValuesType( 1, "MultiResolutionRegistration" );
-    parameterMap[ "Transform" ]                     = ParameterValuesType( 1, "BSplineStackTransform" );
-    parameterMap[ "Metric" ]                        = ParameterValuesType( 1, "VarianceOverLastDimensionMetric" );
-    parameterMap[ "FinalGridSpacingInVoxels" ]      = finalGridSpacingInVoxels;
-    parameterMap[ "GridSpacingSchedule" ]           = gridSpacingSchedule;
-    parameterMap[ "MaximumNumberOfIterations" ]     = ParameterValuesType( 1, "512" );
+    parameterMap[ "Registration" ]                    = ParameterValuesType( 1, "MultiResolutionRegistration" );
+    parameterMap[ "Transform" ]                       = ParameterValuesType( 1, "BSplineStackTransform" );
+    parameterMap[ "Metric" ]                          = ParameterValuesType( 1, "VarianceOverLastDimensionMetric" );
+    parameterMap[ "MaximumNumberOfIterations" ]       = ParameterValuesType( 1, "512" );
   }
   else
   {
-    sitkExceptionMacro( "No default parameter map \"" << name << "\"." );
+    sitkExceptionMacro( "No default parameter map \"" << transform << "\"." );
   }
 
-  // Required for 2D
-  if( dimension == 2 )
+  // B-spline transforms settings 
+  if( transform == "nonrigid" || transform == "groupwise")
   {
-    parameterMap[ "FixedImagePyramid" ]             = ParameterValuesType( 1, "FixedRecursiveImagePyramid" );
-    parameterMap[ "MovingImagePyramid" ]            = ParameterValuesType( 1, "MovingRecursiveImagePyramid" );    
+    ParameterValuesType gridSpacingSchedule = ParameterValuesType();
+    for( unsigned int resolution = 0; resolution < numberOfResolutions; ++resolution )
+    {
+      gridSpacingSchedule.insert( gridSpacingSchedule.begin(), std::to_string( pow( 2, resolution ) ) ); 
+    }
+
+    parameterMap[ "GridSpacingSchedule" ] = gridSpacingSchedule;
+    parameterMap[ "FinalGridSpacingInVoxels" ] = ParameterValuesType( 1, std::to_string( finalGridSpacingInPhysicalUnits ) );;
+  }
+
+  // Fixed image pyramid has to be FixedRecursiveImagePyramid in 2D
+  if( !isEmpty( this->m_FixedImage ) )
+  {
+    if( this->m_FixedImage.GetDimension() == 2 )
+    {
+      parameterMap[ "FixedImagePyramid" ] = ParameterValuesType( 1, "FixedRecursiveImagePyramid" );
+    }
+  }
+
+  // Moving image pyramid has to be MovingRecursiveImagePyramid in 2D
+  if( !isEmpty( this->m_MovingImage ) )
+  {
+    if( this->m_MovingImage.GetDimension() == 2 )
+    {
+      parameterMap[ "MovingImagePyramid" ] = ParameterValuesType( 1, "MovingRecursiveImagePyramid" );
+    }
   }
 
   return parameterMap;
@@ -496,15 +486,17 @@ SimpleElastix
 
 
 
-// Procedural interface 
+/**
+ * Procedural interface 
+ */
 
 
 
 std::map< std::string, std::vector< std::string > >
-GetDefaultParameterMap( std::string name )
+GetDefaultParameterMap( std::string transform, const unsigned int numberOfResolutions, const double finalGridSpacingInPhysicalUnits )
 {
   SimpleElastix selx;
-  SimpleElastix::ParameterMapType parameterMap = selx.GetDefaultParameterMap( name );
+  SimpleElastix::ParameterMapType parameterMap = selx.GetDefaultParameterMap( transform, numberOfResolutions, finalGridSpacingInPhysicalUnits );
   return parameterMap;
 }
 

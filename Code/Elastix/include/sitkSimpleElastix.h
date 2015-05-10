@@ -60,7 +60,7 @@ class SITKCommon_EXPORT SimpleElastix
     Self& SetParameterMap( std::vector< std::map< std::string, std::vector< std::string > > > const parameterMapList );
     Self& SetParameterMap( std::map< std::string, std::vector< std::string > > const parameterMap );
     std::vector< std::map< std::string, std::vector< std::string > > > GetParameterMap( void );
-    std::map< std::string, std::vector< std::string > > GetDefaultParameterMap( const std::string name );
+    std::map< std::string, std::vector< std::string > > GetDefaultParameterMap( const std::string name, const unsigned int numberOfResolutions = 4, const double finalGridSpacingInPhysicalUnits = 8.0 );
     std::map< std::string, std::vector< std::string > > ReadParameterFile( const std::string filename );
     Self& WriteParameterFile( std::map< std::string, std::vector< std::string > > const parameterMap, const std::string filename );
     Self& PrettyPrint( void );
@@ -121,7 +121,7 @@ class SITKCommon_EXPORT SimpleElastix
 };
 
 // Procedural Interface 
-SITKCommon_EXPORT std::map< std::string, std::vector< std::string > > GetDefaultParameterMap( const std::string filename );
+SITKCommon_EXPORT std::map< std::string, std::vector< std::string > > GetDefaultParameterMap( const std::string transform, const unsigned int numberOfResolutions = 4, const double finalGridSpacingInPhysicalUnits = 8.0  );
 SITKCommon_EXPORT std::map< std::string, std::vector< std::string > > ReadParameterFile( const std::string filename );
 SITKCommon_EXPORT void WriteParameterFile( std::map< std::string, std::vector< std::string > > const parameterMap, const std::string filename );
 SITKCommon_EXPORT void PrettyPrint( std::map< std::string, std::vector< std::string > > const parameterMap );
