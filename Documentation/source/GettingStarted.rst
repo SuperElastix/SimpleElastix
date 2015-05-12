@@ -1,10 +1,31 @@
+.. _GettingStarted:
+
 Getting Started
 ===============
 
-You can download and install SimpleElastix in a few easy steps outlined below. If you thirst for more, consult the `Elastix Manual <http://elastix.isi.uu.nl/download/elastix_manual_v4.7.pdf>`_ for an elaborate discussion of all components supported by the Elastix API.
+If you are completely new to SimpleElastix, or even medical image registration, you might not know where to start, or what questions to ask. This document walk you through the basics.
+
+Image Registration
+------------------
+
+Medical image registration is the process of transforming images into a common coordinate system so corresponding pixels represent homologous biological points. This is a prerequisite for a wide range of medical image analysis tasks and a key algorithmic component for statistical analysis and machine learning in medical image processing. For example, registration can be used to obtain biological correspondence between images of the brains of mulitiple patients. Image intensities of brain regions can then be compared in an anatomically normalized reference frame. Computer scientists and medical doctors use this information to build computational models of disease processes.
+
+Registration is not limited to brain images of course. Many body parts are rutinely registered and the outputs are used in many different applications ranging from segmentation of anatomical structures to computer-aided diagnosis, monitoring of disease progression, surgical intervention and treatment planning. 
+
+Image registration is such a fundamental algorithmic building block that the field continues to enourmous amounts of research. The surge in development and availability of scanners, computing power and potential to save time, money and lives makes it an increasingly relevant field of study. In the future, patient-specific computational models may deliver the next paradigm shift in modern medical diagnosis and treatment planning.
+
+While this is all very inspiring, it is not always easy for us mortals to get our hands on decent implementations of state-of-the-art methods. They all say we should stand on the shoulders of giants, but how do we get up there? One possibility is to use SimpleElastix.
+
+SimpleElastix
+-------------
+
+There are as many registration methods as there are people working in the field. Some methods have proved themselves to be more useful than others and have stood the test of time. Elastix is a collection of some of these algorithms and a significant amount of research has focused on making them robust, fast and easy to use through a simple command line interface. SimpleElastix takes this idea a step further and makes elastix available in a wide variety of scripting languages. Follow the steps below to install elastix and read the rest of the documentation for an overview of methods implement in SimpleElastix and useful, real-world examples. 
+
+.. _Linux:
 
 SuperBuild On Linux
 -------------------
+
 SimpleElastix integrates elastix and transformix with the SimpleITK SuperBuild. To build SimpleElastix in unix-like environments, clone the repository and invoke the SuperBuild.
 
 ::
@@ -15,7 +36,7 @@ SimpleElastix integrates elastix and transformix with the SimpleITK SuperBuild. 
     cmake ../SimpleElastix/SuperBuild
     make -j4
 
-The SuperBuild will download and install dependencies (elastix, ITK and SWIG) and compile SimpleElastix. You will find language packages in the :code:`${BUILD_DIRECTORY}/SimpleITK-build/Wrapping` directory. For example, to install the python module onto your system, navigate to
+The SuperBuild will download and install dependencies (elastix, ITK and SWIG) and compile SimpleElastix. You will find language packages in the :code:`${BUILD_DIRECTORY}/SimpleITK-build/Wrapping` directory. For example, to install the python module onto your system, compile the project, navigate to
 
 ::
 
@@ -27,7 +48,7 @@ and run the following command:
 
     sudo python setup.py install
 
-Target language dependencies need to be pre-installed. These :code:`apt-get` packages are  
+Target language dependencies need to be pre-installed. The :code:`apt-get` packages are  
 
 ::
 
@@ -37,12 +58,21 @@ Note that this project takes around an hour to build on a quad-core machine. Sim
 
 .. note::
 
-    Be careful not to run out of memory during the build. If you have 8GB or less, it is recommended not build on more than two threads, especially if you are wrapping more than one language. 
+    Be careful not to run out of memory during the build. If you have 8GB or less, it is recommended not build on more than two threads, especially if you are wrapping multiple languages. 
+
+.. _MacOSX:
+
+SuperBuild On Mac OS X
+----------------------
+
+To download, compile and install SimpleElastix follow the Linux instructions above. Target-language dependencies have to be installed separately using e.g. `Macports <https://www.macports.org/>`_ or `Homebrew <http://http://brew.sh/>`_. Mac OS X comes with Python and Tcl already installed. 
+
+.. _Windows:
 
 SuperBuild On Windows
 ---------------------
 
-The process is similar to building on Unix except you will be using the CMake GUI to generate a Visual Studio solution and compile the project with Visual Studio.
+Building SimpleElastix on windows is similar the building on Unix except you will be using the CMake GUI to generate a Visual Studio solution and Visual Studio to compile the project.
 
 1. Generate build files.
     - Download and install `CMake GUI <http://www.cmake.org/download/>`_.
@@ -80,7 +110,7 @@ The process is similar to building on Unix except you will be using the CMake GU
         Figure 5: Open the solution in Visual Studio.
 
 
-4. Make sure "Release" build type is selected and build the :code:`ALL_BUILD` project. If the "Debug" build type is used instead of "Release" mode, but stick with the debug build type, you will experience a significant performance penalty and may not be able to build language packages that are distributed without development binaries by default (e.g. Python).
+4. Make sure "Release" build type is selected and build the :code:`ALL_BUILD` project. If the "Debug" build type is used instead of "Release" mode, you will experience a significant performance penalty and may not be able to build language packages that are distributed without development binaries by default.
 
     .. figure:: _static/WindowsInstallationBuildSolution.png
         :align: center
@@ -101,7 +131,7 @@ This is not the recommended way of building SimpleElastix but it can be useful i
 4. Configure ITK using CMake
     - BUILD_EXAMPLES=OFF, BUILD_TESTING=OFF, BUILD_SHARED_LIBS=OFF, ITK_USE_REVIEW=ON, ITK_WRAP_*=OFF
 5. Build ITK. Make sure to note the build settings, e.g. Release x64.
-6. Clone elastix from `github.com/kaspermarstal/elastix <https://github.com/kaspermarstal/SimpleElastix>`_ (or use your own repo).
+6. Clone elastix from `github.com/kaspermarstal/elastix <https://github.com/kaspermarstal/SimpleElastix>`_.
 7. Configure elastix using CMake
     - BUILD_TESTING=OFF, BUILD_EXECUTABLE=OFF, BUILD_SHARED_LIBRARIES=ON, USE_KNNGraphAlphaMutualInformationMetric=OFF 
     - Set appropriate ELASTIX_IMAGE_2/3/4D_PIXELTYPES and any components that you might require

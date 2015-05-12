@@ -1,7 +1,7 @@
 Affine Registration
 ===================
 
-The affine transform allows for shearing and scaling in addition to rotation and translation. For example, if you are interested in registering normal bones from different patients or want to initialize a non-rigid registration, the affine transform is usually a good choice. The affine transform is selected using :code:`(Transform "AdvancedAffineTransform")`. Consider the images in Figure 10. 
+The affine transform allows for shearing and scaling in addition to rotation and translation. For example, if you are interested in registering bones from different patients, or want to initialize a non-rigid registration, the affine transform is usually a good choice. The affine transform is selected using :code:`(Transform "AdvancedAffineTransform")`. Consider the images in Figure 10. 
 
 .. _fig10: 
 

@@ -1,11 +1,9 @@
 SimpleElastix
 =============
-[![Build Status](https://travis-ci.org/kaspermarstal/SimpleElastix.svg?branch=SimpleElastix)](https://travis-ci.org/kaspermarstal/SimpleElastix)
-
 Installation, examples, usage and introductory material is available at [simpleelastix.readthedocs.org](https://simpleelastix.readthedocs.org/). Tweet us [@SimpleElastix](https://twitter.com/SimpleElastix/)!
 
 ### What is SimpleElastix?
-SimpleElastix is a medical image processing package that makes state-of-the-art medical image registration really easy to do. Image registration is the process of transforming images into a common coordinate system so corresponding pixels represent homologous biological points. This is a prerequisite for a wide range of medical image analysis tasks and a key algorithmic component for statistical analysis and machine learning in medical image processing. The goal of SimpleElastix is to bring the robust C++ medical image registration algorithms of the [elastix](http://elastix.isi.uu.nl/ "Elastix website") library to a wider audience by integrating elastix with [SimpleITK](https://github.com/SimpleITK/SimpleITK "SimpleITK github repository"). This package provides
+The goal of SimpleElastix is to bring the robust C++ medical image registration algorithms of the [elastix](http://elastix.isi.uu.nl/ "Elastix website") library to a wider audience by integrating elastix with [SimpleITK](https://github.com/SimpleITK/SimpleITK "SimpleITK github repository"). Image registration is the process of transforming images into a common coordinate system so corresponding pixels represent homologous biological points. This is a prerequisite for a wide range of medical image analysis tasks and a key algorithmic component for statistical analysis and machine learning in medical image processing. This package provides
 
 - elastix and transformix bindings for Python, Java, R, Ruby, Octave, Lua, Tcl and C# (see [elastix manual](http://elastix.isi.uu.nl/download/elastix_manual_v4.7.pdf "elastix manual") for a list of supported registration algorithms).
 - A user-friendly API that aligns with the design philosophy of SimpleITK, developed specifically for rapid prototyping and use in scripting languages. If you are interested, [The Design of SimpleITK](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3874546/ "PubMed") is a great read.
@@ -62,7 +60,7 @@ make -j4
 
 The SuperBuild will download and install dependencies (elastix, ITK, SimpleITK and SWIG) and compile SimpleElastix. Target language dependencies need to be pre-installed, e.g. `sudo apt-get install cmake swig monodevelop r-base r-base-dev ruby python python-dev tcl tcl-dev tk tk-dev`. Note that this project takes around an hour to build on a quad-core machine.
 
-The documentation explains how to [build SimpleElastix manually](http://simpleelastix.readthedocs.org/GettingStarted.html#building-manually-on-linux).
+The documentation further describes how to [build SimpleElastix on Windows](http://simpleelastix.readthedocs.org/GettingStarted.html#Windows) and how to [build SimpleElastix manually](http://simpleelastix.readthedocs.org/GettingStarted.html#building-manually-on-linux).
 
 SimpleElastix has been tried and tested on Ubuntu 14.10 using GCC 4.9.2 and Clang 3.4.0, Mac OSX Yosemite using Apple Clang 600.0.56 and Windows 8.1 using Microsft Visual Studio 2012 C++ compiler.
 

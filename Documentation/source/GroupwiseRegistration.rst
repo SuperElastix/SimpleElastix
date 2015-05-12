@@ -1,15 +1,15 @@
 Groupwise Registration
 ======================
 
-Groupwise registration methods try to mitigate uncertainties associated with any one image by simultaneously registering all images in a population. This incorporates as much image information in registration process as possible and eliminates bias towards a chosen reference frame. The method described here uses a 3D (2D+time) or 4D (3D+time) free-form B-spline deformation model and a similarity metric that minimizes variance of intensities under the constraint that the average deformation over images is zero. This constraint defines a true mean frame of reference that lie in the center of the population without ever having to calculate it explicitly. 
+Groupwise registration methods try to mitigate uncertainties associated with any one image by simultaneously registering all images in a population. This incorporates all image information in registration process and eliminates bias towards a chosen reference frame. The method described here uses a 3D (2D+time) or 4D (3D+time) free-form B-spline deformation model and a similarity metric that minimizes variance of intensities under the constraint that the average deformation over images is zero. This constraint defines a true mean frame of reference that lie in the center of the population without ever having to calculate it explicitly. 
 
-The method may or may not take into account temporal smoothness of the deformations and may or may not be cyclic in the time dimension. This may be appropriate if it is known a priori that the anatomical motion has a cyclic nature e.g. in cases of cardiac or respiratory motion.
+The method can take into account temporal smoothness of the deformations and a cyclic transform in the time dimension. This may be appropriate if it is known a priori that the anatomical motion has a cyclic nature e.g. in cases of cardiac or respiratory motion.
 
 Note that brain registration is a difficult to task because of complex anatomical variations and almost a scientific topic in itself. `Entire registration packages <http://freesurfer.net/>`_ are dedicated to just brain image processing. In this section we are less strict with the end result and focus on illustrating the groupwise registration method in SimpleElastix.
 
 .. note::
 
-    SimpleITK does not support 3D+t images yet. SimpleElastix authors have contributed 4D support upstream which will be merged Soon\ :sup:`TM`. 
+    SimpleITK does not support 3D+t images yet. SimpleElastix authors have contributed 4D support upstream which will be merged in the next release. 
 
 Consider the following mean image:
 

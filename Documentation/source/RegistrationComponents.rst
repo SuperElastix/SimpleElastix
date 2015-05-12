@@ -14,7 +14,7 @@ It is important to know the appropriate definitions and terms when working with 
 
     Figure 7: Geometrical concepts associated with the ITK image. Adopted from Ibanez et al. (2005).
 
-Above, circles are used to represent the centre of pixels. The value of the pixel is assumed to exist as a Dirac Delta Function located at the pixel centre. Pixel spacing is measured between the pixel centres and can be different along each dimension. The image origin is associated with the coordinates of the first pixel in the image. A pixel is considered to be the rectangular region surrounding the pixel centre holding the data value.
+Above, circles are used to represent the centre of pixels. The value of the pixel is assumed to be a Dirac Delta Function located at the pixel centre. Pixel spacing is measured between the pixel centres and can be different along each dimension. The image origin is associated with the coordinates of the first pixel in the image. A pixel is considered to be the rectangular region surrounding the pixel centre holding the data value.
 
 You should take great care that you use an image format that is able to store the relevant information, like .mhd, DICOM or NiftI file formats. SimpleElastix will use direction cosines by default. Make sure you know what you are doing before turning it off.
 
@@ -46,27 +46,31 @@ for a 3D image with 3 resolution levels, where less smoothing is performed in th
 Masks
 -----
 
-Sometimes you are specifically interested in aligning certain objects in an image. For example, if you are registering CT images of lungs which vary considerably due to breating motion, you may not want to align the more static rib cage at the expense of lung overlap. One possibility is to crop the image, but this approach restricts the Region Of Interest (ROI) to be a square (2D) or cube (3D) only. If you need an irregular shaped ROI, you can use masks. A mask is a binary image filled with 0’s and 1’s. Intensity values are only sampled within regions filled with 1's.
+Sometimes you are interested in aligning substructures in an image. For example, if you are registering CT images of lungs which vary considerably due to breating motion, you may not want to align the more static rib cage at the expense of lung overlap. One possibility is to crop the image, but this approach restricts the Region Of Interest (ROI) to be a square (2D) or cube (3D) only. If you need an irregular shaped ROI, you can use masks. A mask is a binary image filled with 0’s and 1’s. Intensity values are only sampled within regions filled with 1's.
 
 You should use a mask when: 
 
 - Your image contains an artificial edge that has no real meaning. The registration might be tempted to align these artificial edges, thereby neglecting the meaningful edges. The conic beam edge in ultrasound images is an example of such an artificial edge.
 - The image contains structures in the neighbourhood of your ROI that may influence the registration within your ROI as in the lung example.
 
-Masks can be used both for fixed and moving images. A fixed image mask is sufficient to focus the registration on a ROI, since samples are drawn from the fixed image. You only want to use a mask for the moving image when your moving image contains highly pertubed grey values near the ROI.
+Masks can be used both for fixed and moving images. A fixed image mask is sufficient to focus the registration on a ROI, since sample positions are drawn from the fixed image. You only want to use a mask for the moving image when your moving image contains highly pertubed grey values near the ROI.
 
-In case you of multi-resolution registation you also need to set :code:`(ErodeMask "true")` or information from the artificial edge will flow into you ROI due to the smoothing step. If the edge around your ROI is meaningful, as in the lung example where the edges of lungs needs to be aligned, you should set it to false, because this edge will help to guide the registration.
- 
+In case of multi-resolution registation you need to set :code:`(ErodeMask "true")` if you do not want information from the artificial edge to flow into you ROI during the smoothing step. If the edge around your ROI is meaningful, as in the lung example where the edges of lungs needs to be aligned, you should set it to false, because the edge will help to guide the registration.
+
 Transforms
 ----------
 
 The choice of transform is essential for successful registration and, perhaps more importantly, what we perceive as "successful". The transform reflects the desired type of transformation and constrain the solution space to that type of deformation. For example, in intra-subject applications it may be sufficent to consider only rigid transformations if you are registering bones while a cross-sectional study demands more flexible transformation models to allow for local deformations and normal anatomical variability between patients.
 
-The number of parameters of the transform corresponds to the degrees of freedom (DOF) of the transformation. This number varies greatly from 3 DOFs for 3D translation and 9 DOFs for 3D affine warping to anywhere between hundreds and millions of DOFs for non-parametric methods and b-spline deformation fields depending on the control point grid.
+The number of parameters of the transform corresponds to the degrees of freedom (DOF) of the transformation. This number varies greatly from 3 DOFs for 3D translation and 9 DOFs for 3D affine warping to anywhere between hundreds and millions of DOFs for b-spline deformation fields and non-parametric methods.
 
-The number of DOFs is equal to the dimensionality of the search space and directly proportional to the computational complexity of the optimization problem which affects the likelihood of convergence to an optimal solution. Notice that there is a distinction between convergence to an optimal solution and a good registration result. If we use a 2D translation transform embedded in a multi-resolution approach, chances are we will find the global optimal solution. That does not garuantee the same level of anatomical correspondence, however, which will most likely require a more complex deformation model. On the other hand, registering complex anatomical structures using a b-spline deformation without proper initialization is most likely going to fail. Therefore it is often a good idea to start with simple transforms and propagate the solution through transforms of gradually increasing complexity. 
+The number of DOFs is equal to the dimensionality of the search space and directly proportional to the computational complexity of the optimization problem. The computational complexity affects running time. likelihood of convergence to an optimal solution. Notice that there is a distinction between convergence to an optimal solution and a good registration result. If we use a 2D translation transform embedded in a multi-resolution approach, chances are we will find the global optimal solution. That does not garuantee the same level of anatomical correspondence, however, which will most likely require a more complex deformation model. On the other hand, registering complex anatomical structures using a b-spline deformation without proper initialization is most likely going to fail. Therefore it is often a good idea to start with simple transforms and propagate the solution through transforms of gradually increasing complexity. 
 
 Some common transforms are (in order of increased complexity) translation, rigid (roation, translation), Euler (rotation, translation, scaling), affine (rotation, translation, scaling, shearing), b-spline (non-rigid), Spline-Kernel Transform (non-rigid) and weighted combinations of any of these.
+
+In elastix, the transform is defined from the fixed image to the moving image. It may seem counter-intuitive that the transform is defined in this direction, since it is the moving image we want to transform. Would it not be more logical to map each pixel in the moving image to its new position in fixed image? Perhaps, but then two pixels from the moving image might be mapped to the same pixel on the fixed grid, or some pixels in the fixed image might not be mapped to at all. The chosen convention allows us to iterate over the fixed image and pick a pixel from the moving image for every pixel in the fixed image. 
+
+ITKv4 introduces an even more flexible registration framework in which the computations can happen in a "virtual" physical domain different from both the fixed image and moving image domains. We will ignore this distinction for the remainder of this discussion however, and present registration examples in the special case of the virtual domain being the same as the fixed image domain. This is also what happens in most real life applications.
 
 Metrics
 -------
