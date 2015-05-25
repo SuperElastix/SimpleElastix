@@ -249,7 +249,7 @@ SimpleElastix
 { 
 
   // Parameters that depend on size and number of resolutions
-  ParameterMapType parameterMap                     = ParameterMapType();
+  ParameterMapType parameterMap                       = ParameterMapType();
 
   // Common Components
   parameterMap[ "FixedImagePyramid" ]                 = ParameterValuesType( 1, "FixedSmoothingImagePyramid" );
@@ -259,7 +259,7 @@ SimpleElastix
   parameterMap[ "Resampler"]                          = ParameterValuesType( 1, "DefaultResampler" );
   parameterMap[ "ResampleInterpolator"]               = ParameterValuesType( 1, "FinalBSplineInterpolator" );
   parameterMap[ "FinalBSplineInterpolationOrder" ]    = ParameterValuesType( 1, "2" );
-  parameterMap[ "NumberOfResolutions" ]               = ParameterValuesType( 1, std::to_string( numberOfResolutions ) );
+  parameterMap[ "NumberOfResolutions" ]               = ParameterValuesType( 1, to_string( numberOfResolutions ) );
 
   // Image Sampler
   parameterMap[ "ImageSampler" ]                      = ParameterValuesType( 1, "RandomCoordinate" ); 
@@ -326,11 +326,11 @@ SimpleElastix
     ParameterValuesType gridSpacingSchedule = ParameterValuesType();
     for( unsigned int resolution = 0; resolution < numberOfResolutions; ++resolution )
     {
-      gridSpacingSchedule.insert( gridSpacingSchedule.begin(), std::to_string( pow( 2, resolution ) ) ); 
+      gridSpacingSchedule.insert( gridSpacingSchedule.begin(), to_string( pow( 2, resolution ) ) ); 
     }
 
     parameterMap[ "GridSpacingSchedule" ] = gridSpacingSchedule;
-    parameterMap[ "FinalGridSpacingInVoxels" ] = ParameterValuesType( 1, std::to_string( finalGridSpacingInPhysicalUnits ) );;
+    parameterMap[ "FinalGridSpacingInVoxels" ] = ParameterValuesType( 1, to_string( finalGridSpacingInPhysicalUnits ) );;
   }
 
   // Fixed image pyramid has to be FixedRecursiveImagePyramid in 2D

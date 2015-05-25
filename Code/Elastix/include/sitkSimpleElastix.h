@@ -133,17 +133,14 @@ SITKCommon_EXPORT Image Elastix( const Image& fixedImage, const Image& movingIma
 SITKCommon_EXPORT Image Elastix( const Image& fixedImage, const Image& movingImage, const std::map< std::string, std::vector< std::string > >, const Image& fixedMask, const Image& movingMask, const bool logToConsole = false, const std::string outputFolder = "" );
 SITKCommon_EXPORT Image Elastix( const Image& fixedImage, const Image& movingImage, const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList, const Image& fixedMask, const Image& movingMask, const bool logToConsole = false, const std::string outputFolder = "" );
 
-} // end namespace simple
-} // end namespace itk
-
-namespace std
+template < typename T > std::string to_string( const T& n )
 {
-  template < typename T > string to_string( const T& n )
-  {
-    ostringstream stm;
+    std::ostringstream stm;
     stm << n;
     return stm.str();
-  }
 }
+
+} // end namespace simple
+} // end namespace itk
 
 #endif // __sitksimpleelastix_h_
