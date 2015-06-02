@@ -75,8 +75,8 @@ endif()
 
 find_package( OpenMP )
 if( OPENMP_FOUND )
-  set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} " )
-  set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS} " )
+  set( SimpleITK_REQUIRED_C_FLAGS "${SimpleITK_REQUIRED_C_FLAGS} ${OpenMP_C_FLAGS} " )
+  set( SimpleITK_REQUIRED_CXX_FLAGS "${SimpleITK_REQUIRED_CXX_FLAGS} ${OpenMP_CXX_FLAGS} " )
 endif()
 
 # Find UseElastix.cmake 
@@ -92,9 +92,9 @@ endif()
 
 include( ${ELASTIX_USE_FILE} )
 
-# Check if shared libraries are available
+# Check if libraries are available
 if( ELASTIX_BUILD_EXECUTABLE )
-  message(FATAL_ERROR "SimpleElastix requires elastix shared libraries, please set ELASTIX_BUILD_EXECUTABLE=OFF and rebuild elastix")
+  message(FATAL_ERROR "SimpleElastix requires elastix libraries, please set ELASTIX_BUILD_EXECUTABLE=OFF and rebuild elastix")
 endif()
 
 #----------------------------------------------------------

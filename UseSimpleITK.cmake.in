@@ -17,3 +17,8 @@ include_directories(${SimpleITK_INCLUDE_DIRS})
 
 # Add link directories needed to use SimpleITK.
 link_directories(${SimpleITK_LIBRARY_DIRS})
+
+# Add itk and elastix needed to use SimpleElastix.
+set( ITK_NO_IO_FACTORY_REGISTER_MANAGER 1 )
+include( ${ITK_USE_FILE} )
+include( ${ELASTIX_USE_FILE} )

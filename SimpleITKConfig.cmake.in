@@ -19,6 +19,10 @@ set(SimpleITK_REQUIRED_LINK_FLAGS "@SimpleITK_REQUIRED_LINK_FLAGS@")
 # The SimpleITK include file directories.
 set(SimpleITK_INCLUDE_DIRS "@SimpleITKConfig_INCLUDE_DIRS@")
 
+# The files needed for SimpleElastix.
+set(ELASTIX_USE_FILE "@ELASTIX_USE_FILE@")
+set(ITK_USE_FILE "@ITK_USE_FILE@")
+
 # The SimpleITK library directories.
 set(ITK_LIBRARY_DIRS "@ITK_LIBRARY_DIRS@")
 set(SimpleITK_LIBRARY_DIRS "${ITK_LIBRARY_DIRS}")
