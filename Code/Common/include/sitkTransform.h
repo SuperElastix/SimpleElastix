@@ -20,6 +20,7 @@
 
 #include "sitkCommon.h"
 #include "sitkExceptionObject.h"
+#include "sitkImage.h"
 #include <vector>
 
 
@@ -54,13 +55,30 @@ enum TransformEnum { sitkIdentity,
                      sitkQuaternionRigid,
                      sitkVersor,
                      sitkVersorRigid,
+                     sitkScaleSkewVersor,
                      sitkAffine,
-                     sitkComposite };
+                     sitkComposite,
+                     sitkDisplacementField,
+                     sitkBSplineTransform
+};
 
 
-/** \class Tranform
- * \brief A simplified wrapper around a variety of ITK transforms.
+/** \brief A simplified wrapper around a variety of ITK transforms.
  *
+ * The interface to ITK transform objects to be used with the
+ * ImageRegistrationMethod, ResampleImageFilter and other SimpleITK
+ * process objects. The transforms are designed to have a serialized
+ * array of parameters to facilitate optimization for registration.
+ *
+ * Provides a base class interface to any type of ITK
+ * transform. Objects of this type may have their interface converted
+ * to a derived interface while keeping the same reference to the ITK
+ * object.
+ *
+ * Additionally, this class provides a basic interface to a composite
+ * transforms.
+ *
+ * \sa itk::CompositeTransform
  */
 class SITKCommon_EXPORT Transform
 {
@@ -77,6 +95,7 @@ public:
    */
   template<unsigned int NDimension>
   explicit Transform( itk::CompositeTransform< double, NDimension >* compositeTransform )
+    : m_PimpleTransform( NULL )
     {
       sitkStaticAssert( NDimension == 2 || NDimension == 3, "Only 2D and 3D transforms are supported" );
       if ( compositeTransform == NULL )
@@ -86,9 +105,27 @@ public:
       this->InternalInitialization<NDimension>( sitkComposite, compositeTransform );
     }
 
+  explicit Transform( itk::TransformBase *transform );
+
   /** \brief Construct a specific transformation
+   *
+   * \deprecated This constructor will be removed in future releases.
    */
   Transform( unsigned int dimensions, TransformEnum type);
+
+  /** \brief Use an image to construct a transform.
+   *
+   * The input displacement image is transferred to the constructed
+   * transform object. The input image is modified to be a default
+   * constructed Image object.
+   *
+   * Only the sitkDisplacementField transformation type can currently
+   * be constructed this way. Image must be of sitkVectorFloat64 pixel
+   * type with the number of components equal to the image dimension.
+   *
+   * \deprecated This constructor will be removed in future releases.
+   */
+  Transform( Image &displacement, TransformEnum type = sitkDisplacementField );
 
   virtual ~Transform( void );
 
@@ -145,19 +182,99 @@ public:
   // write
   void WriteTransform( const std::string &filename ) const;
 
-  // todo set identity
+  virtual bool IsLinear() const;
+
+  virtual void SetIdentity();
+
+  /** \brief Try to change the current transform to it's inverse.
+   *
+   * If the transform has an inverse, i.e. non-singular linear
+   * transforms, then a new ITK transform is created of the same type
+   * and this object is set to it.
+   *
+   * However not all transform have a direct inverse, if the inverse
+   * does not exist or fails false will be returned and this transform
+   * will not be modified.
+   */
+  virtual bool SetInverse();
+
+  /** \brief Return a new inverse transform of the same type as this.
+   *
+   * Creates a new transform object and tries to set the value to the
+   * inverse. As not all transform types have inverse and some
+   * transforms are not invertable, an exception will be throw is
+   * there is no inverse.
+   */
+  Transform GetInverse() const;
 
   std::string ToString( void ) const;
 
 
+  /** return user readable name for the SimpleITK transform */
+  virtual std::string GetName() const;
+
+  /** \brief Performs actually coping if needed to make object unique.
+   *
+   * The Transform class by default performs lazy coping and
+   * assignment. This method make sure that coping actually happens
+   * to the itk::Transform pointed to is only pointed to by this
+   * object.
+   */
+  void MakeUnique( void );
+
 protected:
 
-  void MakeUniqueForWrite( void );
+
+  explicit Transform( PimpleTransformBase *pimpleTransform );
+
+  // this method is called to set the private pimpleTransfrom outside
+  // of the constructor, derived classes can override it of update the
+  // state.
+  virtual void SetPimpleTransform( PimpleTransformBase *pimpleTransform );
 
 private:
 
   template< unsigned int VDimension>
-  void InternalInitialization(  TransformEnum type, itk::TransformBase *base = NULL );
+  void InternalInitialization( TransformEnum type, itk::TransformBase *base = NULL );
+
+  struct TransformTryCastVisitor
+  {
+    itk::TransformBase *transform;
+    Transform *that;
+    template< typename TransformType >
+    void operator() ( void ) const
+      {
+        TransformType *t = dynamic_cast<TransformType*>(transform);
+        if (t)
+          {
+          that->InternalInitialization<TransformType>(t);
+          }
+      }
+  };
+
+
+  template< class TransformType>
+  void InternalInitialization( TransformType *t );
+  void InternalInitialization( itk::TransformBase *base );
+
+
+  template< unsigned int >
+    void InternalBSplineInitialization( Image & img );
+
+  template< typename TDisplacementType >
+    void InternalDisplacementInitialization( Image & img );
+
+  template < class TMemberFunctionPointer >
+    struct DisplacementInitializationMemberFunctionAddressor
+  {
+    typedef typename ::detail::FunctionTraits<TMemberFunctionPointer>::ClassType ObjectType;
+
+    template< typename TImageType >
+    TMemberFunctionPointer operator() ( void ) const
+      {
+        return &ObjectType::template InternalDisplacementInitialization< TImageType >;
+      }
+  };
 
   // As is the architecture of all SimpleITK pimples,
   // this pointer should never be null and should always point to a

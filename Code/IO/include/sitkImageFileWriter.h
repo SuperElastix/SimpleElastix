@@ -44,9 +44,6 @@ namespace itk {
     public:
       typedef ImageFileWriter Self;
 
-      // function pointer type
-      typedef Self& (Self::*MemberFunctionType)( const Image& );
-
       // list of pixel types supported
       typedef NonLabelPixelIDTypeList PixelIDTypeList;
 
@@ -83,6 +80,9 @@ namespace itk {
 
       bool m_UseCompression;
       std::string m_FileName;
+
+      // function pointer type
+      typedef Self& (Self::*MemberFunctionType)( const Image& );
 
       // friend to get access to executeInternal member
       friend struct detail::MemberFunctionAddressor<MemberFunctionType>;

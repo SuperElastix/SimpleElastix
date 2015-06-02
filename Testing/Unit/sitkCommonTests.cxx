@@ -38,6 +38,25 @@ TEST( ConditionalTest, ConditionalTest1 ) {
 
 }
 
+
+TEST( ProcessObject, GlobalTolerance ) {
+  // basic coverage test of setting and getting
+
+  namespace sitk = itk::simple;
+
+  EXPECT_EQ( sitk::ProcessObject::GetGlobalDefaultCoordinateTolerance(), 1e-6 );
+  EXPECT_EQ( sitk::ProcessObject::GetGlobalDefaultDirectionTolerance(), 1e-6 );
+
+  sitk::ProcessObject::SetGlobalDefaultCoordinateTolerance( 1e-5 );
+  EXPECT_EQ( sitk::ProcessObject::GetGlobalDefaultCoordinateTolerance(), 1e-5 );
+  EXPECT_EQ( sitk::ProcessObject::GetGlobalDefaultDirectionTolerance(), 1e-6 );
+
+  sitk::ProcessObject::SetGlobalDefaultDirectionTolerance( 1e-4);
+  EXPECT_EQ( sitk::ProcessObject::GetGlobalDefaultCoordinateTolerance(), 1e-5 );
+  EXPECT_EQ( sitk::ProcessObject::GetGlobalDefaultDirectionTolerance(), 1e-4 );
+
+}
+
 TEST( ProcessObject, GlobalWarning ) {
   // Basic coverage test of setting and getting. Need separate
   // specific check for propagation of warning to ITK.
@@ -195,6 +214,7 @@ TEST( ProcessObject, Command_Add ) {
   EXPECT_FALSE(po1.HasCommand(sitk::sitkProgressEvent));
   EXPECT_FALSE(po1.HasCommand(sitk::sitkStartEvent));
   EXPECT_FALSE(po1.HasCommand(sitk::sitkUserEvent));
+  EXPECT_FALSE(po1.HasCommand(sitk::sitkMultiResolutionIterationEvent));
 
   po1.AddCommand(sitk::sitkAnyEvent, cmd);
   EXPECT_TRUE(po1.HasCommand(sitk::sitkAnyEvent));
@@ -205,6 +225,7 @@ TEST( ProcessObject, Command_Add ) {
   EXPECT_FALSE(po1.HasCommand(sitk::sitkProgressEvent));
   EXPECT_FALSE(po1.HasCommand(sitk::sitkStartEvent));
   EXPECT_FALSE(po1.HasCommand(sitk::sitkUserEvent));
+  EXPECT_FALSE(po1.HasCommand(sitk::sitkMultiResolutionIterationEvent));
 
   po1.RemoveAllCommands();
   EXPECT_FALSE(po1.HasCommand(sitk::sitkAnyEvent));
@@ -215,6 +236,7 @@ TEST( ProcessObject, Command_Add ) {
   EXPECT_FALSE(po1.HasCommand(sitk::sitkProgressEvent));
   EXPECT_FALSE(po1.HasCommand(sitk::sitkStartEvent));
   EXPECT_FALSE(po1.HasCommand(sitk::sitkUserEvent));
+  EXPECT_FALSE(po1.HasCommand(sitk::sitkMultiResolutionIterationEvent));
 
   po1.AddCommand(sitk::sitkAnyEvent, cmd);
   po1.AddCommand(sitk::sitkAbortEvent, cmd);
@@ -224,6 +246,7 @@ TEST( ProcessObject, Command_Add ) {
   po1.AddCommand(sitk::sitkProgressEvent, cmd);
   po1.AddCommand(sitk::sitkStartEvent, cmd);
   po1.AddCommand(sitk::sitkUserEvent, cmd);
+  po1.AddCommand(sitk::sitkMultiResolutionIterationEvent, cmd);
 
   EXPECT_TRUE(po1.HasCommand(sitk::sitkAnyEvent));
   EXPECT_TRUE(po1.HasCommand(sitk::sitkAbortEvent));
@@ -233,12 +256,12 @@ TEST( ProcessObject, Command_Add ) {
   EXPECT_TRUE(po1.HasCommand(sitk::sitkProgressEvent));
   EXPECT_TRUE(po1.HasCommand(sitk::sitkStartEvent));
   EXPECT_TRUE(po1.HasCommand(sitk::sitkUserEvent));
+  EXPECT_TRUE(po1.HasCommand(sitk::sitkMultiResolutionIterationEvent));
 }
 
-TEST( ProcessObjectDeathTest, DeleteCommandActiveProcess )
+TEST( ProcessObject, DeleteCommandActiveProcess )
 {
-  // if a command is deleted while the process is active, it is
-  // expected for the program to terminate.
+  // Test the case of deleting the command while the process is active.
   namespace sitk = itk::simple;
 
   class DeleteCommandAtCommand
@@ -260,7 +283,7 @@ TEST( ProcessObjectDeathTest, DeleteCommandActiveProcess )
 
     float m_AbortAt;
     Command *m_Cmd;
-};
+  };
 
   sitk::CastImageFilter po;
   sitk::Image img(100,100,100, sitk::sitkUInt16);
@@ -272,11 +295,54 @@ TEST( ProcessObjectDeathTest, DeleteCommandActiveProcess )
   po.AddCommand(sitk::sitkProgressEvent, cmd2);
 
 
-  po.SetNumberOfThreads(1);
-  ::testing::FLAGS_gtest_death_test_style = "fast";
+  ASSERT_NO_THROW(po.Execute(img)) << "Exception with deleting command";
 
-  ASSERT_DEATH(po.Execute(img), "Cannot delete Command during execution");
+  EXPECT_FALSE(po.HasCommand(sitk::sitkAnyEvent));
+  EXPECT_TRUE(po.HasCommand(sitk::sitkProgressEvent));
+}
 
+TEST( ProcessObject, RemoveAllCommandsActiveProcess )
+{
+  // Test the case of deleting the command while the process is active.
+  namespace sitk = itk::simple;
+
+  class RemoveAllCommandsAtCommand
+  : public ProcessObjectCommand
+  {
+  public:
+    RemoveAllCommandsAtCommand(itk::simple::ProcessObject &po, float abortAt )
+      : ProcessObjectCommand(po),
+        m_AbortAt(abortAt)
+      {
+      }
+
+    virtual void Execute( )
+      {
+        if ( m_Process.GetProgress() >= m_AbortAt )
+          {
+          std::cout << "Removing All Commands" << std::endl;
+          m_Process.RemoveAllCommands();
+          std::cout << "Done" << std::endl;
+          }
+      }
+
+    float m_AbortAt;
+  };
+
+  sitk::CastImageFilter po;
+  sitk::Image img(100,100,100, sitk::sitkUInt16);
+
+  sitk::Command cmd1;
+  RemoveAllCommandsAtCommand cmd2(po, .01);
+
+  po.AddCommand(sitk::sitkAnyEvent, cmd1);
+  po.AddCommand(sitk::sitkProgressEvent, cmd2);
+
+
+  ASSERT_NO_THROW(po.Execute(img)) << "Exception with remove all commands";
+
+  EXPECT_FALSE(po.HasCommand(sitk::sitkAnyEvent));
+  EXPECT_FALSE(po.HasCommand(sitk::sitkProgressEvent));
 }
 
 
@@ -309,6 +375,9 @@ TEST( Event, Test1 )
   ss.str("");
   ss << sitk::sitkUserEvent;
   EXPECT_EQ("UserEvent", ss.str());
+  ss.str("");
+  ss << sitk::sitkMultiResolutionIterationEvent;
+  EXPECT_EQ("MultiResolutionIterationEvent", ss.str());
 }
 
 

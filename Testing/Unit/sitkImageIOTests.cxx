@@ -19,11 +19,18 @@
 #include <sitkImageFileReader.h>
 #include <sitkImageSeriesReader.h>
 #include <sitkImageFileWriter.h>
+#include <sitkImageSeriesWriter.h>
 #include <sitkHashImageFilter.h>
+#include <sitkPhysicalPointImageSource.h>
 
 TEST(IO,ImageFileReader) {
-  itk::simple::HashImageFilter hasher;
-  itk::simple::ImageFileReader reader;
+
+  namespace sitk = itk::simple;
+
+  sitk::HashImageFilter hasher;
+  sitk::ImageFileReader reader;
+
+  EXPECT_EQ( reader.GetOutputPixelType(), sitk::sitkUnknown );
 
   typedef std::map<std::string,std::string> MapType;
   MapType mapping;
@@ -45,16 +52,33 @@ TEST(IO,ImageFileReader) {
   for ( MapType::iterator it = mapping.begin(); it != mapping.end(); ++it ) {
     reader.SetFileName ( dataFinder.GetFile ( it->first ) );
     EXPECT_EQ ( reader.GetFileName(), dataFinder.GetFile ( it->first ) );
-    itk::simple::Image image = reader.Execute();
+    sitk::Image image = reader.Execute();
     ASSERT_TRUE ( image.GetITKBase() != NULL );
-    hasher.SetHashFunction ( itk::simple::HashImageFilter::MD5 );
+    hasher.SetHashFunction ( sitk::HashImageFilter::MD5 );
     EXPECT_EQ ( it->second, hasher.Execute ( image ) ) << " reading " << it->first;
     // Try the functional interface
-    EXPECT_EQ ( it->second, hasher.Execute ( itk::simple::ReadImage ( dataFinder.GetFile ( it->first ) ) ) ) << "Functional interface";
+    EXPECT_EQ ( it->second, hasher.Execute ( sitk::ReadImage ( dataFinder.GetFile ( it->first ) ) ) ) << "Functional interface";
   }
 
   EXPECT_EQ ( "ImageFileReader", reader.GetName() );
   EXPECT_NO_THROW ( reader.ToString() );
+
+  std::string fileName =  dataFinder.GetFile( "Input/RA-Short.nrrd" );
+  sitk::Image image;
+
+  image = sitk::ReadImage( fileName, sitk::sitkInt32 );
+  EXPECT_EQ( image.GetPixelID(), sitk::sitkInt32 );
+  EXPECT_EQ( sitk::Hash(image), "f1045032b6862753b7e6b71771b552c40b8eaf32") << "Short to " <<  sitk::sitkInt32;
+
+  image = sitk::ReadImage( fileName, sitk::sitkVectorInt16 );
+  EXPECT_EQ( image.GetPixelID(), sitk::sitkVectorInt16 );
+  EXPECT_EQ( sitk::Hash(image), "126ea8c3ef5573ca1e4e0deece920c2c4a4f38b5") << "Short to " <<  sitk::sitkVectorInt16;
+
+  reader.SetOutputPixelType( sitk::sitkVectorInt32 );
+  EXPECT_EQ( reader.GetOutputPixelType(), sitk::sitkVectorInt32 );
+
+  reader.SetFileName( fileName );
+  image = reader.Execute();
 }
 
 TEST(IO,ImageFileWriter) {
@@ -208,6 +232,9 @@ TEST(IO, SeriesReader) {
 
   sitk::ImageSeriesReader reader;
 
+  EXPECT_THROW( reader.Execute(), sitk::GenericException );
+
+  EXPECT_EQ( reader.GetOutputPixelType(), sitk::sitkUnknown );
   EXPECT_EQ( 0u, reader.GetFileNames().size());
 
   ProgressUpdate progressCmd(reader);
@@ -261,9 +288,18 @@ TEST(IO, SeriesReader) {
   EXPECT_EQ ( 3u, image.GetDepth() );
   EXPECT_EQ ( "bb42b8d3991132b4860adbc4b3f6c38313f52b4c", sitk::Hash( image ) );
 
-
   EXPECT_EQ ( "ImageSeriesReader", reader.GetName() );
   EXPECT_NO_THROW( reader.ToString() );
+
+  reader.SetOutputPixelType(sitk::sitkUInt8);
+  EXPECT_EQ(reader.GetOutputPixelType(), sitk::sitkUInt8);
+  image = reader.Execute();
+  EXPECT_EQ ( 3u, image.GetDepth() );
+  EXPECT_EQ ( "a51361940fdf6c33cf700e1002e5f5ca5b88cc42", sitk::Hash( image ) );
+
+  fileNames.resize(0);
+  reader.SetFileNames ( fileNames );
+  EXPECT_THROW( reader.Execute(), sitk::GenericException );
 }
 
 
@@ -288,6 +324,7 @@ TEST(IO, DicomSeriesReader) {
 
   seriesIDs = reader.GetGDCMSeriesIDs( dicomDir );
 
+  ASSERT_FALSE ( seriesIDs.empty() );
   EXPECT_EQ( "1.2.840.113619.2.133.1762890640.1886.1055165015.999", seriesIDs[0] );
 
   fileNames = reader.GetGDCMSeriesFileNames( dicomDir );
@@ -297,4 +334,81 @@ TEST(IO, DicomSeriesReader) {
 
   fileNames = reader.GetGDCMSeriesFileNames( dicomDir, "1.2.840.113619.2.133.1762890640.1886.1055165015.999" );
   EXPECT_EQ( 3u, fileNames.size() );
+}
+
+
+TEST(IO, ImageSeriesWriter )
+{
+
+  sitk::ImageSeriesWriter writer;
+
+  EXPECT_FALSE(writer.GetUseCompression());
+  writer.UseCompressionOn();
+  EXPECT_TRUE(writer.GetUseCompression());
+  writer.UseCompressionOff();
+  EXPECT_FALSE(writer.GetUseCompression());
+
+  EXPECT_NO_THROW ( writer.ToString() );
+
+
+
+  std::vector< std::string > fileNames;
+  fileNames.push_back( dataFinder.GetOutputDirectory()+"/ImageSeriesWriter_1.png" );
+  fileNames.push_back( dataFinder.GetOutputDirectory()+"/ImageSeriesWriter_2.png" );
+  fileNames.push_back( dataFinder.GetOutputDirectory()+"/ImageSeriesWriter_3.png" );
+
+  std::vector<unsigned int> size;
+  size.push_back(10);
+  size.push_back(10);
+  size.push_back(3);
+
+  sitk::Image image( size, sitk::sitkUInt8 );
+
+  EXPECT_ANY_THROW(writer.Execute(image));
+
+  writer.SetFileNames( fileNames );
+
+  EXPECT_EQ( writer.GetFileNames().size(), 3u );
+
+  EXPECT_NO_THROW( writer.Execute( image ) );
+
+  fileNames.push_back( dataFinder.GetOutputDirectory()+"/ImageSeriesWriter_4.png" );
+  EXPECT_ANY_THROW( sitk::WriteImage( image, fileNames ) );
+
+  fileNames.pop_back();
+  fileNames.pop_back();
+
+  EXPECT_ANY_THROW( sitk::WriteImage( image, fileNames ) );
+
+  fileNames.resize(0);
+  writer.SetFileNames( fileNames );
+  EXPECT_ANY_THROW(writer.Execute(image));
+}
+
+
+TEST(IO, VectorImageSeriesWriter )
+{
+
+
+  std::vector< std::string > fileNames;
+  fileNames.push_back( dataFinder.GetOutputDirectory()+"/VectorImageSeriesWriter_1.png" );
+  fileNames.push_back( dataFinder.GetOutputDirectory()+"/VectorImageSeriesWriter_2.png" );
+  fileNames.push_back( dataFinder.GetOutputDirectory()+"/VectorImageSeriesWriter_3.png" );
+
+  std::vector<unsigned int> size;
+  size.push_back(10);
+  size.push_back(10);
+  size.push_back(3);
+
+  sitk::Image image = sitk::PhysicalPointSource(sitk::sitkVectorUInt8, size);
+
+  sitk::ImageSeriesWriter writer;
+  writer.SetFileNames( fileNames );
+
+  EXPECT_NO_THROW( writer.Execute( image ) );
+
+
+  sitk::Image result = sitk::ReadImage(fileNames[0]);
+
+  EXPECT_EQ ( "1729319806705e94181c9b9f4bd5e0ac854935db", sitk::Hash( result ) );
 }

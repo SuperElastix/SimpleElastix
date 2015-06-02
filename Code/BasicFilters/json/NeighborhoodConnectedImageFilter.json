@@ -1,6 +1,7 @@
 {
   "name" : "NeighborhoodConnectedImageFilter",
   "template_code_filename" : "RegionGrowingImageFilter",
+  "template_test_filename" : "ImageFilter",
   "template_type" : "RegionGrowing",
   "number_of_inputs" : 1,
   "doc" : "Some global documentation",
@@ -98,7 +99,10 @@
           "parameter" : "Radius",
           "dim_vec" : 1,
           "type" : "unsigned int",
-          "value" : [5,5]
+          "value" : [
+            5,
+            5
+          ]
         }
       ],
       "inputs" : [

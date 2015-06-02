@@ -27,31 +27,33 @@
 namespace itk {
   namespace simple {
 
-    Image ReadImage ( std::string filename ) {
-      ImageFileReader reader; return reader.SetFileName ( filename ).Execute();
+  Image ReadImage ( std::string filename, PixelIDValueEnum outputPixelType )
+    {
+      ImageFileReader reader;
+      return reader.SetFileName ( filename ).SetOutputPixelType(outputPixelType).Execute();
     }
 
-    ImageFileReader::ImageFileReader() {
-
+    ImageFileReader::ImageFileReader()
+      {
       // list of pixel types supported
       typedef NonLabelPixelIDTypeList PixelIDTypeList;
 
       this->m_MemberFactory.reset( new detail::MemberFunctionFactory<MemberFunctionType>( this ) );
 
+      this->m_MemberFactory->RegisterMemberFunctions< PixelIDTypeList, 4 > ();
       this->m_MemberFactory->RegisterMemberFunctions< PixelIDTypeList, 3 > ();
       this->m_MemberFactory->RegisterMemberFunctions< PixelIDTypeList, 2 > ();
-    }
+      }
 
     std::string ImageFileReader::ToString() const {
 
       std::ostringstream out;
       out << "itk::simple::ImageFileReader";
       out << std::endl;
-
       out << "  FileName: \"";
-      this->ToStringHelper(out, this->m_FileName);
-      out << "\"" << std::endl;
+      this->ToStringHelper(out, this->m_FileName) << "\"" << std::endl;
 
+      out << ImageReaderBase::ToString();
       return out.str();
     }
 
@@ -66,14 +68,26 @@ namespace itk {
 
     Image ImageFileReader::Execute () {
 
-      PixelIDValueType type = sitkUnknown;
+      PixelIDValueType type = this->GetOutputPixelType();
       unsigned int dimension = 0;
 
-      this->GetPixelIDFromImageIO( this->m_FileName, type, dimension );
-
-      if ( dimension != 2 && dimension != 3 )
+      if (type == sitkUnknown)
         {
-        sitkExceptionMacro( "The file in the series have unsupported " << dimension - 1 << " dimensions." );
+        this->GetPixelIDFromImageIO( this->m_FileName, type, dimension );
+        }
+      else
+        {
+        PixelIDValueType unused;
+        this->GetPixelIDFromImageIO( this->m_FileName, unused, dimension );
+        }
+
+#ifdef SITK_4D_IMAGES
+      if ( dimension != 2 && dimension != 3  && dimension != 4 )
+#else
+      if ( dimension != 2 && dimension != 3 )
+#endif
+        {
+        sitkExceptionMacro( "The file has unsupported " << dimension - 1 << " dimensions." );
         }
 
       if ( !this->m_MemberFactory->HasMemberFunction( type, dimension ) )

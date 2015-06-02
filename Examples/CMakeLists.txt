@@ -11,11 +11,11 @@ if( NOT SimpleITK_SOURCE_DIR )
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
   set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
+else()
+  # Additional files needed for SimpleElastix
+  set ( ITK_NO_IO_FACTORY_REGISTER_MANAGER 1 )
+  include( ${ITK_USE_FILE} )
 endif()
-
-find_package( ITK REQUIRED )
-include( ${ITK_USE_FILE} )
-include( ${ELASTIX_USE_FILE} )
 
 # Add individual cxx executables
 add_executable ( SimpleGaussian SimpleGaussian.cxx )
@@ -30,6 +30,32 @@ target_link_libraries ( BufferImportExport ${SimpleITK_LIBRARIES} )
 add_executable ( FilterProgressReporting FilterProgressReporting.cxx )
 target_link_libraries ( FilterProgressReporting ${SimpleITK_LIBRARIES} )
 
+add_executable ( DicomSeriesReader DicomSeriesReader.cxx )
+target_link_libraries ( DicomSeriesReader ${SimpleITK_LIBRARIES} )
+
+add_executable ( ImageRegistrationMethod1 ImageRegistrationMethod1.cxx )
+target_link_libraries ( ImageRegistrationMethod1 ${SimpleITK_LIBRARIES} )
+
+add_executable ( ImageRegistrationMethod2 ImageRegistrationMethod2.cxx )
+target_link_libraries ( ImageRegistrationMethod2 ${SimpleITK_LIBRARIES} )
+
+add_executable ( ImageRegistrationMethodBSpline1 ImageRegistrationMethodBSpline1.cxx )
+target_link_libraries ( ImageRegistrationMethodBSpline1 ${SimpleITK_LIBRARIES} )
+
+add_executable ( ImageRegistrationMethodDisplacement1 ImageRegistrationMethodDisplacement1.cxx )
+target_link_libraries ( ImageRegistrationMethodDisplacement1  ${SimpleITK_LIBRARIES} )
+
+
+add_executable ( DemonsRegistration1 DemonsRegistration1.cxx )
+target_link_libraries ( DemonsRegistration1 ${SimpleITK_LIBRARIES} )
+
+add_executable ( DemonsRegistration2 DemonsRegistration2.cxx )
+target_link_libraries ( DemonsRegistration2 ${SimpleITK_LIBRARIES} )
+
 # Add subdirectories
 add_subdirectory(Segmentation)
 add_subdirectory(SimpleElastix)
+
+if ( BUILD_TESTING )
+  add_subdirectory( test )
+endif()

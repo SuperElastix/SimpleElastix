@@ -1,0 +1,88 @@
+{
+  "name" : "FastMarchingBaseImageFilter",
+  "itk_name" : "FastMarchingImageFilterBase",
+  "include_files" : [
+    "itkFastMarchingThresholdStoppingCriterion.h"
+  ],
+  "template_code_filename" : "FastMarchingImageFilter",
+  "number_of_inputs" : 1,
+  "template_test_filename" : "ImageFilter",
+  "output_pixel_type" : "float",
+  "doc" : "Docs",
+  "pixel_types" : "BasicPixelIDTypeList",
+  "members" : [
+    {
+      "name" : "NormalizationFactor",
+      "type" : "double",
+      "default" : "1.0",
+      "briefdescriptionSet" : "",
+      "detaileddescriptionSet" : "Set/Get the Normalization Factor for the Speed Image . The values in the Speed Image is divided by this factor. This allows the use of images with integer pixel types to represent the speed.",
+      "briefdescriptionGet" : "",
+      "detaileddescriptionGet" : "Set/Get the Normalization Factor for the Speed Image . The values in the Speed Image is divided by this factor. This allows the use of images with integer pixel types to represent the speed."
+    },
+    {
+      "name" : "StoppingValue",
+      "type" : "double",
+      "default" : "std::numeric_limits<float>::max()/2.0",
+      "custom_itk_cast" : "typedef itk::FastMarchingThresholdStoppingCriterion< InputImageType, OutputImageType > CriterionType;\ntypename CriterionType::Pointer criterion = CriterionType::New();\ncriterion->SetThreshold( m_StoppingValue );\nfilter->SetStoppingCriterion( criterion );",
+      "briefdescriptionSet" : "",
+      "detaileddescriptionSet" : "Set the Fast Marching algorithm Stopping Value. The Fast Marching algorithm is terminated when the value of the smallest trial point is greater than the stopping value.",
+      "briefdescriptionGet" : "",
+      "detaileddescriptionGet" : "Get the Fast Marching algorithm Stopping Value."
+    },
+    {
+      "name" : "TopologyCheck",
+      "enum" : [
+        "Nothing",
+        "NoHandles",
+        "Strict"
+      ],
+      "default" : "itk::simple::FastMarchingBaseImageFilter::Nothing",
+      "doc" : "",
+      "itk_type" : "typename FilterType::TopologyCheckType"
+    }
+  ],
+  "tests" : [
+    {
+      "tag" : "default",
+      "description" : "Default parameter settings",
+      "md5hash" : "b4b628f078fdfd7c14c55b1aed24e72a",
+      "settings" : [
+        {
+          "parameter" : "TrialPoints",
+          "dim" : 2,
+          "value" : [
+            "{70,70}",
+            "{200,180}"
+          ],
+          "tcl_value" : [
+            "70 70",
+            "200 180"
+          ],
+          "python_value" : [
+            "[70,70]",
+            "[200,180]"
+          ],
+          "ruby_value" : [
+            "[70,70]",
+            "[200,180]"
+          ],
+          "R_value" : "list(c(70,70), c(200,180))"
+        },
+        {
+          "parameter" : "NormalizationFactor",
+          "value" : 255.0
+        },
+        {
+          "parameter" : "StoppingValue",
+          "value" : 50.0
+        }
+      ],
+      "inputs" : [
+        "Input/cthead1-Float.mha"
+      ]
+    }
+  ],
+  "briefdescription" : "Fast Marching Method on Image .",
+  "detaileddescription" : "The speed function can be specified as a speed image or a speed constant. The speed image is set using the method SetInput(). If the speed image is ITK_NULLPTR, a constant speed function is used and is specified using method the SetSpeedConstant() .\n\nIf the speed function is constant and of value one, fast marching results is an approximate distance function from the initial alive points.\n\nThere are two ways to specify the output image information ( LargestPossibleRegion, Spacing, Origin):\n\\li it is copied directly from the input speed image\n\n\\li it is specified by the user. Default values are used if the user does not specify all the information.\n\nThe output information is computed as follows.\n\nIf the speed image is ITK_NULLPTR or if the OverrideOutputInformation is set to true, the output information is set from user specified parameters. These parameters can be specified using methods\n\\li FastMarchingImageFilterBase::SetOutputRegion() ,\n\n\\li FastMarchingImageFilterBase::SetOutputSpacing() ,\n\n\\li FastMarchingImageFilterBase::SetOutputDirection() ,\n\n\\li FastMarchingImageFilterBase::SetOutputOrigin() .\n\nElse the output information is copied from the input speed image.\n\nImplementation of this class is based on Chapter 8 of \"Level Set Methods and Fast Marching Methods\", J.A. Sethian, Cambridge Press, Second edition, 1999.\n\nTTraitstraits\n\n\\see ImageFastMarchingTraits\n\\see \n\\see ImageFastMarchingTraits2"
+}

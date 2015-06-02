@@ -62,6 +62,12 @@ $(for i=1,#tcl_value do OUT=OUT .. "  filter AddTrialPoint [list ".. tcl_value[i
 elseif parameter == "TrialPoints" then
 OUT=[[  filter ClearTrialPoints
 $(for i=1,#value do OUT=OUT .. "  filter AddTrialPoint [list ".. value[i] .. "]\n" end)]]
+elseif point_vec and point_vec==1 then
+OUT=[[  filter Clear${parameter}
+]]
+  for i=1,#value do
+    OUT=OUT .. "   filter Add${parameter:gsub('s([0-9]?)$','%1')} [list ".. tcl_value[i] .. "]\n"
+  end
 elseif tcl_value then
 OUT=[[
   filter Set${parameter} ${tcl_value}]]
@@ -93,8 +99,16 @@ OUT=[[
 end)
 
   set output [eval filter Execute $$inputs ]
+$(if not no_return_image then
+OUT=[[
+  set labelIDs [ list [set sitkLabelUInt8] [set sitkLabelUInt16] [set sitkLabelUInt32] [set sitkLabelUInt64] ]
+  if { [lsearch $labelIDs [$$output GetPixelIDValue] ] >= 0 } {
+      set output [ LabelMapToLabel $$output ]
+  }
 
   [writer SetFileName [lindex $$argv end] ] Execute $$output
+]]
+end)
   exit
 }
 )

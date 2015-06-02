@@ -21,13 +21,14 @@
 #include <sitkImageFileReader.h>
 #include <sitkImageFileWriter.h>
 #include <sitkHashImageFilter.h>
+#include <sitkGaussianImageSource.h>
 #include <sitkRecursiveGaussianImageFilter.h>
 #include <sitkCastImageFilter.h>
 #include <sitkPixelIDValues.h>
 #include <sitkStatisticsImageFilter.h>
 #include <sitkLabelStatisticsImageFilter.h>
 #include <sitkExtractImageFilter.h>
-#include <sitkFastMarchingImageFilter.h>
+#include <sitkFastMarchingBaseImageFilter.h>
 #include <sitkInverseDeconvolutionImageFilter.h>
 #include <sitkTikhonovDeconvolutionImageFilter.h>
 #include <sitkWienerDeconvolutionImageFilter.h>
@@ -41,10 +42,18 @@
 #include <sitkLabelMapContourOverlayImageFilter.h>
 #include <sitkPatchBasedDenoisingImageFilter.h>
 #include <sitkConnectedThresholdImageFilter.h>
+#include <sitkMergeLabelMapFilter.h>
+#include <sitkDiffeomorphicDemonsRegistrationFilter.h>
+#include <sitkFastSymmetricForcesDemonsRegistrationFilter.h>
+#include <sitkOtsuThresholdImageFilter.h>
+#include <sitkBSplineTransformInitializerFilter.h>
+#include <sitkCenteredTransformInitializerFilter.h>
+#include <sitkCenteredVersorTransformInitializerFilter.h>
 #include <sitkAdditionalProcedures.h>
 #include <sitkCommand.h>
 
 #include "itkVectorImage.h"
+#include "itkVector.h"
 #include "itkRecursiveGaussianImageFilter.h"
 #include "itkExtractImageFilter.h"
 #include "itkFastMarchingImageFilterBase.h"
@@ -58,7 +67,45 @@
 #include "itkLabelMapContourOverlayImageFilter.h"
 #include "itkPatchBasedDenoisingImageFilter.h"
 #include "itkConnectedThresholdImageFilter.h"
+#include "itkMergeLabelMapFilter.h"
+#include "itkDiffeomorphicDemonsRegistrationFilter.h"
+#include "itkFastSymmetricForcesDemonsRegistrationFilter.h"
 
+#include "sitkShow.h"
+
+#include "sitkVersorRigid3DTransform.h"
+#include "sitkSimilarity3DTransform.h"
+
+TEST(BasicFilter,FastSymmetricForcesDemonsRegistrationFilter_ENUMCHECK) {
+  typedef itk::Image<float,3> ImageType;
+  typedef itk::Image<itk::Vector<float,3>,3> DisplacementType;
+  typedef itk::FastSymmetricForcesDemonsRegistrationFilter<ImageType,ImageType,DisplacementType>::DemonsRegistrationFunctionType ITKType;
+
+  EXPECT_EQ( (int)ITKType::Symmetric, (int)itk::simple::FastSymmetricForcesDemonsRegistrationFilter::Symmetric);
+  EXPECT_EQ( (int)ITKType::Fixed, (int)itk::simple::FastSymmetricForcesDemonsRegistrationFilter::Fixed);
+  EXPECT_EQ( (int)ITKType::WarpedMoving, (int)itk::simple::FastSymmetricForcesDemonsRegistrationFilter::WarpedMoving);
+  EXPECT_EQ( (int)ITKType::MappedMoving, (int)itk::simple::FastSymmetricForcesDemonsRegistrationFilter::MappedMoving);
+}
+
+
+TEST(BasicFilter,DiffeomorphicDemonsRegistrationFilter_ENUMCHECK) {
+  typedef itk::Image<float,3> ImageType;
+  typedef itk::Image<itk::Vector<float,3>,3> DisplacementType;
+  typedef itk::DiffeomorphicDemonsRegistrationFilter<ImageType,ImageType,DisplacementType>::DemonsRegistrationFunctionType ITKType;
+
+  EXPECT_EQ( (int)ITKType::Symmetric, (int)itk::simple::DiffeomorphicDemonsRegistrationFilter::Symmetric);
+  EXPECT_EQ( (int)ITKType::Fixed, (int)itk::simple::DiffeomorphicDemonsRegistrationFilter::Fixed);
+  EXPECT_EQ( (int)ITKType::WarpedMoving, (int)itk::simple::DiffeomorphicDemonsRegistrationFilter::WarpedMoving);
+  EXPECT_EQ( (int)ITKType::MappedMoving, (int)itk::simple::DiffeomorphicDemonsRegistrationFilter::MappedMoving);
+}
+
+TEST(BasicFilters,MergeLabelMap_ENUMCHECK) {
+  typedef itk::MergeLabelMapFilter< itk::LabelMap< itk::LabelObject<int, 3> > >  ITKType;
+  EXPECT_EQ( (int)ITKType::KEEP, (int)itk::simple::MergeLabelMapFilter::Keep);
+  EXPECT_EQ( (int)ITKType::AGGREGATE, (int)itk::simple::MergeLabelMapFilter::Aggregate);
+  EXPECT_EQ( (int)ITKType::PACK, (int)itk::simple::MergeLabelMapFilter::Pack);
+  EXPECT_EQ( (int)ITKType::STRICT, (int)itk::simple::MergeLabelMapFilter::Strict);
+}
 
 TEST(BasicFilters,ScalarToRGBColormap_ENUMCHECK) {
   typedef itk::ScalarToRGBColormapImageFilter< itk::Image<float,3>, itk::Image< itk::RGBPixel<float>,3> > ITKType;
@@ -95,9 +142,9 @@ TEST(BasicFilters,Extract_ENUMCHECK) {
 
 TEST(BasicFilters,FastMarching_ENUMCHECK) {
   typedef itk::FastMarchingImageFilterBase< itk::Image<float,3>, itk::Image<float,3> > ITKType;
-  EXPECT_EQ( (int) ITKType::Nothing, (int) itk::simple::FastMarchingImageFilter::Nothing );
-  EXPECT_EQ( (int) ITKType::NoHandles, (int) itk::simple::FastMarchingImageFilter::NoHandles );
-  EXPECT_EQ( (int) ITKType::Strict, (int) itk::simple::FastMarchingImageFilter::Strict );
+  EXPECT_EQ( (int) ITKType::Nothing, (int) itk::simple::FastMarchingBaseImageFilter::Nothing );
+  EXPECT_EQ( (int) ITKType::NoHandles, (int) itk::simple::FastMarchingBaseImageFilter::NoHandles );
+  EXPECT_EQ( (int) ITKType::Strict, (int) itk::simple::FastMarchingBaseImageFilter::Strict );
 }
 
 TEST(BasicFilters,InverseDeconvolution_ENUMCHECK) {
@@ -400,10 +447,180 @@ TEST(BasicFilters,Cast) {
 
 TEST(BasicFilters,HashImageFilter) {
   itk::simple::HashImageFilter hasher;
-  EXPECT_EQ ( "itk::simple::HashImageFilter\nHashFunction: SHA1\n", hasher.ToString() );
+  std::string out = hasher.ToString();
+  EXPECT_TRUE ( out.find("itk::simple::HashImageFilter") != std::string::npos );
+  EXPECT_TRUE ( out.find("HashFunction: SHA1") != std::string::npos );
+  EXPECT_TRUE ( out.find("Debug:") != std::string::npos );
+  EXPECT_TRUE ( out.find("NumberOfThreads:") != std::string::npos );
   EXPECT_EQ ( itk::simple::HashImageFilter::SHA1, hasher.SetHashFunction ( itk::simple::HashImageFilter::SHA1 ).GetHashFunction() );
   EXPECT_EQ ( itk::simple::HashImageFilter::MD5, hasher.SetHashFunction ( itk::simple::HashImageFilter::MD5 ).GetHashFunction() );
 }
+
+
+TEST(BasicFilters,BSplineTransformInitializer) {
+  namespace sitk = itk::simple;
+
+  sitk::BSplineTransformInitializerFilter filter;
+
+  EXPECT_EQ ( "BSplineTransformInitializerFilter", filter.GetName() );
+  EXPECT_EQ ( std::vector<uint32_t>(3,1u), filter.GetTransformDomainMeshSize() );
+  EXPECT_EQ ( std::vector<uint32_t>(3,10u), filter.SetTransformDomainMeshSize(std::vector<uint32_t>(3,10u)).GetTransformDomainMeshSize() );
+
+  const double cs = 0.5*itk::Math::sqrt2; // cos(pi/4) = sin(pi/4)
+  sitk::Image img( 100, 100, sitk::sitkUInt32 );
+  img.SetDirection(v4(cs,-cs,cs,cs) );
+  img.SetSpacing( v2(2,2) );
+
+
+  sitk::BSplineTransform outTx = filter.Execute( img );
+  EXPECT_EQ ( std::vector<uint32_t>(2,10u), outTx.GetTransformDomainMeshSize() );
+  EXPECT_VECTOR_DOUBLE_NEAR ( v4(cs,-cs,cs,cs), outTx.GetTransformDomainDirection(), 1e-6 );
+   EXPECT_VECTOR_DOUBLE_NEAR ( v2(0, -1.7677669525146484 ), outTx.GetTransformDomainOrigin(), 1e-6 );
+  EXPECT_VECTOR_DOUBLE_NEAR ( v2(10.025, 20.05), outTx.GetTransformDomainPhysicalDimensions(), 1e6);
+  EXPECT_EQ ( 10u, outTx.GetFixedParameters().size() );
+
+  // 3D
+  img = sitk::Image(10,10,10,  sitk::sitkUInt32 );
+
+  outTx = sitk::BSplineTransformInitializer( img, std::vector<uint32_t>(3,5u) );
+  EXPECT_EQ( std::vector<uint32_t>(3,5u), outTx.GetTransformDomainMeshSize() );
+
+  // check that it's identity
+  EXPECT_VECTOR_DOUBLE_NEAR( outTx.TransformPoint( v3(0.0,0.0,0.0) ), v3(0.0,0.0,0.0), 1e-17);
+  EXPECT_VECTOR_DOUBLE_NEAR( outTx.TransformPoint( v3(1.123,0.0,2.0) ), v3(1.123,0.0,2.0), 1e-17);
+  EXPECT_VECTOR_DOUBLE_NEAR( outTx.TransformPoint( v3(0.0,0.0,5.0) ), v3(0.0,0.0,5.0), 1e-17);
+  EXPECT_VECTOR_DOUBLE_NEAR( outTx.TransformPoint( v3(5.0,7.0,9.0) ), v3(5.0,7.0,9.0), 1e-17);
+}
+
+
+TEST(BasicFilters,CenteredTransformInitializer) {
+  namespace sitk = itk::simple;
+
+  sitk::CenteredTransformInitializerFilter filter;
+
+  EXPECT_EQ ( "CenteredTransformInitializerFilter", filter.GetName() );
+  EXPECT_EQ ( sitk::CenteredTransformInitializerFilter::MOMENTS, filter.GetOperationMode() );
+  filter.GeometryOn();
+  EXPECT_EQ ( sitk::CenteredTransformInitializerFilter::GEOMETRY, filter.GetOperationMode() );
+  filter.MomentsOn();
+  EXPECT_EQ ( sitk::CenteredTransformInitializerFilter::MOMENTS, filter.GetOperationMode() );
+
+  sitk::Image fixed = sitk::ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png") );
+  sitk::Image moving = sitk::ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
+
+  sitk::Transform tx = sitk::Transform(2, sitk::sitkAffine);
+
+  sitk::Transform outTx = filter.Execute( fixed, moving , tx );
+
+  std::vector<double> params = outTx.GetFixedParameters();
+
+  ASSERT_EQ( 2u, params.size() );
+  EXPECT_EQ( 0.0, tx.GetFixedParameters()[0] );
+  EXPECT_EQ( 0.0, tx.GetFixedParameters()[1] );
+  EXPECT_FLOAT_EQ ( 111.20356, params[0] );
+  EXPECT_FLOAT_EQ ( 131.59097, params[1] );
+
+
+  tx = sitk::Transform(2, sitk::sitkEuler);
+
+  outTx = sitk::CenteredTransformInitializer( fixed, moving, tx );
+
+  params = outTx.GetFixedParameters();
+
+  ASSERT_EQ( 2u, params.size() );
+  EXPECT_EQ( 0.0, tx.GetFixedParameters()[0] );
+  EXPECT_EQ( 0.0, tx.GetFixedParameters()[1] );
+  EXPECT_FLOAT_EQ ( 111.20356, params[0] );
+  EXPECT_FLOAT_EQ ( 131.59097, params[1] );
+
+}
+
+
+TEST(BasicFilters,CenteredVersorTransformInitializer) {
+  namespace sitk = itk::simple;
+
+  sitk::CenteredVersorTransformInitializerFilter filter;
+
+  EXPECT_EQ ( "CenteredVersorTransformInitializerFilter", filter.GetName() );
+  EXPECT_EQ ( filter.GetComputeRotation(), false );
+  EXPECT_EQ ( filter.ComputeRotationOn().GetComputeRotation(), true );
+  EXPECT_EQ ( filter.ComputeRotationOff().GetComputeRotation(), false );
+
+  // generate a few basic test images from gaussian blobs
+
+  sitk::GaussianImageSource source;
+  source.SetOutputPixelType( sitk::sitkFloat32 );
+  source.SetSize( std::vector< unsigned int >(3, 128) );
+  source.SetMean( v3(64.0, 64.0, 64.0) );
+  source.SetSigma( v3( 10.0, 15.0, 20.0) );
+
+  const sitk::Image g1 = source.Execute();
+
+  source.SetMean( v3(63.0, 62.0, 61.0) );
+  const sitk::Image g2 = source.Execute();
+
+  source.SetMean( v3(63.0, 62.0, 61.0) );
+  source.SetSigma( v3( 15.0, 20.0, 10) );
+  const sitk::Image g3 = source.Execute();
+
+  {
+  sitk::VersorRigid3DTransform tx;
+
+  filter.ComputeRotationOff();
+  tx = sitk::VersorRigid3DTransform( filter.Execute(g1, g2, sitk::VersorRigid3DTransform() ) );
+  EXPECT_VECTOR_DOUBLE_NEAR( tx.GetTranslation(), v3(-1.0,-2.0,-3.0), 0.1 );
+  EXPECT_VECTOR_DOUBLE_NEAR( tx.GetCenter(), v3(64.0,64.0,64.0), 0.1 );
+  EXPECT_VECTOR_DOUBLE_NEAR( tx.GetVersor(), v4(0.0, 0.0,0.0,1.0), 1e-15 );
+  tx = sitk::VersorRigid3DTransform( filter.Execute(g1, g3, sitk::VersorRigid3DTransform() ) );
+  EXPECT_VECTOR_DOUBLE_NEAR( tx.GetTranslation(), v3(-1.0,-2.0,-3.0), 0.1 );
+  EXPECT_VECTOR_DOUBLE_NEAR( tx.GetCenter(), v3(64.0,64.0,64.0), 0.1 );
+  EXPECT_VECTOR_DOUBLE_NEAR( tx.GetVersor(), v4(0.0, 0.0,0.0,1.0), 1e-15 );
+
+  filter.ComputeRotationOn();
+  tx = sitk::VersorRigid3DTransform( filter.Execute(g1, g2, sitk::VersorRigid3DTransform() ) );
+  EXPECT_VECTOR_DOUBLE_NEAR( tx.GetTranslation(), v3(-1.0,-2.0,-3.0), 0.1 );
+  EXPECT_VECTOR_DOUBLE_NEAR( tx.GetCenter(), v3(64.0,64.0,64.0), 0.1 );
+  EXPECT_VECTOR_DOUBLE_NEAR( tx.GetVersor(), v4(0.0, 0.0,0.0,1.0), 1e-5 );
+  tx = sitk::VersorRigid3DTransform( filter.Execute(g1, g3, sitk::VersorRigid3DTransform() ) );
+  EXPECT_VECTOR_DOUBLE_NEAR( tx.GetTranslation(), v3(-1.0,-2.0,-3.0), 0.1 );
+  EXPECT_VECTOR_DOUBLE_NEAR( tx.GetCenter(), v3(64.0,64.0,64.0), 0.1 );
+  EXPECT_VECTOR_DOUBLE_NEAR( tx.GetVersor(), v4(-0.5, -0.5,0.5,0.5), 1e-5 );
+  }
+
+  {
+  sitk::Similarity3DTransform tx;
+
+  filter.ComputeRotationOff();
+  tx = sitk::Similarity3DTransform( filter.Execute(g1, g2, sitk::Similarity3DTransform() ) );
+  EXPECT_VECTOR_DOUBLE_NEAR( tx.GetTranslation(), v3(-1.0,-2.0,-3.0), 0.1 );
+  EXPECT_VECTOR_DOUBLE_NEAR( tx.GetCenter(), v3(64.0,64.0,64.0), 0.1 );
+  EXPECT_VECTOR_DOUBLE_NEAR( tx.GetVersor(), v4(0.0, 0.0,0.0,1.0), 1e-15 );
+  tx = sitk::Similarity3DTransform( filter.Execute(g1, g3, sitk::Similarity3DTransform() ) );
+  EXPECT_VECTOR_DOUBLE_NEAR( tx.GetTranslation(), v3(-1.0,-2.0,-3.0), 0.1 );
+  EXPECT_VECTOR_DOUBLE_NEAR( tx.GetCenter(), v3(64.0,64.0,64.0), 0.1 );
+  EXPECT_VECTOR_DOUBLE_NEAR( tx.GetVersor(), v4(0.0, 0.0,0.0,1.0), 1e-15 );
+
+  filter.ComputeRotationOn();
+  tx = sitk::Similarity3DTransform( filter.Execute(g1, g2, sitk::Similarity3DTransform() ) );
+  EXPECT_VECTOR_DOUBLE_NEAR( tx.GetTranslation(), v3(-1.0,-2.0,-3.0), 0.1 );
+  EXPECT_VECTOR_DOUBLE_NEAR( tx.GetCenter(), v3(64.0,64.0,64.0), 0.1 );
+  EXPECT_VECTOR_DOUBLE_NEAR( tx.GetVersor(), v4(0.0, 0.0,0.0,1.0), 1e-5 );
+  tx = sitk::Similarity3DTransform( filter.Execute(g1, g3, sitk::Similarity3DTransform() ) );
+  EXPECT_VECTOR_DOUBLE_NEAR( tx.GetTranslation(), v3(-1.0,-2.0,-3.0), 0.1 );
+  EXPECT_VECTOR_DOUBLE_NEAR( tx.GetCenter(), v3(64.0,64.0,64.0), 0.1 );
+  EXPECT_VECTOR_DOUBLE_NEAR( tx.GetVersor(), v4(-0.5, -0.5,0.5,0.5), 1e-5 );
+  }
+
+  EXPECT_THROW( sitk::CenteredVersorTransformInitializer(g1, g2, sitk::Transform(2,sitk::sitkSimilarity)), sitk::GenericException );
+  EXPECT_THROW( sitk::CenteredVersorTransformInitializer(g1, g2, sitk::Transform(3,sitk::sitkVersor)), sitk::GenericException );
+  EXPECT_THROW( sitk::CenteredVersorTransformInitializer(g1, g2, sitk::Transform(3,sitk::sitkAffine)), sitk::GenericException );
+  EXPECT_THROW( sitk::CenteredVersorTransformInitializer(g1, g2, sitk::Transform(3,sitk::sitkQuaternionRigid)), sitk::GenericException );
+  EXPECT_THROW( sitk::CenteredVersorTransformInitializer(g1, g2, sitk::Transform(3,sitk::sitkTranslation)), sitk::GenericException );
+
+
+}
+
+
 
 TEST(BasicFilters,Cast_Commands) {
   // test cast filter with a bunch of commands
@@ -493,127 +710,6 @@ TEST(BasicFilters,Statistics_Abort) {
 
 }
 
-TEST(BasicFilters,Statistics) {
-
-  itk::simple::Image image = itk::simple::ReadImage ( dataFinder.GetFile ( "Input/RA-Float.nrrd" ) );
-
-  itk::simple::StatisticsImageFilter stats;
-  stats.DebugOn();
-
-  EXPECT_EQ ( stats.GetName(), "StatisticsImageFilter" );
-  EXPECT_NO_THROW ( stats.ToString() );
-
-  stats.Execute( image );
-
-
-  EXPECT_EQ ( stats.GetMinimum(), -1146 );
-  EXPECT_EQ ( stats.GetMaximum(), 32767 );
-  EXPECT_NEAR ( stats.GetMean(), 25887.390, 0.001 );
-  EXPECT_NEAR ( stats.GetSigma(),  3800.565, 0.01 );
-  EXPECT_NEAR ( stats.GetVariance(), 14444296.271, 10 );
-  EXPECT_EQ ( stats.GetSum(), 6786223965.0 );
-
-  image = itk::simple::ReadImage ( dataFinder.GetFile ( "Input/cthead1.png" ) );
-
-  const itk::simple::MeasurementMap measurements = itk::simple::Statistics( image );
-
-  EXPECT_EQ ( measurements.find("Minimum")->second, 0 );
-  EXPECT_EQ ( measurements.find("Maximum")->second, 255 );
-  EXPECT_NEAR ( measurements.find("Mean")->second, 77.7415, 0.001 );
-  EXPECT_NEAR ( measurements.find("Sigma")->second, 78.2619, 0.01 );
-  EXPECT_NEAR ( measurements.find("Variance")->second,  6124.9260064656282, 1 );
-  EXPECT_EQ ( measurements.find("Sum")->second, 5094871 );
-
-}
-
-TEST(BasicFilters,LabelStatistics) {
-  namespace sitk = itk::simple;
-
-  sitk::Image image = sitk::ReadImage ( dataFinder.GetFile ( "Input/cthead1.png" ) );
-  sitk::Image labels = sitk::ReadImage ( dataFinder.GetFile ( "Input/2th_cthead1.mha" ) );
-
-  sitk::LabelStatisticsImageFilter stats;
-
-
-  ProgressUpdate progressCmd(stats);
-  stats.AddCommand(sitk::sitkProgressEvent, progressCmd);
-
-  CountCommand abortCmd(stats);
-  stats.AddCommand(sitk::sitkAbortEvent, abortCmd);
-
-  CountCommand deleteCmd(stats);
-  stats.AddCommand(sitk::sitkDeleteEvent, deleteCmd);
-
-  CountCommand endCmd(stats);
-  stats.AddCommand(sitk::sitkEndEvent, endCmd);
-
-  CountCommand iterCmd(stats);
-  stats.AddCommand(sitk::sitkIterationEvent, iterCmd);
-
-  CountCommand startCmd(stats);
-  stats.AddCommand(sitk::sitkStartEvent, startCmd);
-
-  CountCommand userCmd(stats);
-  stats.AddCommand(sitk::sitkUserEvent, userCmd);
-
-  stats.DebugOn();
-
-  EXPECT_TRUE ( stats.GetUseHistograms() );
-  stats.UseHistogramsOff();
-  EXPECT_FALSE ( stats.GetUseHistograms() );
-  stats.UseHistogramsOn();
-
-  stats.Execute ( image, labels );
-
-  EXPECT_EQ( stats.GetName(), "LabelStatisticsImageFilter" );
-  EXPECT_NO_THROW( stats.ToString() );
-
-  EXPECT_TRUE ( stats.HasLabel ( 0 ) );
-  EXPECT_NEAR ( stats.GetMinimum ( 0 ), 0, 0.01 );
-  EXPECT_NEAR ( stats.GetMaximum ( 0 ), 99, 0.01 );
-  EXPECT_NEAR ( stats.GetMean ( 0 ), 13.0911, 0.001 );
-  EXPECT_NEAR ( stats.GetSigma ( 0 ),  16.4065, 0.01 );
-  EXPECT_NEAR ( stats.GetVariance ( 0 ),  269.173, 0.01 );
-  EXPECT_NEAR ( stats.GetCount ( 0 ),  36172, 0.01 );
-  EXPECT_NEAR ( stats.GetSum ( 0 ),  473533, 0.01 );
-  EXPECT_NEAR ( stats.GetMedian ( 0 ), 12.0, 0.001 );
-
-  ASSERT_EQ( 4u, stats.GetBoundingBox(0).size() );
-  EXPECT_EQ( 0, stats.GetBoundingBox(0)[0] );
-  EXPECT_EQ( 255, stats.GetBoundingBox(0)[1] );
-  EXPECT_EQ( 0, stats.GetBoundingBox(0)[2] );
-  EXPECT_EQ( 255, stats.GetBoundingBox(0)[3] );
-
-  EXPECT_EQ ( 1.0f, stats.GetProgress() );
-  EXPECT_EQ ( 1.0f, progressCmd.m_Progress );
-  EXPECT_EQ ( 0, abortCmd.m_Count );
-  EXPECT_EQ ( 1, deleteCmd.m_Count );
-  EXPECT_EQ ( 1, endCmd.m_Count );
-  EXPECT_EQ ( 0, iterCmd.m_Count );
-  EXPECT_EQ ( 1, startCmd.m_Count );
-  EXPECT_EQ ( 0, userCmd.m_Count );
-
-  const sitk::LabelStatisticsImageFilter::LabelListingType myLabels = stats.GetValidLabels();
-  EXPECT_EQ ( myLabels.size() , 3u);
-
-  const sitk::LabelStatisticsImageFilter::LabelStatisticsMap myMap = stats.GetLabelStatisticsMap();
-  EXPECT_EQ( myLabels.size() , myMap.size() );
-
-  const sitk::MeasurementMap myMeasurementMap = stats.GetMeasurementMap(0);
-  EXPECT_EQ( myMeasurementMap.size(), 8u ); //4 measurements produced
-
-  const sitk::BasicMeasurementMap myBasicMeasurementMap =
-    myMeasurementMap.GetBasicMeasurementMap();
-  EXPECT_EQ( myBasicMeasurementMap.size(), 8u ); //4 measurements produced
-
-  EXPECT_EQ ( myMeasurementMap.ToString(), "Count, Maximum, Mean, Minimum, Sigma, Sum, Variance, approxMedian, \n36172, 99, 13.0911, 0, 16.4065, 473533, 269.173, 12, \n" );
-
-  stats.SetUseHistograms(false);
-  EXPECT_FALSE ( stats.GetUseHistograms() );
-  stats.Execute ( image, labels );
-  EXPECT_EQ ( stats.GetMedian ( 0 ), 0 );
-}
-
 TEST(BasicFilters,ResampleImageFilter_AdditionalProcedures)
 {
   namespace sitk = itk::simple;
@@ -645,4 +741,19 @@ TEST(BasicFilters,ResampleImageFilter_AdditionalProcedures)
                        img.GetSpacing(),
                        img.GetDirection() );
   EXPECT_EQ( "b187541bdcc89843d0a25a3761f344c358f3518a", sitk::Hash( out )) << " Procedural Interface 3 identity transform.";
+}
+
+
+TEST(BasicFilters,OtsuThreshold_CheckNamesInputCompatibility)
+{
+  namespace sitk = itk::simple;
+
+  sitk::Image input(10,10,sitk::sitkFloat32);
+  sitk::Image mask1(10,10,10,sitk::sitkUInt8);
+  sitk::Image mask2(11,10,sitk::sitkUInt8);
+
+  // check that if the dimension or size does not match an exception
+  // is thrown.
+  EXPECT_THROW( sitk::OtsuThreshold(input, mask1), sitk::GenericException );
+  EXPECT_THROW( sitk::OtsuThreshold(input, mask2), sitk::GenericException );
 }

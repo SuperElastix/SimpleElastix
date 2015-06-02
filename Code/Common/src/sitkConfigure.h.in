@@ -25,10 +25,13 @@
 #else
 #define SITKSTATIC
 #endif
+#cmakedefine SITK_SimpleITKExplit_STATIC
 
 
 // defined if the system has C++0x "static_assert" keyword
 #cmakedefine SITK_HAS_CXX11_STATIC_ASSERT
+// defined if the compiler has C++11 "nullptr" keyword
+#cmakedefine SITK_HAS_CXX11_NULLPTR
 #cmakedefine SITK_HAS_CXX11_FUNCTIONAL
 #cmakedefine SITK_HAS_CXX11_TYPE_TRAITS
 #cmakedefine SITK_HAS_CXX11_UNORDERED_MAP
@@ -40,6 +43,9 @@
 #cmakedefine SITK_HAS_TR1_UNORDERED_MAP
 
 #cmakedefine SITK_INT64_PIXELIDS
+#cmakedefine SITK_4D_IMAGES
+
+#cmakedefine SITK_EXPLICIT_INSTANTIATION
 
 #cmakedefine SITK_EXPRESS_INSTANTIATEDPIXELS
 

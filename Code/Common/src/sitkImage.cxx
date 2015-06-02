@@ -39,7 +39,7 @@ namespace itk
   Image::Image( )
     : m_PimpleImage( NULL )
   {
-    Allocate ( 0, 0, 0, sitkUInt8, 1 );
+    Allocate ( 0, 0, 0, 0, sitkUInt8, 1 );
   }
 
   Image::Image( const Image &img )
@@ -60,13 +60,13 @@ namespace itk
     Image::Image( unsigned int Width, unsigned int Height, PixelIDValueEnum ValueEnum )
       : m_PimpleImage( NULL )
     {
-      Allocate ( Width, Height, 0, ValueEnum, 0 );
+      Allocate ( Width, Height, 0, 0, ValueEnum, 0 );
     }
 
     Image::Image( unsigned int Width, unsigned int Height, unsigned int Depth, PixelIDValueEnum ValueEnum )
       : m_PimpleImage( NULL )
     {
-      Allocate ( Width, Height, Depth, ValueEnum, 0 );
+      Allocate ( Width, Height, Depth, 0, ValueEnum, 0 );
     }
 
     Image::Image( const std::vector< unsigned int > &size, PixelIDValueEnum ValueEnum, unsigned int numberOfComponents )
@@ -74,11 +74,15 @@ namespace itk
     {
       if ( size.size() == 2 )
         {
-        Allocate ( size[0], size[1], 0, ValueEnum, numberOfComponents );
+        Allocate ( size[0], size[1], 0, 0, ValueEnum, numberOfComponents );
         }
       else if ( size.size() == 3 )
         {
-        Allocate ( size[0], size[1], size[2], ValueEnum, numberOfComponents );
+        Allocate ( size[0], size[1], size[2], 0, ValueEnum, numberOfComponents );
+        }
+      else if ( size.size() == 4 )
+        {
+        Allocate ( size[0], size[1], size[2], size[3], ValueEnum, numberOfComponents );
         }
       else
         {
@@ -89,7 +93,7 @@ namespace itk
     itk::DataObject* Image::GetITKBase( void )
     {
       assert( m_PimpleImage );
-      this->MakeUniqueForWrite();
+      this->MakeUnique();
       return m_PimpleImage->GetDataBase();
     }
 
@@ -121,7 +125,6 @@ namespace itk
       assert( m_PimpleImage );
       return this->m_PimpleImage->GetNumberOfComponentsPerPixel();
     }
-
 
     std::string Image::GetPixelIDTypeAsString( void ) const
     {
@@ -169,7 +172,7 @@ namespace itk
     void Image::SetOrigin( const std::vector<double> &orgn )
     {
        assert( m_PimpleImage );
-      this->MakeUniqueForWrite();
+      this->MakeUnique();
       this->m_PimpleImage->SetOrigin(orgn);
     }
 
@@ -184,7 +187,7 @@ namespace itk
     void Image::SetSpacing( const std::vector<double> &spc )
     {
       assert( m_PimpleImage );
-      this->MakeUniqueForWrite();
+      this->MakeUnique();
       this->m_PimpleImage->SetSpacing(spc);
     }
 
@@ -199,7 +202,7 @@ namespace itk
     void Image::SetDirection( const std::vector< double > &direction )
     {
       assert( m_PimpleImage );
-      this->MakeUniqueForWrite();
+      this->MakeUnique();
       this->m_PimpleImage->SetDirection( direction );
     }
 
@@ -416,70 +419,70 @@ namespace itk
     int8_t *Image::GetBufferAsInt8( )
     {
       assert( m_PimpleImage );
-      this->MakeUniqueForWrite();
+      this->MakeUnique();
       return this->m_PimpleImage->GetBufferAsInt8( );
     }
 
     uint8_t *Image::GetBufferAsUInt8( )
     {
       assert( m_PimpleImage );
-      this->MakeUniqueForWrite();
+      this->MakeUnique();
       return this->m_PimpleImage->GetBufferAsUInt8( );
     }
 
     int16_t *Image::GetBufferAsInt16( )
     {
       assert( m_PimpleImage );
-      this->MakeUniqueForWrite();
+      this->MakeUnique();
       return this->m_PimpleImage->GetBufferAsInt16( );
     }
 
     uint16_t *Image::GetBufferAsUInt16( )
     {
       assert( m_PimpleImage );
-      this->MakeUniqueForWrite();
+      this->MakeUnique();
       return this->m_PimpleImage->GetBufferAsUInt16( );
     }
 
     int32_t *Image::GetBufferAsInt32( )
     {
       assert( m_PimpleImage );
-      this->MakeUniqueForWrite();
+      this->MakeUnique();
       return this->m_PimpleImage->GetBufferAsInt32( );
     }
 
     uint32_t *Image::GetBufferAsUInt32( )
     {
       assert( m_PimpleImage );
-      this->MakeUniqueForWrite();
+      this->MakeUnique();
       return this->m_PimpleImage->GetBufferAsUInt32( );
     }
 
     int64_t *Image::GetBufferAsInt64( )
     {
       assert( m_PimpleImage );
-      this->MakeUniqueForWrite();
+      this->MakeUnique();
       return this->m_PimpleImage->GetBufferAsInt64( );
     }
 
     uint64_t *Image::GetBufferAsUInt64( )
     {
       assert( m_PimpleImage );
-      this->MakeUniqueForWrite();
+      this->MakeUnique();
       return this->m_PimpleImage->GetBufferAsUInt64( );
     }
 
     float *Image::GetBufferAsFloat( )
     {
       assert( m_PimpleImage );
-      this->MakeUniqueForWrite();
+      this->MakeUnique();
       return this->m_PimpleImage->GetBufferAsFloat( );
     }
 
     double *Image::GetBufferAsDouble( )
     {
       assert( m_PimpleImage );
-      this->MakeUniqueForWrite();
+      this->MakeUnique();
       return this->m_PimpleImage->GetBufferAsDouble( );
     }
 
@@ -546,159 +549,159 @@ namespace itk
     void Image::SetPixelAsInt8( const std::vector<uint32_t> &idx, int8_t v )
     {
       assert( m_PimpleImage );
-      this->MakeUniqueForWrite();
+      this->MakeUnique();
       this->m_PimpleImage->SetPixelAsInt8( idx, v );
     }
 
     void Image::SetPixelAsUInt8( const std::vector<uint32_t> &idx, uint8_t v )
     {
       assert( m_PimpleImage );
-      this->MakeUniqueForWrite();
+      this->MakeUnique();
       this->m_PimpleImage->SetPixelAsUInt8( idx, v );
     }
 
     void Image::SetPixelAsInt16( const std::vector<uint32_t> &idx, int16_t v )
     {
       assert( m_PimpleImage );
-      this->MakeUniqueForWrite();
+      this->MakeUnique();
       this->m_PimpleImage->SetPixelAsInt16( idx, v );
     }
 
     void Image::SetPixelAsUInt16( const std::vector<uint32_t> &idx, uint16_t v )
     {
       assert( m_PimpleImage );
-      this->MakeUniqueForWrite();
+      this->MakeUnique();
       this->m_PimpleImage->SetPixelAsUInt16( idx, v );
     }
 
     void Image::SetPixelAsInt32( const std::vector<uint32_t> &idx, int32_t v )
     {
       assert( m_PimpleImage );
-      this->MakeUniqueForWrite();
+      this->MakeUnique();
       this->m_PimpleImage->SetPixelAsInt32( idx, v );
     }
 
     void Image::SetPixelAsUInt32( const std::vector<uint32_t> &idx, uint32_t v )
     {
       assert( m_PimpleImage );
-      this->MakeUniqueForWrite();
+      this->MakeUnique();
       this->m_PimpleImage->SetPixelAsUInt32( idx, v );
     }
 
     void Image::SetPixelAsInt64( const std::vector<uint32_t> &idx, int64_t v )
     {
       assert( m_PimpleImage );
-      this->MakeUniqueForWrite();
+      this->MakeUnique();
       this->m_PimpleImage->SetPixelAsInt64( idx, v );
     }
 
     void Image::SetPixelAsUInt64( const std::vector<uint32_t> &idx, uint64_t v )
     {
       assert( m_PimpleImage );
-      this->MakeUniqueForWrite();
+      this->MakeUnique();
       this->m_PimpleImage->SetPixelAsUInt64( idx, v );
     }
 
     void Image::SetPixelAsFloat( const std::vector<uint32_t> &idx, float v )
     {
       assert( m_PimpleImage );
-      this->MakeUniqueForWrite();
+      this->MakeUnique();
       this->m_PimpleImage->SetPixelAsFloat( idx, v );
     }
 
     void Image::SetPixelAsDouble( const std::vector<uint32_t> &idx, double v )
     {
       assert( m_PimpleImage );
-      this->MakeUniqueForWrite();
+      this->MakeUnique();
       this->m_PimpleImage->SetPixelAsDouble( idx, v );
     }
 
     void Image::SetPixelAsVectorInt8( const std::vector<uint32_t> &idx, const std::vector<int8_t> &v )
     {
       assert( m_PimpleImage );
-      this->MakeUniqueForWrite();
+      this->MakeUnique();
       this->m_PimpleImage->SetPixelAsVectorInt8( idx, v );
     }
 
     void Image::SetPixelAsVectorUInt8( const std::vector<uint32_t> &idx, const std::vector<uint8_t> &v )
     {
       assert( m_PimpleImage );
-      this->MakeUniqueForWrite();
+      this->MakeUnique();
       this->m_PimpleImage->SetPixelAsVectorUInt8( idx, v );
     }
 
     void Image::SetPixelAsVectorInt16( const std::vector<uint32_t> &idx, const std::vector<int16_t> &v )
     {
       assert( m_PimpleImage );
-      this->MakeUniqueForWrite();
+      this->MakeUnique();
       this->m_PimpleImage->SetPixelAsVectorInt16( idx, v );
     }
 
     void Image::SetPixelAsVectorUInt16( const std::vector<uint32_t> &idx, const std::vector<uint16_t> &v )
     {
       assert( m_PimpleImage );
-      this->MakeUniqueForWrite();
+      this->MakeUnique();
       this->m_PimpleImage->SetPixelAsVectorUInt16( idx, v );
     }
 
     void Image::SetPixelAsVectorInt32( const std::vector<uint32_t> &idx, const std::vector<int32_t> &v )
     {
       assert( m_PimpleImage );
-      this->MakeUniqueForWrite();
+      this->MakeUnique();
       this->m_PimpleImage->SetPixelAsVectorInt32( idx, v );
     }
 
     void Image::SetPixelAsVectorUInt32( const std::vector<uint32_t> &idx, const std::vector<uint32_t> &v )
     {
       assert( m_PimpleImage );
-      this->MakeUniqueForWrite();
+      this->MakeUnique();
       this->m_PimpleImage->SetPixelAsVectorUInt32( idx, v );
     }
 
     void Image::SetPixelAsVectorInt64( const std::vector<uint32_t> &idx, const std::vector<int64_t> &v )
     {
       assert( m_PimpleImage );
-      this->MakeUniqueForWrite();
+      this->MakeUnique();
       this->m_PimpleImage->SetPixelAsVectorInt64( idx, v );
     }
 
     void Image::SetPixelAsVectorUInt64( const std::vector<uint32_t> &idx, const std::vector<uint64_t> &v )
     {
       assert( m_PimpleImage );
-      this->MakeUniqueForWrite();
+      this->MakeUnique();
       this->m_PimpleImage->SetPixelAsVectorUInt64( idx, v );
     }
 
     void Image::SetPixelAsVectorFloat32( const std::vector<uint32_t> &idx, const std::vector<float> &v )
     {
       assert( m_PimpleImage );
-      this->MakeUniqueForWrite();
+      this->MakeUnique();
       this->m_PimpleImage->SetPixelAsVectorFloat32( idx, v );
     }
 
     void Image::SetPixelAsVectorFloat64( const std::vector<uint32_t> &idx, const std::vector<double> &v )
     {
       assert( m_PimpleImage );
-      this->MakeUniqueForWrite();
+      this->MakeUnique();
       this->m_PimpleImage->SetPixelAsVectorFloat64( idx, v );
     }
 
   void Image::SetPixelAsComplexFloat32( const std::vector<uint32_t> &idx, const std::complex<float> v )
     {
       assert( m_PimpleImage );
-      this->MakeUniqueForWrite();
+      this->MakeUnique();
       this->m_PimpleImage->SetPixelAsComplexFloat32( idx, v );
     }
 
     void Image::SetPixelAsComplexFloat64( const std::vector<uint32_t> &idx, const std::complex<double> v )
     {
       assert( m_PimpleImage );
-      this->MakeUniqueForWrite();
+      this->MakeUnique();
       this->m_PimpleImage->SetPixelAsComplexFloat64( idx, v );
     }
 
 
-    void Image::MakeUniqueForWrite( void )
+    void Image::MakeUnique( void )
     {
       if ( this->m_PimpleImage->GetReferenceCountOfImage() > 1 )
         {

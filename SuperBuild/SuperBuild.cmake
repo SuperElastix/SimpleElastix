@@ -95,6 +95,9 @@ option(BUILD_SHARED_LIBS "Build SimpleITK ITK with shared libraries. This does n
 # as this option does not robustly work across platforms it will be marked as advanced
 mark_as_advanced( FORCE BUILD_SHARED_LIBS )
 
+option( SITK_4D_IMAGES "Add Image and I/O support for four spatial dimensions." OFF )
+mark_as_advanced( SITK_4D_IMAGES )
+
 #-----------------------------------------------------------------------------
 # Setup build type
 #------------------------------------------------------------------------------
@@ -162,6 +165,7 @@ endif(NOT SETIFEMPTY)
 list( APPEND ep_common_list
   MAKECOMMAND
   CMAKE_BUILD_TYPE
+  CMAKE_MAKE_PROGRAM
 
   CMAKE_C_COMPILER
   CMAKE_C_COMPILER_ARG1
@@ -268,6 +272,8 @@ option(USE_SYSTEM_ITK "Use a pre-built version of ITK" OFF)
 mark_as_advanced(USE_SYSTEM_ITK)
 if(USE_SYSTEM_ITK)
   find_package(ITK REQUIRED)
+  #we require certain packages be turned on in ITK
+  include("${CMAKE_CURRENT_SOURCE_DIR}/../sitkCheckForITKModuleDependencies.cmake")
 else()
   include(External_ITK)
   list(APPEND ${CMAKE_PROJECT_NAME}_DEPENDENCIES ITK)
@@ -295,6 +301,7 @@ endif()
 #------------------------------------------------------------------------------
 # SimpleITK
 #------------------------------------------------------------------------------
+
 
 get_cmake_property( _varNames VARIABLES )
 
@@ -332,6 +339,7 @@ ExternalProject_Add(${proj}
     -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY:PATH=<BINARY_DIR>/lib
     -DCMAKE_RUNTIME_OUTPUT_DIRECTORY:PATH=<BINARY_DIR>/bin
     -DCMAKE_BUNDLE_OUTPUT_DIRECTORY:PATH=<BINARY_DIR>/bin
+    -DSITK_4D_IMAGES:BOOL=${SITK_4D_IMAGES}
     ${ep_languages_args}
     # ITK
     -DITK_DIR:PATH=${ITK_DIR}

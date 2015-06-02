@@ -26,6 +26,8 @@ package org.itk.simple.testing;
 import java.math.BigInteger;
 // This is Java code to test ${name}
 import org.itk.simple.*;
+import java.util.Arrays;
+
 
 class BigIntergerFix {
   public static long Convert( long referenceType, long value) {
@@ -122,6 +124,22 @@ elseif parameter == "TrialPoints" then
         filter.addTrialPoint(idx);\
       }\
       " end)]]
+elseif point_vec and point_vec == 1 then
+    OUT=[[
+                filter.clear${parameter}();
+]]
+    for i=1,#value do
+      OUT=OUT.. [[
+                {
+                  int v[] = ]] .. value[i] .. [[;
+                  VectorUInt32 pts = new VectorUInt32( );
+                  for (int i = 0; i < inputs[0].getDimension(); i++) {
+                    pts.push_back(v[i]);
+                  }
+                  filter.add${parameter:gsub('s([0-9]?)$','%1')}(pts);
+                }
+]]
+     end
 elseif dim_vec == 1 then
       OUT=[[
       {
@@ -208,8 +226,20 @@ end)
       // Run the filter
       Image output = filter.execute ( $(if #inputs > 0 then OUT=[[inputs[0] ]] end)$(for inum=1,#inputs-1 do OUT=OUT..", inputs["..inum.."]" end) );
 
+      PixelIDValueEnum[] labelIDs = { PixelIDValueEnum.sitkLabelUInt8, PixelIDValueEnum.sitkLabelUInt16, PixelIDValueEnum.sitkLabelUInt32, PixelIDValueEnum.sitkLabelUInt64 };
+
+$(if not no_return_image then
+OUT=[[
+      if (Arrays.asList(labelIDs).contains(output.getPixelID()))
+        {
+          LabelMapToLabelImageFilter toImage = new LabelMapToLabelImageFilter();
+          output = toImage.execute(output);
+        }
+
       // Write output
       writer.setFileName( argv[argv.length - 1] ).execute( output );
+]]
+end)
     }
 )
   }

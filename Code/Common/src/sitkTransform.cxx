@@ -15,8 +15,14 @@
 *  limitations under the License.
 *
 *=========================================================================*/
+
+
+#include "sitkPimpleTransform.hxx"
+
 #include "sitkTransform.h"
 #include "sitkTemplateFunctions.h"
+#include "sitkMemberFunctionFactory.h"
+#include "sitkImageConvert.h"
 
 #include "itkTransformBase.h"
 #include "itkTransformFactory.h"
@@ -32,11 +38,19 @@
 #include "itkQuaternionRigidTransform.h"
 #include "itkVersorTransform.h"
 #include "itkVersorRigid3DTransform.h"
+#include "itkScaleSkewVersor3DTransform.h"
+#include "itkScaleVersor3DTransform.h"
 #include "itkAffineTransform.h"
 #include "itkCompositeTransform.h"
 
+#include "itkDisplacementFieldTransform.h"
+#include "itkBSplineTransform.h"
+
 #include "itkTransformFileReader.h"
 #include "itkTransformFileWriter.h"
+
+#include "itkVectorImage.h"
+#include "itkCommand.h"
 
 #include <memory>
 
@@ -87,201 +101,100 @@ bool RegisterMoreTransforms(void)
   itk::TransformFactory<MatrixOffsetTransformType>::RegisterTransform();
   typedef itk::MatrixOffsetTransformBase<double, Dimension, Dimension> MatrixOffsetTransformType;
   itk::TransformFactory<MatrixOffsetTransformType>::RegisterTransform();
+
+  // Only BSpline transforms of order 3 are registered in ITK
+  typedef itk::BSplineTransform<double, Dimension, 0> BSplineTransformO0Type;
+  itk::TransformFactory<BSplineTransformO0Type>::RegisterTransform();
+  typedef itk::BSplineTransform<double, Dimension, 1> BSplineTransformO1Type;
+  itk::TransformFactory<BSplineTransformO1Type>::RegisterTransform();
+  typedef itk::BSplineTransform<double, Dimension, 2> BSplineTransformO2Type;
+  itk::TransformFactory<BSplineTransformO2Type>::RegisterTransform();
+
   return true;
 }
 
 bool initialized = RegisterMoreTransforms<2>() && RegisterMoreTransforms<3>();
 
-}
 
-// This is a base class of the private implementatino of the transform
-// class.
-//
-// The interface provide virutal method and other generic methods to
-// the concrete ITK transform type, there by provide encapsulation and
-// a uniform interface
-class PimpleTransformBase
+/** \brief An ITK Command class to hold a object until destruction
+ *
+ * This command is to add resource management, by utilizing
+ * the lifetime of a Command added to an object is about the same as
+ * that managed object. So this command holds onto a resource or object for
+ * lifetime of itself. By adding as a command to an ITK object it will
+ * be released on destruction of the ITK object ( subject to the
+ * reference counting on the Command ).
+ */
+template< class T >
+class HolderCommand
+  : public itk::Command
 {
 public:
-  virtual ~PimpleTransformBase( void ) {};
+  typedef T ObjectType;
 
-  // Get Access to the internal ITK transform class
-  virtual TransformBase::Pointer GetTransformBase( void ) = 0;
-  virtual TransformBase::ConstPointer GetTransformBase( void ) const = 0;
+  typedef  HolderCommand Self;
+  typedef  itk::Command Superclass;
 
-  // general methods to get information about the internal class
-  virtual unsigned int GetInputDimension( void ) const = 0;
-  virtual unsigned int GetOutputDimension( void ) const = 0;
+  typedef itk::SmartPointer<Self>        Pointer;
+  typedef itk::SmartPointer<const Self>  ConstPointer;
 
-  // Set the fixed parameter for the transform, converting from the
-  // simpleITK std::vector to the ITK's array.
-  void SetFixedParameters( const std::vector< double > &inParams )
-    {
-      itk::TransformBase::ParametersType p( inParams.size() );
+  itkNewMacro( HolderCommand );
 
-      // todo check expected number of Fixed parameters
-      std::copy( inParams.begin(), inParams.end(), p.begin() );
-      this->GetTransformBase()->SetFixedParameters( p );
-    }
+  void Set(const ObjectType object) { this->m_Object = object; }
+  ObjectType &Get() {return this->m_Object;}
+  const ObjectType &Get() const {return this->m_Object;}
 
-  // Get the fixed parameters form the transform
-  std::vector< double >  GetFixedParameters( void ) const
-    {
-      const itk::TransformBase::ParametersType &p = this->GetTransformBase()->GetFixedParameters();
-      return std::vector< double >( p.begin(), p.end() );
-    }
-
-
-  unsigned int GetNumberOfParameters( void ) const { return this->GetTransformBase()->GetNumberOfParameters(); }
-
-
-  void SetParameters( const std::vector< double > &inParams )
-    {
-      itk::TransformBase::ParametersType p( inParams.size() );
-
-      // todo check expected number of Parameters
-      std::copy( inParams.begin(), inParams.end(), p.begin() );
-      this->GetTransformBase()->SetParameters( p );
-    }
-  std::vector< double > GetParameters( void ) const
-    {
-      const itk::TransformBase::ParametersType &p = this->GetTransformBase()->GetParameters();
-      return std::vector< double >( p.begin(), p.end() );
-    }
-
-
-  virtual PimpleTransformBase *ShallowCopy( void ) const = 0;
-  virtual PimpleTransformBase *DeepCopy( void ) const = 0;
-
-  virtual int GetReferenceCount( ) const = 0;
-
-  std::string ToString( void ) const
-    {
-      std::ostringstream out;
-      this->GetTransformBase()->Print ( out );
-      return out.str();
-    }
-
-  // note: the returned pointer needs to be externally managed and
-  // deleted
-  // Also the return pointer could be this
-  virtual PimpleTransformBase* AddTransform( Transform &t ) = 0;
-
-
-  virtual std::vector< double > TransformPoint( const std::vector< double > &t ) const = 0;
+  void Execute(itk::Object*, const itk::EventObject&) {}
+  void Execute(const itk::Object*, const itk::EventObject&) {}
 
 protected:
-
-};
-
-template< typename TTransformType >
-class PimpleTransform
-  : public PimpleTransformBase
-{
-public:
-  typedef PimpleTransform                  Self;
-  typedef TTransformType                   TransformType;
-  typedef typename TransformType::Pointer  TransformPointer;
-
-  typedef itk::CompositeTransform<double, TransformType::InputSpaceDimension> CompositeTransformType;
-
-  static const unsigned int InputDimension = TTransformType::InputSpaceDimension;
-  static const unsigned int OutputDimension = TTransformType::OutputSpaceDimension;
-
-  PimpleTransform( TransformType * p)
-    {
-      this->m_Transform = p;
-    }
-
-  PimpleTransform( )
-    {
-      this->m_Transform = TransformType::New();
-    }
-
-  PimpleTransform( Self &s )
-    : m_Transform( s.m_Transform )
-    {}
-
-  PimpleTransform &operator=( const PimpleTransform &s )
-    {
-      m_Transform = s.m_Transform;
-    }
-
-  virtual TransformBase::Pointer GetTransformBase( void ) { return this->m_Transform.GetPointer(); }
-  virtual TransformBase::ConstPointer GetTransformBase( void ) const { return this->m_Transform.GetPointer(); }
-
-  virtual unsigned int GetInputDimension( void ) const { return InputDimension; }
-  virtual unsigned int GetOutputDimension( void ) const { return OutputDimension; }
-
-
-  virtual PimpleTransformBase *ShallowCopy( void ) const
-    {
-      return new Self( this->m_Transform.GetPointer() );
-    }
-
-  virtual PimpleTransformBase *DeepCopy( void ) const
-    {
-      PimpleTransformBase *copy( new Self( this->m_Transform->Clone() ) );
-      return copy;
-    }
-
-  virtual int GetReferenceCount( ) const
-    {
-      return this->m_Transform->GetReferenceCount();
-    }
-
-  virtual PimpleTransformBase* AddTransform( Transform &t )
-    {
-      if ( t.GetDimension() != TransformType::InputSpaceDimension )
-        {
-        sitkExceptionMacro( "Transform argument has dimension " << t.GetDimension()
-                            << " does not match this dimesion of " << TransformType::InputSpaceDimension );
-        }
-
-      typename CompositeTransformType::TransformType* base =
-        dynamic_cast< typename CompositeTransformType::TransformType*>( t.GetITKBase() );
-
-      return this->AddTransform( base, typename nsstd::is_same<TTransformType, CompositeTransformType>::type() );
-    }
-
-  PimpleTransformBase* AddTransform( typename CompositeTransformType::TransformType* t, nsstd::true_type isCompositeTransform )
-    {
-      Unused( isCompositeTransform );
-      assert( t->GetInputSpaceDimension() == TransformType::InputSpaceDimension );
-
-      m_Transform->AddTransform( t );
-      return this;
-    }
-
-  PimpleTransformBase* AddTransform( typename CompositeTransformType::TransformType* t, nsstd::false_type isNotCompositeTransform )
-    {
-      Unused( isNotCompositeTransform );
-
-      typename CompositeTransformType::Pointer composite = CompositeTransformType::New();
-      composite->AddTransform( this->m_Transform );
-      composite->AddTransform( t );
-      return new PimpleTransform<CompositeTransformType>( composite );
-    }
-
-
-
-  virtual std::vector< double > TransformPoint( const std::vector< double > &pt ) const
-    {
-      if (pt.size() != this->GetInputDimension() )
-        {
-        sitkExceptionMacro("vector dimension mismatch");
-        }
-
-      typename TransformType::OutputPointType opt =
-        this->m_Transform->TransformPoint( sitkSTLVectorToITK< typename TransformType::InputPointType >(pt));
-
-      return sitkITKVectorToSTL<double>( opt );
-    }
+  HolderCommand() {};
+  ~HolderCommand() {};
 
 private:
+  void operator=(const HolderCommand&); // not implemented
+  HolderCommand(const HolderCommand&); // not implemented
 
-  TransformPointer m_Transform;
+  ObjectType m_Object;
+
 };
+
+template< class T >
+class HolderCommand<T*>
+  : public itk::Command
+{
+public:
+  typedef T ObjectType;
+
+  typedef  HolderCommand Self;
+  typedef  itk::Command Superclass;
+
+  typedef itk::SmartPointer<Self>        Pointer;
+  typedef itk::SmartPointer<const Self>  ConstPointer;
+
+  itkNewMacro( HolderCommand );
+
+  void Set(ObjectType *object) { this->m_Object = object; }
+  ObjectType *Get() {return this->m_Object;}
+  const ObjectType *Get() const {return this->m_Object;}
+
+  void Execute(itk::Object*, const itk::EventObject&) {}
+  void Execute(const itk::Object*, const itk::EventObject&) {}
+
+protected:
+  HolderCommand() : m_Object(NULL) {};
+  ~HolderCommand() { delete m_Object;}
+
+private:
+  void operator=(const HolderCommand&); // not implemented
+  HolderCommand(const HolderCommand&); // not implemented
+
+  ObjectType* m_Object;
+
+};
+
+}
+
 
 //
 // class Transform
@@ -292,6 +205,12 @@ Transform::Transform( )
   {
     m_PimpleTransform = new PimpleTransform<itk::IdentityTransform< double, 3 > >();
   }
+
+Transform::Transform( itk::TransformBase *transformBase )
+  : m_PimpleTransform( NULL )
+{
+  this->InternalInitialization( transformBase );
+}
 
   Transform::Transform( unsigned int dimensions, TransformEnum type)
     : m_PimpleTransform( NULL )
@@ -310,6 +229,7 @@ Transform::Transform( )
       }
   }
 
+
   Transform::~Transform()
   {
     delete m_PimpleTransform;
@@ -319,49 +239,184 @@ Transform::Transform( )
   Transform::Transform( const Transform &txf )
     : m_PimpleTransform( NULL )
   {
-    m_PimpleTransform = txf.m_PimpleTransform->ShallowCopy();
+    Self::SetPimpleTransform( txf.m_PimpleTransform->ShallowCopy() );
   }
 
   Transform& Transform::operator=( const Transform & txf )
   {
-    // note: if txf and this are the same,the following statements
-    // will be safe. It's also exception safe.
-    std::auto_ptr<PimpleTransformBase> temp( txf.m_PimpleTransform->ShallowCopy() );
-    delete this->m_PimpleTransform;
-    this->m_PimpleTransform = temp.release();
+    assert( m_PimpleTransform );
+    PimpleTransformBase *temp = txf.m_PimpleTransform->ShallowCopy();
+    this->SetPimpleTransform( temp );
     return *this;
   }
 
-void Transform::MakeUniqueForWrite( void )
+
+Transform::Transform( Image &image, TransformEnum txType )
+    : m_PimpleTransform( NULL )
+  {
+
+
+    if (txType == sitkDisplacementField)
+      {
+      const PixelIDValueEnum type = image.GetPixelID();
+      const unsigned int dimension = image.GetDimension();
+
+      // The pixel IDs supported
+      typedef typelist::MakeTypeList<VectorPixelID<double> >::Type PixelIDTypeList;
+
+      typedef void (Self::*MemberFunctionType)( Image & );
+
+      typedef DisplacementInitializationMemberFunctionAddressor<MemberFunctionType> Addressor;
+
+      detail::MemberFunctionFactory<MemberFunctionType> initializationMemberFactory(this);
+      initializationMemberFactory.RegisterMemberFunctions< PixelIDTypeList, 3,  Addressor > ();
+      initializationMemberFactory.RegisterMemberFunctions< PixelIDTypeList, 2,  Addressor > ();
+
+
+      initializationMemberFactory.GetMemberFunction( type, dimension )( image );
+      }
+    else if ( txType == sitkBSplineTransform )
+      {
+      const unsigned int dimension = image.GetDimension();
+
+      switch (dimension)
+        {
+        case 2:
+          this->InternalBSplineInitialization<2>(image);
+          break;
+        case 3:
+          this->InternalBSplineInitialization<3>(image);
+          break;
+        default:
+          sitkExceptionMacro("LogicError: Unexplected case!");
+        }
+      }
+    else
+      {
+      sitkExceptionMacro("Expected sitkDisplacementField or sitkBSplineTransform for the Transformation type!")
+      }
+
+
+  }
+
+template< unsigned int ImageDimension>
+void Transform::InternalBSplineInitialization( Image & inImage )
+{
+  typedef itk::ImageBase<ImageDimension> ImageType;
+  typename ImageType::Pointer image = dynamic_cast<ImageType *>( inImage.GetITKBase() );
+
+  if ( !image )
+    {
+    sitkExceptionMacro( "Unexpected template dispatch error!" );
+    }
+
+  typedef itk::BSplineTransform<double,ImageDimension,3> BSplineTransformType;
+  typename BSplineTransformType::Pointer itkBSpline = BSplineTransformType::New();
+
+  itkBSpline->SetTransformDomainOrigin( image->GetOrigin() );
+  itkBSpline->SetTransformDomainDirection( image->GetDirection() );
+
+  const typename BSplineTransformType::MeshSizeType  meshSize( image->GetLargestPossibleRegion().GetSize() );
+
+  typename BSplineTransformType::PhysicalDimensionsType fixedPhysicalDimensions;
+
+  for( unsigned int i=0; i< ImageDimension; i++ )
+    {
+    fixedPhysicalDimensions[i] = image->GetSpacing()[i] * static_cast<double>( meshSize[i] - 1 );
+    }
+
+  itkBSpline->SetTransformDomainMeshSize( meshSize );
+  itkBSpline->SetTransformDomainPhysicalDimensions( fixedPhysicalDimensions );
+
+
+
+  typedef typename BSplineTransformType::ParametersType ParametersType;;
+
+  typename HolderCommand<ParametersType *>::Pointer holder = HolderCommand<ParametersType *>::New();
+  itkBSpline->AddObserver( itk::DeleteEvent(), holder);
+  holder->Set( new ParametersType( itkBSpline->GetNumberOfParameters() ) );
+
+  itkBSpline->SetParameters( *holder->Get() );
+  itkBSpline->SetIdentity();
+
+
+  Self::SetPimpleTransform( new PimpleTransform< BSplineTransformType >( itkBSpline.GetPointer() ) );
+}
+
+  template< typename TDisplacementType >
+  void Transform::InternalDisplacementInitialization( Image & inImage )
+  {
+    typedef TDisplacementType VectorImageType;
+
+    typedef typename VectorImageType::PixelType PixelType;
+    typedef typename VectorImageType::InternalPixelType ComponentType;
+    const unsigned int ImageDimension = VectorImageType::ImageDimension;
+
+    typedef itk::Image< itk::Vector<ComponentType, ImageDimension>, ImageDimension > ITKDisplacementType;
+    typedef itk::DisplacementFieldTransform< ComponentType, ImageDimension > DisplacementTransformType;
+
+    typename VectorImageType::Pointer image = dynamic_cast < VectorImageType* > ( inImage.GetITKBase() );
+
+    if ( image.IsNull() )
+      {
+      sitkExceptionMacro( "Unexpected template dispatch error!" );
+      }
+
+    typename ITKDisplacementType::Pointer itkDisplacement = GetImageFromVectorImage(image.GetPointer(), true );
+    inImage = Image();
+
+    Self::SetPimpleTransform( new PimpleTransform< DisplacementTransformType >(itkDisplacement.GetPointer()) );
+  }
+
+
+
+void Transform::MakeUnique( void )
 {
   if ( this->m_PimpleTransform->GetReferenceCount() > 1 )
     {
-    std::auto_ptr<PimpleTransformBase> temp( this->m_PimpleTransform->DeepCopy() );
-    delete this->m_PimpleTransform;
-    this->m_PimpleTransform = temp.release();
+    PimpleTransformBase *temp = this->m_PimpleTransform->DeepCopy();
+    this->SetPimpleTransform( temp );
     }
 }
 
-  template< unsigned int VDimension>
-  void  Transform::InternalInitialization(  TransformEnum type, itk::TransformBase *base )
+Transform::Transform( PimpleTransformBase *pimpleTransform )
+    : m_PimpleTransform( pimpleTransform )
   {
+    if ( pimpleTransform == NULL )
+      {
+      sitkExceptionMacro("Invalid NULL PimpleTransform!");
+      }
+  }
+
+
+void Transform::SetPimpleTransform( PimpleTransformBase *pimpleTransform )
+{
+  delete this->m_PimpleTransform;
+  this->m_PimpleTransform = pimpleTransform;
+}
+
+
+  template< unsigned int VDimension>
+  void Transform::InternalInitialization(  TransformEnum type, itk::TransformBase *base )
+  {
+    PimpleTransformBase* temp;
     switch( type )
       {
 
       case sitkTranslation:
-        m_PimpleTransform = new PimpleTransform<itk::TranslationTransform< double, VDimension > >();
+        temp = new PimpleTransform<itk::TranslationTransform< double, VDimension > >();
         break;
       case sitkScale:
-        m_PimpleTransform = new PimpleTransform<itk::ScaleTransform< double, VDimension > >();
+        temp = new PimpleTransform<itk::ScaleTransform< double, VDimension > >();
         break;
       case sitkScaleLogarithmic:
-        m_PimpleTransform = new PimpleTransform<itk::ScaleLogarithmicTransform< double, VDimension > >();
+        temp = new PimpleTransform<itk::ScaleLogarithmicTransform< double, VDimension > >();
         break;
       case sitkEuler:
-        m_PimpleTransform = new PimpleTransform<typename TransformTraits<double,VDimension>::EulerTransformType>();
+        temp = new PimpleTransform<typename TransformTraits<double,VDimension>::EulerTransformType>();
         break;
       case sitkSimilarity:
-        m_PimpleTransform = new PimpleTransform<typename TransformTraits<double,VDimension>::SimilarityTransformType>();
+        temp = new PimpleTransform<typename TransformTraits<double,VDimension>::SimilarityTransformType>();
         break;
       case sitkQuaternionRigid:
         if( VDimension != 3)
@@ -369,7 +424,7 @@ void Transform::MakeUniqueForWrite( void )
           sitkExceptionMacro( "A sitkQuaternionRigid Transform only works for 3D!");
           }
 
-        m_PimpleTransform = new PimpleTransform<itk::QuaternionRigidTransform< double > >();
+        temp = new PimpleTransform<itk::QuaternionRigidTransform< double > >();
         break;
       case sitkVersor:
         if( VDimension != 3)
@@ -377,7 +432,7 @@ void Transform::MakeUniqueForWrite( void )
           sitkExceptionMacro( "A sitkVersor Transform only works for 3D!");
           }
 
-        m_PimpleTransform = new PimpleTransform<itk::VersorTransform< double > >();
+        temp = new PimpleTransform<itk::VersorTransform< double > >();
         break;
       case sitkVersorRigid:
         if( VDimension != 3)
@@ -385,27 +440,41 @@ void Transform::MakeUniqueForWrite( void )
           sitkExceptionMacro( "A sitkVersorRigid Transform only works for 3D!");
           }
 
-        m_PimpleTransform = new PimpleTransform<itk::VersorRigid3DTransform< double > >();
+        temp = new PimpleTransform<itk::VersorRigid3DTransform< double > >();
+        break;
+      case sitkScaleSkewVersor:
+        if( VDimension != 3)
+          {
+          sitkExceptionMacro( "A sitkScaleSkewVersor Transform only works for 3D!");
+          }
+
+        temp = new PimpleTransform<itk::ScaleSkewVersor3DTransform< double > >();
         break;
       case sitkAffine:
-        m_PimpleTransform = new PimpleTransform<itk::AffineTransform< double, VDimension > >();
+        temp = new PimpleTransform<itk::AffineTransform< double, VDimension > >();
         break;
       case sitkComposite:
         {
         typename itk::CompositeTransform<double, VDimension>::Pointer compositeTransform;
 
-        if ( !base )
+        // if null it'll be converted, no null check needed
+        compositeTransform = dynamic_cast<itk::CompositeTransform<double, VDimension>*>( base );
+
+        if ( !compositeTransform )
           {
           compositeTransform = itk::CompositeTransform<double, VDimension>::New();
-          }
-        else
-          {
-          compositeTransform = dynamic_cast<itk::CompositeTransform<double, VDimension>*>( base );
-          if ( !compositeTransform )
+
+          // base argument was non-composite place into composite
+          if ( base )
             {
-            sitkExceptionMacro("Unexpectedly unable to convert to CompositeTransform" );
+            typedef itk::Transform<double,  VDimension,  VDimension> TransformType;
+            TransformType* itktx = dynamic_cast<TransformType*>(base);
+
+            compositeTransform->ClearTransformQueue();
+            compositeTransform->AddTransform( itktx );
             }
           }
+
 
         if ( compositeTransform->IsTransformQueueEmpty() )
           {
@@ -416,16 +485,28 @@ void Transform::MakeUniqueForWrite( void )
 
           compositeTransform->AddTransform( identityTransform );
           }
-        m_PimpleTransform = new PimpleTransform<itk::CompositeTransform<double, VDimension> >( compositeTransform );
+
+        compositeTransform->SetAllTransformsToOptimizeOff();
+        compositeTransform->SetOnlyMostRecentTransformToOptimizeOn();
+
+        temp = new PimpleTransform<itk::CompositeTransform<double, VDimension> >( compositeTransform );
+
         }
         break;
+      case sitkDisplacementField:
+      case sitkBSplineTransform:
+        // todo print transform type..
+        sitkExceptionMacro("Incorrect constructor for transform type.");
       case sitkIdentity:
       default:
-        m_PimpleTransform = new PimpleTransform<itk::IdentityTransform< double, VDimension > >();
+        temp = new PimpleTransform<itk::IdentityTransform< double, VDimension > >();
 
       }
+    Self::SetPimpleTransform(temp);
   }
 
+  template void SITKCommon_EXPORT Transform::InternalInitialization<2>( TransformEnum, itk::TransformBase * );
+  template void SITKCommon_EXPORT Transform::InternalInitialization<3>( TransformEnum, itk::TransformBase * );
 
   itk::TransformBase* Transform::GetITKBase ( void )
   {
@@ -448,7 +529,7 @@ void Transform::MakeUniqueForWrite( void )
   void Transform::SetParameters ( const std::vector<double>& parameters )
   {
     assert( m_PimpleTransform );
-    this->MakeUniqueForWrite();
+    this->MakeUnique();
     this->m_PimpleTransform->SetParameters( parameters );
   }
 
@@ -461,7 +542,7 @@ void Transform::MakeUniqueForWrite( void )
   void Transform::SetFixedParameters ( const std::vector<double>& parameters )
   {
     assert( m_PimpleTransform );
-    this->MakeUniqueForWrite();
+    this->MakeUnique();
     this->m_PimpleTransform->SetFixedParameters( parameters );
   }
 
@@ -474,13 +555,12 @@ void Transform::MakeUniqueForWrite( void )
   Transform &Transform::AddTransform( Transform t )
   {
     assert( m_PimpleTransform );
-    this->MakeUniqueForWrite();
+    this->MakeUnique();
     // this returns a pointer which may be the same or a new object
     PimpleTransformBase *temp = this->m_PimpleTransform->AddTransform( t );
     if ( temp != this->m_PimpleTransform )
       {
-      delete this->m_PimpleTransform;
-      this->m_PimpleTransform = temp;
+      this->SetPimpleTransform(temp);
       }
     return *this;
   }
@@ -491,11 +571,147 @@ void Transform::MakeUniqueForWrite( void )
     return this->m_PimpleTransform->TransformPoint( point );
   }
 
+
+  bool Transform::IsLinear() const
+  {
+    assert( m_PimpleTransform );
+    return this->m_PimpleTransform->IsLinear();
+  }
+
+  void Transform::SetIdentity()
+  {
+    assert( m_PimpleTransform );
+    this->MakeUnique();
+    return this->m_PimpleTransform->SetIdentity();
+  }
+
+  bool Transform::SetInverse()
+  {
+    assert( m_PimpleTransform );
+    std::auto_ptr<PimpleTransformBase> temp;
+    {
+    // See if a new pimple transform can be created
+    PimpleTransformBase *p = NULL;
+    if (!this->m_PimpleTransform->GetInverse(p))
+      {
+      return false;
+      }
+    temp.reset(p);
+    }
+    // take ownership of the new pimple transform
+    this->SetPimpleTransform( temp.release() );
+    return true;
+  }
+
+  Transform Transform::GetInverse() const
+  {
+    // create a shallow copy
+    Transform tx(*this);
+    if (!tx.SetInverse())
+      {
+      sitkExceptionMacro("Unable to create inverse!");
+      }
+    return tx;
+  }
+
   std::string Transform::ToString( void ) const
   {
     assert( m_PimpleTransform );
-    return this->m_PimpleTransform->ToString();
+
+    // mark as used
+    static_cast<void>( itk::simple::initialized );
+
+    return std::string("itk::simple::")+this->GetName() + '\n'+this->m_PimpleTransform->ToString();
   }
+
+  std::string Transform::GetName( void ) const
+  {
+    return "Transform";
+  }
+
+
+void Transform::InternalInitialization(itk::TransformBase *transform)
+{
+
+  TransformTryCastVisitor visitor;
+  visitor.transform = transform;
+  visitor.that = this;
+
+  // The following list must have the children before their parents to
+  // cast to the most derived classes
+  typedef typelist::MakeTypeList<itk::IdentityTransform<double, 2>,
+                                 itk::IdentityTransform<double, 3>,
+                                 itk::TranslationTransform<double, 2>,
+                                 itk::TranslationTransform<double, 3>,
+
+                                 itk::ScaleLogarithmicTransform< double, 2 >,
+                                 itk::ScaleLogarithmicTransform< double, 3 >,
+                                 itk::ScaleTransform< double, 2>,
+                                 itk::ScaleTransform< double, 3>,
+
+                                 TransformTraits< double, 2>::EulerTransformType,
+
+                                 TransformTraits< double, 3>::EulerTransformType,
+
+                                 TransformTraits< double, 2>::SimilarityTransformType,
+
+                                 TransformTraits< double, 3>::SimilarityTransformType,
+                                 itk::ScaleSkewVersor3DTransform< double >,
+                                 itk::ScaleVersor3DTransform< double >,
+                                 itk::VersorRigid3DTransform< double >,
+                                 itk::VersorTransform< double >,
+
+                                 itk::QuaternionRigidTransform< double >,
+
+                                 itk::AffineTransform<double,3>,
+                                 itk::AffineTransform<double,2>,
+
+                                 itk::DisplacementFieldTransform<double, 3>,
+                                 itk::DisplacementFieldTransform<double, 2>,
+
+                                 itk::BSplineTransform<double, 3, 0>,
+                                 itk::BSplineTransform<double, 2, 0>,
+                                 itk::BSplineTransform<double, 3, 1>,
+                                 itk::BSplineTransform<double, 2, 1>,
+                                 itk::BSplineTransform<double, 3, 2>,
+                                 itk::BSplineTransform<double, 2, 2>,
+                                 itk::BSplineTransform<double, 3, 3>,
+                                 itk::BSplineTransform<double, 2, 3>
+                                 >::Type TransformTypeList;
+
+  typelist::Visit<TransformTypeList> callInternalInitialization;
+
+  callInternalInitialization(visitor);
+
+  // The transform didn't match a known type, place it into a Composite.
+  if ( !m_PimpleTransform )
+    {
+    if ( transform->GetInputSpaceDimension() == 2 &&
+         transform->GetInputSpaceDimension() == 2 )
+      {
+      this->InternalInitialization<2>( sitkComposite, transform );
+      }
+    else if ( transform->GetInputSpaceDimension() == 3 &&
+              transform->GetInputSpaceDimension() == 3 )
+      {
+      this->InternalInitialization<3>( sitkComposite, transform );
+      }
+    else
+      {
+      sitkExceptionMacro( "Unable to create transform with InputSpaceDimension: " <<  transform->GetInputSpaceDimension()
+                        << " and OutputSpaceDimension: " << transform->GetOutputSpaceDimension() << ". "
+                        << "Transform of type " << transform->GetNameOfClass() << "is not supported." );
+      }
+    }
+}
+
+
+template<class TransformType>
+void Transform::InternalInitialization(TransformType *t)
+{
+  PimpleTransformBase* temp = new PimpleTransform<TransformType>(t);
+  Self::SetPimpleTransform(temp);
+}
 
   Transform ReadTransform( const std::string &filename )
   {
@@ -510,73 +726,44 @@ void Transform::MakeUniqueForWrite( void )
       sitkExceptionMacro( "Read transform file: \"" << filename << "\", but there appears to be not transform in the file!" );
       }
 
+    if( list->size() != 1 )
+      {
+      std::cerr << "Warning: There is more than one tranform in the file! Only using the first transform.\n";
+      }
+
     if( list->front()->GetInputSpaceDimension() == 3
         && list->front()->GetOutputSpaceDimension() == 3 )
       {
-      typedef itk::CompositeTransform<double, 3> CompositeTransformType;
-      typedef CompositeTransformType::TransformType TransformType;
-
-      CompositeTransformType::Pointer comp;
-
-      // check if transform is a composite
-      comp = dynamic_cast<CompositeTransformType*>(list->front().GetPointer());
-      if ( comp )
+      typedef itk::Transform<double, 3, 3> TransformType3D;
+      TransformType3D* itktx3d = dynamic_cast<TransformType3D*>(list->front().GetPointer());
+      if (!itktx3d)
         {
-        return Transform( comp.GetPointer() );
+        sitkExceptionMacro( "Unexpected type conversion error for 3D Transform!");
         }
-
-      if( list->size() != 1 )
-        {
-        std::cerr << "Warning: There is more than one tranform in the file! Only using the first transform.\n";
-        }
-
-
-      typedef itk::Transform<double, 3, 3> TransformType;
-      TransformType* itktx = dynamic_cast<TransformType*>(list->front().GetPointer());
-      if (itktx)
-        {
-        comp = CompositeTransformType::New();
-        comp->ClearTransformQueue();
-        comp->AddTransform( itktx );
-        return Transform( comp.GetPointer() );
-        }
+      return Transform(itktx3d);
 
       }
+
+
 
     if( list->front()->GetInputSpaceDimension() == 2
         && list->front()->GetOutputSpaceDimension() == 2)
       {
-      typedef itk::CompositeTransform<double, 2> CompositeTransformType;
 
-      CompositeTransformType::Pointer comp;
-
-      // check if transform is a composite
-      comp = dynamic_cast<CompositeTransformType*>(list->front().GetPointer());
-      if ( comp )
+      typedef itk::Transform<double, 2, 2> TransformType2D;
+      TransformType2D* itktx2d = dynamic_cast<TransformType2D*>(list->front().GetPointer());
+      if (!itktx2d)
         {
-        return Transform( comp.GetPointer() );
+        sitkExceptionMacro( "Unexpected type conversion error for 2D Transform!");
         }
+      return Transform(itktx2d);
 
-      if( list->size() != 1 )
-        {
-        std::cerr << "Warning: There is more than one tranform in the file! Only using the first transform.\n";
-        }
-
-      typedef itk::Transform<double, 2, 2> TransformType;
-      TransformType* itktx = dynamic_cast<TransformType*>(list->front().GetPointer());
-
-      if (itktx)
-        {
-        comp = CompositeTransformType::New();
-        comp->ClearTransformQueue();
-        comp->AddTransform( itktx );
-        return Transform( comp.GetPointer() );
-        }
 
       }
 
+
     sitkExceptionMacro( "Unable to transform with InputSpaceDimension: " <<  list->front()->GetInputSpaceDimension()
-                        << " and OutputSpaceDimension: " << list->front()->GetOutputSpaceDimension() << "."
+                        << " and OutputSpaceDimension: " << list->front()->GetOutputSpaceDimension() << ". "
                         << "Transform of type " << list->front()->GetNameOfClass() << "is not supported." );
 
   }

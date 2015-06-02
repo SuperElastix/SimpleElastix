@@ -37,6 +37,8 @@ $(include ConstructorMemberFunctionSetup.cxx.in)
 $(include ConstructorVectorPixels.cxx.in)
 }
 
+$(include DesctuctorDefinition.cxx.in)
+
 //
 // ToString
 //
@@ -74,6 +76,10 @@ end)
 end)
 $(include ExecuteNoParameters.cxx.in)
 
+//-----------------------------------------------------------------------------
+
+$(include CustomCasts.cxx)
+
 //----------------------------------------------------------------------------
 
 $(include ExecuteInternalVectorImages.cxx.in)
@@ -107,7 +113,8 @@ $(include ExecuteInternalSetITKFilterInputs.cxx.in)
     NodeType index = sitkSTLVectorToITK<NodeType>( m_TrialPoints[i] );
     node.SetNode( index );
     node.SetValue( 0.0 );
-
+    if (m_TrialPoints[i].size() > NodeType::Dimension)
+      node.SetValue(m_TrialPoints[i][NodeType::Dimension]);
     trialNodes->push_back( node );
     }
   filter->SetTrialPoints( trialNodes );
@@ -120,7 +127,7 @@ $(include ExecuteInternalUpdateAndReturn.cxx.in)
 //
 // Function to run the Execute method of this filter
 //
-Image ${name:gsub("ImageFilter$", "")} ( const Image& imageA,
+Image ${name:gsub("ImageFilter$", ""):gsub("Filter$", "")} ( const Image& imageA,
   std::vector< std::vector<unsigned int> > trialPoints$(include MemberParameters.in) )
 {
   ${name} filter;

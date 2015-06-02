@@ -106,9 +106,6 @@ namespace std
   %template(VectorUIntList) vector< vector<unsigned int> >;
   %template(VectorString) vector< std::string >;
 
-  // Support for LabelStatisticsImageFilter/MeasurementMap
-  %template(BasicMeasurementMap) map<std::string, double>;
-
   %template(DoubleDoubleMap) map<double, double>;
 }
 
@@ -123,32 +120,42 @@ namespace std
 #define SITKBasicFilters_HIDDEN
 #define SITKIO_EXPORT
 #define SITKIO_HIDDEN
+#define SITKRegistration_EXPORT
+#define SITKRegistration_HIDDEN
 
 
 // Any new classes need to have an "%include" statement to be wrapped.
 
 // Common
+%include "sitkConfigure.h"
 %include "sitkVersion.h"
 %include "sitkPixelIDValues.h"
 %include "sitkImage.h"
-%include "sitkTransform.h"
 %include "sitkCommand.h"
 %include "sitkInterpolator.h"
 %include "sitkKernel.h"
 %include "sitkEvent.h"
 
+// Transforms
+%include "sitkTransform.h"
+%include "sitkBSplineTransform.h"
+%include "sitkDisplacementFieldTransform.h"
+%include "sitkAffineTransform.h"
+%include "sitkEuler3DTransform.h"
+%include "sitkEuler2DTransform.h"
+%include "sitkScaleTransform.h"
+%include "sitkScaleSkewVersor3DTransform.h"
+%include "sitkScaleVersor3DTransform.h"
+%include "sitkSimilarity2DTransform.h"
+%include "sitkSimilarity3DTransform.h"
+%include "sitkTranslationTransform.h"
+%include "sitkVersorTransform.h"
+%include "sitkVersorRigid3DTransform.h"
+
+
 // Basic Filter Base
 %include "sitkProcessObject.h"
-%include "sitkImageFilterExecuteBase.h"
 %include "sitkImageFilter.h"
-
-// describe instantiated  templates
-%template(ImageFilterExecuteBase_0) itk::simple::ImageFilterExecuteBase<0>;
-%template(ImageFilterExecuteBase_1) itk::simple::ImageFilterExecuteBase<1>;
-%template(ImageFilterExecuteBase_2) itk::simple::ImageFilterExecuteBase<2>;
-%template(ImageFilterExecuteBase_3) itk::simple::ImageFilterExecuteBase<3>;
-%template(ImageFilterExecuteBase_4) itk::simple::ImageFilterExecuteBase<4>;
-%template(ImageFilterExecuteBase_5) itk::simple::ImageFilterExecuteBase<5>;
 
 %template(ImageFilter_0) itk::simple::ImageFilter<0>;
 %template(ImageFilter_1) itk::simple::ImageFilter<1>;
@@ -160,15 +167,16 @@ namespace std
 // IO
 %include "sitkShow.h"
 %include "sitkImageFileWriter.h"
+%include "sitkImageSeriesWriter.h"
 %include "sitkImageReaderBase.h"
 %include "sitkImageSeriesReader.h"
 %include "sitkImageFileReader.h"
 
 // Basic Filters
 %include "sitkHashImageFilter.h"
-%include "sitkStatisticsImageFilter.h"
-%include "sitkMeasurementMap.h"
-%include "sitkLabelStatisticsImageFilter.h"
+%include "sitkBSplineTransformInitializerFilter.h"
+%include "sitkCenteredTransformInitializerFilter.h"
+%include "sitkCenteredVersorTransformInitializerFilter.h"
 %include "sitkCastImageFilter.h"
 %include "sitkAdditionalProcedures.h"
 
@@ -177,6 +185,9 @@ namespace std
 %template(ParameterMapList) std::vector< std::map< std::string, std::vector< std::string > > >;
 %include "sitkSimpleElastix.h"
 %include "sitkSimpleTransformix.h"
+
+// Registration
+%include "sitkImageRegistrationMethod.h"
 
 // Only C# can handle import filter
 #if SWIGCSHARP

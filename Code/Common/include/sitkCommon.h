@@ -24,6 +24,11 @@
 #error "sitkMacro.h must be included before sitkCommon.h"
 #endif
 
+#ifdef SITK_USE_EXPLICITITK
+#include "sitkExplicitITK.h"
+#endif
+
+
 #if defined( SITKDLL )
   #ifdef SimpleITKCommon_EXPORTS
     #define SITKCommon_EXPORT SITK_ABI_EXPORT

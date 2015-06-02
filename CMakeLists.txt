@@ -49,7 +49,10 @@ message(STATUS "Building SimpleITK version \"${SimpleITK_VERSION}\"")
 include(sitkCheckRequiredFlags)
 
 
-find_package(ITK REQUIRED ) # the modules needed can be listed here as required components
+find_package(ITK REQUIRED )
+#we require certain packages be turned on in ITK
+include("sitkCheckForITKModuleDependencies.cmake")
+
 if(ITK_FOUND)
   # NOTE: We are purposely not calling UseITK yet. However, we must make
   # sure the requred compilation and linker flags are set. Since, we
@@ -108,37 +111,15 @@ if( NOT ITK_USE_REVIEW )
 #  message(FATAL_ERROR "Please reconfigure ITK by turning ITK_USE_REVIEW ON")
 endif()
 
-# Setup build locations.
-if(NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
-  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
-endif()
-if(NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY)
-  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
-endif()
-if(NOT CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
-  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
-endif()
-
-set ( SimpleITK_INCLUDE_DIRS
-      ${CMAKE_SOURCE_DIR}/Code/Common/include
-      ${CMAKE_SOURCE_DIR}/Code/Registration
-      ${CMAKE_SOURCE_DIR}/Code/BasicFilters/include
-      ${CMAKE_SOURCE_DIR}/Code/IO/include
-      ${CMAKE_SOURCE_DIR}/Code/Elastix/include
-      ${CMAKE_BINARY_DIR}/Code/BasicFilters/include
-      ${CMAKE_BINARY_DIR}/Code/Common/include
-      ${CMAKE_BINARY_DIR}/Code/Elastix/include
-      )
-
-set ( SimpleITK_LIBRARIES SimpleITKCommon SimpleITKIO SimpleElastix SimpleTransformix CACHE INTERNAL "" )
-
-# Be sure to clear these each time
-set ( GENERATED_TEST_LIST "" CACHE INTERNAL "" )
-set ( GENERATED_FILTER_LIST "" CACHE INTERNAL "" )
-set ( GENERATED_TEST_SOURCE_LIST "" CACHE INTERNAL "" )
-
 #----------------------------------------------------------
 # Place all options to go into sitkConfigure.h here
+option(BUILD_SHARED_LIBS "Build SimpleITK ITK with shared libraries. This does not effect wrapped languages." OFF)
+set(SITK_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
+
+option(SITK_EXPLICIT_INSTANTIATION "Enable an ITK static library of explicitly instantiated templates." ON)
+if ( MSVC AND SITK_BUILD_SHARED_LIBS )
+  set( SITK_SimpleITKExplit_STATIC 1 )
+endif()
 
 set( SITK_INT64_PIXELIDS_DEFAULT ON )
 if( MSVC )
@@ -159,11 +140,44 @@ option( SITK_INT64_PIXELIDS "Instantiate 64-bit integer pixels, including unsign
 option ( SITK_EXPRESS_INSTANTIATEDPIXELS "Instantiate very few pixel types ( for use for development only )" OFF )
 mark_as_advanced ( SITK_EXPRESS_INSTANTIATEDPIXELS )
 
+option( SITK_4D_IMAGES "Add Image and I/O support for four spatial dimensions." OFF )
+mark_as_advanced( SITK_4D_IMAGES )
 
-#-----------------------------------------------------------------------------
-# SimpleITK build configuration options.
-option(BUILD_SHARED_LIBS "Build SimpleITK ITK with shared libraries. This does not effect wrapped languages." OFF)
-set(SITK_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
+
+# Setup build locations.
+if(NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
+endif()
+if(NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
+endif()
+if(NOT CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
+  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
+endif()
+
+set ( SimpleITK_INCLUDE_DIRS
+      ${CMAKE_SOURCE_DIR}/Code/Common/include
+      ${CMAKE_SOURCE_DIR}/Code/Registration/include
+      ${CMAKE_SOURCE_DIR}/Code/BasicFilters/include
+      ${CMAKE_SOURCE_DIR}/Code/IO/include
+      ${CMAKE_SOURCE_DIR}/Code/Elastix/include
+      ${CMAKE_BINARY_DIR}/Code/BasicFilters/include
+      ${CMAKE_BINARY_DIR}/Code/Common/include
+      )
+
+set ( SimpleITK_LIBRARIES SimpleITKCommon SimpleITKIO SimpleITKRegistration SimpleElastix SimpleTransformix )
+
+if (SITK_EXPLICIT_INSTANTIATION)
+  list ( APPEND SimpleITK_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/Code/Explicit/include )
+  list ( APPEND SimpleITK_LIBRARIES  SimpleITKExplicit )
+endif()
+
+set( SimpleITK_LIBRARIES ${SimpleITK_LIBRARIES}  CACHE INTERNAL "" )
+
+# Be sure to clear these each time
+set ( GENERATED_TEST_LIST "" CACHE INTERNAL "" )
+set ( GENERATED_FILTER_LIST "" CACHE INTERNAL "" )
+set ( GENERATED_TEST_SOURCE_LIST "" CACHE INTERNAL "" )
 
 
 
@@ -404,13 +418,6 @@ add_subdirectory ( Utilities )
 add_subdirectory ( Code )
 add_subdirectory ( Wrapping )
 
-# optional examples directory
-option(BUILD_EXAMPLES "Build the Examples directory." ON)
-
-if(BUILD_EXAMPLES)
-  add_subdirectory ( Examples )
-endif()
-
 #------------------------------------------------------------------------------
 # ITK uses KWStyle for checking the coding style
 include(${SimpleITK_SOURCE_DIR}/Utilities/KWStyle/KWStyle.cmake)
@@ -420,13 +427,8 @@ include(${SimpleITK_SOURCE_DIR}/Utilities/KWStyle/KWStyle.cmake)
 
 if ( BUILD_TESTING )
 
-  # Fetch testing data.
-  # 2.8.11 required for ExternalData.cmake.
-  if( CMAKE_VERSION VERSION_LESS 2.8.11 )
-    message( FATAL_ERROR "BUILD_TESTING ON requires CMake 2.8.11 or newer." )
-  endif()
+  include( sitkAddTest )
 
-  include( SimpleITKExternalData )
   file( GLOB_RECURSE content_links
     RELATIVE "${SimpleITK_SOURCE_DIR}" "Testing/Data/*.md5" )
   foreach(link ${content_links})
@@ -436,15 +438,23 @@ if ( BUILD_TESTING )
       DATA{${link}}
       )
   endforeach()
-  ExternalData_Add_Target( SimpleITKData )
 
   enable_testing()
   add_subdirectory ( Testing )
+
   option ( RUN_LONG_TESTS "Run long tests.  Some tests have been identified as long running, should these be run?" OFF )
   mark_as_advanced(RUN_LONG_TESTS)
   set(BUILDNAME "${BUILDNAME}" CACHE STRING "Name of build on the dashboard")
   configure_file(CMake/CTestCustom.cmake.in CTestCustom.cmake)
 endif()
+
+# optional examples directory with testing
+option(BUILD_EXAMPLES "Build the Examples directory." ON)
+
+if(BUILD_EXAMPLES)
+  add_subdirectory ( Examples )
+endif()
+
 
 #------------------------------------------------------------------------------
 # Options for documentation
@@ -539,6 +549,16 @@ install(
 
 install(FILES ${SimpleITK_DOC_FILES} DESTINATION "${SimpleITK_INSTALL_DOC_DIR}" COMPONENT Runtime)
 
+# Additional files needed by SimpleElastix
+install(
+  DIRECTORY 
+    ${ITK_INCLUDE_DIRS}
+    ${ELASTIX_INCLUDE_DIRECTORIES}
+  DESTINATION 
+    ${SimpleITK_INSTALL_INCLUDE_DIR}/
+  COMPONENT Development
+  FILES_MATCHING PATTERN "*.h"
+)
 
 #------------------------------------------------------------------------------
 # CPack
@@ -550,3 +570,7 @@ set(CPACK_PACKAGE_VERSION_PATCH "${SimpleITK_Patch}")
 
 
 include( CPack )
+
+if(COMMAND ExternalData_Add_Target )
+  ExternalData_Add_Target( SimpleITKData )
+endif()

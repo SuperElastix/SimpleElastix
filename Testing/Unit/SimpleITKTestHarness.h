@@ -18,8 +18,27 @@
 #ifndef __SimpleITKTestHarness_h
 #define __SimpleITKTestHarness_h
 
-// include ITK before STL to prevent warning in std::copy
-#include <itkMacro.h>
+
+#include <ostream>
+#include <vector>
+#include <iterator>
+#include <algorithm>
+
+// This is needed before the gtest include for lookup of the operator
+// to work with clang 5.1
+namespace {
+inline std::ostream& operator<< (std::ostream& os, const std::vector<double>& v)
+ {
+   if ( v.empty() )
+     {
+     return os << "[ ]";
+     }
+
+   os << "[ ";
+   std::copy( v.begin(), v.end()-1, std::ostream_iterator<double>(os, ", ") );
+   return os << v.back() << " ]";
+ }
+}
 
 #include <string>
 #include <vector>
@@ -228,6 +247,61 @@ public:
 
   int m_Count;
 };
+
+
+namespace
+{
+
+
+inline std::vector<double> v2(double v1, double v2)
+{
+  std::vector<double> temp(2);
+  temp[0]=v1;temp[1]=v2;
+  return temp;
+}
+
+inline std::vector<double> v3(double v1, double v2, double v3)
+{
+  std::vector<double> temp(3);
+  temp[0]=v1;temp[1]=v2;temp[2]=v3;
+  return temp;
+}
+
+inline std::vector<double> v4(double v1, double v2, double v3, double v4)
+{
+  std::vector<double> temp(4);
+  temp[0]=v1;temp[1]=v2;temp[2]=v3;temp[3]=v4;
+  return temp;
+}
+
+inline std::vector<double> v9(double v1, double v2, double v3,
+                              double v4, double v5, double v6,
+                              double v7, double v8, double v9)
+{
+  std::vector<double> temp(9);
+  temp[0]=v1;temp[1]=v2;temp[2]=v3;
+  temp[3]=v4;temp[4]=v5;temp[5]=v6;
+  temp[6]=v7;temp[7]=v8;temp[8]=v9;
+  return temp;
+}
+
+
+}
+
+::testing::AssertionResult VectorDoubleRMSPredFormat(const char* expr1,
+                                                     const char* expr2,
+                                                     const char* rms_error_expr,
+                                                     const std::vector<double> &val1,
+                                                     const std::vector<double> &val2,
+                                                     double rms_error);
+
+
+
+#define EXPECT_VECTOR_DOUBLE_NEAR(val1, val2, rms_error)                \
+  EXPECT_PRED_FORMAT3(VectorDoubleRMSPredFormat,                        \
+                      val1, val2, rms_error)
+
+
 
 #include "sitkImageCompare.h"
 

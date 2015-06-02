@@ -3,6 +3,19 @@ set ( SimpleITKCommonSource
   sitkImageExplicit.cxx
   sitkProcessObject.cxx
   sitkTransform.cxx
+  sitkAffineTransform.cxx
+  sitkBSplineTransform.cxx
+  sitkDisplacementFieldTransform.cxx
+  sitkEuler2DTransform.cxx
+  sitkEuler3DTransform.cxx
+  sitkScaleTransform.cxx
+  sitkScaleSkewVersor3DTransform.cxx
+  sitkScaleVersor3DTransform.cxx
+  sitkSimilarity2DTransform.cxx
+  sitkSimilarity3DTransform.cxx
+  sitkTranslationTransform.cxx
+  sitkVersorTransform.cxx
+  sitkVersorRigid3DTransform.cxx
   sitkCommand.cxx
   sitkFunctionCommand.cxx
   sitkPixelIDValues.cxx
@@ -20,6 +33,9 @@ include(${ITK_USE_FILE})
 
 add_library ( SimpleITKCommon ${SimpleITKCommonSource} ${SimpleITKAncillarySource} )
 target_link_libraries ( SimpleITKCommon ${ITK_LIBRARIES} )
+if (SITK_EXPLICIT_INSTANTIATION)
+  target_link_libraries ( SimpleITKCommon SimpleITKExplicit )
+endif()
 set_target_properties( SimpleITKCommon PROPERTIES SKIP_BUILD_RPATH TRUE )
 
 sitk_install_exported_target( SimpleITKCommon )

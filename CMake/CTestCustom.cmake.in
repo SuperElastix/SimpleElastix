@@ -48,6 +48,9 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   # Ignore warning in lua about the use of `tmpnam' is dangerous
   "loslib"
 
+  # RH5 GCC 4.1 is producing warnings internally for functional headers
+  "mu_iterate.h.*warning? unused parameter '__tuple'"
+
   # Ignore CSharp invalid version warning for dev
   "warning CS1607.*The version number.*dev.*is invalid"
   "warning CS1607.*The version.*dev.*is not in the normal"
@@ -60,5 +63,11 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
 
   # Warning from RHEL5 GCC 4.1 about visibility change
   "warning: lowering visibility of .* to match its type"
+
+  # Warning from SWIG with self member type
+  "sitkCommand.* Warning 314.*self.*is a python keyword"
+
+  # Warning from RH5 gcc 4.1.2
+  "tr1/mu_iterate.h.* warning: unused parameter '__tuple'"
 )
 
