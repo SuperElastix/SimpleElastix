@@ -17,6 +17,10 @@ SimpleElastix
   m_MemberFactory->RegisterMemberFunctions< PixelIDTypeList, 3, SimpleElastixAddressor< MemberFunctionType > >();
   m_MemberFactory->RegisterMemberFunctions< PixelIDTypeList, 2, SimpleElastixAddressor< MemberFunctionType > >();
 
+#ifdef SITK_4D_IMAGES
+  m_MemberFactory->RegisterMemberFunctions< PixelIDTypeList, 4, SimpleElastixAddressor< MemberFunctionType > >();
+#endif
+
   // This class holds data that is passed to elastix API when run
   this->m_FixedImage = Image();
   this->m_MovingImage = Image();
@@ -275,6 +279,7 @@ SimpleElastix
 
   // Output
   parameterMap[ "WriteResultImage" ]                  = ParameterValuesType( 1, "true" );
+  parameterMap[ "ResultImageFormat" ]                 = ParameterValuesType( 1, "nii" );
 
   // Transforms
   if( transform == "translation" )
@@ -282,14 +287,15 @@ SimpleElastix
     parameterMap[ "Registration" ]                    = ParameterValuesType( 1, "MultiResolutionRegistration" );
     parameterMap[ "Transform" ]                       = ParameterValuesType( 1, "TranslationTransform" );
     parameterMap[ "Metric" ]                          = ParameterValuesType( 1, "AdvancedMattesMutualInformation" );
-    parameterMap[ "MaximumNumberOfIterations" ]       = ParameterValuesType( 1, "64" );
+    parameterMap[ "MaximumNumberOfIterations" ]       = ParameterValuesType( 1, "128" );
+    parameterMap[ "Interpolator"]                       = ParameterValuesType( 1, "LinearInterpolator");
   }
   else if( transform == "rigid" )
   {
     parameterMap[ "Registration" ]                    = ParameterValuesType( 1, "MultiResolutionRegistration" );
     parameterMap[ "Transform" ]                       = ParameterValuesType( 1, "EulerTransform" );
     parameterMap[ "Metric" ]                          = ParameterValuesType( 1, "AdvancedMattesMutualInformation" );
-    parameterMap[ "MaximumNumberOfIterations" ]       = ParameterValuesType( 1, "64" );
+    parameterMap[ "MaximumNumberOfIterations" ]       = ParameterValuesType( 1, "128" );
   }
   else if( transform == "affine" )
   {
@@ -314,6 +320,8 @@ SimpleElastix
     parameterMap[ "Transform" ]                       = ParameterValuesType( 1, "BSplineStackTransform" );
     parameterMap[ "Metric" ]                          = ParameterValuesType( 1, "VarianceOverLastDimensionMetric" );
     parameterMap[ "MaximumNumberOfIterations" ]       = ParameterValuesType( 1, "512" );
+    parameterMap[ "Interpolator"]                     = ParameterValuesType( 1, "ReducedDimensionBSplineInterpolator" );
+    parameterMap[ "ResampleInterpolator" ]            = ParameterValuesType( 1, "FinalReducedDimensionBSplineInterpolator" );
   }
   else
   {
@@ -330,25 +338,7 @@ SimpleElastix
     }
 
     parameterMap[ "GridSpacingSchedule" ] = gridSpacingSchedule;
-    parameterMap[ "FinalGridSpacingInVoxels" ] = ParameterValuesType( 1, to_string( finalGridSpacingInPhysicalUnits ) );;
-  }
-
-  // Fixed image pyramid has to be FixedRecursiveImagePyramid in 2D
-  if( !isEmpty( this->m_FixedImage ) )
-  {
-    if( this->m_FixedImage.GetDimension() == 2 )
-    {
-      parameterMap[ "FixedImagePyramid" ] = ParameterValuesType( 1, "FixedRecursiveImagePyramid" );
-    }
-  }
-
-  // Moving image pyramid has to be MovingRecursiveImagePyramid in 2D
-  if( !isEmpty( this->m_MovingImage ) )
-  {
-    if( this->m_MovingImage.GetDimension() == 2 )
-    {
-      parameterMap[ "MovingImagePyramid" ] = ParameterValuesType( 1, "MovingRecursiveImagePyramid" );
-    }
+    parameterMap[ "FinalGridSpacingInPhysicalUnits" ] = ParameterValuesType( 1, to_string( finalGridSpacingInPhysicalUnits ) );
   }
 
   return parameterMap;
@@ -430,10 +420,9 @@ SimpleElastix
 
   sitkExceptionMacro( << "SimpleElastix does not support the combination of image type \""
                       << GetPixelIDValueAsString( FixedImagePixelEnum ) << "and dimension "
-                      << FixedImageDimension << ". For elastix support, recompile elastix "
-                      << "with the desired pixel type or cast the SimpleITK image. Supported types are "
-                      << "sitkUInt8, sitkInt8, sitkUInt16, sitkInt16, sitkUInt32, sitkInt32, "
-                      << "sitkInt64, sitkUInt64, sitkFloat32 or sitkFloat64." );
+                      << FixedImageDimension << ". By default elastix is compiled with support "
+                      << "sitkFloat32 in 2D, sitkInt16 and sitkFloat32 in 3D and sitkInt16 in 4D. "
+                      << "Recompile elastix with the desired pixel type or cast the SimpleITK image." );
 }
 
 
