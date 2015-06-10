@@ -3,7 +3,7 @@ SimpleElastix Documentation
 
 SimpleElastix is a medical image registration library that makes state-of-the-art image registration really easy to do. This is accomplished by native Python, Java, R, Ruby, Octave, Lua, Tcl and C# interfaces to the robust C++ algorithms of the elastix library and a modular architecture that allows you to quickly compare different registration methods.
 
-The :ref:`Getting Started <GettingStarted>` section explains how to clone the `Github repository <https://github.com/kaspermarstal/SimpleElastix>`_ and compile SimpleElastix on :ref:`Linux <Linux>`, :ref:`Mac OS X <MacOSX>` and :ref:`Windows <Windows>`. If you know the basic syntax of any of the supported languages (like how to write a for loop), you are then ready to perform state-of-the-art medical image registration:
+The :ref:`Getting Started <GettingStarted>` section explains how to clone the `Github repository <https://github.com/kaspermarstal/SimpleElastix>`_ and compile SimpleElastix on :ref:`Linux <Linux>`, :ref:`Mac OS X <MacOSX>` and :ref:`Windows <Windows>`. With SimpleElastix, performing state-of-the-art medical image registration is as easy as writing a foor-loop:
 
 .. _fig1: 
 

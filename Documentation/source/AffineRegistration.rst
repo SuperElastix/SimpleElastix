@@ -1,7 +1,9 @@
 Affine Registration
 ===================
 
-The affine transform allows for shearing and scaling in addition to rotation and translation. For example, if you are interested in registering bones from different patients, or want to initialize a non-rigid registration, the affine transform is usually a good choice. The affine transform is selected using :code:`(Transform "AdvancedAffineTransform")`. Consider the images in Figure 10. 
+The affine transform allows for shearing and scaling in addition to rotation and translation. For example, if you are interested in registering bones from different patients, or want to initialize a non-rigid registration, the affine transform is usually a good choice. The affine transform allows for shearing and scaling in addition to rotation and translation. For example, if you are interested in registering bones from different patients, or want to initialize a non-rigid registration, the affine transform is usually a good choice. The affine transform is selected using :code:`(Transform "AdvancedAffineTransform")`.
+
+Consider the images in Figure 10.
 
 .. _fig10: 
 
@@ -16,7 +18,7 @@ The affine transform allows for shearing and scaling in addition to rotation and
     
     Figure 10. The original image :code:`fixedImage.nii` (left) and translated and rotated image :code:`movingImage.nii` (right).
 
-The image on right has been sheared, scaled 1.2x, rotated 10 degrees and translated 13 pixels in the x-direction and 17 pixels in the y-direction. Using the :code:`AdvancedAffineTransform` we may correct for this misaligned.
+The image on right has been sheared, scaled 1.2x, rotated 10 degrees and translated 13 pixels in the x-direction and 17 pixels in the y-direction. Using the :code:`AdvancedAffineTransform` we may correct for this misalignment.
 
 ::
 
@@ -24,7 +26,7 @@ The image on right has been sheared, scaled 1.2x, rotated 10 degrees and transla
 
     elastix = sitk.SimpleElastix()
     elastix.SetFixedImage(sitk.ReadImage("fixedImage.nii")
-    elastix.SetMovingImage(sitk.ReadImage(""movingImage.nii")
+    elastix.SetMovingImage(sitk.ReadImage(movingImage.nii")
     elastix.SetParameterMap(sitk.GetDefaultParameterMap("affine"))
     elastix.Execute()
     sitk.WriteImage(elastix.GetResultImage())
@@ -44,4 +46,19 @@ It is clear from the result mean image on right in Fig. 11 that registration was
     
     Figure 11. Mean image before registration (left) and mean image after registration (right).
 
-In the next example we will introduce non-rigid registration and initialize the moving image with an affine transform.
+Notice that the only difference from the previous example is the requested parameter map. In fact, the following code will produce the same result as above:
+
+::
+
+    import SimpleITK as sitk
+
+    elastix = sitk.SimpleElastix()
+    elastix.SetFixedImage(sitk.ReadImage("fixedImage.nii")
+    elastix.SetMovingImage(sitk.ReadImage(movingImage.nii")
+    parameterMap = sitk.GetDefaultParameterMap("affine")
+    parameterMap["Transform"] = ["AffineTransform"]
+    elastix.SetParameterMap()
+    elastix.Execute()
+    sitk.WriteImage(elastix.GetResultImage())
+
+This demonstrates how easy it is to try out different registration components with SimpleElastix. In the next example we will introduce non-rigid registration and initialize the moving image with an affine transform.

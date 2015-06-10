@@ -1,13 +1,29 @@
+.. _Introduction:
+
 Introduction
 ============
 
-SimpleElastix is a multi-lingual wrapper around the elastix library C++ API that exposes elastix algorithms in a wide variatety of programming languages. Elastix is a framework of pluggable registration components that can easily be interchanged. This flexibility means that a combinatorial number of registration methods can be easily tested allowing you to efficiently find the right tool for the right job. For example, to register two MRI scans you could use a Sum of Squared Differences (SSD) metric which is optimal under Gaussian distributed noise found in MR images. If instead you wanted to register a CT image with a MR image, you could use a mutual information-based metric which is invariant to differences in the underlying intensity distributions. Or you could try something completely different. Choosing a metric is as simple as setting a variable:
+If you are completely new to SimpleElastix, or even medical image registration in general, you might not know where to start or what questions to ask. This document walk you through the basics.
 
-::
+Image Registration
+------------------
 
-    parameters["Metric"] = ["NormalizedMutualInformation"]
+Medical image registration is the process of transforming images into a common coordinate system so corresponding pixels represent homologous biological points. This is a prerequisite for a wide range of medical image analysis tasks and a key algorithmic component for statistical analysis and machine learning in medical image processing. For example, registration can be used to obtain an anatomically normalized reference frame in which brain regions of different patients can be compared. Computer scientists and medical doctors use this information to build computational models of disease processes.
 
-Transforms, optimizers, interpolators, resamplers, penalty terms and image pyramids can be swapped out in a similar fashion. 
+Registration is not limited to brain images of course. Many body parts are rutinely registered in clinical practice and even more so in research. The outputs are used in many different applications ranging from segmentation of anatomical structures to computer-aided diagnosis, monitoring of disease progression, surgical intervention and treatment planning. The surge in development and availability of scanners, computing power and potential to save time, money and lives makes medical image registration an increasingly relevant field of study. In the future, patient-specific computational models may deliver the next paradigm shift in modern diagnosis and treatment methods.
+
+Open access to state-of-the-art methods is essential to reach this goal. They all say you should stand on the shoulders of giants, but how do you get up there? One option is to use SimpleElastix.
+
+SimpleElastix
+-------------
+
+SimpleElastix is a medical image registration library that makes state-of-the-art registration methods available from a variety of languages, namely C++, Python, Java, R, Ruby, Octave, Lua, Tcl and C#. A lot of research has focused on making SimpleElastix computationally efficient and easy to use. Stochastic sampling (Klein et al. 2007), multi-threading and code optimizations (Shamonin et al 2014) makes registration run fast without sacrificing robustness. A simple parameter interface configures registration components at runtime which allows you to easily try out many different registration methods. SimpleElastix is built on SimpleITK and shipped with the complete set of robust SimpleITK image processing algorithms. SimpleElastix is open source, freely available from `Github.com <https://github.com/kaspermarstal/SimpleElastix>`_ and runs on Windows, Mac OS X and Linux using Visual Studio, Clang and GCC compilers.
+
+The `original elastix registration library <http://elastix.isi.uu.nl/>`_ consists of two command line programs. Elastix is the main program that performs registration. It takes input images and generates output images and transform parameter files. The transform parameter files contain all information needed to reproduce the final transformation of the moving to the fixed image. 
+
+Transformix can take a transform parameter file and apply the transformation to other images, indexes and point sets. It can also write the deformation field and transform jacobian to disk. You can also use transformix to apply the transformation to an original (e.g. higher-reslotion) image to gain resolution or warp a label image to do atlas-based segmentations.
+
+Previously, performing these kinds of operations on large datasets would incur a significant workflow overhead from scripting command line invocations and arguments to copying images and transform parameter files across folders. With SimpleElastix and SimpleTransformix this complexity is easier to manage and more memory and disk I/O efficient. 
 
 Mathematical Background
 -----------------------
@@ -34,7 +50,7 @@ In theory, the combinatorial number of choices of registration components can be
 Registration Components
 -----------------------
 
-In this section we introduce the different choices for each type of component and some common terminology. For a technical discussion and equations see the `elastix manual <http://elastix.isi.uu.nl/download/elastix_manual_v4.7.pdf>`_. For documentation of source code see the `elastix doxygen pages <http://elastix.isi.uu.nl/doxygen/index.html>`_ where you will also find a `complete list of available parameters <http://elastix.isi.uu.nl/doxygen/parameter.html>`_.
+In this section we introduce the different choices for each type of component and common terminology. For a technical discussion and equations see the `elastix manual <http://elastix.isi.uu.nl/download/elastix_manual_v4.7.pdf>`_. For documentation of source code see the `elastix doxygen pages <http://elastix.isi.uu.nl/doxygen/index.html>`_ where you will also find a `complete list of available parameters <http://elastix.isi.uu.nl/doxygen/parameter.html>`_.
 
 Images
 ~~~~~~
@@ -48,9 +64,6 @@ It is important to know the appropriate definitions and terms when working with 
     Figure 7: Geometrical concepts associated with the ITK image. Adopted from Ibanez et al. (2005).
 
 Above, circles are used to represent the centre of pixels. The value of the pixel is assumed to be a Dirac Delta Function located at the pixel centre. Pixel spacing is measured between the pixel centres and can be different along each dimension. The image origin is associated with the coordinates of the first pixel in the image. A pixel is considered to be the rectangular region surrounding the pixel centre holding the data value.
-
-You should take great care that you use an image format that is able to store the relevant information, like .mhd, DICOM or NiftI file formats. SimpleElastix will use direction cosines by default. Make sure you know what you are doing before turning it off.
-
 
 Image Pyramids
 ~~~~~~~~~~~~~~
@@ -144,25 +157,4 @@ The :code:`LinearInterpolator` returns a weighted average of surrounding voxels 
 
 The :code:`BSplineInterpolator` (or the more memory effecient :code:`BSplineInterpolatorFloat`) interpolates pixel values using b-spline approximations of user-defined order :math:`N`. First order b-splines corresponds to linear intepolation in which case you might as well use the linear interpolator. To generate the final result image a higher-order interpolation is usually required for which :math:`N = 3` is recommended. The final interpolator is called a ResampleInterpolator. Any one of the above methods can be used, but you need to prepend the name with Final, for example :code:`FinalBSplineInterpolatorFloat`
 
-In the next section we will introduce the object-oriented programming interface.
-
-Elastix And Transformix
------------------------
-The `original elastix registration library <http://elastix.isi.uu.nl/>`_ consists of two command line programs. Elastix is the main program that performs registration, taking input images and generating output images and transform parameter files. Transform parameter files contains all the information computed by elastix to reproduce the final transformation of the moving to the fixed image. 
-
-Transformix takes a transform parameter file and applies the transformation to other images, indexes and point sets. It can also write the deformation field and transform Jacobian to disk. You can use transformix to apply the transformation to an original (e.g. higher-reslotion) image to gain resolution or apply the transformation to a label image to do atlas-based segmentations.
-
-Previously, performing these kinds of operations on large datasets would incur a significant workflow overhead from scripting command line invocations and arguments to copying images and transform parameter files across folders. With SimpleElastix and SimpleTransformix this complexity is easier to manage and much more memory and disk I/O efficient.
-
-Below is listed some of the key features that hopefully make your time with SimpleElastix as productive as possible. SimpleElastix is
-
-* Flexible: A simple parameter interface configures registration components at runtime.
-* Fast: Stochastic sampling (Klein et al. 2007), multi-threading and code optimizations (Shamonin et al 2014) makes registration run very fast. Some components are based on CUDA and OpenCL and can take advantage of heterogeneous execution platforms. 
-* Robust: The core image processing algorithms are based on ITK which is thoroughly tested and developed according to some highest standards you will find in open source software. An estimated 400 man years has gone into developing ITK.
-* Easy to use: New users can get started quickly and the native interface makes processing large data sets significantly easier than scripting command line invocations.
-* Multi-lingual: Available in C++, Python, Java, R, Ruby, Octave, Lua, Tcl and C#.
-* Shipped with the complete set of SimpleITK image processing algorithms.
-* Open Source and freely available from `Github.com <https://github.com/kaspermarstal/SimpleElastix>`_.
-* Multi-platform: Compiles and runs on Windows, Mac OS X and Linux using Visual Studio, Clang and GCC compilers.
-
-Enough talk! Time for some examples. In the next section we introduce the SimpleElastix Hello World example.
+In the next section we introduce the SimpleElastix Hello World example. 

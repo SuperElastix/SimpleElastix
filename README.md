@@ -1,11 +1,9 @@
-SimpleElastix
-=============
-Installation, examples, usage and introductory material is available at [simpleelastix.readthedocs.org](https://simpleelastix.readthedocs.org/). Tweet us [@SimpleElastix](https://twitter.com/SimpleElastix/)!
-
-### What is SimpleElastix?
+What is SimpleElastix?
+======================
 The goal of SimpleElastix is to bring the robust C++ medical image registration algorithms of the [elastix](http://elastix.isi.uu.nl/ "Elastix website") library to a wider audience by integrating elastix with [SimpleITK](https://github.com/SimpleITK/SimpleITK "SimpleITK github repository"). Image registration is the process of transforming images into a common coordinate system so corresponding pixels represent homologous biological points. This is a prerequisite for a wide range of medical image analysis tasks and a key algorithmic component for statistical analysis and machine learning in medical image processing. This package provides
 
 - elastix and transformix bindings for Python, Java, R, Ruby, Octave, Lua, Tcl and C# (see [elastix manual](http://elastix.isi.uu.nl/download/elastix_manual_v4.7.pdf "elastix manual") for a list of supported registration algorithms).
+- Installation, examples, usage and introductory material at [simpleelastix.readthedocs.org](https://simpleelastix.readthedocs.org/).
 - A user-friendly API that aligns with the design philosophy of SimpleITK, developed specifically for rapid prototyping and use in scripting languages. If you are interested, [The Design of SimpleITK](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3874546/ "PubMed") is a great read.
 - Pre-configured parameter files that should serve as good starting points for new users.
 - A SuperBuild that automatically compiles and installs SimpleElastix and any dependencies.
@@ -20,7 +18,8 @@ import SimpleITK as sitk
 movingImage = sitk.ReadImage('atlasImage.hdr')
 movingLabel = sitk.ReadImage('atlasLabel.hdr')
 
-# Images are loaded from disk one at a time
+# Images are loaded from disk one at a time. Here we specify an array of 
+# paths to images which we will loop over. 
 population = ['image1.hdr', 'image2.hdr', ... , 'imageN.hdr']
 
 selx = sitk.SimpleElastix()
@@ -58,9 +57,9 @@ cmake ../SimpleElastix/SuperBuild
 make -j4
 ```
 
-The SuperBuild will download and install dependencies (elastix, ITK, SimpleITK and SWIG) and compile SimpleElastix. Target language dependencies need to be pre-installed, e.g. `sudo apt-get install cmake swig monodevelop r-base r-base-dev ruby python python-dev tcl tcl-dev tk tk-dev`. Note that this project takes around an hour to build on a quad-core machine.
+The SuperBuild will download and install dependencies (elastix, ITK, SimpleITK and SWIG) and compile SimpleElastix. Target language dependencies need to be pre-installed, e.g. `sudo apt-get install cmake swig monodevelop r-base r-base-dev ruby ruby-dev python python-dev tcl tcl-dev tk tk-dev`. Note that this project takes around an hour to build on a quad-core machine.
 
-The documentation further describes how to [build SimpleElastix on Windows](http://simpleelastix.readthedocs.org/GettingStarted.html#Windows) and how to [build SimpleElastix manually](http://simpleelastix.readthedocs.org/GettingStarted.html#building-manually-on-linux).
+The documentation further describes how to [build SimpleElastix on Windows](http://simpleelastix.readthedocs.org/GettingStarted.html#Windows) and how to [build SimpleElastix manually](http://simpleelastix.readthedocs.org/GettingStarted.html#building-manually-on-linux) without the SuperBuild.
 
 SimpleElastix has been tried and tested on Ubuntu 14.10 using GCC 4.9.2 and Clang 3.4.0, Mac OSX Yosemite using Apple Clang 600.0.56 and Windows 8.1 using Microsft Visual Studio 2012 C++ compiler.
 

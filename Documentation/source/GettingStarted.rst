@@ -3,40 +3,24 @@
 Getting Started
 ===============
 
-If you are completely new to SimpleElastix, or even medical image registration, you might not know where to start, or what questions to ask. This document walk you through the basics.
-
-Image Registration
-------------------
-
-Medical image registration is the process of transforming images into a common coordinate system so corresponding pixels represent homologous biological points. This is a prerequisite for a wide range of medical image analysis tasks and a key algorithmic component for statistical analysis and machine learning in medical image processing. For example, registration can be used to obtain biological correspondence between images of the brains of mulitiple patients. Image intensities of brain regions can then be compared in an anatomically normalized reference frame. Computer scientists and medical doctors use this information to build computational models of disease processes.
-
-Registration is not limited to brain images of course. Many body parts are rutinely registered and the outputs are used in many different applications ranging from segmentation of anatomical structures to computer-aided diagnosis, monitoring of disease progression, surgical intervention and treatment planning. 
-
-Image registration is such a fundamental algorithmic building block that the field continues to enourmous amounts of research. The surge in development and availability of scanners, computing power and potential to save time, money and lives makes it an increasingly relevant field of study. In the future, patient-specific computational models may deliver the next paradigm shift in modern medical diagnosis and treatment planning.
-
-While this is all very inspiring, it is not always easy for us mortals to get our hands on decent implementations of state-of-the-art methods. They all say we should stand on the shoulders of giants, but how do we get up there? One possibility is to use SimpleElastix.
-
-SimpleElastix
--------------
-
-There are as many registration methods as there are people working in the field. Some methods have proved themselves to be more useful than others and have stood the test of time. Elastix is a collection of some of these algorithms and a significant amount of research has focused on making them robust, fast and easy to use through a simple command line interface. SimpleElastix takes this idea a step further and makes elastix available in a wide variety of scripting languages. Follow the steps below to install elastix and read the rest of the documentation for an overview of methods implement in SimpleElastix and useful, real-world examples. 
+Follow the steps below to install SimpleElastix, then see the :ref:`Introduction <Introduction>` for an overview of SimpleElastix. You can also go straight to the examples for a hands-on presentation.
 
 .. _Linux:
 
 SuperBuild On Linux
 -------------------
 
-SimpleElastix integrates elastix and transformix with the SimpleITK SuperBuild. To build SimpleElastix in unix-like environments, clone the repository and invoke the SuperBuild.
+SimpleElastix integrates elastix and transformix with the SimpleITK SuperBuild. To build SimpleElastix in unix-like environments, clone the repository and invoke the SuperBuild. 
 
 ::
 
-    git clone https://github.com/kaspermarstal/SimpleElastix
-    mkdir build
-    cd build
-    cmake ../SimpleElastix/SuperBuild
-    make -j4
+    $ git clone https://github.com/kaspermarstal/SimpleElastix
+    $ mkdir build
+    $ cd build
+    $ cmake ../SimpleElastix/SuperBuild
+    $ make -j4
 
-The SuperBuild will download and install dependencies (elastix, ITK and SWIG) and compile SimpleElastix. You will find language packages in the :code:`${BUILD_DIRECTORY}/SimpleITK-build/Wrapping` directory. For example, to install the python module onto your system, compile the project, navigate to
+The SuperBuild will download and install dependencies (elastix, ITK and SWIG) and compile SimpleElastix. When you have built the project, you will find language packages in the :code:`${BUILD_DIRECTORY}/SimpleITK-build/Wrapping` directory. For example, to install the python module onto your system, navigate to
 
 ::
 
@@ -46,13 +30,15 @@ and run the following command:
 
 ::
 
-    sudo python setup.py install
+    $ sudo python setup.py install
+
+This will install the SimpleITK python module with SimpleElastix unto your system, which can then be imported into your scripts like any other python module. 
 
 Target language dependencies need to be pre-installed. The :code:`apt-get` packages are  
 
 ::
 
-    python python-dev monodevelop r-base r-base-dev ruby tcl tcl-dev tk tk-dev
+    python python-dev monodevelop r-base r-base-dev ruby ruby-dev tcl tcl-dev tk tk-dev
 
 Note that this project takes around an hour to build on a quad-core machine. SimpleElastix has been tried and tested on Ubuntu 14.10 using GCC 4.9.2 and Clang 3.4.0, Mac OSX Yosemite using Apple Clang 600.0.56 and Windows 8.1 using Microsft Visual Studio 2010 C++ compiler.
 
@@ -65,21 +51,32 @@ Note that this project takes around an hour to build on a quad-core machine. Sim
 SuperBuild On Mac OS X
 ----------------------
 
-To download, compile and install SimpleElastix follow the Linux instructions above. Target-language dependencies have to be installed separately using e.g. `Macports <https://www.macports.org/>`_ or `Homebrew <http://http://brew.sh/>`_. Mac OS X comes with Python and Tcl already installed. 
+To build SimpleElastix, the Xcode Command Line Tools needs to be installed. First, check if it is already installed. 
+
+- Open the OS X terminal and the the command
+
+    ::
+        $ make
+
+    OS X will know if make is missing and prompt you to install Xcode Command Line Tools if this is the case. Do it and then follow the Linux installation instructions above.
+
+- If you see an error message from the make program, the tools are installed and you can follow the Linux installation instructions above.
+- Target-language dependencies have to be installed separately using e.g. `Macports <https://www.macports.org/>`_ or `Homebrew <http://http://brew.sh/>`_. Mac OS X comes with Python and Tcl already installed.
 
 .. _Windows:
 
 SuperBuild On Windows
 ---------------------
 
-Building SimpleElastix on windows is similar the building on Unix except you will be using the CMake GUI to generate a Visual Studio solution and Visual Studio to compile the project.
+Building SimpleElastix on windows is conceptually similar the building on Unix. You will be using the CMake GUI to generate a Visual Studio solution and Visual Studio to compile the project, but you need to pay special attention to certain configuration settings before you start the build. These settings are explained below. Follow the steps closely and you should be good.
 
 1. Generate build files.
+    - Check whether your target languages are installed as 32-bit or 64-bit. For example, if your Python installation is 64-bit, you will need to build the 64-bit version of SimpleElastix to link with it. 
     - Download and install `CMake GUI <http://www.cmake.org/download/>`_.
     - :code:`git clone https://github.com/kaspermarstal/SimpleElastix` into a source folder of your choice.
     - Point the source directory to the :code:`SimpleElastix/SuperBuild` folder inside the source directory.
     - Point the build directory to a clean directory. Note that Visual Studio may complain during the build if the path is longer than 50 characters.
-    - You may want to to speed up compilation by deselecting Examples, Testing and any wrapped languages you don't need. It takes 1+ hour to build the full project on a quad-core machine. 
+    - You may want to to speed up compilation by deselecting Examples, Testing and any wrapped languages you don't need as the full build can take a long time (1+ hour a standard quad-core machine). 
 
     .. figure:: _static/WindowsInstallationConfigureCMake.png
         :align: center
@@ -89,7 +86,11 @@ Building SimpleElastix on windows is similar the building on Unix except you wil
         Figure 3: Configure CMake.
 
 
-2. Press configure, select your desired compiler and click Finish. CMake will choose a compiler for you if you just select the default option.
+2. Press configure, select your desired compiler and click Finish.
+    - Choose a 64-bit version of the compiler and click next. CMake will find the selected compiler for you if you leave the "Use default native compiler" option checked.
+    - If you need a compiler other than the default system option, select "Specifiy native compilers". If you don't know what this means or what you need, leave the "Use default native compiler" option checked.
+    - If CMake complains that a compiler cannot be found, install the free `Visual Studio Community Edition <https://www.visualstudio.com/>`_ .
+    - If CMake does not pick up your target language, you can set the paths manually. For example, you can now manually specify :code:`PYTHON_EXECUTABLE`, :code:`PYTHON_INCLUDE_DIR` and :code:`PYTHON_LIBRARY` if you wish to build the python package. See this section under Troubleshooting for details.
 
     .. figure:: _static/WindowsInstallationSelectCompiler.png
         :align: center
@@ -110,7 +111,7 @@ Building SimpleElastix on windows is similar the building on Unix except you wil
         Figure 5: Open the solution in Visual Studio.
 
 
-4. Make sure "Release" build type is selected and build the :code:`ALL_BUILD` project. If the "Debug" build type is used instead of "Release" mode, you will experience a significant performance penalty and may not be able to build language packages that are distributed without development binaries by default.
+4. Make sure "Release" build type is selected and build the :code:`ALL_BUILD` project. If the "Debug" build type is used instead of "Release" mode, you will experience a significant performance penalty and may not be able to build language packages that are distributed without development binaries, e.g. Python.
 
     .. figure:: _static/WindowsInstallationBuildSolution.png
         :align: center
@@ -119,6 +120,17 @@ Building SimpleElastix on windows is similar the building on Unix except you wil
 
         Figure 6: Right-click on :code:`ALL_BUILD` and click :code:`Build`.
 
+Troubleshooting
+---------------
+- I have installed a target language but CMake cannot find it.
+    - The language package may be configured incorrectly or the necessary folders may not have been added to your :code:`$PATH` environment variable during installation. Add the necessary folders to your :code:`$PATH`. Alternatively, you may also set the paths manually in CMake as a quck and dirt fix. For example, specify :code:`PYTHON_EXECUTABLE`, :code:`PYTHON_INCLUDE_DIR` and :code:`PYTHON_LIBRARY` in the cmake GUI if you wish to build the python package. If you are using the CMake GUI on Windows, tick "Advanced" to see these options. If you are using CMake from the command line, run :code:`$ ccmake .` in the build directory and press :code:`t` on your keyboard to see these options. You will have to repeat this procedure every time you setup a new build of SimpleElastix so we strongly recommended you fix your installation and configure your :code:`$PATH` environment variable correctly instead. If you still experience problems at this point, re-install the language package or consult Google or Stackoverflow.
+- Visual Studio throws :code:`LNK1102 out of memory` error even though I selected the 64-bit compiler.
+    - While Visual Studio targets 64-bit platforms when you select a 64-bit compiler, the Visual Studio toolchain itself will be 32-bit by default. This is a problem when SimpleElastix requires more than 4GB of memory during the linking stage. Switch to the 64-bit toolchain.
+- Ruby build fails os Mac OS X.
+    - The Ruby virtual machine cannot accomodate spaces in paths. If you see a path that contains spaces like :code:`/Applications/Apple Dev Tools/Xcode.app/Contents/Developer`, re-install Xcode Command Line Tools to a place with no spaces in the path.
+
+If you are experiencing a problem that is not describes on this page, you are very welcome to open an issue on Github and we will try to help you. Likewise, if you have found a solution to a problem that is not described on this page, you are very welcome to open a pull request on Github and help us fix the problem for everyone.
+
 
 Building Manually On Linux
 --------------------------
@@ -126,19 +138,19 @@ This is not the recommended way of building SimpleElastix but it can be useful i
 
 1. Setup the prerequisites
     - `sudo apt-get install cmake swig monodevelop r-base r-base-dev ruby python python-dev tcl tcl-dev tk tk-dev`.
-2. Install the matching version of SWIG >= 2.0.12
+2. Install the matching version of SWIG >= 3.0.5
 3. Clone ITK from `github.com/InsightSoftwareConsortium/ITK <https://github.com/InsightSoftwareConsortium/ITK>`_.
 4. Configure ITK using CMake
-    - BUILD_EXAMPLES=OFF, BUILD_TESTING=OFF, BUILD_SHARED_LIBS=OFF, ITK_USE_REVIEW=ON, ITK_WRAP_*=OFF
+    - BUILD_SHARED_LIBS=OFF, ITK_USE_REVIEW=ON, ITK_WRAP_*=OFF
 5. Build ITK. Make sure to note the build settings, e.g. Release x64.
-6. Clone elastix from `github.com/kaspermarstal/elastix <https://github.com/kaspermarstal/SimpleElastix>`_.
+6. Clone elastix from `github.com/kaspermarstal/elastix <https://github.com/kaspermarstal/elastix>`_.
 7. Configure elastix using CMake
-    - BUILD_TESTING=OFF, BUILD_EXECUTABLE=OFF, BUILD_SHARED_LIBRARIES=ON, USE_KNNGraphAlphaMutualInformationMetric=OFF 
+    - BUILD_TESTING=OFF, BUILD_EXECUTABLE=OFF, USE_KNNGraphAlphaMutualInformationMetric=OFF 
     - Set appropriate ELASTIX_IMAGE_2/3/4D_PIXELTYPES and any components that you might require
 8. Build elastix
     - Set ITK_DIR to the location of the ITK build directory
-9. Clone SimpleITK from `github.com/SimpleITK/SimpleITK <https://github.com/SimpleITK/SimpleITK>`_.
-10. Configure SimpleITK using CMake
+9. Clone SimpleElastix from `github.com/kaspermarstal/SimpleElastix <https://github.com/kaspermarstal/SimpleElastix>`_.
+10. Configure SimpleElastix using CMake
         - Set ITK_DIR to the location of the ITK build directory
         - Set ELASTIX_DIR to the location of the elastix build directory
 11. Build SimpleITK. Make sure to configure the build settings exactly the same as ITK e.g. Release x64.

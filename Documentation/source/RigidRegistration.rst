@@ -1,7 +1,7 @@
 Rigid Registration
 ==================
 
-A rigid transform can register objects that are related by rotation and translation. This is one of the simplest of methods in the catagory of linear transformation models and is therefore often used as initialization for affine- and non-rigid transforms. In addition, rigid registration is well suited for intra-subject registration of rigid objects. For example, if you are registering images of a patient's bones, you can often assume that a rigid transform is sufficient to align these structures. In this case it is advantageus to chose a simple transform as this constrains the solution space and ensures no spurious non-rigid local minima affects your results.
+A rigid transform can register objects that are related by rotation and translation. For example, if you are registering images of a patient's bones, you can often assume that a rigid transform is sufficient to align these structures. In fact, it is often advantageus to chose a simple transform for the problems that allows it as this constrains the solution space and ensures no spurious non-rigid local minima affects your results. Rigid registration is one of the simplest of methods in the catagory of linear transformation models and is therefore often used as initialization for affine- and non-rigid transforms. 
 
 The rigid transform is selected using :code:`(Transform "EulerTransform")`. Consider the images in Figure 8. 
 
