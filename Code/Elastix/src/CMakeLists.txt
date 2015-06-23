@@ -18,5 +18,5 @@ set( SimpleTransformixSource
 
 add_library( SimpleTransformix ${SimpleTransformixSource} )
 set_target_properties( SimpleTransformix PROPERTIES SKIP_BUILD_RPATH TRUE )
-target_link_libraries( SimpleTransformix transformix SimpleITKCommon )
+target_link_libraries( SimpleTransformix transformix elastix SimpleITKCommon )
 sitk_install_exported_target( SimpleTransformix )
