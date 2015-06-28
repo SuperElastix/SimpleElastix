@@ -126,6 +126,14 @@ Troubleshooting
     - The language package may be configured incorrectly or the necessary folders may not have been added to your :code:`$PATH` environment variable during installation. Add the necessary folders to your :code:`$PATH`. Alternatively, you may also set the paths manually in CMake as a quck and dirt fix. For example, specify :code:`PYTHON_EXECUTABLE`, :code:`PYTHON_INCLUDE_DIR` and :code:`PYTHON_LIBRARY` in the cmake GUI if you wish to build the python package. If you are using the CMake GUI on Windows, tick "Advanced" to see these options. If you are using CMake from the command line, run :code:`$ ccmake .` in the build directory and press :code:`t` on your keyboard to see these options. You will have to repeat this procedure every time you setup a new build of SimpleElastix so we strongly recommended you fix your installation and configure your :code:`$PATH` environment variable correctly instead. If you still experience problems at this point, re-install the language package or consult Google or Stackoverflow.
 - Visual Studio throws :code:`LNK1102 out of memory` error even though I selected the 64-bit compiler.
     - While Visual Studio targets 64-bit platforms when you select a 64-bit compiler, the Visual Studio toolchain itself will be 32-bit by default. This is a problem when SimpleElastix requires more than 4GB of memory during the linking stage. Switch to the 64-bit toolchain.
+    - TIP: To force Visual Studio 2013/2012 to use x64 toolchain, set enviorment variable _IsNativeEnvironment=true in command prompt, and then call the VS2013 exe (i.e "c:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\devenv.exe" c:\SimpleElastix\build\SimpleITK-build\SimpleITK.sln).
+        OR in Visual Studio 2013:
+        
+        Edit your .vcxproj file and insert the following after the <Import...Microsoft.Cpp.Defaults line:
+        <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+        <PropertyGroup>
+            <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+        </PropertyGroup>
 - Ruby build fails os Mac OS X.
     - The Ruby virtual machine cannot accomodate spaces in paths. If you see a path that contains spaces like :code:`/Applications/Apple Dev Tools/Xcode.app/Contents/Developer`, re-install Xcode Command Line Tools to a place with no spaces in the path.
 
