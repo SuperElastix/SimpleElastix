@@ -3,7 +3,7 @@
 Getting Started
 ===============
 
-Follow the steps below to install SimpleElastix, then see the :ref:`Introduction <Introduction>` for an overview of SimpleElastix. You can also go straight to the examples for a hands-on presentation.
+This page explains how to install SimpleElastix. The process typically involves compiling the C++ project and linking against a target language from which you would like to use SimpleElastix. SimpleElastix can be linked against Python, Java, R, Ruby, Octave, Lua, Tcl and C#. 
 
 .. _Linux:
 
@@ -42,7 +42,7 @@ Target language dependencies need to be pre-installed. The :code:`apt-get` packa
 
 Note that this project takes around an hour to build on a quad-core machine. SimpleElastix has been tried and tested on Ubuntu 14.10 using GCC 4.9.2 and Clang 3.4.0, Mac OSX Yosemite using Apple Clang 600.0.56 and Windows 8.1 using Microsft Visual Studio 2010 C++ compiler.
 
-.. note::
+.. warning::
 
     Be careful not to run out of memory during the build. If you have 8GB or less, it is recommended not build on more than two threads, especially if you are wrapping multiple languages. 
 
@@ -51,62 +51,58 @@ Note that this project takes around an hour to build on a quad-core machine. Sim
 SuperBuild On Mac OS X
 ----------------------
 
-To build SimpleElastix, the Xcode Command Line Tools needs to be installed. First, check if it is already installed. 
+The Mac OS X installation procedure is identical to that of Linux. You will use CMake to generate build files and Clang to compile the project. First, however, check if a working compiler is installed:
 
-- Open the OS X terminal and the the command
-
-    ::
-        $ make
-
-    OS X will know if make is missing and prompt you to install Xcode Command Line Tools if this is the case. Do it and then follow the Linux installation instructions above.
-
+- Open the OS X terminal and run :code:`make`. OS X will know if the Xcode Command Line Tools is missing and prompt you to install them if this is the case.
 - If you see an error message from the make program, the tools are installed and you can follow the Linux installation instructions above.
-- Target-language dependencies have to be installed separately using e.g. `Macports <https://www.macports.org/>`_ or `Homebrew <http://http://brew.sh/>`_. Mac OS X comes with Python and Tcl already installed.
+
+Target-language dependencies also need to be installed seperately. This can be done with `Macports <https://www.macports.org/>`_ or `Homebrew <http://http://brew.sh/>`_. Mac OS X comes with Python and Tcl already installed.
 
 .. _Windows:
 
 SuperBuild On Windows
 ---------------------
 
-Building SimpleElastix on windows is conceptually similar the building on Unix. You will be using the CMake GUI to generate a Visual Studio solution and Visual Studio to compile the project, but you need to pay special attention to certain configuration settings before you start the build. These settings are explained below. Follow the steps closely and you should be good.
+SimpleElastix integrates elastix and transformix with the SimpleITK SuperBuild. The SuperBuild will download and install dependencies (elastix, ITK and SWIG) and compile SimpleElastix. You will use CMake to generate build files and the Visual Studio compiler to compile the project. You need to pay special attention to certain configuration settings before you start the build, but everything is explained below. Follow the steps closely and you should be good.
 
-1. Generate build files.
-    - Check whether your target languages are installed as 32-bit or 64-bit. For example, if your Python installation is 64-bit, you will need to build the 64-bit version of SimpleElastix to link with it. 
+1. Setup directories.
     - Download and install `CMake GUI <http://www.cmake.org/download/>`_.
     - :code:`git clone https://github.com/kaspermarstal/SimpleElastix` into a source folder of your choice.
-    - Point the source directory to the :code:`SimpleElastix/SuperBuild` folder inside the source directory.
-    - Point the build directory to a clean directory. Note that Visual Studio may complain during the build if the path is longer than 50 characters.
-    - You may want to to speed up compilation by deselecting Examples, Testing and any wrapped languages you don't need as the full build can take a long time (1+ hour a standard quad-core machine). 
+    - Point the CMake source directory to the :code:`SimpleElastix/SuperBuild` folder inside the source directory.
+    - Point the CMake build directory to a clean directory. Note that Visual Studio may complain during the build if the path is longer than 50 characters. Make a build directory with a short name at the root of your harddrive to avoid any issues.
 
     .. figure:: _static/WindowsInstallationConfigureCMake.png
         :align: center
-        :figwidth: 90%
-        :width: 90% 
+        :width: 100%
 
         Figure 3: Configure CMake.
 
 
-2. Press configure, select your desired compiler and click Finish.
-    - Choose a 64-bit version of the compiler and click next. CMake will find the selected compiler for you if you leave the "Use default native compiler" option checked.
-    - If you need a compiler other than the default system option, select "Specifiy native compilers". If you don't know what this means or what you need, leave the "Use default native compiler" option checked.
-    - If CMake complains that a compiler cannot be found, install the free `Visual Studio Community Edition <https://www.visualstudio.com/>`_ .
-    - If CMake does not pick up your target language, you can set the paths manually. For example, you can now manually specify :code:`PYTHON_EXECUTABLE`, :code:`PYTHON_INCLUDE_DIR` and :code:`PYTHON_LIBRARY` if you wish to build the python package. See this section under Troubleshooting for details.
+2. Select compiler.
+    - Press configure to bring up the compiler selection window.
+    - Check whether your target languages are installed as 32-bit or 64-bit. For example, if your Python installation is 64-bit, you will need to build the 64-bit version of SimpleElastix to link with it. If possible at all, we recommend 64-bit since compilation may run out of memory on 32-bit platforms.
+    - Choose a compiler and click next. CMake will find the selected compiler for you if you leave the "Use default native compiler" option checked.
+
+    .. tip::
+
+        - If you need a compiler other than the default system option, select "Specify native compilers". If you don't know what this means or what you need, leave the "Use default native compiler" option checked.
+        - If CMake complains that a compiler cannot be found, install the free `Visual Studio Community Edition <https://www.visualstudio.com/>`_ .
+        - If CMake does not pick up your target language, you can set the paths manually. For example, to manually configure CMake Python paths, tick "Advanced" and specify :code:`PYTHON_EXECUTABLE`, :code:`PYTHON_INCLUDE_DIR` and :code:`PYTHON_LIBRARY`. See Troubleshooting section for details.
 
     .. figure:: _static/WindowsInstallationSelectCompiler.png
         :align: center
-        :figwidth: 90%
-        :width: 90% 
+        :width: 100% 
 
-        Figure 4: WindowsInstallationSelectCompiler.
+        Figure 4: Select compiler.
+
 
     - Press generate.
 
-3. Open visual studio, select File -> Open Project/Solution -> Open and choose :code:`SuperBuildSimpleITK` solution.
+3. Open Visual Studio, select File -> Open Project/Solution -> Open and choose :code:`SuperBuildSimpleITK` solution.
 
     .. figure:: _static/WindowsInstallationOpenSolution.png
         :align: center
-        :figwidth: 90%
-        :width: 90% 
+        :width: 100% 
 
         Figure 5: Open the solution in Visual Studio.
 
@@ -115,50 +111,73 @@ Building SimpleElastix on windows is conceptually similar the building on Unix. 
 
     .. figure:: _static/WindowsInstallationBuildSolution.png
         :align: center
-        :figwidth: 90%
-        :width: 90% 
+        :width: 100% 
 
         Figure 6: Right-click on :code:`ALL_BUILD` and click :code:`Build`.
 
-Troubleshooting
----------------
-- I have installed a target language but CMake cannot find it.
-    - The language package may be configured incorrectly or the necessary folders may not have been added to your :code:`$PATH` environment variable during installation. Add the necessary folders to your :code:`$PATH`. Alternatively, you may also set the paths manually in CMake as a quck and dirt fix. For example, specify :code:`PYTHON_EXECUTABLE`, :code:`PYTHON_INCLUDE_DIR` and :code:`PYTHON_LIBRARY` in the cmake GUI if you wish to build the python package. If you are using the CMake GUI on Windows, tick "Advanced" to see these options. If you are using CMake from the command line, run :code:`$ ccmake .` in the build directory and press :code:`t` on your keyboard to see these options. You will have to repeat this procedure every time you setup a new build of SimpleElastix so we strongly recommended you fix your installation and configure your :code:`$PATH` environment variable correctly instead. If you still experience problems at this point, re-install the language package or consult Google or Stackoverflow.
-- Visual Studio throws :code:`LNK1102 out of memory` error even though I selected the 64-bit compiler.
-    - While Visual Studio targets 64-bit platforms when you select a 64-bit compiler, the Visual Studio toolchain itself will be 32-bit by default. This is a problem when SimpleElastix requires more than 4GB of memory during the linking stage. Switch to the 64-bit toolchain.
-    - TIP: To force Visual Studio 2013/2012 to use x64 toolchain, set enviorment variable _IsNativeEnvironment=true in command prompt, and then call the VS2013 exe (i.e "c:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\devenv.exe" c:\SimpleElastix\build\SimpleITK-build\SimpleITK.sln).
-        OR in Visual Studio 2013:
-        
-        Edit your .vcxproj file and insert the following after the <Import...Microsoft.Cpp.Defaults line:
-        <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-        <PropertyGroup>
-            <PreferredToolArchitecture>x64</PreferredToolArchitecture>
-        </PropertyGroup>
-- Ruby build fails os Mac OS X.
-    - The Ruby virtual machine cannot accomodate spaces in paths. If you see a path that contains spaces like :code:`/Applications/Apple Dev Tools/Xcode.app/Contents/Developer`, re-install Xcode Command Line Tools to a place with no spaces in the path.
 
-If you are experiencing a problem that is not describes on this page, you are very welcome to open an issue on Github and we will try to help you. Likewise, if you have found a solution to a problem that is not described on this page, you are very welcome to open a pull request on Github and help us fix the problem for everyone.
-
-
-Building Manually On Linux
+Manually Building On Linux
 --------------------------
-This is not the recommended way of building SimpleElastix but it can be useful if you want to use a system version of ITK, SWIG or your own version of elastix (in this case check out the necessary changes to elastix source code at https://github.com/kaspermarstal/elastix). 
+The following approach allows you to use a system version of ITK or your own version of elastix. In the latter case, start out with the elastix source code at https://github.com/kaspermarstal/elastix which includes some changes that make elastix play nicely with SimpleITK. 
 
 1. Setup the prerequisites
     - `sudo apt-get install cmake swig monodevelop r-base r-base-dev ruby python python-dev tcl tcl-dev tk tk-dev`.
 2. Install the matching version of SWIG >= 3.0.5
-3. Clone ITK from `github.com/InsightSoftwareConsortium/ITK <https://github.com/InsightSoftwareConsortium/ITK>`_.
-4. Configure ITK using CMake
-    - BUILD_SHARED_LIBS=OFF, ITK_USE_REVIEW=ON, ITK_WRAP_*=OFF
-5. Build ITK. Make sure to note the build settings, e.g. Release x64.
-6. Clone elastix from `github.com/kaspermarstal/elastix <https://github.com/kaspermarstal/elastix>`_.
-7. Configure elastix using CMake
-    - BUILD_TESTING=OFF, BUILD_EXECUTABLE=OFF, USE_KNNGraphAlphaMutualInformationMetric=OFF 
-    - Set appropriate ELASTIX_IMAGE_2/3/4D_PIXELTYPES and any components that you might require
-8. Build elastix
+3. Install ITK. Configure CMake using the same approach as above.
+    - Clone ITK from `github.com/InsightSoftwareConsortium/ITK <https://github.com/InsightSoftwareConsortium/ITK>`_.
+    - Configure CMake. Set the following CMake variables: BUILD_SHARED_LIBS=OFF, ITK_USE_REVIEW=ON, ITK_WRAP_*=OFF.
+    - Compile ITK. Make sure to note the build settings, e.g. Release x64.
+4. Build elastix. 
+    - Clone elastix from `github.com/kaspermarstal/elastix <https://github.com/kaspermarstal/elastix>`_.
     - Set ITK_DIR to the location of the ITK build directory
-9. Clone SimpleElastix from `github.com/kaspermarstal/SimpleElastix <https://github.com/kaspermarstal/SimpleElastix>`_.
-10. Configure SimpleElastix using CMake
-        - Set ITK_DIR to the location of the ITK build directory
-        - Set ELASTIX_DIR to the location of the elastix build directory
-11. Build SimpleITK. Make sure to configure the build settings exactly the same as ITK e.g. Release x64.
+    - Configure CMake. Set the following CMake variables: BUILD_EXECUTABLE=OFF, USE_KNNGraphAlphaMutualInformationMetric=OFF 
+    - Set appropriate ELASTIX_IMAGE_2/3/4D_PIXELTYPES and any components that you might require.
+    - Make sure your own compontents are properly registered by the elastix build system if you are writing your own components.
+    - Compile elastix. Make sure to configure the build settings exactly the same as ITK e.g. Release x64.
+5. Build SimpleElastix. 
+    - Clone SimpleElastix from `github.com/kaspermarstal/SimpleElastix <https://github.com/kaspermarstal/SimpleElastix>`_.
+    - Configure CMake. Point ITK_DIR to the location of the ITK build directory and ELASTIX_DIR to the location of the elastix build directory.
+    - Build SimpleElastix. Make sure to configure the build settings exactly the same as ITK e.g. Release x64.
+
+Troubleshooting
+---------------
+
+I have installed a target language but CMake cannot find it.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The language package may be configured incorrectly or the necessary folders may not have been added to your :code:`$PATH` environment variable during installation. Two solutions are available.
+
+    - Add the necessary folders to your :code:`$PATH` environment variable. 
+        - Linux and Mac OS X: Add :code:`export PATH=${PATH}:/path/to/folder` to your :code:`$HOME/.bash_profile` (or :code:`$HOME/.profile` depending on your system) and restart the terminal.
+        - Windows: Go to Control Panel -> System -> Advanced tab -> Environment Variables and add the target language installation directory to the :code:`PATH` variable.
+    - Set the paths manually in CMake (quick and dirty fix). For example, specify :code:`PYTHON_EXECUTABLE`, :code:`PYTHON_INCLUDE_DIR` and :code:`PYTHON_LIBRARY` if you wish to build the python package. 
+        - Linux and Mac OS X: Run :code:`$ ccmake .` in the build directory and press :code:`t` on your keyboard to see these options.
+        - Windows: Tick "Advanced" in the CMake GUI to see these options.
+        - You will have to repeat this procedure every time you setup a new build of SimpleElastix so it is worth considering configuring your :code:`PATH` variable instead (we recommend you configure your :code:`$PATH` environment variable correctly in any case). If you still experience problems at this point, re-install the language package or consult Google or Stackoverflow.
+
+Visual Studio throws :code:`LNK1102 out of memory` error even though I selected the 64-bit compiler.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+While Visual Studio targets 64-bit platforms when you select a 64-bit compiler, the Visual Studio toolchain itself will be 32-bit by default. This is a problem when SimpleElastix requires more than 4GB of memory during the linking stage. 
+
+    - Switch to the 64-bit toolchain. There are two ways of doing this.
+        - Set the environment variable :code:`_IsNativeEnvironment=true` in command prompt, then call the VS2013 executable from command line. For example:
+        ::
+
+            c:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\devenv.exe" c:\SimpleElastix\build\SimpleITK-build\SimpleITK.sln)
+        - In Visual Studio, edit your .vcxproj file and insert the following after the :code:`<Import...Microsoft.Cpp.Defaults>` line:
+        ::
+
+            <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+            <PropertyGroup>
+                <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+            </PropertyGroup>
+
+Ruby build fails os Mac OS X.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The Ruby virtual machine cannot accomodate spaces in paths. If you see a path that contains spaces like :code:`/Applications/Apple Dev Tools/Xcode.app/Contents/Developer`, re-install Xcode Command Line Tools to a place with no spaces in the path.
+
+If you are experiencing a problem that is not describes on this page, you are very welcome to open an issue on Github and we will do our best to help you out. Likewise, if you have found a solution to a problem that is not described on this page, you are welcome to open a pull request on Github and help fix the problem for everyone.
+
+SimpleElastix takes a long time to build!
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The full build take 2+ hours to build on a standard machine. You can speed up compilation by deselecting Examples, Testing and any wrapped languages you don't need.
+

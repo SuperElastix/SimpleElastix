@@ -1,7 +1,7 @@
 Hello World
 ===========
 
-This example illustrates the simplest way to use SimpleElastix. With *one* function call you can specify the fixed image, the moving image and the type of registration you want to perform. SimpleElastix will then register your images using sensible default parameters that work well in most cases. In later examples we shall see how to tweak the default parameters if you are not happy with the initial results, but for now we keep it simple for illustrative purposes.
+This example illustrates the easiest way to use SimpleElastix. With *one* function call you can specify the fixed image, the moving image and the type of registration you want to perform. SimpleElastix will then register your images using sensible default parameters that work well in most cases. In later examples we shall see how to tweak the default parameters if you are not happy with the initial results, but for now we keep it simple for illustrative purposes.
 
 Registration With Translation Transform
 ---------------------------------------
@@ -33,21 +33,13 @@ We identify that the objects are related by a simple spatial shift and that a tr
                              "translation")
 
 
-That's it! We have effectively registered two images using a robust multi-resolution approach with a single line of code. Compare this to the `ITK Hello World example <https://github.com/InsightSoftwareConsortium/ITK/blob/master/Examples/RegistrationITKv4/DeformableRegistration1.cxx>`_. We refer to this short-hand notation as the procedural interface because it consists of functions that accomplish a specific task. The procedural interface is less flexible than the object-oriented interface but very simple to use. Let's break down what we did.
+That's it! We have effectively registered two images using a robust multi-resolution approach with a single line of code. Compare this to the `ITK Hello World example <https://github.com/InsightSoftwareConsortium/ITK/blob/master/Examples/RegistrationITKv4/DeformableRegistration1.cxx>`_. We refer to this short-hand notation as the procedural interface because it consists of functions that accomplish a specific task. The procedural interface is less flexible than the object-oriented interface (introduced below) but very simple to use. Let's break down what goes on.
 
 :code:`import SimpleITK as sitk` loads the SimpleITK module from which SimpleElastix is accessed (the main module has retained its SimpleITK name for compatibility reasons). This assumes that SimpleElastix has been compiled and installed on your machine.
 
-:code:`sitk.ReadImage()` is the generic image file reader of SimpleITK which loads an image from disk and pass a SimpleITK image object to SimpleElastix. You can apply any SimpleITK filter to the fixed and moving image before passing them to SimpleElastix. For example, if you want to emphasize edge correspondences, you can apply an edge detection filter prior to registration as follows:
+:code:`sitk.ReadImage()` is the generic image file reader of SimpleITK which loads an image from disk and pass a SimpleITK image object to SimpleElastix. You can apply any SimpleITK filter to the fixed and moving image before passing them to SimpleElastix. 
 
-:: 
-
-  import SimpleITK as sitk
-
-  resultImage = sitk.Elastix(sitk.CannyEdgeDetection(sitk.ReadImage("fixedBinaryImage.nii")), \ 
-                             sitk.CannyEdgeDetection(sitk.ReadImage("movingBinaryImage.nii")), \
-                             "translation")
-
-The final parameter :code:`"translation"` specifies the desired type of registration. In the next section we will take a close look at parameter maps and examine what what happens under the hood when you specify this parameter. It is obvious from the figure below that a translation transform sufficient to align these images.
+The final parameter :code:`"translation"` specifies the desired type of registration. In the next section we will take a close look at parameter maps and examine what what happens under the hood when you specify this parameter. It is obvious from the figure below that a translation transform is sufficient to align these images.
 
 .. _fig2: 
 
@@ -99,9 +91,9 @@ This is more verbose but also a lot more powerful. We can now warp an entire pop
         transformix.Execute()
         sitk.WriteImage(transformix.GetResultImage(), "result_"+filename)
 
-The object-oriented interface facilitates reuse of components and dramatically simplifies book-keeping and boilerplate clode compared to the original command line interface. We will use the object-oriented interface from this point forward.
+The object-oriented interface facilitates reuse of components and dramatically simplifies book-keeping and boilerplate code. We will use the object-oriented interface from this point forward.
 
-In the next section, we will take a closer look at the parameter map interface that configures the registration components under the hood.
+In the next section, we will take a closer look at the parameter map interface that configures the registration components.
 
 
 
