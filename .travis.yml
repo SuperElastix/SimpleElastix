@@ -1,4 +1,10 @@
+sudo: false
+
 language: cpp
+
+os:
+  - linux
+  - osx
 
 compiler:
   - clang
@@ -25,3 +31,7 @@ script:
 notifications:
   slack:
     secure: h43Xu8fWhyJeuLNuvGHM5GglU5j03eDZD1obwAbe0Xccr/UyY0Cm7YA2sRtzCHKsEUaOheP6UeUuhLR9dQb0ByhDjMnEbZJViZoYzuTNaaP8Olv0GWe43CrMB2fQpOcGPfdzDNfmIrW/+kK9Yhq3Rw9UlE0O2Kk7DHebhxG2zIU=
+
+matrix:
+  allow_failures:
+    - compiler: gcc # gcc sometimes hit time limit
