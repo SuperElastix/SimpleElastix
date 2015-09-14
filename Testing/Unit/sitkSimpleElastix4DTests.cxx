@@ -13,17 +13,31 @@ protected:
         image4d = sitk::ReadImage( dataFinder.GetFile( "Input/4D.nii.gz" ) );
     }
 
-    typedef sitk::SimpleElastix SimpleElastixType;
+    typedef sitk::SimpleElastix                      SimpleElastixType;
+    typedef SimpleElastixType::ParameterMapType      ParameterMapType;
+    typedef SimpleElastixType::ParameterValuesType   ParameterValuesType;
 
     sitk::Image image4d;
+
+    bool IsEmpty( const sitk::Image image )
+    {
+      return ( image.GetWidth() == 0 && image.GetHeight() == 0 );
+    }
 };
 
 TEST_F( SimpleElastix4DTest, GroupwiseRegistration )
 {
+    ParameterMapType parameterMap = sitk::GetDefaultParameterMap( "groupwise" );
+    parameterMap["MaxiumNumberOfIterations"] = ParameterValuesType( 1, "4" ); // otherwise unreasonable testing time
+
     SimpleElastixType elastix;
+    sitk::Image resultImage;
+
     EXPECT_NO_THROW( elastix.SetFixedImage( image4d ) );
     EXPECT_NO_THROW( elastix.SetMovingImage( image4d ) );
-    EXPECT_NO_THROW( elastix.SetParameterMap( sitk::GetDefaultParameterMap( "groupwise" ) ) );
+    EXPECT_NO_THROW( elastix.SetParameterMap( parameterMap ) );
     EXPECT_NO_THROW( elastix.LogToFolder( "." ) );
     EXPECT_NO_THROW( elastix.Execute() );
+    EXPECT_NO_THROW( resultImage = elastix.GetResultImage() );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
 }

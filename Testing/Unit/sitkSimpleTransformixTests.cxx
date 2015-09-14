@@ -32,6 +32,11 @@ protected:
     sitk::Image fixedImage;
     sitk::Image movingImage;
     std::string outputFolder;
+
+    bool IsEmpty( const sitk::Image image )
+    {
+      return ( image.GetWidth() == 0 && image.GetHeight() == 0 );
+    }
 };
 
 TEST_F( SimpleTransformixTest, ObjectOrientedInterface )
@@ -47,24 +52,41 @@ TEST_F( SimpleTransformixTest, ObjectOrientedInterface )
 
     EXPECT_NO_THROW( transformix.SetTransformParameterMap( elastix.GetTransformParameterMap() ) );
     EXPECT_NO_THROW( transformix.Execute() );
+    EXPECT_FALSE( this->IsEmpty( transformix.GetResultImage() ) );
 
-    /**
-     * TODO: This fails, presumably due to rounding errors:
-     * EXPECT_EQ( sitk::Hash( elastix.GetResultImage() ), sitk::Hash( transformix.GetResultImage() ) );
-     */
+    EXPECT_NO_THROW( transformix.Execute() );
+    EXPECT_FALSE( this->IsEmpty( transformix.GetResultImage() ) );
+
+    EXPECT_NO_THROW( transformix.Execute() );
+    EXPECT_FALSE( this->IsEmpty( transformix.GetResultImage() ) );
 }
 
 
 TEST_F( SimpleTransformixTest, ProceduralInterface )
 {
-    EXPECT_NO_THROW( Transformix( movingImage, elastix.GetTransformParameterMap()[0] ) );
-    EXPECT_NO_THROW( Transformix( movingImage, elastix.GetTransformParameterMap()[0], true ) );
-    EXPECT_NO_THROW( Transformix( movingImage, elastix.GetTransformParameterMap()[0], true, outputFolder ) );
-    EXPECT_NO_THROW( Transformix( movingImage, elastix.GetTransformParameterMap()[0], false, outputFolder ) );
+    sitk::Image resultImage;
 
-    EXPECT_NO_THROW( Transformix( movingImage, elastix.GetTransformParameterMap() ) );
-    EXPECT_NO_THROW( Transformix( movingImage, elastix.GetTransformParameterMap(), true ) );
-    EXPECT_NO_THROW( Transformix( movingImage, elastix.GetTransformParameterMap(), true, outputFolder ) );
-    EXPECT_NO_THROW( Transformix( movingImage, elastix.GetTransformParameterMap(), false, outputFolder ) );
+    EXPECT_NO_THROW( resultImage = Transformix( movingImage, elastix.GetTransformParameterMap()[0] ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( resultImage = Transformix( movingImage, elastix.GetTransformParameterMap()[0], true ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( resultImage = Transformix( movingImage, elastix.GetTransformParameterMap()[0], true, outputFolder ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( resultImage = Transformix( movingImage, elastix.GetTransformParameterMap()[0], false, outputFolder ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+
+    EXPECT_NO_THROW( resultImage = Transformix( movingImage, elastix.GetTransformParameterMap() ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( resultImage = Transformix( movingImage, elastix.GetTransformParameterMap(), true ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( resultImage = Transformix( movingImage, elastix.GetTransformParameterMap(), true, outputFolder ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( resultImage = Transformix( movingImage, elastix.GetTransformParameterMap(), false, outputFolder ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+
+    ParameterMapListType parameterMapList = elastix.GetTransformParameterMap();
+    parameterMapList[ parameterMapList.size()-1 ][ "WriteResultImage" ] = ParameterValuesType( 1, "false" );
+    EXPECT_NO_THROW( resultImage = Transformix( movingImage, elastix.GetTransformParameterMap() ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
 }
 
