@@ -13,7 +13,7 @@ Image
 SimpleTransformix::ExecuteInternal( void )
 {
   // Assert fixed and moving image is set
-  if( isEmpty( this->m_InputImage ) )
+  if( IsEmpty( this->m_InputImage ) )
   {
     sitkExceptionMacro( << "Input image is not set. Use SetInputImage() or run Help() to get information on how to use this module." );
   }
@@ -49,17 +49,17 @@ SimpleTransformix::ExecuteInternal( void )
   }
   catch( itk::ExceptionObject &e )
   {
-    sitkExceptionMacro( << "Errors occured during transformation: " << e.what() );
+    sitkExceptionMacro( << "Errors occured in transformix: " << e.what() );
   }
 
   if( isError == -2 )
   {
-    sitkExceptionMacro( << "Errors occured during transformation: Output directory does not exist." );
+    sitkExceptionMacro( << "Errors occured in transformix: Output directory does not exist." );
   }
 
   if( isError != 0 )
   {
-    sitkExceptionMacro( << "Errors occured during transformation." );
+    sitkExceptionMacro( << "Errors occured in transformix. If you do not see any other error message, set LogToConsoleOn() or LogToFolder(\"path/to/folder\") to view transformix output." );
   }
 
   if( transformix.GetResultImage().IsNotNull() )
@@ -69,15 +69,7 @@ SimpleTransformix::ExecuteInternal( void )
   }
   else
   {
-    // Some day this will save someone a LOT of time ...
-    if( this->m_TransformParameterMaps[ this->m_TransformParameterMaps.size()-1 ].count( "WriteResultImage" ) > 0 )
-    {
-      if( this->m_TransformParameterMaps[ this->m_TransformParameterMaps.size()-1 ][ "WriteResultImage" ][ 0 ] == "false" )
-      {
-        std::cout << "WARNING: Result image cannot be read because WriteResultImage is set to \"false\". " << std::endl; 
-      }
-    }
-    sitkExceptionMacro( << "Errors occured during warping: Could not read result image." );
+    sitkExceptionMacro( << "Error occured in transformix: If you do not see any other error message, Set LogToConsoleOn() or LogToFolder(\"path/to/folder\") to view transformix output." );
   }
 
   return this->m_ResultImage;

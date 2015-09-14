@@ -12,20 +12,20 @@ Image
 SimpleElastix::ExecuteInternal( void )
 {
   // Assert fixed and moving image is set
-  if( isEmpty( this->m_FixedImage ) )
+  if( IsEmpty( this->m_FixedImage ) )
   {
-    sitkExceptionMacro( << "Fixed image is not set. Use SetFixedImage() or run Help() to get information on how to use this module." );
+    sitkExceptionMacro( << "Fixed image is not set. Set with method SetFixedImage()." );
   }
 
-  if( isEmpty( this->m_MovingImage ) )
+  if( IsEmpty( this->m_MovingImage ) )
   {
-    sitkExceptionMacro( << "Moving image is not set. Use SetMovingImage() or run Help() to get information on how to use this module." );
+    sitkExceptionMacro( << "Moving image is not set. Set with method SetMovingImage()." );
   }
 
   // Assert at least one parameter map is set
   if( this->m_ParameterMaps.size() == 0 )
   {
-    sitkExceptionMacro( << "Parameter map not set. Use SetParameterMap() or run Help() to get information on how to use this module." );
+    sitkExceptionMacro( << "Parameter map not set. Set with method SetParameterMap()." );
   }
 
   for( unsigned int i = 0; i < this->m_ParameterMaps.size(); ++i )
@@ -40,13 +40,13 @@ SimpleElastix::ExecuteInternal( void )
 
   // Get masks (optional)
   itk::DataObject::Pointer fixedMask = 0;
-  if( !this->isEmpty( this->m_FixedMask ) )
+  if( !this->IsEmpty( this->m_FixedMask ) )
   {
     fixedMask = this->m_FixedMask.GetITKBase();
   }
 
   itk::DataObject::Pointer movingMask = 0;
-  if( !this->isEmpty( this->m_MovingMask ) )
+  if( !this->IsEmpty( this->m_MovingMask ) )
   {
     movingMask = this->m_MovingMask.GetITKBase();
   }
@@ -86,7 +86,7 @@ SimpleElastix::ExecuteInternal( void )
 
   if( isError != 0 )
   {
-    sitkExceptionMacro( << "Errors occured during registration. Set LogToConsoleOn() or LogToFolder(outputFolder) for detailed information." );
+    sitkExceptionMacro( << "Errors occured during registration. If you do not see any error message, set LogToConsoleOn() or LogToFolder(\"path/to/folder\") to view elastix output." );
   }
 
   if( elastix.GetTransformParameterMapList().size() > 0 )

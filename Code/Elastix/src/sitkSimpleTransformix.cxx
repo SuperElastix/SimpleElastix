@@ -275,9 +275,10 @@ SimpleTransformix
 
 bool
 SimpleTransformix
-::isEmpty( const Image& image )
+::IsEmpty( const Image& image )
 {
-  return( image.GetWidth() == 0 && image.GetHeight() == 0 );
+  bool isEmpty = image.GetWidth() == 0 && image.GetHeight() == 0;
+  return isEmpty;
 }
 
 

@@ -70,7 +70,7 @@ class SITKCommon_EXPORT SimpleTransformix
 
   private:
 
-    bool isEmpty( const Image& image );
+    bool IsEmpty( const Image& image );
 
     template< typename TResultImage >
     Image ExecuteInternal( void );
