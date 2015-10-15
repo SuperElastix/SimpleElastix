@@ -5,6 +5,7 @@ set( ELASTIX_REPOSITORY git://github.com/kaspermarstal/elastix.git )
 
 ExternalProject_Add( ${proj} 
   GIT_REPOSITORY ${ELASTIX_REPOSITORY}
+  GIT_TAG elastix-4-8
   UPDATE_COMMAND ""
   SOURCE_DIR ${proj}
   BINARY_DIR ${proj}-build
