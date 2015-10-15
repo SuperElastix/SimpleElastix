@@ -144,8 +144,8 @@ The following approach allows us to use a system version of ITK or our own versi
 Troubleshooting
 ---------------
 
-I have installed a target language but CMake cannot find it.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+I have installed a target language but CMake cannot find it
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The language package may be configured incorrectly or the necessary folders may not have been added to your :code:`$PATH` environment variable during installation. Two solutions are available.
 
     - Solution 1: Add the necessary folders to your :code:`$PATH` environment variable. 
@@ -156,7 +156,7 @@ The language package may be configured incorrectly or the necessary folders may 
         - Windows: Tick "Advanced" in the CMake GUI to see these options.
         - You will have to repeat this procedure every time you setup a new build of SimpleElastix so it is worth considering configuring your :code:`PATH` variable instead (we recommend you configure your :code:`$PATH` environment variable correctly in any case). If you still experience problems at this point, re-install the language package or consult Google or Stackoverflow.
 
-Visual Studio throws :code:`LNK1102 out of memory` error even though I selected the 64-bit compiler.
+Visual Studio throws :code:`LNK1102 out of memory` error even though I selected the 64-bit compiler
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 While Visual Studio targets 64-bit platforms when we select a 64-bit compiler, the Visual Studio toolchain itself will be 32-bit by default. We may therefore experience an out-of-memory error even though you compile a 64-bit vesion of elastix, especially during the linking stage. There are (at least) two ways we can try switch to a 64-bit toolchain (we say "try" because these methods work, someimes they don't).
 
@@ -172,13 +172,38 @@ While Visual Studio targets 64-bit platforms when we select a 64-bit compiler, t
             <PreferredToolArchitecture>x64</PreferredToolArchitecture>
         </PropertyGroup>
 
-Ruby build fails os Mac OS X.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Ruby build fails on Mac OS X
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The Ruby virtual machine cannot accomodate spaces in paths. If you see a path that contains spaces like :code:`/Applications/Apple Dev Tools/Xcode.app/Contents/Developer`, re-install Xcode Command Line Tools to a place with no spaces in the path.
+
+PCRE (Perl Compatible Regular Expression) build fails on Mac OS X
+
+On recent versions of Mac OS X you may experience the following error when using the SuperBuild:
+
+::
+
+    Performing build step for 'PCRE'
+    make[3]: *** No targets specified and no makefile found. Stop.
+    make[2]: *** [PCRE-prefix/src/PCRE-stamp/PCRE-build] Error 2
+    make[1]: *** [CMakeFiles/PCRE.dir/all] Error 2
+    make: *** [all] Error 2
+
+We can work around this issue by adding the following flags to the CMake configure command and run it in a *clean* directory (i.e. you need to start over with a fresh build directory):
+
+::
+
+    cmake -DCMAKE_CXX_COMPILER:STRING=/usr/bin/clang++ -DCMAKE_C_COMPILER:STRING=/usr/bin/clang path/to/SimpleElastix/SuperBuild
+
+This just sets the compiler to the one in "/usr/bin".
 
 SimpleElastix takes a long time to build!
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The full build take 2+ hours to build on a standard machine. You can speed up compilation by deselecting Examples, Testing and any wrapped languages you don't need.
+
+I am unable to assign a parameter to a parameter map in a parameter map list
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This is a known issue which is possibly related to the SWIG-generated code. If you have a solution please make a pull request!
 
 Contribute
 ----------
