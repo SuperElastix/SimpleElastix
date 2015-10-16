@@ -2,7 +2,7 @@
 #define __sitksimpleelastix_hxx_
 
 #include "sitkSimpleElastix.h"
-#include "itkImage.h"
+#include "elxElastixMain.h" // for xoutClose
  
 namespace itk {
   namespace simple {
@@ -114,6 +114,9 @@ SimpleElastix::ExecuteInternal( void )
     TResultImage* itkResultImage = static_cast< TResultImage* >( elastix.GetResultImage().GetPointer() );
     this->m_ResultImage = Image( itkResultImage );
   }
+
+  // Close dangling xout buffers
+  elastix::xoutClose();
 
   return this->m_ResultImage;
 }

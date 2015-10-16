@@ -57,6 +57,8 @@ TEST_F( SimpleElastixTest, ObjectOrientedInterface )
     parameterMap[ "Transform" ]           = ParameterValuesType( 1, "TranslationTransform" );
     parameterMap[ "Metric" ]              = ParameterValuesType( 1, "AdvancedMattesMutualInformation" );
 
+    EXPECT_NO_THROW( elastix.LogToConsoleOn();  );
+    EXPECT_NO_THROW( elastix.LogToFolder(".");  );
     EXPECT_NO_THROW( elastix.SetParameterMap( parameterMap ) );
     EXPECT_NO_THROW( elastix.Execute() );
     EXPECT_FALSE( this->IsEmpty( elastix.GetResultImage() ) );
