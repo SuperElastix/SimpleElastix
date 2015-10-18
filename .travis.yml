@@ -1,4 +1,5 @@
-sudo: false
+sudo: required
+dist: trusty
 
 language: cpp
 
@@ -9,11 +10,6 @@ os:
 compiler:
   - clang
   - gcc
-
-addons:
-  apt:
-    packages:
-    - cmake
 
 before_install:
   - pwd
@@ -31,4 +27,4 @@ before_script:
 
 script:
   - cmake ../SimpleElastix/SuperBuild
-  - make --jobs=1 | grep -v '^--' | grep -v '^Installing'
+  - make --jobs=2 | grep -v '^--' | grep -v '^Installing'
