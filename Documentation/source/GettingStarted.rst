@@ -177,7 +177,7 @@ Ruby build fails on Mac OS X
 The Ruby virtual machine cannot accomodate spaces in paths. If you see a path that contains spaces like :code:`/Applications/Apple Dev Tools/Xcode.app/Contents/Developer`, re-install Xcode Command Line Tools to a place with no spaces in the path.
 
 PCRE (Perl Compatible Regular Expression) build fails on Mac OS X
-
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 On recent versions of Mac OS X you may experience the following error when using the SuperBuild:
 
 ::
@@ -188,7 +188,7 @@ On recent versions of Mac OS X you may experience the following error when using
     make[1]: *** [CMakeFiles/PCRE.dir/all] Error 2
     make: *** [all] Error 2
 
-We can work around this issue by adding the following flags to the CMake configure command and run it in a *clean* directory (i.e. you need to start over with a fresh build directory):
+This happens during the SWIG build. We can work around this issue by installing our own version of SWIG and set USE_SYSTEM_SWIG to ON or by adding the following flags to the CMake configure command and run it in a *clean* directory:
 
 ::
 
@@ -196,9 +196,14 @@ We can work around this issue by adding the following flags to the CMake configu
 
 This just sets the compiler to the one in "/usr/bin".
 
+I get compilation errors :code:`elastixlib.h' and 'transformixlib.h' file not found`  
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This error may stem from a space in the path of the build directory. For example, if we are building SimplElastix in :code:`/Users/kasper/folder name/build` we should rename it to :code:`/Users/kasper/folder_name/build` or similar.
+
 SimpleElastix takes a long time to build!
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The full build take 2+ hours to build on a standard machine. You can speed up compilation by deselecting Examples, Testing and any wrapped languages you don't need.
+The full build take 2+ hours to build on a standard machine. We can speed up compilation by deselecting Examples, Testing and any wrapped languages we don't need.
 
 I am unable to assign a parameter to a parameter map in a parameter map list
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
