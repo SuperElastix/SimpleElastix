@@ -179,6 +179,8 @@ SimpleTransformix
 ::WriteParameterFile( std::map< std::string, std::vector< std::string > > const parameterMap, const std::string filename )
 {
   std::ofstream parameterFile;
+  parameterFile << std::fixed;
+
   parameterFile.open( filename.c_str(), std::ofstream::out );
 
   ParameterMapConstIterator parameterMapIterator = parameterMap.begin();
