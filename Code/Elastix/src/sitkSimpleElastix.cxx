@@ -418,11 +418,10 @@ SimpleElastix
     return this->m_MemberFactory->GetMemberFunction( FixedImagePixelEnum, FixedImageDimension )();
   }
 
-  sitkExceptionMacro( << "SimpleElastix does not support the combination of image type \""
-                      << GetPixelIDValueAsString( FixedImagePixelEnum ) << "and dimension "
-                      << FixedImageDimension << ". By default elastix is compiled with support "
-                      << "sitkFloat32 in 2D, sitkInt16 and sitkFloat32 in 3D and sitkInt16 in 4D. "
-                      << "Recompile elastix with the desired pixel type or cast the SimpleITK image." );
+  sitkExceptionMacro( << "SimpleITK does not support the combination of image type \""
+                      << GetPixelIDValueAsString( FixedImagePixelEnum ) << "\" ("
+                      << GetPixelIDValueAsElastixParameter( FixedImagePixelEnum ) << ") and dimension "
+                      << FixedImageDimension << "." );
 }
 
 

@@ -85,7 +85,7 @@ SimpleTransformix
     return this->m_MemberFactory->GetMemberFunction( InputImagePixelEnum, InputImageDimension )();
   }
 
-  sitkExceptionMacro( << "SimpleTransformix does not support the combination of image type \""
+  sitkExceptionMacro( << "SimpleITK does not support the combination of image type \""
                       << GetPixelIDValueAsString( InputImagePixelEnum ) << "\" ("
                       << GetPixelIDValueAsElastixParameter( InputImagePixelEnum ) << ") and dimension "
                       << InputImageDimension << "." );
