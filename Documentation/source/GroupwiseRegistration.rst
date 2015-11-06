@@ -1,3 +1,5 @@
+.. _GroupwiseRegistration:
+
 Groupwise Registration
 ======================
 

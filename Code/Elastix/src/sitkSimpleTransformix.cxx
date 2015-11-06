@@ -85,7 +85,7 @@ SimpleTransformix
     return this->m_MemberFactory->GetMemberFunction( InputImagePixelEnum, InputImageDimension )();
   }
 
-  sitkExceptionMacro( << "SimpleTransformix does not support the combination of image type \""
+  sitkExceptionMacro( << "SimpleITK does not support the combination of image type \""
                       << GetPixelIDValueAsString( InputImagePixelEnum ) << "\" ("
                       << GetPixelIDValueAsElastixParameter( InputImagePixelEnum ) << ") and dimension "
                       << InputImageDimension << "." );
@@ -179,6 +179,8 @@ SimpleTransformix
 ::WriteParameterFile( std::map< std::string, std::vector< std::string > > const parameterMap, const std::string filename )
 {
   std::ofstream parameterFile;
+  parameterFile << std::fixed;
+
   parameterFile.open( filename.c_str(), std::ofstream::out );
 
   ParameterMapConstIterator parameterMapIterator = parameterMap.begin();
@@ -275,9 +277,10 @@ SimpleTransformix
 
 bool
 SimpleTransformix
-::isEmpty( const Image& image )
+::IsEmpty( const Image& image )
 {
-  return( image.GetWidth() == 0 && image.GetHeight() == 0 );
+  bool isEmpty = image.GetWidth() == 0 && image.GetHeight() == 0;
+  return isEmpty;
 }
 
 

@@ -83,7 +83,7 @@ class SITKCommon_EXPORT SimpleElastix
 
   private:
 
-    bool isEmpty( const Image& image );
+    bool IsEmpty( const Image& image );
 
     template< typename TResultImage >
     Image ExecuteInternal( void );
@@ -123,21 +123,21 @@ class SITKCommon_EXPORT SimpleElastix
 // Procedural Interface 
 SITKCommon_EXPORT std::map< std::string, std::vector< std::string > > GetDefaultParameterMap( const std::string transform, const unsigned int numberOfResolutions = 4, const double finalGridSpacingInPhysicalUnits = 8.0  );
 SITKCommon_EXPORT std::map< std::string, std::vector< std::string > > ReadParameterFile( const std::string filename );
-SITKCommon_EXPORT void WriteParameterFile( std::map< std::string, std::vector< std::string > > const parameterMap, const std::string filename );
-SITKCommon_EXPORT void PrettyPrint( std::map< std::string, std::vector< std::string > > const parameterMap );
-SITKCommon_EXPORT void PrettyPrint( std::vector< std::map< std::string, std::vector< std::string > > > const parameterMapList );
+SITKCommon_EXPORT void WriteParameterFile( const std::map< std::string, std::vector< std::string > > parameterMap, const std::string filename );
+SITKCommon_EXPORT void PrettyPrint( const std::map< std::string, std::vector< std::string > > parameterMap );
+SITKCommon_EXPORT void PrettyPrint( const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList );
 SITKCommon_EXPORT Image Elastix( const Image& fixedImage, const Image& movingImage, const std::string defaultParameterMapName, const bool logToConsole = false, const std::string outputFolder = "" );
 SITKCommon_EXPORT Image Elastix( const Image& fixedImage, const Image& movingImage, const std::map< std::string, std::vector< std::string > > parameterMap, const bool logToConsole = false, const std::string outputFolder = "" );
 SITKCommon_EXPORT Image Elastix( const Image& fixedImage, const Image& movingImage, const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList, const bool logToConsole = false, const std::string outputFolder = "" );
 SITKCommon_EXPORT Image Elastix( const Image& fixedImage, const Image& movingImage, const std::string defaultParameterMapName, const Image& fixedMask, const Image& movingMask, const bool logToConsole = false, const std::string outputFolder = "" );
 SITKCommon_EXPORT Image Elastix( const Image& fixedImage, const Image& movingImage, const std::map< std::string, std::vector< std::string > >, const Image& fixedMask, const Image& movingMask, const bool logToConsole = false, const std::string outputFolder = "" );
-SITKCommon_EXPORT Image Elastix( const Image& fixedImage, const Image& movingImage, const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList, const Image& fixedMask, const Image& movingMask, const bool logToConsole = false, const std::string outputFolder = "" );
+SITKCommon_EXPORT Image Elastix( const Image& fixedImage, const Image& movingImage, std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList, const Image& fixedMask, const Image& movingMask, const bool logToConsole = false, const std::string outputFolder = "" );
 
 template < typename T > std::string to_string( const T& n )
 {
-    std::ostringstream stm;
-    stm << n;
-    return stm.str();
+  std::ostringstream stm;
+  stm << n;
+  return stm.str();
 }
 
 } // end namespace simple

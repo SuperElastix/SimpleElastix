@@ -213,6 +213,8 @@ SimpleElastix
 ::WriteParameterFile( std::map< std::string, std::vector< std::string > > const parameterMap, const std::string filename )
 {
   std::ofstream parameterFile;
+  parameterFile << std::fixed;
+
   parameterFile.open( filename.c_str(), std::ofstream::out );
 
   ParameterMapConstIterator parameterMapIterator = parameterMap.begin();
@@ -288,7 +290,7 @@ SimpleElastix
     parameterMap[ "Transform" ]                       = ParameterValuesType( 1, "TranslationTransform" );
     parameterMap[ "Metric" ]                          = ParameterValuesType( 1, "AdvancedMattesMutualInformation" );
     parameterMap[ "MaximumNumberOfIterations" ]       = ParameterValuesType( 1, "128" );
-    parameterMap[ "Interpolator"]                       = ParameterValuesType( 1, "LinearInterpolator");
+    parameterMap[ "Interpolator"]                     = ParameterValuesType( 1, "LinearInterpolator");
   }
   else if( transform == "rigid" )
   {
@@ -418,11 +420,10 @@ SimpleElastix
     return this->m_MemberFactory->GetMemberFunction( FixedImagePixelEnum, FixedImageDimension )();
   }
 
-  sitkExceptionMacro( << "SimpleElastix does not support the combination of image type \""
-                      << GetPixelIDValueAsString( FixedImagePixelEnum ) << "and dimension "
-                      << FixedImageDimension << ". By default elastix is compiled with support "
-                      << "sitkFloat32 in 2D, sitkInt16 and sitkFloat32 in 3D and sitkInt16 in 4D. "
-                      << "Recompile elastix with the desired pixel type or cast the SimpleITK image." );
+  sitkExceptionMacro( << "SimpleITK does not support the combination of image type \""
+                      << GetPixelIDValueAsString( FixedImagePixelEnum ) << "\" ("
+                      << GetPixelIDValueAsElastixParameter( FixedImagePixelEnum ) << ") and dimension "
+                      << FixedImageDimension << "." );
 }
 
 
@@ -468,9 +469,10 @@ SimpleElastix
 
 bool
 SimpleElastix
-::isEmpty( const Image& image )
+::IsEmpty( const Image& image )
 {
-  return( image.GetWidth() == 0 && image.GetHeight() == 0 );
+  const bool isEmpty = image.GetWidth() == 0 && image.GetHeight() == 0;
+  return isEmpty;
 }
 
 
@@ -502,7 +504,7 @@ ReadParameterFile( const std::string filename )
 
 
 void
-WriteParameterFile( std::map< std::string, std::vector< std::string > > const parameterMap, const std::string filename )
+WriteParameterFile( const std::map< std::string, std::vector< std::string > > parameterMap, const std::string filename )
 {
   SimpleElastix selx;
   selx.WriteParameterFile( parameterMap, filename );
@@ -512,7 +514,7 @@ WriteParameterFile( std::map< std::string, std::vector< std::string > > const pa
 
 
 void 
-PrettyPrint( std::map< std::string, std::vector< std::string > > const parameterMap )
+PrettyPrint( const std::map< std::string, std::vector< std::string > > parameterMap )
 {
   SimpleElastix::ParameterMapListType parameterMapList = SimpleElastix::ParameterMapListType( 1 );
   parameterMapList[ 0 ] = parameterMap;
@@ -522,7 +524,7 @@ PrettyPrint( std::map< std::string, std::vector< std::string > > const parameter
 
 
 void
-PrettyPrint( std::vector< std::map< std::string, std::vector< std::string > > > const parameterMapList )
+PrettyPrint( const std::vector< std::map< std::string, std::vector< std::string > > >  parameterMapList )
 {
   SimpleElastix selx;
   selx.PrettyPrint( parameterMapList );
@@ -549,8 +551,11 @@ Elastix( const Image& fixedImage, const Image& movingImage, const std::map< std:
 
 
 Image
-Elastix( const Image& fixedImage, const Image& movingImage, const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList, const bool logToConsole, const std::string outputFolder )
+Elastix( const Image& fixedImage, const Image& movingImage, std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList, const bool logToConsole, const std::string outputFolder )
 {
+  // Make sure result image is written to output image buffer
+  parameterMapList[ parameterMapList.size()-1 ][ "WriteResultImage" ] = SimpleElastix::ParameterValuesType( 1, "true" );
+
   SimpleElastix selx;
   selx.SetFixedImage( fixedImage );
   selx.SetMovingImage( movingImage );
@@ -571,7 +576,6 @@ Elastix( const Image& fixedImage, const Image& movingImage, const std::string de
 
 
 
-
 Image
 Elastix( const Image& fixedImage, const Image& movingImage, const std::map< std::string, std::vector< std::string > > parameterMap, const Image& fixedMask, const Image& movingMask, bool logToConsole, std::string outputFolder )
 {
@@ -583,8 +587,11 @@ Elastix( const Image& fixedImage, const Image& movingImage, const std::map< std:
 
 
 Image
-Elastix( const Image& fixedImage, const Image& movingImage, const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList, const Image& fixedMask, const Image& movingMask, bool logToConsole, std::string outputFolder )
+Elastix( const Image& fixedImage, const Image& movingImage, std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList, const Image& fixedMask, const Image& movingMask, bool logToConsole, std::string outputFolder )
 {
+  // Make sure result image is written to output image buffer
+  parameterMapList[ parameterMapList.size()-1 ][ "WriteResultImage" ] = SimpleElastix::ParameterValuesType( 1, "true" );
+
   SimpleElastix selx;
   selx.SetFixedImage( fixedImage );
   selx.SetMovingImage( movingImage );
