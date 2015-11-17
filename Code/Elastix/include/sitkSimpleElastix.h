@@ -20,9 +20,6 @@ class SITKCommon_EXPORT SimpleElastix
     ~SimpleElastix( void );
 
     typedef SimpleElastix Self;
- 
-    // typedefs inherited from SimpleITK
-    typedef BasicPixelIDTypeList PixelIDTypeList;
 
     // typedefs inherited from elastix library api
     typedef elastix::ELASTIX                                libelastix;
@@ -121,7 +118,7 @@ class SITKCommon_EXPORT SimpleElastix
 };
 
 // Procedural Interface 
-SITKCommon_EXPORT std::map< std::string, std::vector< std::string > > GetDefaultParameterMap( const std::string transform, const unsigned int numberOfResolutions = 4, const double finalGridSpacingInPhysicalUnits = 8.0  );
+SITKCommon_EXPORT std::map< std::string, std::vector< std::string > > GetDefaultParameterMap( const std::string transform, const unsigned int numberOfResolutions = 4, const double finalGridSpacingInPhysicalUnits = 8.0 );
 SITKCommon_EXPORT std::map< std::string, std::vector< std::string > > ReadParameterFile( const std::string filename );
 SITKCommon_EXPORT void WriteParameterFile( const std::map< std::string, std::vector< std::string > > parameterMap, const std::string filename );
 SITKCommon_EXPORT void PrettyPrint( const std::map< std::string, std::vector< std::string > > parameterMap );

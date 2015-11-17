@@ -1,5 +1,6 @@
 #include "SimpleITKTestHarness.h"
 #include "sitkCastImageFilter.h"
+#include "sitkHashImageFilter.h"
 #include "sitkSimpleElastix.h"
 
 namespace sitk = itk::simple;
@@ -42,20 +43,34 @@ TEST(ParameteMapTest,ParameterMapList)
     EXPECT_EQ( parameterMapList1.size(), 2u );
 }
 
-TEST(ParameterMapTest,ProceduralInterface)
+TEST( ParameterMapTest, ProceduralInterface )
 {
     sitk::SimpleElastix::ParameterMapType parameterMap;
     EXPECT_NO_THROW( parameterMap = sitk::GetDefaultParameterMap( "translation" ) );
-    EXPECT_NO_THROW( sitk::WriteParameterFile( parameterMap, "ParameterMapTestProceduralInterface.txt" ) );
-
-    sitk::SimpleElastix::ParameterMapType parameterMapRead;
-    EXPECT_NO_THROW( parameterMapRead = sitk::ReadParameterFile( "ParameterMapTestProceduralInterface.txt" ) );
-    EXPECT_EQ( parameterMap, parameterMapRead );
-
     EXPECT_NO_THROW( sitk::PrettyPrint( parameterMap ) );
 
     sitk::SimpleElastix::ParameterMapListType parameterMapList;
     parameterMapList.push_back( parameterMap );
     parameterMapList.push_back( parameterMap );
     EXPECT_NO_THROW( sitk::PrettyPrint( parameterMapList ) );
+}
+
+TEST( ParameterMaptest, ReadWrite )
+{
+    sitk::SimpleElastix::ParameterMapType parameterMap;
+    EXPECT_NO_THROW( parameterMap = sitk::GetDefaultParameterMap( "translation" ) );
+
+    sitk::Image fixedImage = sitk::Cast( sitk::ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) ), sitk::sitkFloat32 );
+    sitk::Image movingImage = sitk::Cast( sitk::ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) ), sitk::sitkFloat32 );
+
+    sitk::Image resultImage0;
+    EXPECT_NO_THROW( resultImage0 = Elastix( fixedImage, movingImage, parameterMap) );
+
+    sitk::Image resultImage1;
+    EXPECT_NO_THROW( sitk::WriteParameterFile( parameterMap, "ParameterMapTestProceduralInterface.txt" ) );
+    sitk::SimpleElastix::ParameterMapType parameterMapRead;
+    EXPECT_NO_THROW( parameterMapRead = sitk::ReadParameterFile( "ParameterMapTestProceduralInterface.txt" ) ); 
+    EXPECT_NO_THROW( resultImage1 = Elastix( fixedImage, movingImage, parameterMapRead ) );
+
+    EXPECT_EQ( sitk::Hash( resultImage0 ), sitk::Hash( resultImage0 ) );
 }

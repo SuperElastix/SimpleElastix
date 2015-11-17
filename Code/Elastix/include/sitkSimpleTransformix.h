@@ -21,9 +21,6 @@ class SITKCommon_EXPORT SimpleTransformix
 
     typedef SimpleTransformix Self;
 
-    // typedefs inherited from SimpleITK
-    typedef BasicPixelIDTypeList PixelIDTypeList;
-
     // typedefs inherited from elastix library api
     typedef transformix::TRANSFORMIX                        libtransformix;
     typedef itk::ParameterFileParser::ParameterMapType      ParameterMapType;

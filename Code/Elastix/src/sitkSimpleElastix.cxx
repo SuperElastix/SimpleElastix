@@ -14,11 +14,11 @@ SimpleElastix
 {
   // Register this class with SimpleITK
   m_MemberFactory.reset( new detail::MemberFunctionFactory< MemberFunctionType >( this ) );
-  m_MemberFactory->RegisterMemberFunctions< PixelIDTypeList, 3, SimpleElastixAddressor< MemberFunctionType > >();
-  m_MemberFactory->RegisterMemberFunctions< PixelIDTypeList, 2, SimpleElastixAddressor< MemberFunctionType > >();
+  m_MemberFactory->RegisterMemberFunctions< BasicPixelIDTypeList, 3, SimpleElastixAddressor< MemberFunctionType > >();
+  m_MemberFactory->RegisterMemberFunctions< BasicPixelIDTypeList, 2, SimpleElastixAddressor< MemberFunctionType > >();
 
 #ifdef SITK_4D_IMAGES
-  m_MemberFactory->RegisterMemberFunctions< PixelIDTypeList, 4, SimpleElastixAddressor< MemberFunctionType > >();
+  m_MemberFactory->RegisterMemberFunctions< BasicPixelIDTypeList, 4, SimpleElastixAddressor< MemberFunctionType > >();
 #endif
 
   // This class holds data that is passed to elastix API when run

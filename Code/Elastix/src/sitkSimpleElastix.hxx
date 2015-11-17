@@ -38,17 +38,21 @@ SimpleElastix::ExecuteInternal( void )
     this->m_ParameterMaps[ i ][ "ResultImagePixelType" ] = ParameterValuesType( 1, GetPixelIDValueAsElastixParameter( this->m_FixedImage.GetPixelID() ) );
   }
 
+  std::cout << "Setting masks " << std::endl;
+
   // Get masks (optional)
   itk::DataObject::Pointer fixedMask = 0;
   if( !this->IsEmpty( this->m_FixedMask ) )
   {
     fixedMask = this->m_FixedMask.GetITKBase();
+    std::cout << "FixedMask was set: " << fixedMask << std::endl;
   }
 
   itk::DataObject::Pointer movingMask = 0;
   if( !this->IsEmpty( this->m_MovingMask ) )
   {
     movingMask = this->m_MovingMask.GetITKBase();
+    std::cout << "MovingMask was set: " << movingMask << std::endl;
   }
 
   /**
@@ -56,7 +60,9 @@ SimpleElastix::ExecuteInternal( void )
    * We pass a copy as a temporary workaround until the issue is fixed
    */
   Image fixedImage = this->m_FixedImage;
-  fixedImage.SetDirection( fixedImage.GetDirection() );
+
+  // Make a deep copy
+  fixedImage.MakeUnique();
 
   // Do the (possibly multiple) registrations
   int isError = 1;

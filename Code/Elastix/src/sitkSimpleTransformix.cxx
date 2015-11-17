@@ -14,8 +14,8 @@ SimpleTransformix
 {
   // Register this class with SimpleITK
   m_MemberFactory.reset( new detail::MemberFunctionFactory< MemberFunctionType >( this ) );
-  m_MemberFactory->RegisterMemberFunctions< PixelIDTypeList, 3, SimpleTransformixAddressor< MemberFunctionType > >();
-  m_MemberFactory->RegisterMemberFunctions< PixelIDTypeList, 2, SimpleTransformixAddressor< MemberFunctionType > >();
+  m_MemberFactory->RegisterMemberFunctions< BasicPixelIDTypeList, 3, SimpleTransformixAddressor< MemberFunctionType > >();
+  m_MemberFactory->RegisterMemberFunctions< BasicPixelIDTypeList, 2, SimpleTransformixAddressor< MemberFunctionType > >();
 
   // This class holds configuration and pointers to data that is passed to Transformix API when run
   this->m_InputImage = Image();
