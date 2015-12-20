@@ -72,9 +72,6 @@ SimpleTransformix::ExecuteInternal( void )
     sitkExceptionMacro( << "Error occured in transformix: If you do not see any other error message, Set LogToConsoleOn() or LogToFolder(\"path/to/folder\") to view transformix output." );
   }
 
-  // Close dangling xout buffers
-  elastix::xoutClose();
-
   return this->m_ResultImage;
 }
 

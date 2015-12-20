@@ -116,9 +116,6 @@ SimpleElastix::ExecuteInternal( void )
     this->m_ResultImage = Image( itkResultImage );
   }
 
-  // Close dangling xout buffers
-  elastix::xoutClose();
-
   return this->m_ResultImage;
 }
 
