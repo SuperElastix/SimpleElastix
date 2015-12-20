@@ -27,8 +27,10 @@ protected:
 
 TEST_F( SimpleElastix4DTest, GroupwiseRegistration )
 {
-    ParameterMapType parameterMap = sitk::GetDefaultParameterMap( "groupwise" );
-    parameterMap["MaxiumNumberOfIterations"] = ParameterValuesType( 1, "4" ); // otherwise unreasonable testing time
+    ParameterMapType parameterMap = sitk::GetDefaultParameterMap( "groupwise", 1, 32 );
+
+    // otherwise unreasonable testing time
+    parameterMap["MaximumNumberOfIterations"] = ParameterValuesType( 1, "16" ); 
 
     SimpleElastixType elastix;
     sitk::Image resultImage;
