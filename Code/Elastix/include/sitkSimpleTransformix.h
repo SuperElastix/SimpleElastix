@@ -40,7 +40,7 @@ class SITKCommon_EXPORT SimpleTransformix
 
     // Images
     Self& SetInputImage( const Image& inputImage );
-    Image& GetInputImage( void );
+    Image GetInputImage( void );
 
     // Parameter map interface 
     Self& SetTransformParameterMap( std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList );
@@ -55,7 +55,7 @@ class SITKCommon_EXPORT SimpleTransformix
     Image Execute( void );
 
     // Get result
-    Image& GetResultImage( void );
+    Image GetResultImage( void );
     std::vector< std::map< std::string, std::vector< std::string > > > GetTransformParameterMap( void );
     
     // Output

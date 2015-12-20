@@ -38,7 +38,7 @@ const std::string
 SimpleTransformix
 ::GetName( void )
 { 
-  const std::string name = std::string("SimpleTransformix");
+  const std::string name = std::string( "SimpleTransformix" );
   return name;
 }
 
@@ -54,7 +54,7 @@ SimpleTransformix
 
 
 
-Image&
+Image
 SimpleTransformix
 ::GetInputImage( void )
 {
@@ -63,8 +63,7 @@ SimpleTransformix
 
 
 
-
-Image&
+Image
 SimpleTransformix
 ::GetResultImage( void )
 {

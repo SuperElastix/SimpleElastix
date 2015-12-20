@@ -40,17 +40,17 @@ class SITKCommon_EXPORT SimpleElastix
 
     // Images
     Self& SetFixedImage( const Image& fixedImage );
-    Image& GetFixedImage( void );
+    Image GetFixedImage( void );
 
     Self& SetMovingImage( const Image& movingImage );
-    Image& GetMovingImage( void );
+    Image GetMovingImage( void );
     
     Self& SetFixedMask( const Image& fixedMask );
-    Image& GetFixedMask( void );
+    Image GetFixedMask( void );
     Self& DeleteFixedMask( void );
 
     Self& SetMovingMask( const Image& movingMask );
-    Image& GetMovingMask( void );
+    Image GetMovingMask( void );
     Self& DeleteMovingMask( void );
 
     // Parameter Map interface
@@ -68,7 +68,7 @@ class SITKCommon_EXPORT SimpleElastix
     Image Execute( void );
 
     // Get result
-    Image& GetResultImage( void );
+    Image GetResultImage( void );
     std::vector< std::map< std::string, std::vector< std::string > > > GetTransformParameterMap( void );
 
     // Output

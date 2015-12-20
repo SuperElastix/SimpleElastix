@@ -20,7 +20,7 @@ SimpleElastix
 #ifdef SITK_4D_IMAGES
   m_MemberFactory->RegisterMemberFunctions< BasicPixelIDTypeList, 4, SimpleElastixAddressor< MemberFunctionType > >();
 #endif
-
+ 
   // This class holds data that is passed to elastix API when run
   this->m_FixedImage = Image();
   this->m_MovingImage = Image();
@@ -62,7 +62,7 @@ SimpleElastix
 
 
 
-Image&
+Image
 SimpleElastix
 ::GetFixedImage( void )
 {
@@ -81,7 +81,7 @@ SimpleElastix
 
 
 
-Image&
+Image
 SimpleElastix
 ::GetMovingImage( void )
 {
@@ -100,7 +100,7 @@ SimpleElastix
 
 
 
-Image&
+Image
 SimpleElastix
 ::GetFixedMask( void )
 {
@@ -129,7 +129,7 @@ SimpleElastix
 
 
 
-Image&
+Image
 SimpleElastix
 ::GetMovingMask( void )
 {
@@ -428,7 +428,7 @@ SimpleElastix
 
 
 
-Image&
+Image
 SimpleElastix
 ::GetResultImage( void )
 {

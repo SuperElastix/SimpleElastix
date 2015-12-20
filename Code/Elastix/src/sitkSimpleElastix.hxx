@@ -38,31 +38,26 @@ SimpleElastix::ExecuteInternal( void )
     this->m_ParameterMaps[ i ][ "ResultImagePixelType" ] = ParameterValuesType( 1, GetPixelIDValueAsElastixParameter( this->m_FixedImage.GetPixelID() ) );
   }
 
-  std::cout << "Setting masks " << std::endl;
-
   // Get masks (optional)
   itk::DataObject::Pointer fixedMask = 0;
   if( !this->IsEmpty( this->m_FixedMask ) )
   {
     fixedMask = this->m_FixedMask.GetITKBase();
-    std::cout << "FixedMask was set: " << fixedMask << std::endl;
   }
 
   itk::DataObject::Pointer movingMask = 0;
   if( !this->IsEmpty( this->m_MovingMask ) )
   {
     movingMask = this->m_MovingMask.GetITKBase();
-    std::cout << "MovingMask was set: " << movingMask << std::endl;
   }
 
   /**
    * BUG: Fixed image buffer is empty after elastix has run.
-   * We pass a copy as a temporary workaround until the issue is fixed
+   * We pass a deep copy as a temporary workaround until the issue is fixed
    */
   Image fixedImage = this->m_FixedImage;
-
-  // Make a deep copy
-  fixedImage.MakeUnique();
+  fixedImage.MakeUnique(); // <-- Make a deep copy
+  
 
   // Do the (possibly multiple) registrations
   int isError = 1;
