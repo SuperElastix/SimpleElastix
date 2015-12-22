@@ -7,346 +7,525 @@
 namespace itk {
   namespace simple {
 
-
-
 SimpleElastix
 ::SimpleElastix( void )
 {
   // Register this class with SimpleITK
-  m_MemberFactory.reset( new detail::MemberFunctionFactory< MemberFunctionType >( this ) );
-  m_MemberFactory->RegisterMemberFunctions< BasicPixelIDTypeList, 3, SimpleElastixAddressor< MemberFunctionType > >();
-  m_MemberFactory->RegisterMemberFunctions< BasicPixelIDTypeList, 2, SimpleElastixAddressor< MemberFunctionType > >();
+  this->m_DualMemberFactory.reset( new detail::DualMemberFunctionFactory< MemberFunctionType >( this ) );
+  this->m_DualMemberFactory->RegisterMemberFunctions< BasicPixelIDTypeList, BasicPixelIDTypeList, 2 > ();
+  this->m_DualMemberFactory->RegisterMemberFunctions< BasicPixelIDTypeList, BasicPixelIDTypeList, 3 > ();
 
-#ifdef SITK_4D_IMAGES
-  m_MemberFactory->RegisterMemberFunctions< BasicPixelIDTypeList, 4, SimpleElastixAddressor< MemberFunctionType > >();
-#endif
+  // TODO: Add support for 4D images to dual member function factory
+  // #ifdef SITK_4D_IMAGES
+  //   m_MemberFactory->RegisterMemberFunctions< BasicPixelIDTypeList, BasicPixelIDTypeList, 4 >();
+  // #endif
  
-  // This class holds data that is passed to elastix API when run
-  this->m_FixedImage = Image();
-  this->m_MovingImage = Image();
-  this->m_ParameterMaps = ParameterMapListType();
-  this->m_FixedMask = Image();
-  this->m_MovingMask = Image();
-  this->m_OutputFolder = "";
-  this->m_LogToConsole = false;
-  this->m_ResultImage = Image();
-  this->m_TransformParameterMaps = ParameterMapListType();
+  m_FixedImages                 = VectorOfImage();
+  m_MovingImages                = VectorOfImage();
+  m_FixedMasks                  = VectorOfImage();
+  m_MovingMasks                 = VectorOfImage();
+
+  m_ParameterMapVector          = ParameterMapVectorType();
+  m_TransformParameterMapVector = ParameterMapVectorType();
+
+  m_FixedPointSetFileName       = std::string();
+  m_MovingPointSetFileName      = std::string();
+
+  m_OutputDirectory             = std::string();
+  m_LogFileName                 = std::string();
+
+  this->LogToFileOff();
+  this->LogToConsoleOff();
+
+  m_ResultImage                 = Image();
 }
-
-
 
 SimpleElastix
 ::~SimpleElastix( void )
 {
 }
 
-
-
 const std::string 
 SimpleElastix
 ::GetName( void )
 { 
-  const std::string name = std::string("SimpleElastix");
+  const std::string name = "SimpleElastix";
   return name;
 }
-
-
 
 SimpleElastix::Self& 
 SimpleElastix
 ::SetFixedImage( const Image& fixedImage )
 {
-  this->m_FixedImage = fixedImage;
+  this->RemoveFixedImage();
+  this->m_FixedImages.push_back( fixedImage );
   return *this;
 }
 
+SimpleElastix::Self& 
+SimpleElastix
+::SetFixedImage( const VectorOfImage& fixedImages )
+{
+  if( fixedImages.size() == 0u )
+  {
+    sitkExceptionMacro( "Cannot set fixed images from empty vector" );
+  }
 
+  this->RemoveFixedImage();
+  this->m_FixedImages = fixedImages;
+
+  return *this;
+}
+
+SimpleElastix::Self& 
+SimpleElastix
+::AddFixedImage( const Image& fixedImage )
+{
+  this->m_FixedImages.push_back( fixedImage );
+  return *this;
+}
 
 Image
 SimpleElastix
-::GetFixedImage( void )
+::GetFixedImage( const unsigned long index )
 {
-  return this->m_FixedImage;
+  if( this->m_FixedImages.size() < index )
+  {
+    sitkExceptionMacro( "Index out of range (number of fixed images: " << this->m_FixedImages.size() << ")" );
+  }
+
+  return this->m_FixedImages[ index ];
 }
 
+SimpleElastix::VectorOfImage
+SimpleElastix
+::GetFixedImage( void )
+{
+  return this->m_FixedImages;
+}
 
+SimpleElastix::Self& 
+SimpleElastix
+::RemoveFixedImage( const unsigned long index )
+{
+  if( this->m_FixedImages.size() < index )
+  {
+    sitkExceptionMacro( "Index out of range (number of fixed images: " << this->m_FixedImages.size() << ")" );
+  }
+
+  this->m_FixedImages.erase( this->m_FixedImages.begin() + index );
+
+  return *this;
+}
+
+SimpleElastix::Self& 
+SimpleElastix
+::RemoveFixedImage( void )
+{
+  this->m_FixedImages.clear();
+  return *this;
+}
 
 SimpleElastix::Self& 
 SimpleElastix
 ::SetMovingImage( const Image& movingImage )
 {
-  this->m_MovingImage = movingImage;
+  this->RemoveMovingImage();
+  this->m_MovingImages.push_back( movingImage );
   return *this;
 }
 
+SimpleElastix::Self& 
+SimpleElastix
+::SetMovingImage( const VectorOfImage& movingImages )
+{
+  if( movingImages.size() == 0u )
+  {
+    sitkExceptionMacro( "Cannot set moving images from empty vector" );
+  }
 
+  this->RemoveFixedImage();
+  this->m_MovingImages = movingImages;
+
+  return *this;
+}
+
+SimpleElastix::Self& 
+SimpleElastix
+::AddMovingImage( const Image& movingImage )
+{
+  this->m_MovingImages.push_back( movingImage );
+  return *this;
+}
 
 Image
 SimpleElastix
-::GetMovingImage( void )
+::GetMovingImage( const unsigned long index )
 {
-  return this->m_MovingImage;
+  if( this->m_MovingImages.size() < index )
+  {
+    sitkExceptionMacro( "Index out of range (number of moving images: " << this->m_MovingImages.size() << ")" );
+  }
+  
+  return this->m_MovingImages[ index ];
 }
 
+SimpleElastix::VectorOfImage
+SimpleElastix
+::GetMovingImage( void )
+{
+  return this->m_MovingImages;
+}
 
+SimpleElastix::Self& 
+SimpleElastix
+::RemoveMovingImage( const unsigned long index )
+{
+  if( this->m_MovingImages.size() < index )
+  {
+    sitkExceptionMacro( "Index out of range (number of moving images: " << this->m_MovingImages.size() << ")" );
+  }
+
+  this->m_MovingImages.erase( this->m_MovingImages.begin() + index );
+
+  return *this;
+}
+
+SimpleElastix::Self& 
+SimpleElastix
+::RemoveMovingImage( void )
+{
+  this->m_MovingImages.clear();
+  return *this;
+}
 
 SimpleElastix::Self& 
 SimpleElastix
 ::SetFixedMask( const Image& fixedMask )
 {
-  this->m_FixedMask = fixedMask;
+  this->RemoveFixedMask();
+  this->m_FixedMasks.push_back( fixedMask );
   return *this;
 }
-
-
-
-Image
-SimpleElastix
-::GetFixedMask( void )
-{
-  return this->m_FixedMask;
-}
-
-
 
 SimpleElastix::Self& 
 SimpleElastix
-::DeleteFixedMask( void )
+::SetFixedMask( const VectorOfImage& fixedMasks )
 {
-  this->m_FixedMask = Image();
+  if( fixedMasks.size() == 0u )
+  {
+    sitkExceptionMacro( "Cannot set fixed images from empty vector" );
+  }
+
+  this->RemoveFixedMask();
+  this->m_FixedMasks = fixedMasks;
+
   return *this;
 }
 
+SimpleElastix::Self& 
+SimpleElastix
+::AddFixedMask( const Image& fixedMask )
+{
+  this->m_FixedMasks.push_back( fixedMask );
+  return *this;
+}
+
+Image
+SimpleElastix
+::GetFixedMask( const unsigned long index )
+{
+  if( this->m_FixedMasks.size() < index )
+  {
+    sitkExceptionMacro( "Index out of range (number of fixed masks: " << this->m_FixedMasks.size() << ")" );
+  }
+
+  return this->m_FixedMasks[ index ];
+}
+
+SimpleElastix::VectorOfImage
+SimpleElastix
+::GetFixedMask( void )
+{
+  return this->m_FixedMasks;
+}
+
+SimpleElastix::Self& 
+SimpleElastix
+::RemoveFixedMask( const unsigned long index )
+{
+  if( this->m_FixedMasks.size() < index )
+  {
+    sitkExceptionMacro( "Index out of range (number of fixed masks: " << this->m_FixedMasks.size() << ")" );
+  }
+
+  this->m_FixedMasks.erase( this->m_FixedMasks.begin() + index );
+
+  return *this;
+}
+
+SimpleElastix::Self& 
+SimpleElastix
+::RemoveFixedMask( void )
+{
+  this->m_FixedMasks.clear();
+  return *this;
+}
 
 
 SimpleElastix::Self& 
 SimpleElastix
 ::SetMovingMask( const Image& movingMask )
 {
-  this->m_MovingMask = movingMask;
+  this->RemoveMovingMask();
+  this->m_MovingMasks.push_back( movingMask );
   return *this;
 }
 
+SimpleElastix::Self& 
+SimpleElastix
+::SetMovingMask( const VectorOfImage& movingMasks )
+{
+  if( movingMasks.size() == 0u )
+  {
+    sitkExceptionMacro( "Cannot set moving masks from empty vector" );
+  }
 
+  this->RemoveMovingMask();
+  this->m_MovingMasks = movingMasks;
+
+  return *this;
+}
+
+SimpleElastix::Self& 
+SimpleElastix
+::AddMovingMask( const Image& movingMask )
+{
+  this->m_MovingMasks.push_back( movingMask );
+  return *this;
+}
 
 Image
 SimpleElastix
+::GetMovingMask( const unsigned long index )
+{
+  if( this->m_MovingMasks.size() < index )
+  {
+    sitkExceptionMacro( "Index out of range (number of moving masks: " << this->m_MovingMasks.size() << ")" );
+  }
+
+  return this->m_MovingMasks[ index ];
+}
+
+SimpleElastix::VectorOfImage
+SimpleElastix
 ::GetMovingMask( void )
 {
-  return this->m_MovingMask;
+  return this->m_MovingMasks;
 }
-
-
 
 SimpleElastix::Self& 
 SimpleElastix
-::DeleteMovingMask( void )
+::RemoveMovingMask( const unsigned long index )
 {
-  this->m_MovingMask = Image();
+  if( this->m_MovingMasks.size() < index )
+  {
+    sitkExceptionMacro( "Index out of range (number of moving masks: " << this->m_MovingMasks.size() << ")" );
+  }
+
+  this->m_MovingMasks.erase( this->m_MovingMasks.begin() + index );
+
   return *this;
 }
-
-
 
 SimpleElastix::Self& 
 SimpleElastix
-::SetParameterMap( const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList )
+::RemoveMovingMask( void )
 {
-  this->m_ParameterMaps = parameterMapList;
+  this->m_MovingMasks.clear();
   return *this;
 }
-
-
 
 SimpleElastix::Self& 
 SimpleElastix
-::SetParameterMap( const std::map< std::string, std::vector< std::string > > parameterMap )
+::SetFixedPointSetFileName( std::string fixedPointSetFileName )
 {
-  ParameterMapListType parameterMapList = ParameterMapListType( 1 );
-  parameterMapList[ 0 ] = parameterMap;
-  this->SetParameterMap( parameterMapList );
+  this->m_FixedPointSetFileName = fixedPointSetFileName;
   return *this;
 }
 
+std::string
+SimpleElastix
+::GetFixedPointSetFileName( void )
+{
+  return this->m_FixedPointSetFileName;
+}
 
+SimpleElastix::Self& 
+SimpleElastix
+::RemoveFixedPointSetFileName( void )
+{
+  this->m_FixedPointSetFileName = std::string();
+  return *this;
+}
 
-std::vector< std::map< std::string, std::vector< std::string > > > 
+SimpleElastix::Self& 
+SimpleElastix
+::SetMovingPointSetFileName( std::string movingPointSetFileName )
+{
+  this->m_MovingPointSetFileName = movingPointSetFileName;
+  return *this;
+}
+
+std::string
+SimpleElastix
+::GetMovingPointSetFileName( void )
+{
+  return this->m_MovingPointSetFileName;
+}
+
+SimpleElastix::Self& 
+SimpleElastix
+::RemoveMovingPointSetFileName( void )
+{
+  this->m_MovingPointSetFileName = std::string();
+  return *this;
+}
+
+SimpleElastix::Self& 
+SimpleElastix
+::SetOutputDirectory( std::string outputDirectory )
+{
+  this->m_OutputDirectory = outputDirectory;
+  return *this;
+}
+
+std::string
+SimpleElastix
+::GetOutputDirectory( void )
+{
+  return this->m_OutputDirectory;
+}
+
+SimpleElastix::Self& 
+SimpleElastix
+::RemoveOutputDirectory( void )
+{
+  this->m_OutputDirectory = std::string();
+  return *this;
+}
+
+SimpleElastix::Self& 
+SimpleElastix
+::SetLogFileName( std::string logFileName )
+{
+  this->m_LogFileName = logFileName;
+  return *this;
+}
+
+std::string
+SimpleElastix
+::GetLogFileName( void )
+{
+  return this->m_LogFileName;
+}
+
+SimpleElastix::Self& 
+SimpleElastix
+::RemoveLogFileName( void )
+{
+  this->m_LogFileName = std::string();
+  return *this;
+}
+
+SimpleElastix::Self& 
+SimpleElastix
+::SetLogToConsole( bool logToConsole )
+{
+  this->m_LogToConsole = logToConsole;
+  return *this;
+}
+
+bool
+SimpleElastix
+::GetLogToConsole( void )
+{
+  return this->m_LogToConsole;
+}
+
+SimpleElastix::Self& 
+SimpleElastix
+::LogToConsoleOn()
+{
+  this->SetLogToConsole( true );
+  return *this;
+}
+
+SimpleElastix::Self& 
+SimpleElastix
+::LogToConsoleOff()
+{
+  this->SetLogToConsole( false );
+  return *this;
+}
+
+SimpleElastix::Self& 
+SimpleElastix
+::SetParameterMap( const ParameterMapType parameterMap )
+{
+  ParameterMapVectorType parameterMapVector = ParameterMapVectorType( 1 );
+  parameterMapVector[ 0 ] = parameterMap;
+  this->SetParameterMap( parameterMapVector );
+  return *this;
+}
+
+SimpleElastix::Self& 
+SimpleElastix
+::SetParameterMap( const ParameterMapVectorType parameterMapVector )
+{
+  this->m_ParameterMapVector = parameterMapVector;
+  return *this;
+}
+
+SimpleElastix::ParameterMapVectorType 
 SimpleElastix
 ::GetParameterMap( void )
 {
-  return this->m_ParameterMaps;
+  return this->m_ParameterMapVector;
 }
 
-
-
-std::vector< std::map< std::string, std::vector< std::string > > > 
+SimpleElastix::ParameterMapVectorType 
 SimpleElastix
 ::GetTransformParameterMap( void )
 {
-  return this->m_TransformParameterMaps;
+  return this->m_TransformParameterMapVector;
 }
 
-
-
-std::map< std::string, std::vector< std::string > >
+SimpleElastix::ParameterMapType
 SimpleElastix
-::ReadParameterFile( const std::string filename )
+::ReadParameterFile( const std::string fileName )
 {
-  ParameterFileParserPointer parser = ParameterFileParserType::New();
-  parser->SetParameterFileName( filename );
-  try
-  {
-    parser->ReadParameterFile();
-  }
-  catch( itk::ExceptionObject &e )
-  {
-    std::cout << e.what() << std::endl;
-  }
-
-  return parser->GetParameterMap();
+  ParameterObjectPointer parameterObject = ParameterObjectType::New();
+  parameterObject->ReadParameterFile( fileName );
+  return parameterObject->GetParameterMap( 0 );
 }
-
-
 
 SimpleElastix::Self&
 SimpleElastix
-::WriteParameterFile( std::map< std::string, std::vector< std::string > > const parameterMap, const std::string filename )
+::WriteParameterFile( ParameterMapType const parameterMap, const std::string parameterFileName )
 {
-  std::ofstream parameterFile;
-  parameterFile << std::fixed;
-
-  parameterFile.open( filename.c_str(), std::ofstream::out );
-
-  ParameterMapConstIterator parameterMapIterator = parameterMap.begin();
-  ParameterMapConstIterator parameterMapIteratorEnd = parameterMap.end();
-  while( parameterMapIterator != parameterMapIteratorEnd )
-  {
-    parameterFile << "(" << parameterMapIterator->first;
-
-    ParameterValuesType parameterMapValues = parameterMapIterator->second;
-    for( unsigned int i = 0; i < parameterMapValues.size(); ++i )
-    {
-      std::stringstream stream( parameterMapValues[ i ] );
-      float number;
-      stream >> number;
-      if( stream.fail() || stream.bad() ) {
-         parameterFile << " \"" << parameterMapValues[ i ] << "\"";
-      }
-      else
-      {
-        parameterFile << " " << number;
-      }      
-    }
-      
-    parameterFile << ")" << std::endl;
-    parameterMapIterator++;
-  }
-
-  parameterFile.close();
-
+  ParameterObjectPointer parameterObject = ParameterObjectType::New();
+  parameterObject->WriteParameterFile( parameterMap, parameterFileName );
   return *this;
 }
 
-
-
-std::map< std::string, std::vector< std::string > >
+SimpleElastix::ParameterMapType
 SimpleElastix
-::GetDefaultParameterMap( const std::string transform, const unsigned int numberOfResolutions, const double finalGridSpacingInPhysicalUnits )
+::GetDefaultParameterMap( const std::string transformName, const unsigned int numberOfResolutions, const double finalGridSpacingInPhysicalUnits )
 { 
-
-  // Parameters that depend on size and number of resolutions
-  ParameterMapType parameterMap                       = ParameterMapType();
-
-  // Common Components
-  parameterMap[ "FixedImagePyramid" ]                 = ParameterValuesType( 1, "FixedSmoothingImagePyramid" );
-  parameterMap[ "MovingImagePyramid" ]                = ParameterValuesType( 1, "MovingSmoothingImagePyramid" );
-  parameterMap[ "Interpolator"]                       = ParameterValuesType( 1, "LinearInterpolator");
-  parameterMap[ "Optimizer" ]                         = ParameterValuesType( 1, "AdaptiveStochasticGradientDescent" );
-  parameterMap[ "Resampler"]                          = ParameterValuesType( 1, "DefaultResampler" );
-  parameterMap[ "ResampleInterpolator"]               = ParameterValuesType( 1, "FinalBSplineInterpolator" );
-  parameterMap[ "FinalBSplineInterpolationOrder" ]    = ParameterValuesType( 1, "2" );
-  parameterMap[ "NumberOfResolutions" ]               = ParameterValuesType( 1, to_string( numberOfResolutions ) );
-
-  // Image Sampler
-  parameterMap[ "ImageSampler" ]                      = ParameterValuesType( 1, "RandomCoordinate" ); 
-  parameterMap[ "NumberOfSpatialSamples"]             = ParameterValuesType( 1, "2048" );
-  parameterMap[ "CheckNumberOfSamples" ]              = ParameterValuesType( 1, "true" );
-  parameterMap[ "MaximumNumberOfSamplingAttempts" ]   = ParameterValuesType( 1, "8" );
-  parameterMap[ "NewSamplesEveryIteration" ]          = ParameterValuesType( 1, "true");
-
-  // Optimizer
-  parameterMap[ "NumberOfSamplesForExactGradient" ]   = ParameterValuesType( 1, "4096" );
-  parameterMap[ "DefaultPixelValue" ]                 = ParameterValuesType( 1, "0" );
-  parameterMap[ "AutomaticParameterEstimation" ]      = ParameterValuesType( 1, "true" );
-
-  // Output
-  parameterMap[ "WriteResultImage" ]                  = ParameterValuesType( 1, "true" );
-  parameterMap[ "ResultImageFormat" ]                 = ParameterValuesType( 1, "nii" );
-
-  // Transforms
-  if( transform == "translation" )
-  {
-    parameterMap[ "Registration" ]                    = ParameterValuesType( 1, "MultiResolutionRegistration" );
-    parameterMap[ "Transform" ]                       = ParameterValuesType( 1, "TranslationTransform" );
-    parameterMap[ "Metric" ]                          = ParameterValuesType( 1, "AdvancedMattesMutualInformation" );
-    parameterMap[ "MaximumNumberOfIterations" ]       = ParameterValuesType( 1, "128" );
-    parameterMap[ "Interpolator"]                     = ParameterValuesType( 1, "LinearInterpolator");
-  }
-  else if( transform == "rigid" )
-  {
-    parameterMap[ "Registration" ]                    = ParameterValuesType( 1, "MultiResolutionRegistration" );
-    parameterMap[ "Transform" ]                       = ParameterValuesType( 1, "EulerTransform" );
-    parameterMap[ "Metric" ]                          = ParameterValuesType( 1, "AdvancedMattesMutualInformation" );
-    parameterMap[ "MaximumNumberOfIterations" ]       = ParameterValuesType( 1, "128" );
-  }
-  else if( transform == "affine" )
-  {
-    parameterMap[ "Registration" ]                    = ParameterValuesType( 1, "MultiResolutionRegistration" );
-    parameterMap[ "Transform" ]                       = ParameterValuesType( 1, "AffineTransform" );
-    parameterMap[ "Metric" ]                          = ParameterValuesType( 1, "AdvancedMattesMutualInformation" );
-    parameterMap[ "MaximumNumberOfIterations" ]       = ParameterValuesType( 1, "128" );
-  }
-  else if( transform == "nonrigid" )
-  {
-    parameterMap[ "Registration" ]                    = ParameterValuesType( 1, "MultiMetricMultiResolutionRegistration" );
-    parameterMap[ "Transform" ]                       = ParameterValuesType( 1, "BSplineTransform" );
-    parameterMap[ "Metric" ]                          = ParameterValuesType( 1, "AdvancedMattesMutualInformation" );
-    parameterMap[ "Metric" ]                            .push_back( "TransformBendingEnergyPenalty" );
-    parameterMap[ "Metric0Weight" ]                   = ParameterValuesType( 1, "0.0001" );
-    parameterMap[ "Metric1Weight" ]                   = ParameterValuesType( 1, "0.9999" );
-    parameterMap[ "MaximumNumberOfIterations" ]       = ParameterValuesType( 1, "256" );
-  }
-  else if( transform == "groupwise" )
-  {
-    parameterMap[ "Registration" ]                    = ParameterValuesType( 1, "MultiResolutionRegistration" );
-    parameterMap[ "Transform" ]                       = ParameterValuesType( 1, "BSplineStackTransform" );
-    parameterMap[ "Metric" ]                          = ParameterValuesType( 1, "VarianceOverLastDimensionMetric" );
-    parameterMap[ "MaximumNumberOfIterations" ]       = ParameterValuesType( 1, "512" );
-    parameterMap[ "Interpolator"]                     = ParameterValuesType( 1, "ReducedDimensionBSplineInterpolator" );
-    parameterMap[ "ResampleInterpolator" ]            = ParameterValuesType( 1, "FinalReducedDimensionBSplineInterpolator" );
-  }
-  else
-  {
-    sitkExceptionMacro( "No default parameter map \"" << transform << "\"." );
-  }
-
-  // B-spline transforms settings 
-  if( transform == "nonrigid" || transform == "groupwise")
-  {
-    ParameterValuesType gridSpacingSchedule = ParameterValuesType();
-    for( unsigned int resolution = 0; resolution < numberOfResolutions; ++resolution )
-    {
-      gridSpacingSchedule.insert( gridSpacingSchedule.begin(), to_string( pow( 2, resolution ) ) ); 
-    }
-
-    parameterMap[ "GridSpacingSchedule" ] = gridSpacingSchedule;
-    parameterMap[ "FinalGridSpacingInPhysicalUnits" ] = ParameterValuesType( 1, to_string( finalGridSpacingInPhysicalUnits ) );
-  }
-
-  return parameterMap;
+  ParameterObjectPointer parameterObject = ParameterObjectType::New();
+  return parameterObject->GetParameterMap( transformName, numberOfResolutions, finalGridSpacingInPhysicalUnits );
 }
-
-
 
 SimpleElastix::Self&
 SimpleElastix
@@ -356,23 +535,19 @@ SimpleElastix
   return *this;
 }
 
-
-
 SimpleElastix::Self& 
 SimpleElastix
-::PrettyPrint( const std::map< std::string, std::vector< std::string > > parameterMap )
+::PrettyPrint( const ParameterMapType parameterMap )
 {
-  ParameterMapListType parameterMapList = ParameterMapListType( 1 );
-  parameterMapList[ 0 ] = parameterMap;
-  this->PrettyPrint( parameterMapList );
+  ParameterMapVectorType parameterMapVector = ParameterMapVectorType( 1 );
+  parameterMapVector[ 0 ] = parameterMap;
+  this->PrettyPrint( parameterMapVector );
   return *this;
 }
 
-
-
 SimpleElastix::Self& 
 SimpleElastix
-::PrettyPrint( const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList )
+::PrettyPrint( const ParameterMapVectorType parameterMapList )
 {
   for( unsigned int i = 0; i < parameterMapList.size(); ++i )
   {
@@ -382,15 +557,15 @@ SimpleElastix
     while( parameterMapIterator != parameterMapIteratorEnd )
     {
       std::cout << "  (" << parameterMapIterator->first;
-      ParameterValuesType parameterMapValues = parameterMapIterator->second;
+      ParameterValueVectorType parameterMapValueVector = parameterMapIterator->second;
       
-      for(unsigned int j = 0; j < parameterMapValues.size(); ++j)
+      for(unsigned int j = 0; j < parameterMapValueVector.size(); ++j)
       {
-        std::stringstream stream( parameterMapValues[ j ] );
+        std::stringstream stream( parameterMapValueVector[ j ] );
         float number;
         stream >> number;
         if( stream.fail() ) {
-           std::cout << " \"" << parameterMapValues[ j ] << "\"";
+           std::cout << " \"" << parameterMapValueVector[ j ] << "\"";
         }
         else
         {
@@ -406,84 +581,50 @@ SimpleElastix
   return *this;
 }
 
-
-
 Image
 SimpleElastix
 ::Execute( void )
 {
-  const PixelIDValueEnum FixedImagePixelEnum = this->m_FixedImage.GetPixelID();
-  const unsigned int FixedImageDimension = this->m_FixedImage.GetDimension();
+  const PixelIDValueEnum FixedImagePixelID = this->m_FixedImages[ 0 ].GetPixelID();
+  const unsigned int FixedImageDimension = this->m_FixedImages[ 0 ].GetDimension();
+  const PixelIDValueEnum MovingImagePixelID = this->m_MovingImages[ 0 ].GetPixelID();
 
-  if (this->m_MemberFactory->HasMemberFunction( FixedImagePixelEnum, FixedImageDimension ) )
+  if( this->m_DualMemberFactory->HasMemberFunction( FixedImagePixelID, MovingImagePixelID, FixedImageDimension ) )
   {
-    return this->m_MemberFactory->GetMemberFunction( FixedImagePixelEnum, FixedImageDimension )();
+    return this->m_DualMemberFactory->GetMemberFunction( FixedImagePixelID, MovingImagePixelID, FixedImageDimension )();
   }
 
   sitkExceptionMacro( << "SimpleITK does not support the combination of image type \""
-                      << GetPixelIDValueAsString( FixedImagePixelEnum ) << "\" ("
-                      << GetPixelIDValueAsElastixParameter( FixedImagePixelEnum ) << ") and dimension "
+                      << GetPixelIDValueAsString( FixedImagePixelID ) << "\" ("
+                      << GetPixelIDValueAsElastixParameter( FixedImagePixelID ) << ") and dimension "
                       << FixedImageDimension << "." );
 }
-
-
 
 Image
 SimpleElastix
 ::GetResultImage( void )
 {
+  if( this->IsEmpty( this->m_ResultImage ) )
+  {
+    sitkExceptionMacro( "No result image was found. Has elastix run yet?" )
+  }
+
   return this->m_ResultImage;
 }
-
-
-
-SimpleElastix::Self& 
-SimpleElastix
-::LogToFolder( const std::string folder )
-{
-  this->m_OutputFolder = folder;
-  return *this;
-}
-
-
-
-SimpleElastix::Self& 
-SimpleElastix
-::LogToFolderOff( void )
-{
-  this->m_OutputFolder = "";
-  return *this;
-}
-
-
-
-SimpleElastix::Self& 
-SimpleElastix
-::LogToConsole( bool logToConsole )
-{
-  this->m_LogToConsole = logToConsole;
-  return *this;
-}
-
-
 
 bool
 SimpleElastix
 ::IsEmpty( const Image& image )
 {
-  const bool isEmpty = image.GetWidth() == 0 && image.GetHeight() == 0;
+  bool isEmpty = image.GetWidth() == 0 && image.GetHeight() == 0;
   return isEmpty;
 }
-
-
 
 /**
  * Procedural interface 
  */
 
-
-
-std::map< std::string, std::vector< std::string > >
+SimpleElastix::ParameterMapType
 GetDefaultParameterMap( std::string transform, const unsigned int numberOfResolutions, const double finalGridSpacingInPhysicalUnits )
 {
   SimpleElastix selx;
@@ -491,119 +632,93 @@ GetDefaultParameterMap( std::string transform, const unsigned int numberOfResolu
   return parameterMap;
 }
 
-
-
-std::map< std::string, std::vector< std::string > >
-ReadParameterFile( const std::string filename )
+SimpleElastix::ParameterMapType
+ReadParameterFile( const std::string fileName )
 {
   SimpleElastix selx;
-  SimpleElastix::ParameterMapType parameterMap = selx.ReadParameterFile( filename );
+  SimpleElastix::ParameterMapType parameterMap = selx.ReadParameterFile( fileName );
   return parameterMap;
 }
 
-
-
 void
-WriteParameterFile( const std::map< std::string, std::vector< std::string > > parameterMap, const std::string filename )
+WriteParameterFile( const SimpleElastix::ParameterMapType parameterMap, const std::string filename )
 {
   SimpleElastix selx;
   selx.WriteParameterFile( parameterMap, filename );
 }
 
-
-
-
 void 
-PrettyPrint( const std::map< std::string, std::vector< std::string > > parameterMap )
+PrettyPrint( const SimpleElastix::ParameterMapType parameterMap )
 {
-  SimpleElastix::ParameterMapListType parameterMapList = SimpleElastix::ParameterMapListType( 1 );
-  parameterMapList[ 0 ] = parameterMap;
-  PrettyPrint( parameterMapList );
+  SimpleElastix::ParameterMapVectorType parameterMapVector = SimpleElastix::ParameterMapVectorType( 1 );
+  parameterMapVector[ 0 ] = parameterMap;
+  PrettyPrint( parameterMapVector );
 }
-
-
 
 void
-PrettyPrint( const std::vector< std::map< std::string, std::vector< std::string > > >  parameterMapList )
+PrettyPrint( const SimpleElastix::ParameterMapVectorType parameterMapVector )
 {
   SimpleElastix selx;
-  selx.PrettyPrint( parameterMapList );
+  selx.PrettyPrint( parameterMapVector );
 }
 
-
-
 Image
-Elastix( const Image& fixedImage, const Image& movingImage, const std::string defaultParameterMapName, const bool logToConsole, const std::string outputFolder )
+Elastix( const Image& fixedImage, const Image& movingImage, const std::string defaultParameterMapName, const bool logToConsole, const std::string outputDirectory )
 {
-  return Elastix( fixedImage, movingImage, GetDefaultParameterMap( defaultParameterMapName ), logToConsole, outputFolder );
+  return Elastix( fixedImage, movingImage, GetDefaultParameterMap( defaultParameterMapName ), logToConsole, outputDirectory );
 }
 
-
-
 Image
-Elastix( const Image& fixedImage, const Image& movingImage, const std::map< std::string, std::vector< std::string > > parameterMap, const bool logToConsole, const std::string outputFolder )
+Elastix( const Image& fixedImage, const Image& movingImage, const SimpleElastix::ParameterMapType parameterMap, const bool logToConsole, const std::string outputDirectory )
 {
-  SimpleElastix::ParameterMapListType parameterMapList = SimpleElastix::ParameterMapListType( 1 );
-  parameterMapList[ 0 ] = parameterMap;
-  return Elastix( fixedImage, movingImage, parameterMapList, logToConsole, outputFolder );
+  SimpleElastix::ParameterMapVectorType parameterMapVector = SimpleElastix::ParameterMapVectorType( 1 );
+  parameterMapVector[ 0 ] = parameterMap;
+  return Elastix( fixedImage, movingImage, parameterMapVector, logToConsole, outputDirectory );
 }
 
-
-
 Image
-Elastix( const Image& fixedImage, const Image& movingImage, std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList, const bool logToConsole, const std::string outputFolder )
+Elastix( const Image& fixedImage, const Image& movingImage, const SimpleElastix::ParameterMapVectorType parameterMapVector, const bool logToConsole, const std::string outputDirectory )
 {
-  // Make sure result image is written to output image buffer
-  parameterMapList[ parameterMapList.size()-1 ][ "WriteResultImage" ] = SimpleElastix::ParameterValuesType( 1, "true" );
-
   SimpleElastix selx;
   selx.SetFixedImage( fixedImage );
   selx.SetMovingImage( movingImage );
-  selx.SetParameterMap( parameterMapList );
-  selx.LogToFolder( outputFolder );
-  selx.LogToConsole( logToConsole );
+  selx.SetParameterMap( parameterMapVector );
+  selx.SetOutputDirectory( outputDirectory );
+  selx.LogToFileOn();
+  selx.SetLogToConsole( logToConsole );
 
   return selx.Execute();
 }
 
-
-
 Image
-Elastix( const Image& fixedImage, const Image& movingImage, const std::string defaultParameterMapName, const Image& fixedMask, const Image& movingMask, const bool logToConsole, const std::string outputFolder )
+Elastix( const Image& fixedImage, const Image& movingImage, const std::string defaultParameterMapName, const Image& fixedMask, const Image& movingMask, const bool logToConsole, const std::string outputDirectory )
 {
-  return Elastix( fixedImage, movingImage, GetDefaultParameterMap( defaultParameterMapName ), fixedMask, movingMask, logToConsole, outputFolder );
+  return Elastix( fixedImage, movingImage, GetDefaultParameterMap( defaultParameterMapName ), fixedMask, movingMask, logToConsole, outputDirectory );
 }
 
-
-
 Image
-Elastix( const Image& fixedImage, const Image& movingImage, const std::map< std::string, std::vector< std::string > > parameterMap, const Image& fixedMask, const Image& movingMask, bool logToConsole, std::string outputFolder )
+Elastix( const Image& fixedImage, const Image& movingImage, const SimpleElastix::ParameterMapType parameterMap, const Image& fixedMask, const Image& movingMask, bool logToConsole, std::string outputDirectory )
 {
-  SimpleElastix::ParameterMapListType parameterMapList = SimpleElastix::ParameterMapListType( 1 );
-  parameterMapList[ 0 ] = parameterMap;
-  return Elastix( fixedImage, movingImage, parameterMapList, fixedMask, movingMask, logToConsole, outputFolder );
+  SimpleElastix::ParameterMapVectorType parameterMapVector = SimpleElastix::ParameterMapVectorType( 1 );
+  parameterMapVector[ 0 ] = parameterMap;
+  return Elastix( fixedImage, movingImage, parameterMapVector, fixedMask, movingMask, logToConsole, outputDirectory );
 }
 
-
-
 Image
-Elastix( const Image& fixedImage, const Image& movingImage, std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList, const Image& fixedMask, const Image& movingMask, bool logToConsole, std::string outputFolder )
+Elastix( const Image& fixedImage, const Image& movingImage, SimpleElastix::ParameterMapVectorType parameterMapVector, const Image& fixedMask, const Image& movingMask, bool logToConsole, std::string outputDirectory )
 {
-  // Make sure result image is written to output image buffer
-  parameterMapList[ parameterMapList.size()-1 ][ "WriteResultImage" ] = SimpleElastix::ParameterValuesType( 1, "true" );
-
   SimpleElastix selx;
   selx.SetFixedImage( fixedImage );
   selx.SetMovingImage( movingImage );
-  selx.SetParameterMap( parameterMapList );
+  selx.SetParameterMap( parameterMapVector );
   selx.SetFixedMask( fixedMask );
   selx.SetMovingMask( movingMask );
-  selx.LogToFolder( outputFolder );
-  selx.LogToConsole( logToConsole );
+  selx.SetOutputDirectory( outputDirectory );
+  selx.LogToFileOn();
+  selx.SetLogToConsole( logToConsole );
 
   return selx.Execute();
 }
-
 
 } // end namespace simple
 } // end namespace itk

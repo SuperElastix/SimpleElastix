@@ -2,7 +2,7 @@ set( proj elastix )
 
 file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/${proj}-build/CMakeCacheInit.txt" "${ep_common_cache}" )
 set( ELASTIX_REPOSITORY https://svn.bigr.nl/elastix/trunkpublic/ )
-set( ELASTIX_REVISION 5159 )
+set( ELASTIX_REVISION 5172 )
 
 ExternalProject_Add( ${proj} 
   SVN_REPOSITORY ${ELASTIX_REPOSITORY}
@@ -19,7 +19,7 @@ ExternalProject_Add( ${proj}
   -DELASTIX_BUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
   -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
   -DITK_DIR:PATH=${ITK_DIR}
-  # Elastix components configuration
+  -DUSE_ALL_PIXELTYPES:BOOL=ON
   -DUSE_AdaptiveStochasticGradientDescent:BOOL=ON                                           
   -DUSE_AdvancedAffineTransformElastix:BOOL=ON
   -DUSE_AdvancedBSplineTransform:BOOL=ON                                           
