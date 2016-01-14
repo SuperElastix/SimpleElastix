@@ -6,8 +6,9 @@
 #include "sitkMemberFunctionFactory.h"
 #include "sitkImage.h"
 
-// SimpleTransformix
-#include "transformixlib.h"
+// Transformix
+#include "elxTransformixFilter.h"
+#include "elxParameterObject.h"
 
 namespace itk { 
   namespace simple {
@@ -19,20 +20,18 @@ class SITKCommon_EXPORT SimpleTransformix
     SimpleTransformix( void );
     ~SimpleTransformix( void );
 
-    typedef SimpleTransformix Self;
+    typedef SimpleTransformix Self;                                
 
-    // typedefs inherited from elastix library api
-    typedef transformix::TRANSFORMIX                        libtransformix;
-    typedef itk::ParameterFileParser::ParameterMapType      ParameterMapType;
-    typedef ParameterMapType::iterator                      ParameterMapIterator;
-    typedef ParameterMapType::const_iterator                ParameterMapConstIterator;
-    typedef std::vector< ParameterMapType >                 ParameterMapListType;
-    typedef ParameterMapListType::iterator                  ParameterMapListIterator;
-    typedef ParameterMapListType::const_iterator            ParameterMapListonstIterator;
-    typedef std::string                                     ParameterKeyType;
-    typedef itk::ParameterFileParser::ParameterValuesType   ParameterValuesType;
-    typedef itk::ParameterFileParser                        ParameterFileParserType;
-    typedef ParameterFileParserType::Pointer                ParameterFileParserPointer;
+    typedef elastix::ParameterObject                       ParameterObjectType;
+    typedef ParameterObjectType::Pointer                   ParameterObjectPointer;
+    typedef ParameterObjectType::ParameterMapType          ParameterMapType;
+    typedef ParameterObjectType::ParameterMapVectorType    ParameterMapVectorType;
+    typedef ParameterMapType::iterator                     ParameterMapIterator;
+    typedef ParameterMapType::const_iterator               ParameterMapConstIterator;
+    typedef itk::ParameterFileParser                       ParameterFileParserType;
+    typedef ParameterFileParserType::Pointer               ParameterFileParserPointer;
+    typedef ParameterObjectType::ParameterKeyType          ParameterKeyType;
+    typedef ParameterObjectType::ParameterValueVectorType  ParameterValueVectorType;
 
     /** To be wrapped by SWIG */ 
 
@@ -40,69 +39,92 @@ class SITKCommon_EXPORT SimpleTransformix
 
     // Images
     Self& SetInputImage( const Image& inputImage );
-    Image GetInputImage( void );
+    Image& GetInputImage( void );
 
-    // Parameter map interface 
-    Self& SetTransformParameterMap( std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList );
-    Self& SetTransformParameterMap( std::map< std::string, std::vector< std::string > > parameterMap );
-    std::map< std::string, std::vector< std::string > > ReadParameterFile( const std::string filename );
-    Self& WriteParameterFile( std::map< std::string, std::vector< std::string > > const parameterMap, const std::string filename );
+    Self& SetInputPointSetFileName( const std::string inputPointSetFileName );
+    std::string GetInputPointSetFileName( void );
+    Self& RemoveInputPointSetFileName( void );
+
+    Self& SetComputeSpatialJacobian( const bool );
+    bool GetComputeSpatialJacobian( void );
+    Self& ComputeSpatialJacobianOn( void );
+    Self& ComputeSpatialJacobianOff( void );
+
+    Self& SetComputeDeterminantOfSpatialJacobian( const bool );
+    bool GetComputeDeterminantOfSpatialJacobian( void );
+    Self& ComputeDeterminantOfSpatialJacobianOn( void );
+    Self& ComputeDeterminantOfSpatialJacobianOff( void );
+
+    Self& SetComputeDeformationField( bool );
+    bool GetComputeDeformationField( void );
+    Self& ComputeDeformationFieldOn( void );
+    Self& ComputeDeformationFieldOff( void );
+
+    Self& SetOutputDirectory( const std::string outputDirectory );
+    std::string GetOutputDirectory( void );
+    Self& RemoveOutputDirectory( void );
+
+    Self& SetLogFileName( const std::string logFileName );
+    std::string GetLogFileName( void );
+    Self& RemoveLogFileName( void );
+
+    Self& SetLogToFile( const bool logToFile );
+    bool GetLogToFile( void );
+    Self& LogToFileOn( void );
+    Self& LogToFileOff( void );
+
+    Self& SetLogToConsole( const bool logToConsole );
+    bool GetLogToConsole( void );
+    Self& LogToConsoleOn();
+    Self& LogToConsoleOff();
+
+    Self& SetTransformParameterMap( const ParameterMapVectorType parameterMapVector );
+    Self& SetTransformParameterMap( const ParameterMapType parameterMap );
+
+    ParameterMapType ReadParameterFile( const std::string filename );
+    Self& WriteParameterFile( const ParameterMapType parameterMap, const std::string parameterFileName );
+
     Self& PrettyPrint( void );
-    Self& PrettyPrint( std::map< std::string, std::vector< std::string > > const parameterMap );
-    Self& PrettyPrint( std::vector< std::map< std::string, std::vector< std::string > > > const parameterMapList );
+    Self& PrettyPrint( const ParameterMapType parameterMap );
+    Self& PrettyPrint( const ParameterMapVectorType parameterMapVector );
 
-    // Warp images
     Image Execute( void );
 
-    // Get result
     Image GetResultImage( void );
-    std::vector< std::map< std::string, std::vector< std::string > > > GetTransformParameterMap( void );
-    
-    // Output
-    Self& LogToFolder( const std::string folder );
-    Self& LogToFolderOff( void );
-    Self& LogToConsole( bool );
-    Self& LogToConsoleOn( void ) { return this->LogToConsole( true ); }
-    Self& LogToConsoleOff( void ) { return this->LogToConsole( false ); }
+    ParameterMapVectorType GetTransformParameterMap( void );
 
   private:
 
     bool IsEmpty( const Image& image );
 
-    template< typename TResultImage >
-    Image ExecuteInternal( void );
-
-    // Addressor of this class for member function factory
-    #ifndef SWIG
-      template < class TMemberFunctionPointer >
-      struct SimpleTransformixAddressor
-      {
-        typedef typename ::detail::FunctionTraits< TMemberFunctionPointer >::ClassType ObjectType;
-
-        template< typename TResultImage >
-        TMemberFunctionPointer operator() ( void ) const
-        {
-          return &ObjectType::template ExecuteInternal< TResultImage >;
-        }
-      };
-    #endif
-
-    // Functions to register SimpleElastix with SimpleITK member factory
-    typedef Image ( Self::*MemberFunctionType )( void );
+    // Definitions for SimpleITK member factory
+    typedef Image (Self::*MemberFunctionType)( void );
+    template< class TInputImage > Image ExecuteInternal ( void );
+    friend struct detail::MemberFunctionAddressor< MemberFunctionType >;
     std::auto_ptr< detail::MemberFunctionFactory< MemberFunctionType > > m_MemberFactory;
 
-    // This class holds configuration and pointers to data that is passed to transformix API when run
-    Image                  m_InputImage;
-    Image                  m_ResultImage;
-    std::string            m_OutputFolder;
-    bool                   m_LogToConsole;
-    ParameterMapListType   m_TransformParameterMaps;
+    Image                   m_InputImage;
+
+    bool                    m_ComputeSpatialJacobian;
+    bool                    m_ComputeDeterminantOfSpatialJacobian;
+    bool                    m_ComputeDeformationField;
+    std::string             m_InputPointSetFileName;
+
+    ParameterMapVectorType  m_TransformParameterMapVector;
+
+    std::string             m_OutputDirectory;
+    std::string             m_LogFileName;
+
+    bool                    m_LogToConsole;
+    bool                    m_LogToFile;
+
+    Image                   m_ResultImage;
 
 };
 
 // Procedural Interface 
-SITKCommon_EXPORT Image Transformix( const Image& inputImage, const std::map< std::string, std::vector< std::string > > parameterMap, const bool logToConsole = false, const std::string outputFolder = "" );
-SITKCommon_EXPORT Image Transformix( const Image& inputImage, const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapList, const bool logToConsole = false, const std::string outputFolder = "" );
+SITKCommon_EXPORT Image Transformix( const Image& inputImage, const SimpleTransformix::ParameterMapType parameterMap, const bool logToConsole = false, const std::string outputDirectory = "" );
+SITKCommon_EXPORT Image Transformix( const Image& inputImage, const SimpleTransformix::ParameterMapVectorType parameterMapVector, const bool logToConsole = false, const std::string outputDirectory = "" );
 
 } // end namespace simple
 } // end namespace itk
