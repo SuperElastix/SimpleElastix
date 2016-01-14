@@ -44,7 +44,7 @@ Note that this project takes around an hour to build on a quad-core machine. Sim
 
 .. warning::
 
-    Be careful not to run out of memory during the build. If you have 8GB or less, it is recommended not build on more than two threads, especially if you are wrapping multiple languages. 
+    Be careful not to run out of memory during the build. A rule of thumb is that we need 4GB of memory per core. For example, if we compile SimpleElastix with 4 cores (e.g. :code:`make -j4`) we need a machine with at least 16GB of RAM.
 
 .. _MacOSX:
 
