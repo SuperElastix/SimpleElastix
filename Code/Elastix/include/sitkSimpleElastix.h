@@ -43,52 +43,52 @@ class SITKCommon_EXPORT SimpleElastix
     Self& SetFixedImage( const Image& fixedImage );
     Self& SetFixedImage( const VectorOfImage& fixedImages );
     Self& AddFixedImage( const Image& fixedImage );
-    Image GetFixedImage( const unsigned long index );
-    VectorOfImage GetFixedImage( void );
+    Image& GetFixedImage( const unsigned long index );
+    VectorOfImage& GetFixedImage( void );
     Self& RemoveFixedImage( const unsigned long index );
     Self& RemoveFixedImage( void );
 
     Self& SetMovingImage( const Image& movingImages );
     Self& SetMovingImage( const VectorOfImage& movingImage );
     Self& AddMovingImage( const Image& movingImage );
-    Image GetMovingImage( const unsigned long index );
-    VectorOfImage GetMovingImage( void );
+    Image& GetMovingImage( const unsigned long index );
+    VectorOfImage& GetMovingImage( void );
     Self& RemoveMovingImage( const unsigned long index );
     Self& RemoveMovingImage( void );
 
     Self& SetFixedMask( const Image& fixedMask );
     Self& SetFixedMask( const VectorOfImage& fixedMasks );
     Self& AddFixedMask( const Image& fixedMask );
-    Image GetFixedMask( const unsigned long index );
-    VectorOfImage GetFixedMask( void );
+    Image& GetFixedMask( const unsigned long index );
+    VectorOfImage& GetFixedMask( void );
     Self& RemoveFixedMask( const unsigned long index );
     Self& RemoveFixedMask( void );
 
     Self& SetMovingMask( const Image& movingMask );
     Self& SetMovingMask( const VectorOfImage& movingMasks );
     Self& AddMovingMask( const Image& movingMask );
-    Image GetMovingMask( const unsigned long index );
-    VectorOfImage GetMovingMask( void );
+    Image& GetMovingMask( const unsigned long index );
+    VectorOfImage& GetMovingMask( void );
     Self& RemoveMovingMask( const unsigned long index );
     Self& RemoveMovingMask( void );
 
-    Self& SetFixedPointSetFileName( std::string );
+    Self& SetFixedPointSetFileName( const std::string movingPointSetFileName );
     std::string GetFixedPointSetFileName( void );
     Self& RemoveFixedPointSetFileName( void );
 
-    Self& SetMovingPointSetFileName( std::string );
+    Self& SetMovingPointSetFileName( const std::string movingPointSetFileName );
     std::string GetMovingPointSetFileName( void );
     Self& RemoveMovingPointSetFileName( void );
 
-    Self& SetOutputDirectory( std::string );
+    Self& SetOutputDirectory( const std::string outputDirectory );
     std::string GetOutputDirectory( void );
     Self& RemoveOutputDirectory( void );
 
-    Self& SetLogFileName( std::string );
+    Self& SetLogFileName( const std::string logFileName );
     std::string GetLogFileName( void );
     Self& RemoveLogFileName( void );
 
-    Self& SetLogToFile( void );
+    Self& SetLogToFile( const bool logToFile );
     bool GetLogToFile( void );
     Self& LogToFileOn( void );
     Self& LogToFileOff( void );
@@ -140,9 +140,9 @@ class SITKCommon_EXPORT SimpleElastix
     std::string             m_OutputDirectory;
     std::string             m_LogFileName;
 
-    bool                    m_LogToConsole;
     bool                    m_LogToFile;
-
+    bool                    m_LogToConsole;
+    
     Image                   m_ResultImage;
 };
 

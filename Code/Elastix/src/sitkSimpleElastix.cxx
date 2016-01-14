@@ -85,19 +85,19 @@ SimpleElastix
   return *this;
 }
 
-Image
+Image&
 SimpleElastix
 ::GetFixedImage( const unsigned long index )
 {
-  if( this->m_FixedImages.size() < index )
+  if( index < this->m_FixedImages.size() )
   {
-    sitkExceptionMacro( "Index out of range (number of fixed images: " << this->m_FixedImages.size() << ")" );
+    return this->m_FixedImages[ index ];
   }
 
-  return this->m_FixedImages[ index ];
+  sitkExceptionMacro( "Index out of range (number of fixed images: " << this->m_FixedImages.size() << ")" );
 }
 
-SimpleElastix::VectorOfImage
+SimpleElastix::VectorOfImage&
 SimpleElastix
 ::GetFixedImage( void )
 {
@@ -108,14 +108,13 @@ SimpleElastix::Self&
 SimpleElastix
 ::RemoveFixedImage( const unsigned long index )
 {
-  if( this->m_FixedImages.size() < index )
+  if( index < this->m_FixedImages.size() )
   {
-    sitkExceptionMacro( "Index out of range (number of fixed images: " << this->m_FixedImages.size() << ")" );
+    this->m_FixedImages.erase( this->m_FixedImages.begin() + index );
+    return *this;
   }
 
-  this->m_FixedImages.erase( this->m_FixedImages.begin() + index );
-
-  return *this;
+  sitkExceptionMacro( "Index out of range (number of fixed images: " << this->m_FixedImages.size() << ")" );
 }
 
 SimpleElastix::Self& 
@@ -158,19 +157,19 @@ SimpleElastix
   return *this;
 }
 
-Image
+Image&
 SimpleElastix
 ::GetMovingImage( const unsigned long index )
 {
-  if( this->m_MovingImages.size() < index )
+  if( index < this->m_MovingImages.size() )
   {
-    sitkExceptionMacro( "Index out of range (number of moving images: " << this->m_MovingImages.size() << ")" );
+    return this->m_MovingImages[ index ];
   }
   
-  return this->m_MovingImages[ index ];
+  sitkExceptionMacro( "Index out of range (number of moving images: " << this->m_MovingImages.size() << ")" );
 }
 
-SimpleElastix::VectorOfImage
+SimpleElastix::VectorOfImage&
 SimpleElastix
 ::GetMovingImage( void )
 {
@@ -181,14 +180,13 @@ SimpleElastix::Self&
 SimpleElastix
 ::RemoveMovingImage( const unsigned long index )
 {
-  if( this->m_MovingImages.size() < index )
+  if( index < this->m_MovingImages.size() )
   {
-    sitkExceptionMacro( "Index out of range (number of moving images: " << this->m_MovingImages.size() << ")" );
+    this->m_MovingImages.erase( this->m_MovingImages.begin() + index );
+    return *this;
   }
 
-  this->m_MovingImages.erase( this->m_MovingImages.begin() + index );
-
-  return *this;
+  sitkExceptionMacro( "Index out of range (number of moving images: " << this->m_MovingImages.size() << ")" );
 }
 
 SimpleElastix::Self& 
@@ -231,19 +229,19 @@ SimpleElastix
   return *this;
 }
 
-Image
+Image&
 SimpleElastix
 ::GetFixedMask( const unsigned long index )
 {
-  if( this->m_FixedMasks.size() < index )
+  if( index < this->m_FixedMasks.size() )
   {
-    sitkExceptionMacro( "Index out of range (number of fixed masks: " << this->m_FixedMasks.size() << ")" );
+    return this->m_FixedMasks[ index ];
   }
 
-  return this->m_FixedMasks[ index ];
+  sitkExceptionMacro( "Index out of range (number of fixed masks: " << this->m_FixedMasks.size() << ")" );
 }
 
-SimpleElastix::VectorOfImage
+SimpleElastix::VectorOfImage&
 SimpleElastix
 ::GetFixedMask( void )
 {
@@ -254,14 +252,13 @@ SimpleElastix::Self&
 SimpleElastix
 ::RemoveFixedMask( const unsigned long index )
 {
-  if( this->m_FixedMasks.size() < index )
+  if( index < this->m_FixedMasks.size()  )
   {
-    sitkExceptionMacro( "Index out of range (number of fixed masks: " << this->m_FixedMasks.size() << ")" );
+    this->m_FixedMasks.erase( this->m_FixedMasks.begin() + index );
+    return *this;
   }
 
-  this->m_FixedMasks.erase( this->m_FixedMasks.begin() + index );
-
-  return *this;
+  sitkExceptionMacro( "Index out of range (number of fixed masks: " << this->m_FixedMasks.size() << ")" );
 }
 
 SimpleElastix::Self& 
@@ -305,19 +302,19 @@ SimpleElastix
   return *this;
 }
 
-Image
+Image&
 SimpleElastix
 ::GetMovingMask( const unsigned long index )
 {
-  if( this->m_MovingMasks.size() < index )
+  if( index < this->m_MovingMasks.size()  )
   {
-    sitkExceptionMacro( "Index out of range (number of moving masks: " << this->m_MovingMasks.size() << ")" );
+    return this->m_MovingMasks[ index ];
   }
 
-  return this->m_MovingMasks[ index ];
+  sitkExceptionMacro( "Index out of range (number of moving masks: " << this->m_MovingMasks.size() << ")" );
 }
 
-SimpleElastix::VectorOfImage
+SimpleElastix::VectorOfImage&
 SimpleElastix
 ::GetMovingMask( void )
 {
@@ -328,14 +325,13 @@ SimpleElastix::Self&
 SimpleElastix
 ::RemoveMovingMask( const unsigned long index )
 {
-  if( this->m_MovingMasks.size() < index )
+  if( index < this->m_MovingMasks.size()  )
   {
-    sitkExceptionMacro( "Index out of range (number of moving masks: " << this->m_MovingMasks.size() << ")" );
+    this->m_MovingMasks.erase( this->m_MovingMasks.begin() + index );
+    return *this;
   }
 
-  this->m_MovingMasks.erase( this->m_MovingMasks.begin() + index );
-
-  return *this;
+  sitkExceptionMacro( "Index out of range (number of moving masks: " << this->m_MovingMasks.size() << ")" );
 }
 
 SimpleElastix::Self& 
@@ -348,7 +344,7 @@ SimpleElastix
 
 SimpleElastix::Self& 
 SimpleElastix
-::SetFixedPointSetFileName( std::string fixedPointSetFileName )
+::SetFixedPointSetFileName( const std::string fixedPointSetFileName )
 {
   this->m_FixedPointSetFileName = fixedPointSetFileName;
   return *this;
@@ -371,7 +367,7 @@ SimpleElastix
 
 SimpleElastix::Self& 
 SimpleElastix
-::SetMovingPointSetFileName( std::string movingPointSetFileName )
+::SetMovingPointSetFileName( const std::string movingPointSetFileName )
 {
   this->m_MovingPointSetFileName = movingPointSetFileName;
   return *this;
@@ -394,7 +390,7 @@ SimpleElastix
 
 SimpleElastix::Self& 
 SimpleElastix
-::SetOutputDirectory( std::string outputDirectory )
+::SetOutputDirectory( const std::string outputDirectory )
 {
   this->m_OutputDirectory = outputDirectory;
   return *this;
@@ -435,6 +431,37 @@ SimpleElastix
 ::RemoveLogFileName( void )
 {
   this->m_LogFileName = std::string();
+  return *this;
+}
+
+SimpleElastix::Self& 
+SimpleElastix
+::SetLogToFile( bool logToFile )
+{
+  this->m_LogToFile = logToFile;
+  return *this;
+}
+
+bool
+SimpleElastix
+::GetLogToFile( void )
+{
+  return this->m_LogToFile;
+}
+
+SimpleElastix::Self& 
+SimpleElastix
+::LogToFileOn()
+{
+  this->SetLogToFile( true );
+  return *this;
+}
+
+SimpleElastix::Self& 
+SimpleElastix
+::LogToFileOff()
+{
+  this->SetLogToFile( false );
   return *this;
 }
 
@@ -523,7 +550,7 @@ SimpleElastix::ParameterMapType
 SimpleElastix
 ::GetDefaultParameterMap( const std::string transformName, const unsigned int numberOfResolutions, const double finalGridSpacingInPhysicalUnits )
 { 
-  ParameterObjectPointer parameterObject = ParameterObjectType::New();
+  SimpleElastix::ParameterObjectPointer parameterObject = SimpleElastix::ParameterObjectType::New();
   return parameterObject->GetParameterMap( transformName, numberOfResolutions, finalGridSpacingInPhysicalUnits );
 }
 
@@ -585,13 +612,17 @@ Image
 SimpleElastix
 ::Execute( void )
 {
-  const PixelIDValueEnum FixedImagePixelID = this->m_FixedImages[ 0 ].GetPixelID();
-  const unsigned int FixedImageDimension = this->m_FixedImages[ 0 ].GetDimension();
-  const PixelIDValueEnum MovingImagePixelID = this->m_MovingImages[ 0 ].GetPixelID();
+  const PixelIDValueEnum FixedImagePixelID = this->GetFixedImage( 0 ).GetPixelID();
+  const unsigned int FixedImageDimension = this->GetFixedImage( 0 ).GetDimension();
+  const PixelIDValueEnum MovingImagePixelID = this->GetFixedImage( 0 ).GetPixelID();
 
   if( this->m_DualMemberFactory->HasMemberFunction( FixedImagePixelID, MovingImagePixelID, FixedImageDimension ) )
   {
-    return this->m_DualMemberFactory->GetMemberFunction( FixedImagePixelID, MovingImagePixelID, FixedImageDimension )();
+    try {
+      return this->m_DualMemberFactory->GetMemberFunction( FixedImagePixelID, MovingImagePixelID, FixedImageDimension )();
+    } catch( itk::ExceptionObject &e ) {
+      sitkExceptionMacro( << e );
+    }
   }
 
   sitkExceptionMacro( << "SimpleITK does not support the combination of image type \""
@@ -616,7 +647,7 @@ bool
 SimpleElastix
 ::IsEmpty( const Image& image )
 {
-  bool isEmpty = image.GetWidth() == 0 && image.GetHeight() == 0;
+  const bool isEmpty = image.GetWidth() == 0 && image.GetHeight() == 0;
   return isEmpty;
 }
 
