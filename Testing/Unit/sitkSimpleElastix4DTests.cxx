@@ -15,7 +15,7 @@ protected:
 
     typedef sitk::SimpleElastix                      SimpleElastixType;
     typedef SimpleElastixType::ParameterMapType      ParameterMapType;
-    typedef SimpleElastixType::ParameterValuesType   ParameterValuesType;
+    typedef SimpleElastixType::ParameterValueVectorType   ParameterValueVectorType;
 
     sitk::Image image4d;
 
@@ -30,7 +30,7 @@ TEST_F( SimpleElastix4DTest, GroupwiseRegistration )
     ParameterMapType parameterMap = sitk::GetDefaultParameterMap( "groupwise", 1, 32 );
 
     // otherwise unreasonable testing time
-    parameterMap["MaximumNumberOfIterations"] = ParameterValuesType( 1, "16" ); 
+    parameterMap["MaximumNumberOfIterations"] = ParameterValueVectorType( 1, "16" ); 
 
     SimpleElastixType elastix;
     sitk::Image resultImage;
@@ -38,7 +38,8 @@ TEST_F( SimpleElastix4DTest, GroupwiseRegistration )
     EXPECT_NO_THROW( elastix.SetFixedImage( image4d ) );
     EXPECT_NO_THROW( elastix.SetMovingImage( image4d ) );
     EXPECT_NO_THROW( elastix.SetParameterMap( parameterMap ) );
-    EXPECT_NO_THROW( elastix.LogToFolder( "." ) );
+    EXPECT_NO_THROW( elastix.SetOutputDirectory( "." ) );
+    EXPECT_NO_THROW( elastix.LogToFileOn() );
     EXPECT_NO_THROW( elastix.Execute() );
     EXPECT_NO_THROW( resultImage = elastix.GetResultImage() );
     EXPECT_FALSE( this->IsEmpty( resultImage ) );

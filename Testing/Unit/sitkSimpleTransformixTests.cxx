@@ -25,8 +25,8 @@ protected:
     typedef sitk::SimpleElastix                         SimpleElastixType;
     typedef sitk::SimpleTransformix                     SimpleTransformixType;
     typedef SimpleTransformixType::ParameterMapType     ParameterMapType;
-    typedef SimpleTransformixType::ParameterMapListType ParameterMapListType;
-    typedef SimpleTransformixType::ParameterValuesType  ParameterValuesType;
+    typedef SimpleTransformixType::ParameterMapVectorType ParameterMapVectorType;
+    typedef SimpleTransformixType::ParameterValueVectorType  ParameterValueVectorType;
 
     SimpleElastixType elastix;
     sitk::Image fixedImage;
@@ -84,8 +84,8 @@ TEST_F( SimpleTransformixTest, ProceduralInterface )
     EXPECT_NO_THROW( resultImage = Transformix( movingImage, elastix.GetTransformParameterMap(), false, outputFolder ) );
     EXPECT_FALSE( this->IsEmpty( resultImage ) );
 
-    ParameterMapListType parameterMapList = elastix.GetTransformParameterMap();
-    parameterMapList[ parameterMapList.size()-1 ][ "WriteResultImage" ] = ParameterValuesType( 1, "false" );
+    ParameterMapVectorType parameterMapVector = elastix.GetTransformParameterMap();
+    parameterMapVector[ parameterMapVector.size()-1 ][ "WriteResultImage" ] = ParameterValueVectorType( 1, "false" );
     EXPECT_NO_THROW( resultImage = Transformix( movingImage, elastix.GetTransformParameterMap() ) );
     EXPECT_FALSE( this->IsEmpty( resultImage ) );
 }
