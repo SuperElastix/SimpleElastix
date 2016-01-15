@@ -31,7 +31,7 @@ SimpleElastix
   m_FixedPointSetFileName       = std::string();
   m_MovingPointSetFileName      = std::string();
 
-  m_OutputDirectory             = std::string();
+  m_OutputDirectory             = ".";
   m_LogFileName                 = std::string();
 
   this->LogToFileOff();

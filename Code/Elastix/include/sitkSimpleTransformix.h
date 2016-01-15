@@ -123,8 +123,8 @@ class SITKCommon_EXPORT SimpleTransformix
 };
 
 // Procedural Interface 
-SITKCommon_EXPORT Image Transformix( const Image& inputImage, const SimpleTransformix::ParameterMapType parameterMap, const bool logToConsole = false, const std::string outputDirectory = "" );
-SITKCommon_EXPORT Image Transformix( const Image& inputImage, const SimpleTransformix::ParameterMapVectorType parameterMapVector, const bool logToConsole = false, const std::string outputDirectory = "" );
+SITKCommon_EXPORT Image Transformix( const Image& inputImage, const SimpleTransformix::ParameterMapType parameterMap, const bool logToConsole = false, const std::string outputDirectory = "." );
+SITKCommon_EXPORT Image Transformix( const Image& inputImage, const SimpleTransformix::ParameterMapVectorType parameterMapVector, const bool logToConsole = false, const std::string outputDirectory = "." );
 
 } // end namespace simple
 } // end namespace itk

@@ -27,6 +27,9 @@ SimpleTransformix
   this->ComputeDeterminantOfSpatialJacobianOff();
   this->ComputeDeformationFieldOff();
 
+  this->m_OutputDirectory             = ".";
+  this->m_LogFileName                 = std::string();
+  
   this->LogToFileOff();
   this->LogToConsoleOff();
 
