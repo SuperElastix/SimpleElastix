@@ -70,7 +70,7 @@ TEST_F( SimpleElastixTest, ObjectOrientedInterface )
     EXPECT_NO_THROW( elastix.Execute() );
     EXPECT_FALSE( this->IsEmpty( elastix.GetResultImage() ) );
 
-    EXPECT_NO_THROW( elastix.SetFixedMask( sitk::Image() ) ); // set mask to zero
+    EXPECT_NO_THROW( elastix.RemoveFixedMask() );
     EXPECT_NO_THROW( elastix.Execute() );
     EXPECT_FALSE( this->IsEmpty( elastix.GetResultImage() ) );
 }
