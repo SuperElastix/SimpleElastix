@@ -57,6 +57,11 @@ SimpleElastix::Self&
 SimpleElastix
 ::SetFixedImage( const Image& fixedImage )
 {
+  if( this->IsEmpty( fixedImage ) )
+  {
+    sitkExceptionMacro( "Image is empty." )
+  }
+
   this->RemoveFixedImage();
   this->m_FixedImages.push_back( fixedImage );
   return *this;
@@ -81,6 +86,11 @@ SimpleElastix::Self&
 SimpleElastix
 ::AddFixedImage( const Image& fixedImage )
 {
+  if( this->IsEmpty( fixedImage ) )
+  {
+    sitkExceptionMacro( "Image is empty." )
+  }
+
   this->m_FixedImages.push_back( fixedImage );
   return *this;
 }
@@ -129,6 +139,11 @@ SimpleElastix::Self&
 SimpleElastix
 ::SetMovingImage( const Image& movingImage )
 {
+  if( this->IsEmpty( movingImage ) )
+  {
+    sitkExceptionMacro( "Image is empty." )
+  }
+
   this->RemoveMovingImage();
   this->m_MovingImages.push_back( movingImage );
   return *this;
@@ -153,6 +168,11 @@ SimpleElastix::Self&
 SimpleElastix
 ::AddMovingImage( const Image& movingImage )
 {
+  if( this->IsEmpty( movingImage ) )
+  {
+    sitkExceptionMacro( "Image is empty." )
+  }
+
   this->m_MovingImages.push_back( movingImage );
   return *this;
 }
@@ -201,6 +221,11 @@ SimpleElastix::Self&
 SimpleElastix
 ::SetFixedMask( const Image& fixedMask )
 {
+  if( this->IsEmpty( fixedMask ) )
+  {
+    sitkExceptionMacro( "Image is empty." )
+  }
+
   this->RemoveFixedMask();
   this->m_FixedMasks.push_back( fixedMask );
   return *this;
@@ -225,6 +250,11 @@ SimpleElastix::Self&
 SimpleElastix
 ::AddFixedMask( const Image& fixedMask )
 {
+  if( this->IsEmpty( fixedMask ) )
+  {
+    sitkExceptionMacro( "Image is empty." )
+  }
+
   this->m_FixedMasks.push_back( fixedMask );
   return *this;
 }
@@ -274,6 +304,11 @@ SimpleElastix::Self&
 SimpleElastix
 ::SetMovingMask( const Image& movingMask )
 {
+  if( this->IsEmpty( movingMask ) )
+  {
+    sitkExceptionMacro( "Image is empty." )
+  }
+
   this->RemoveMovingMask();
   this->m_MovingMasks.push_back( movingMask );
   return *this;
@@ -298,6 +333,11 @@ SimpleElastix::Self&
 SimpleElastix
 ::AddMovingMask( const Image& movingMask )
 {
+  if( this->IsEmpty( movingMask ) )
+  {
+    sitkExceptionMacro( "Image is empty." )
+  }
+
   this->m_MovingMasks.push_back( movingMask );
   return *this;
 }
