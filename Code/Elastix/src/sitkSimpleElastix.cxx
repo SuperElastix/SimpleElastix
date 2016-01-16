@@ -734,13 +734,13 @@ PrettyPrint( const SimpleElastix::ParameterMapVectorType parameterMapVector )
 }
 
 Image
-Elastix( const Image& fixedImage, const Image& movingImage, const std::string defaultParameterMapName, const bool logToConsole, const std::string outputDirectory )
+Elastix( const Image& fixedImage, const Image& movingImage, const std::string defaultParameterMapName, const bool logToConsole, const bool logToFile, const std::string outputDirectory )
 {
   return Elastix( fixedImage, movingImage, GetDefaultParameterMap( defaultParameterMapName ), logToConsole, outputDirectory );
 }
 
 Image
-Elastix( const Image& fixedImage, const Image& movingImage, const SimpleElastix::ParameterMapType parameterMap, const bool logToConsole, const std::string outputDirectory )
+Elastix( const Image& fixedImage, const Image& movingImage, const SimpleElastix::ParameterMapType parameterMap, const bool logToConsole, const bool logToFile, const std::string outputDirectory )
 {
   SimpleElastix::ParameterMapVectorType parameterMapVector = SimpleElastix::ParameterMapVectorType( 1 );
   parameterMapVector[ 0 ] = parameterMap;
@@ -748,35 +748,35 @@ Elastix( const Image& fixedImage, const Image& movingImage, const SimpleElastix:
 }
 
 Image
-Elastix( const Image& fixedImage, const Image& movingImage, const SimpleElastix::ParameterMapVectorType parameterMapVector, const bool logToConsole, const std::string outputDirectory )
+Elastix( const Image& fixedImage, const Image& movingImage, const SimpleElastix::ParameterMapVectorType parameterMapVector, const bool logToConsole, const bool logToFile, const std::string outputDirectory )
 {
   SimpleElastix selx;
   selx.SetFixedImage( fixedImage );
   selx.SetMovingImage( movingImage );
   selx.SetParameterMap( parameterMapVector );
-  selx.SetOutputDirectory( outputDirectory );
-  selx.LogToFileOn();
+  selx.SetLogToFile( logToFile );
   selx.SetLogToConsole( logToConsole );
+  selx.SetOutputDirectory( outputDirectory );
 
   return selx.Execute();
 }
 
 Image
-Elastix( const Image& fixedImage, const Image& movingImage, const std::string defaultParameterMapName, const Image& fixedMask, const Image& movingMask, const bool logToConsole, const std::string outputDirectory )
+Elastix( const Image& fixedImage, const Image& movingImage, const std::string defaultParameterMapName, const Image& fixedMask, const Image& movingMask, const bool logToConsole, const bool logToFile, const std::string outputDirectory )
 {
-  return Elastix( fixedImage, movingImage, GetDefaultParameterMap( defaultParameterMapName ), fixedMask, movingMask, logToConsole, outputDirectory );
+  return Elastix( fixedImage, movingImage, GetDefaultParameterMap( defaultParameterMapName ), fixedMask, movingMask, logToConsole, logToFile, outputDirectory );
 }
 
 Image
-Elastix( const Image& fixedImage, const Image& movingImage, const SimpleElastix::ParameterMapType parameterMap, const Image& fixedMask, const Image& movingMask, bool logToConsole, std::string outputDirectory )
+Elastix( const Image& fixedImage, const Image& movingImage, const SimpleElastix::ParameterMapType parameterMap, const Image& fixedMask, const Image& movingMask, bool logToConsole, const bool logToFile, std::string outputDirectory )
 {
   SimpleElastix::ParameterMapVectorType parameterMapVector = SimpleElastix::ParameterMapVectorType( 1 );
   parameterMapVector[ 0 ] = parameterMap;
-  return Elastix( fixedImage, movingImage, parameterMapVector, fixedMask, movingMask, logToConsole, outputDirectory );
+  return Elastix( fixedImage, movingImage, parameterMapVector, fixedMask, movingMask, logToConsole, logToFile, outputDirectory );
 }
 
 Image
-Elastix( const Image& fixedImage, const Image& movingImage, SimpleElastix::ParameterMapVectorType parameterMapVector, const Image& fixedMask, const Image& movingMask, bool logToConsole, std::string outputDirectory )
+Elastix( const Image& fixedImage, const Image& movingImage, SimpleElastix::ParameterMapVectorType parameterMapVector, const Image& fixedMask, const Image& movingMask, bool logToConsole, const bool logToFile, std::string outputDirectory )
 {
   SimpleElastix selx;
   selx.SetFixedImage( fixedImage );
@@ -784,9 +784,9 @@ Elastix( const Image& fixedImage, const Image& movingImage, SimpleElastix::Param
   selx.SetParameterMap( parameterMapVector );
   selx.SetFixedMask( fixedMask );
   selx.SetMovingMask( movingMask );
-  selx.SetOutputDirectory( outputDirectory );
-  selx.LogToFileOn();
+  selx.SetLogToFile( logToFile );
   selx.SetLogToConsole( logToConsole );
+  selx.SetOutputDirectory( outputDirectory );
 
   return selx.Execute();
 }
