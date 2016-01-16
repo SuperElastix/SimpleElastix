@@ -734,6 +734,34 @@ PrettyPrint( const SimpleElastix::ParameterMapVectorType parameterMapVector )
 }
 
 Image
+Elastix( const Image& fixedImage, const Image& movingImage, const bool logToFile, const bool logToConsole, const bool logToFile, const std::string outputDirectory )
+{
+  SimpleElastix selx;
+  selx.SetFixedImage( fixedImage );
+  selx.SetMovingImage( movingImage );
+  selx.SetLogToFile( logToFile );
+  selx.SetLogToConsole( logToConsole );
+  selx.SetOutputDirectory( outputDirectory );
+
+  return selx.Execute();
+}
+
+Image
+Elastix( const Image& fixedImage, const Image& movingImage, const Image& fixedMask, const Image& movingMask, const bool logToFile, const bool logToConsole, const bool logToFile, const std::string outputDirectory )
+{
+  SimpleElastix selx;
+  selx.SetFixedImage( fixedImage );
+  selx.SetMovingImage( movingImage );
+  selx.SetFixedMask( fixedMask );
+  selx.SetMovingMask( movingMask );
+  selx.SetLogToFile( logToFile );
+  selx.SetLogToConsole( logToConsole );
+  selx.SetOutputDirectory( outputDirectory );
+
+  return selx.Execute();
+}
+
+Image
 Elastix( const Image& fixedImage, const Image& movingImage, const std::string defaultParameterMapName, const bool logToConsole, const bool logToFile, const std::string outputDirectory )
 {
   return Elastix( fixedImage, movingImage, GetDefaultParameterMap( defaultParameterMapName ), logToConsole, outputDirectory );

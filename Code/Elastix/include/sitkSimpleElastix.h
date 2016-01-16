@@ -152,6 +152,8 @@ SITKCommon_EXPORT SimpleElastix::ParameterMapType ReadParameterFile( const std::
 SITKCommon_EXPORT void WriteParameterFile( const SimpleElastix::ParameterMapType parameterMap, const std::string filename );
 SITKCommon_EXPORT void PrettyPrint( const SimpleElastix::ParameterMapType parameterMap );
 SITKCommon_EXPORT void PrettyPrint( const SimpleElastix::ParameterMapVectorType parameterMapVector );
+SITKCommon_EXPORT Image Elastix( const Image& fixedImage, const Image& movingImage, const bool logToConsole = false, const bool logToFile = false, const std::string outputDirectory = "." );
+SITKCommon_EXPORT Image Elastix( const Image& fixedImage, const Image& movingImage, const Image& fixedMask, const Image& movingMask, const bool logToConsole = false, const bool logToFile = false, const std::string outputDirectory = "." );
 SITKCommon_EXPORT Image Elastix( const Image& fixedImage, const Image& movingImage, const std::string defaultParameterMapName, const bool logToConsole = false, const bool logToFile = false, const std::string outputDirectory = "." );
 SITKCommon_EXPORT Image Elastix( const Image& fixedImage, const Image& movingImage, const SimpleElastix::ParameterMapType parameterMap, const bool logToConsole = false, const bool logToFile = false, const std::string outputDirectory = "." );
 SITKCommon_EXPORT Image Elastix( const Image& fixedImage, const Image& movingImage, const SimpleElastix::ParameterMapVectorType parameterMapVector, const bool logToConsole = false, const bool logToFile = false, const std::string outputDirectory = "." );
