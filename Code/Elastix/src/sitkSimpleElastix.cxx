@@ -734,7 +734,7 @@ PrettyPrint( const SimpleElastix::ParameterMapVectorType parameterMapVector )
 }
 
 Image
-Elastix( const Image& fixedImage, const Image& movingImage, const bool logToFile, const bool logToConsole, const bool logToFile, const std::string outputDirectory )
+Elastix( const Image& fixedImage, const Image& movingImage, const bool logToConsole, const bool logToFile, const std::string outputDirectory )
 {
   SimpleElastix selx;
   selx.SetFixedImage( fixedImage );
@@ -747,7 +747,7 @@ Elastix( const Image& fixedImage, const Image& movingImage, const bool logToFile
 }
 
 Image
-Elastix( const Image& fixedImage, const Image& movingImage, const Image& fixedMask, const Image& movingMask, const bool logToFile, const bool logToConsole, const bool logToFile, const std::string outputDirectory )
+Elastix( const Image& fixedImage, const Image& movingImage, const Image& fixedMask, const Image& movingMask, const bool logToConsole, const bool logToFile, const std::string outputDirectory )
 {
   SimpleElastix selx;
   selx.SetFixedImage( fixedImage );
@@ -764,7 +764,7 @@ Elastix( const Image& fixedImage, const Image& movingImage, const Image& fixedMa
 Image
 Elastix( const Image& fixedImage, const Image& movingImage, const std::string defaultParameterMapName, const bool logToConsole, const bool logToFile, const std::string outputDirectory )
 {
-  return Elastix( fixedImage, movingImage, GetDefaultParameterMap( defaultParameterMapName ), logToConsole, outputDirectory );
+  return Elastix( fixedImage, movingImage, GetDefaultParameterMap( defaultParameterMapName ), logToConsole, logToFile, outputDirectory );
 }
 
 Image
@@ -772,7 +772,7 @@ Elastix( const Image& fixedImage, const Image& movingImage, const SimpleElastix:
 {
   SimpleElastix::ParameterMapVectorType parameterMapVector = SimpleElastix::ParameterMapVectorType( 1 );
   parameterMapVector[ 0 ] = parameterMap;
-  return Elastix( fixedImage, movingImage, parameterMapVector, logToConsole, outputDirectory );
+  return Elastix( fixedImage, movingImage, parameterMapVector, logToConsole, logToFile, outputDirectory );
 }
 
 Image
