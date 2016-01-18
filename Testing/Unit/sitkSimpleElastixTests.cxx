@@ -102,66 +102,126 @@ TEST_F( SimpleElastixTest, ProceduralInterface )
     EXPECT_NO_THROW( Elastix( fixedImage, movingImage, "translation", false, true, outputFolder ) );
     EXPECT_FALSE( this->IsEmpty( resultImage ) );
 
-// TODO: Add all combinations with new logToFile parameter
-//    ParameterMapType parameterMap = sitk::GetDefaultParameterMap( "translation" );
-//    EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMap) );
-//    EXPECT_FALSE( this->IsEmpty( resultImage ) );
-//    EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMap, true ) );
-//    EXPECT_FALSE( this->IsEmpty( resultImage ) );
-//    EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMap, true, outputFolder ) );
-//    EXPECT_FALSE( this->IsEmpty( resultImage ) );
-//    EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMap, false, outputFolder ) );
-//    EXPECT_FALSE( this->IsEmpty( resultImage ) );
-//
-//    ParameterMapVectorType parameterMapVector;
-//    parameterMapVector.push_back( sitk::GetDefaultParameterMap( "translation" ) );
-//    parameterMapVector.push_back( sitk::GetDefaultParameterMap( "rigid" ) );
-//
-//    EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMapVector) );
-//    EXPECT_FALSE( this->IsEmpty( resultImage ) );
-//    EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMapVector, true ) );
-//    EXPECT_FALSE( this->IsEmpty( resultImage ) );
-//    EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMapVector, true, outputFolder ) );
-//    EXPECT_FALSE( this->IsEmpty( resultImage ) );
-//    EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMapVector, false, outputFolder ) );
-//    EXPECT_FALSE( this->IsEmpty( resultImage ) );
-//
-//    EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, "translation", mask, mask ) );
-//    EXPECT_FALSE( this->IsEmpty( resultImage ) );
-//    EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, "translation", mask, mask, true ) );
-//    EXPECT_FALSE( this->IsEmpty( resultImage ) );
-//    EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, "translation", true, outputFolder ) );
-//    EXPECT_FALSE( this->IsEmpty( resultImage ) );
-//    EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, "translation", false, outputFolder ) );
-//    EXPECT_FALSE( this->IsEmpty( resultImage ) );
-//
-//    EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMap, mask, mask ) );
-//    EXPECT_FALSE( this->IsEmpty( resultImage ) );
-//    EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMap, mask, mask, true ) );
-//    EXPECT_FALSE( this->IsEmpty( resultImage ) );
-//    EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMap, mask, mask, true, outputFolder ) );
-//    EXPECT_FALSE( this->IsEmpty( resultImage ) );
-//    EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMap, mask, mask, false, outputFolder ) );
-//    EXPECT_FALSE( this->IsEmpty( resultImage ) );
-//
-//    EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMapVector, mask, mask ) );
-//    EXPECT_FALSE( this->IsEmpty( resultImage ) );
-//    EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMapVector, mask, mask, true ) );
-//    EXPECT_FALSE( this->IsEmpty( resultImage ) );
-//    EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMapVector, mask, mask, true, outputFolder ) );
-//    EXPECT_FALSE( this->IsEmpty( resultImage ) );
-//    EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMapVector, mask, mask, false, outputFolder ) );
-//    EXPECT_FALSE( this->IsEmpty( resultImage ) );
-//
-//    parameterMap["WriteResultImage"] = ParameterValueVectorType( 1, "false" );
-//    EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMap ) );
-//    EXPECT_FALSE( this->IsEmpty( resultImage ) );
-//
-//    parameterMapVector[1]["WriteResultImage"] = ParameterValueVectorType( 1, "false" );
-//    EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMapVector ) );
-//    EXPECT_FALSE( this->IsEmpty( resultImage ) );
-//
-//    EXPECT_NO_THROW( sitk::PrettyPrint( parameterMapVector ) );
+    ParameterMapType parameterMap = sitk::GetDefaultParameterMap( "translation" );
+    EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMap ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMap, true ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMap, false ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMap, true, true ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMap, false, false ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMap, true, false ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMap, false, true ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMap, true, true, outputFolder ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMap, false, false, outputFolder ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMap, true, false, outputFolder ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMap, false, true, outputFolder ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+
+    ParameterMapVectorType parameterMapVector;
+    parameterMapVector.push_back( sitk::GetDefaultParameterMap( "translation" ) );
+    parameterMapVector.push_back( sitk::GetDefaultParameterMap( "rigid" ) );
+    EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMapVector ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMapVector, true ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMapVector, false ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMapVector, true, true ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMapVector, false, false ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMapVector, true, false ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMapVector, false, true ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMapVector, true, true, outputFolder ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMapVector, false, false, outputFolder ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMapVector, true, false, outputFolder ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMapVector, false, true, outputFolder ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+
+    EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, "translation", mask, mask ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, "translation", mask, mask, true ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, "translation", mask, mask, false ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, "translation", mask, mask, true, true ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, "translation", mask, mask, false, false ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, "translation", mask, mask, true, false ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, "translation", mask, mask, false, true ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, "translation", mask, mask, true, true, outputFolder ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, "translation", mask, mask, false, false, outputFolder ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, "translation", mask, mask, true, false, outputFolder ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, "translation", mask, mask, false, true, outputFolder ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+
+    EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMap ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMap, mask, mask, true ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMap, mask, mask, false ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMap, mask, mask, true, true ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMap, mask, mask, false, false ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMap, mask, mask, true, false ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMap, mask, mask, false, true ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMap, mask, mask, true, true, outputFolder ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMap, mask, mask, false, false, outputFolder ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMap, mask, mask, true, false, outputFolder ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMap, false, true, outputFolder ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+
+    EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMapVector, mask, mask ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMapVector, mask, mask, true ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMapVector, mask, mask, false ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMapVector, mask, mask, true, true ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMapVector, mask, mask, false, false ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMapVector, mask, mask, true, false ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMapVector, mask, mask, false, true ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMapVector, mask, mask, true, true, outputFolder ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMapVector, mask, mask, false, false, outputFolder ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMapVector, mask, mask, true, false, outputFolder ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+    EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMapVector, mask, mask, false, true, outputFolder ) );
+    EXPECT_FALSE( this->IsEmpty( resultImage ) );
+
+    EXPECT_NO_THROW( sitk::PrettyPrint( parameterMapVector ) );
 }
 
 TEST_F( SimpleElastixTest, DefaultPairwiseParameterMaps )

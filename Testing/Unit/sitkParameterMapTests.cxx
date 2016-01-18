@@ -55,7 +55,7 @@ TEST( ParameterMapTest, ProceduralInterface )
     EXPECT_NO_THROW( sitk::PrettyPrint( parameterMapVector ) );
 }
 
-TEST( ParameterMaptest, ReadWrite )
+TEST( ParameterMapTest, ReadWrite )
 {
     sitk::SimpleElastix::ParameterMapType parameterMap;
     EXPECT_NO_THROW( parameterMap = sitk::GetDefaultParameterMap( "translation" ) );
@@ -64,7 +64,7 @@ TEST( ParameterMaptest, ReadWrite )
     sitk::Image movingImage = sitk::Cast( sitk::ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) ), sitk::sitkFloat32 );
 
     sitk::Image resultImage0;
-    EXPECT_NO_THROW( resultImage0 = Elastix( fixedImage, movingImage, parameterMap) );
+    EXPECT_NO_THROW( resultImage0 = Elastix( fixedImage, movingImage, parameterMap ) );
 
     sitk::Image resultImage1;
     EXPECT_NO_THROW( sitk::WriteParameterFile( parameterMap, "ParameterMapTestProceduralInterface.txt" ) );
@@ -72,5 +72,5 @@ TEST( ParameterMaptest, ReadWrite )
     EXPECT_NO_THROW( parameterMapRead = sitk::ReadParameterFile( "ParameterMapTestProceduralInterface.txt" ) ); 
     EXPECT_NO_THROW( resultImage1 = Elastix( fixedImage, movingImage, parameterMapRead ) );
 
-    EXPECT_EQ( sitk::Hash( resultImage0 ), sitk::Hash( resultImage0 ) );
+    EXPECT_EQ( sitk::Hash( resultImage0 ), sitk::Hash( resultImage1 ) );
 }
