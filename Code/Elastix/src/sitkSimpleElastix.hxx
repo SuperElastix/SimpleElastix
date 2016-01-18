@@ -38,6 +38,11 @@ SimpleElastix::DualExecuteInternal( void )
   elastixFilter->SetFixedPointSetFileName( this->GetFixedPointSetFileName() );
   elastixFilter->SetMovingPointSetFileName( this->GetMovingPointSetFileName() );
 
+  elastixFilter->SetOutputDirectory( this->GetOutputDirectory() );
+  elastixFilter->SetLogFileName( this->GetLogFileName() );
+  elastixFilter->SetLogToFile( this->GetLogToFile() );
+  elastixFilter->SetLogToConsole( this->GetLogToConsole() );
+
   if( this->m_ParameterMapVector.size() > 0 )
   {
     ParameterObjectPointer parameterObject = ParameterObjectType::New();
@@ -45,12 +50,6 @@ SimpleElastix::DualExecuteInternal( void )
     elastixFilter->SetParameterObject( parameterObject );
   }
 
-  elastixFilter->SetOutputDirectory( this->GetOutputDirectory() );
-  elastixFilter->SetLogFileName( this->GetLogFileName() );
-  elastixFilter->SetLogToFile( this->GetLogToFile() );
-  elastixFilter->SetLogToConsole( this->GetLogToConsole() );
-
-  // This call also updates the filter
   this->m_ResultImage = Image( elastixFilter->GetOutput() );
   this->m_TransformParameterMapVector = elastixFilter->GetTransformParameterObject()->GetParameterMap();
 
