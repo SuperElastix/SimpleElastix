@@ -665,10 +665,12 @@ SimpleElastix
     }
   }
 
-  sitkExceptionMacro( << "SimpleITK does not support the combination of image type \""
+  sitkExceptionMacro( << "SimpleITK does not support the combination of fixed image type \""
                       << GetPixelIDValueAsString( FixedImagePixelID ) << "\" ("
-                      << GetPixelIDValueAsElastixParameter( FixedImagePixelID ) << ") and dimension "
-                      << FixedImageDimension << "." );
+                      << GetPixelIDValueAsElastixParameter( FixedImagePixelID ) << "), moving image type \""
+                      << GetPixelIDValueAsString( FixedImagePixelID ) << "\" ("
+                      << GetPixelIDValueAsElastixParameter( FixedImagePixelID ) << ") "
+                      << "and dimension " << FixedImageDimension << "." );
 }
 
 Image
