@@ -53,6 +53,11 @@ SimpleElastix::DualExecuteInternal( void )
   this->m_ResultImage = Image( elastixFilter->GetOutput() );
   this->m_TransformParameterMapVector = elastixFilter->GetTransformParameterObject()->GetParameterMap();
 
+  // Make a deep copy. This is important to prevent the internal data object trying to update its
+  // source (this elastixFilter) outside this function (where it has gone out of scope and been destroyed).
+  // TODO: We should be able to simply call DisconnectPipeline() on the data object but this does not work
+  this->m_ResultImage.MakeUnique();
+
   return this->m_ResultImage;
 }
 
