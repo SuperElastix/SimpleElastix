@@ -654,7 +654,7 @@ SimpleElastix
 {
   const PixelIDValueEnum FixedImagePixelID = this->GetFixedImage( 0 ).GetPixelID();
   const unsigned int FixedImageDimension = this->GetFixedImage( 0 ).GetDimension();
-  const PixelIDValueEnum MovingImagePixelID = this->GetFixedImage( 0 ).GetPixelID();
+  const PixelIDValueEnum MovingImagePixelID = this->GetMovingImage( 0 ).GetPixelID();
 
   if( this->m_DualMemberFactory->HasMemberFunction( FixedImagePixelID, MovingImagePixelID, FixedImageDimension ) )
   {
