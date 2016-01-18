@@ -25,21 +25,28 @@ SimpleTransformix::ExecuteInternal( void )
   transformixFilter->SetComputeDeterminantOfSpatialJacobian( this->GetComputeDeterminantOfSpatialJacobian() );
   transformixFilter->SetComputeDeformationField( this->GetComputeDeformationField() );
 
-  ParameterObjectPointer parameterObject = ParameterObjectType::New();
-  parameterObject->SetParameterMap( this->m_TransformParameterMapVector );
-  transformixFilter->SetTransformParameterObject( parameterObject );
-
   transformixFilter->SetOutputDirectory( this->GetOutputDirectory() );
   transformixFilter->SetLogFileName( this->GetLogFileName() );
   transformixFilter->SetLogToFile( this->GetLogToFile() );
   transformixFilter->SetLogToConsole( this->GetLogToConsole ());
 
-  transformixFilter->Update();
+  ParameterObjectPointer parameterObject = ParameterObjectType::New();
+  parameterObject->SetParameterMap( this->m_TransformParameterMapVector );
+  transformixFilter->SetTransformParameterObject( parameterObject );
+
+  try
+  {
+    transformixFilter->Update();
+  }
+  catch( itk::ExceptionObject &e )
+  {
+    sitkExceptionMacro( << e );
+  }
 
   if( !this->IsEmpty( this->m_InputImage ) )
   {
     this->m_ResultImage = Image( transformixFilter->GetOutput() );
-    
+
     // Make a deep copy. This is important to prevent the internal data object trying to update its
     // source (this elastixFilter) outside this function (where it has gone out of scope and been destroyed).
     // TODO: We should be able to simply call DisconnectPipeline() on the data object but this does not work
