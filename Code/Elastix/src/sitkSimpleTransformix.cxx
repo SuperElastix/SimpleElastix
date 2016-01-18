@@ -402,7 +402,7 @@ SimpleTransformix
   const PixelIDValueEnum InputImagePixelEnum = this->m_InputImage.GetPixelID();
   const unsigned int InputImageDimension = this->m_InputImage.GetDimension();
 
-  if (this->m_MemberFactory->HasMemberFunction( InputImagePixelEnum, InputImageDimension ) )
+  if( this->m_MemberFactory->HasMemberFunction( InputImagePixelEnum, InputImageDimension ) )
   {
     try {
       return this->m_MemberFactory->GetMemberFunction( InputImagePixelEnum, InputImageDimension )();
@@ -411,7 +411,7 @@ SimpleTransformix
     }
   }
 
-  sitkExceptionMacro( << "SimpleITK does not support the combination of image type \""
+  sitkExceptionMacro( << "SimpleTransformix does not support the combination of image type \""
                       << GetPixelIDValueAsString( InputImagePixelEnum ) << "\" ("
                       << GetPixelIDValueAsElastixParameter( InputImagePixelEnum ) << ") and dimension "
                       << InputImageDimension << "." );
