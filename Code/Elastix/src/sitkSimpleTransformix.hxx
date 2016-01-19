@@ -13,7 +13,8 @@ SimpleTransformix::ExecuteInternal( void )
   typedef elastix::TransformixFilter< TInputImage > TransformixFilterType;
   typedef typename TransformixFilterType::Pointer TransforimxFilterPointer;
 
-  try {
+  try
+  {
     TransforimxFilterPointer transformixFilter = TransformixFilterType::New();
 
     if ( !this->IsEmpty( this->m_InputImage ) ) {
@@ -36,19 +37,20 @@ SimpleTransformix::ExecuteInternal( void )
 
     transformixFilter->Update();
 
-    if (!this->IsEmpty(this->m_InputImage)) {
+    if (!this->IsEmpty(this->m_InputImage))
+    {
       this->m_ResultImage = Image( transformixFilter->GetOutput() );
+
+      // Make a deep copy. This is important to prevent the internal data object trying to update its
+      // source (this elastixFilter) outside this function (where it has gone out of scope and been destroyed).
+      // TODO: We should be able to simply call DisconnectPipeline() on the data object but this does not seem to work
+      this->m_ResultImage.MakeUnique();
     }
   }
   catch( itk::ExceptionObject &e )
   {
     sitkExceptionMacro( << e );
   }
-
-  // Make a deep copy. This is important to prevent the internal data object trying to update its
-  // source (this elastixFilter) outside this function (where it has gone out of scope and been destroyed).
-  // TODO: We should be able to simply call DisconnectPipeline() on the data object but this does not seem to work
-  this->m_ResultImage.MakeUnique();
 
   return this->m_ResultImage;
 }
