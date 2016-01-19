@@ -11,33 +11,33 @@ Image
 SimpleTransformix::ExecuteInternal( void )
 {
   typedef elastix::TransformixFilter< TInputImage > TransformixFilterType;
-  typedef typename TransformixFilterType::Pointer   TransforimxFilterPointer;
+  typedef typename TransformixFilterType::Pointer TransforimxFilterPointer;
 
   try {
     TransforimxFilterPointer transformixFilter = TransformixFilterType::New();
 
-    if (!this->IsEmpty(this->m_InputImage)) {
-      transformixFilter->SetInputImage(static_cast< TInputImage * >( this->GetInputImage().GetITKBase()));
+    if ( !this->IsEmpty( this->m_InputImage ) ) {
+      transformixFilter->SetInputImage(static_cast< TInputImage * >( this->GetInputImage().GetITKBase() ) );
     }
 
-    transformixFilter->SetInputPointSetFileName(this->GetInputPointSetFileName());
-    transformixFilter->SetComputeSpatialJacobian(this->GetComputeSpatialJacobian());
-    transformixFilter->SetComputeDeterminantOfSpatialJacobian(this->GetComputeDeterminantOfSpatialJacobian());
-    transformixFilter->SetComputeDeformationField(this->GetComputeDeformationField());
+    transformixFilter->SetInputPointSetFileName( this->GetInputPointSetFileName() );
+    transformixFilter->SetComputeSpatialJacobian( this->GetComputeSpatialJacobian() );
+    transformixFilter->SetComputeDeterminantOfSpatialJacobian( this->GetComputeDeterminantOfSpatialJacobian() );
+    transformixFilter->SetComputeDeformationField( this->GetComputeDeformationField() );
 
-    transformixFilter->SetOutputDirectory(this->GetOutputDirectory());
-    transformixFilter->SetLogFileName(this->GetLogFileName());
-    transformixFilter->SetLogToFile(this->GetLogToFile());
-    transformixFilter->SetLogToConsole(this->GetLogToConsole());
+    transformixFilter->SetOutputDirectory( this->GetOutputDirectory() );
+    transformixFilter->SetLogFileName( this->GetLogFileName() );
+    transformixFilter->SetLogToFile( this->GetLogToFile() );
+    transformixFilter->SetLogToConsole( this->GetLogToConsole() );
 
     ParameterObjectPointer parameterObject = ParameterObjectType::New();
-    parameterObject->SetParameterMap(this->m_TransformParameterMapVector);
-    transformixFilter->SetTransformParameterObject(parameterObject);
+    parameterObject->SetParameterMap( this->m_TransformParameterMapVector );
+    transformixFilter->SetTransformParameterObject( parameterObject );
 
     transformixFilter->Update();
 
     if (!this->IsEmpty(this->m_InputImage)) {
-      this->m_ResultImage = Image(transformixFilter->GetOutput());
+      this->m_ResultImage = Image( transformixFilter->GetOutput() );
     }
   }
   catch( itk::ExceptionObject &e )

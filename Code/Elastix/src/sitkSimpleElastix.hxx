@@ -11,7 +11,7 @@ Image
 SimpleElastix::DualExecuteInternal( void )
 {
   typedef elastix::ElastixFilter< TFixedImage, TMovingImage > ElastixFilterType;
-  typedef typename ElastixFilterType::Pointer                 ElastixFilterPointer;
+  typedef typename ElastixFilterType::Pointer ElastixFilterPointer;
 
   try
   {
