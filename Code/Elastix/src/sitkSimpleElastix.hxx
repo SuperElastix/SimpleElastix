@@ -62,7 +62,7 @@ SimpleElastix::DualExecuteInternal( void )
 
   // Make a deep copy. This is important to prevent the internal data object trying to update its
   // source (this elastixFilter) outside this function (where it has gone out of scope and been destroyed).
-  // TODO: We should be able to simply call DisconnectPipeline() on the data object but this does not seem to work
+  // TODO: We should be able to simply call DisconnectPipeline() on the ITK output image but this does not seem to work
   this->m_ResultImage.MakeUnique();
 
   return this->m_ResultImage;
@@ -72,4 +72,4 @@ SimpleElastix::DualExecuteInternal( void )
 } // end namespace simple
 } // end namespace itk
 
-#endif // __sitksimpleelastix_hxx_
+#endif //
