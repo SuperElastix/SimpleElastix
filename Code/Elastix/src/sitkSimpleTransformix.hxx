@@ -37,7 +37,7 @@ SimpleTransformix::ExecuteInternal( void )
 
     transformixFilter->Update();
 
-    if( !this->IsEmpty( this->m_InputImage) )
+    if( !this->IsEmpty( this->m_InputImage ) )
     {
       this->m_ResultImage = Image( transformixFilter->GetOutput() );
     }

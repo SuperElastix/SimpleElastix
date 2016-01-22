@@ -655,6 +655,7 @@ SimpleElastix
   const PixelIDValueEnum FixedImagePixelID = this->GetFixedImage( 0 ).GetPixelID();
   const unsigned int FixedImageDimension = this->GetFixedImage( 0 ).GetDimension();
   const PixelIDValueEnum MovingImagePixelID = this->GetMovingImage( 0 ).GetPixelID();
+  const unsigned int MovingImageDimension = this->GetMovingImage( 0 ).GetDimension();
 
   if( this->m_DualMemberFactory->HasMemberFunction( FixedImagePixelID, MovingImagePixelID, FixedImageDimension ) )
   {
@@ -665,12 +666,13 @@ SimpleElastix
     }
   }
 
-  sitkExceptionMacro( << "SimpleElastix does not support the combination of fixed image type \""
+  sitkExceptionMacro( << "SimpleElastix does not support the combination of \""
+                      << FixedImageDimension << "-dimensional "
                       << GetPixelIDValueAsString( FixedImagePixelID ) << "\" ("
-                      << GetPixelIDValueAsElastixParameter( FixedImagePixelID ) << "), moving image type \""
+                      << GetPixelIDValueAsElastixParameter( FixedImagePixelID ) << ") fixed image and\""
+                      << MovingImageDimension << "-dimensional " 
                       << GetPixelIDValueAsString( FixedImagePixelID ) << "\" ("
-                      << GetPixelIDValueAsElastixParameter( FixedImagePixelID ) << ") "
-                      << "and dimension " << FixedImageDimension << "." );
+                      << GetPixelIDValueAsElastixParameter( FixedImagePixelID ) << ") moving image." )
 }
 
 Image
