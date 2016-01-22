@@ -17,7 +17,7 @@ SimpleTransformix::ExecuteInternal( void )
   {
     TransforimxFilterPointer transformixFilter = TransformixFilterType::New();
 
-    if ( !this->IsEmpty( this->m_InputImage ) ) {
+    if( !this->IsEmpty( this->m_InputImage ) ) {
       transformixFilter->SetInputImage( static_cast< TInputImage * >( this->GetInputImage().GetITKBase() ) );
     }
 
@@ -37,7 +37,7 @@ SimpleTransformix::ExecuteInternal( void )
 
     transformixFilter->Update();
 
-    if ( !this->IsEmpty( this->m_InputImage) )
+    if( !this->IsEmpty( this->m_InputImage) )
     {
       this->m_ResultImage = Image( transformixFilter->GetOutput() );
     }
