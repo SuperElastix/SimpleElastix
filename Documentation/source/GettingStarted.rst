@@ -172,9 +172,13 @@ While Visual Studio targets 64-bit platforms when we select a 64-bit compiler, t
             <PreferredToolArchitecture>x64</PreferredToolArchitecture>
         </PropertyGroup>
 
-Ruby build fails on Mac OS X
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The Ruby virtual machine cannot accomodate spaces in paths. If you see a path that contains spaces like :code:`/Applications/Apple Dev Tools/Xcode.app/Contents/Developer`, re-install Xcode Command Line Tools to a place with no spaces in the path.
+The SuperBuild throws :code:`Server SSL certificate verification failed: certificate has expired` during checkout of elastix
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~
+This is quite a common problem with git-svn on some platforms. We need to add the elastix certificate to our list of trusted certificates.
+
+    - Solution 1: We run :code:`svn info https://svn.bigr.nl/elastix/trunkpublic/` in out terminal. It will then prompt us to "(R)eject, accept (t)emporarily or accept (p)ermanently?" the certificate. Hit 'p' and then enter. It may then ask us for our SVN username, which is :code:`elastixguest`, and password, which is also :code:`elastixguest`. Then we restart the build.
+    - Solution 2: If the above does not work there is the option noted to change the permissions on SVN certificates recursively in ~/.subversion/auth. This is done by doing "chmod -R 777 ~/.subversion/auth". If this doesn't work then our last port of call will be to delete ~/.subversion/auth/svn.ssl.server and then carry out the steps in Solution 1 to accept the re-issued certificate permanently. The commands notd here are linux-specific although you may try this on Windows as well
 
 PCRE (Perl Compatible Regular Expression) build fails on Mac OS X
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -196,8 +200,12 @@ This happens during the SWIG build. We can work around this issue by installing 
 
 This just sets the compiler to the one in "/usr/bin".
 
-I get compilation errors :code:`elastixlib.h' and 'transformixlib.h' file not found`  
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Ruby build fails on Mac OS X
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The Ruby virtual machine cannot accomodate spaces in paths. If you see a path that contains spaces like :code:`/Applications/Apple Dev Tools/Xcode.app/Contents/Developer`, re-install Xcode Command Line Tools to a place with no spaces in the path.
+
+I get compilation errors like :code:`elastixlib.h' and 'transformixlib.h' file not found`  
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This error may stem from a space in the path of the build directory. For example, if we are building SimplElastix in :code:`/Users/kasper/folder name/build` we should rename it to :code:`/Users/kasper/folder_name/build` or similar.
 
