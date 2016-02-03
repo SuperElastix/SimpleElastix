@@ -37,6 +37,7 @@ SimpleElastix::DualExecuteInternal( void )
       elastixFilter->AddMovingMask( static_cast< TMovingImage* >( this->GetMovingMask( i ).GetITKBase() ) );
     }
 
+    elastixFilter->SetInitialTransformParameterFileName( this->GetInitialTransformParameterFileName() );
     elastixFilter->SetFixedPointSetFileName( this->GetFixedPointSetFileName() );
     elastixFilter->SetMovingPointSetFileName( this->GetMovingPointSetFileName() );
 

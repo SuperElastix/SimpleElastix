@@ -561,11 +561,32 @@ SimpleElastix
   return this->m_ParameterMapVector;
 }
 
-SimpleElastix::ParameterMapVectorType 
+unsigned int 
 SimpleElastix
-::GetTransformParameterMap( void )
+::GetNumberOfParameterMaps( void )
 {
-  return this->m_TransformParameterMapVector;
+  return this->m_ParameterMapVector.size();
+}
+
+SimpleElastix::Self&
+SimpleElastix
+::SetInitialTransformParameterFileName( const std::string initialTransformParameterFileName )
+{
+  this->m_InitialTransformParameterMapFileName = initialTransformParameterFileName;
+}
+
+std::string
+SimpleElastix
+::GetInitialTransformParameterFileName( void )
+{
+  return m_InitialTransformParameterMapFileName ;
+}
+
+SimpleElastix::Self&
+SimpleElastix
+::RemoveInitialTransformParameterFileName( void )
+{
+  this->m_InitialTransformParameterMapFileName = "";
 }
 
 SimpleElastix::ParameterMapType
@@ -685,6 +706,13 @@ SimpleElastix
   }
 
   return this->m_ResultImage;
+}
+
+SimpleElastix::ParameterMapVectorType 
+SimpleElastix
+::GetTransformParameterMap( void )
+{
+  return this->m_TransformParameterMapVector;
 }
 
 bool

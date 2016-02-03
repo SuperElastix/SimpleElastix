@@ -2,7 +2,7 @@ set( proj elastix )
 
 file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/${proj}-build/CMakeCacheInit.txt" "${ep_common_cache}" )
 set( ELASTIX_REPOSITORY https://svn.bigr.nl/elastix/trunkpublic/ )
-set( ELASTIX_REVISION 5186 )
+set( ELASTIX_REVISION 5201 )
 
 ExternalProject_Add( ${proj} 
   SVN_REPOSITORY ${ELASTIX_REPOSITORY}

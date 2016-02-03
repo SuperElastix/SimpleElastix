@@ -23,18 +23,20 @@ class SITKCommon_EXPORT SimpleElastix
 
     typedef SimpleElastix Self;                                
 
-    typedef std::vector< Image >                           VectorOfImage;
+    typedef std::vector< Image >                                VectorOfImage;
 
-    typedef elastix::ParameterObject                       ParameterObjectType;
-    typedef ParameterObjectType::Pointer                   ParameterObjectPointer;
-    typedef ParameterObjectType::ParameterMapType          ParameterMapType;
-    typedef ParameterObjectType::ParameterMapVectorType    ParameterMapVectorType;
-    typedef ParameterMapType::iterator                     ParameterMapIterator;
-    typedef ParameterMapType::const_iterator               ParameterMapConstIterator;
-    typedef itk::ParameterFileParser                       ParameterFileParserType;
-    typedef ParameterFileParserType::Pointer               ParameterFileParserPointer;
-    typedef ParameterObjectType::ParameterKeyType          ParameterKeyType;
-    typedef ParameterObjectType::ParameterValueVectorType  ParameterValueVectorType;
+    typedef elastix::ParameterObject                            ParameterObjectType;
+    typedef ParameterObjectType::Pointer                        ParameterObjectPointer;
+    typedef ParameterObjectType::ParameterMapType               ParameterMapType;
+    typedef ParameterObjectType::ParameterMapVectorType         ParameterMapVectorType;
+    typedef ParameterMapType::iterator                          ParameterMapIterator;
+    typedef ParameterMapType::const_iterator                    ParameterMapConstIterator;
+    typedef itk::ParameterFileParser                            ParameterFileParserType;
+    typedef ParameterFileParserType::Pointer                    ParameterFileParserPointer;
+    typedef ParameterObjectType::ParameterKeyType               ParameterKeyType;
+    typedef ParameterObjectType::ParameterValueType             ParameterValueType;
+    typedef ParameterObjectType::ParameterValueVectorType       ParameterValueVectorType;
+    typedef ParameterObjectType::ParameterValueVectorIterator   ParameterValueVectorIterator;
 
     /** To be wrapped by SWIG */ 
 
@@ -100,9 +102,13 @@ class SITKCommon_EXPORT SimpleElastix
 
     Self& SetParameterMap( const ParameterMapVectorType parameterMapVector );
     Self& SetParameterMap( const ParameterMapType parameterMap );
-
     ParameterMapVectorType GetParameterMap( void );
     ParameterMapType GetDefaultParameterMap( const std::string transformName, const unsigned int numberOfResolutions = 4, const double finalGridSpacingInPhysicalUnits = 8.0 );
+    unsigned int GetNumberOfParameterMaps( void );
+
+    Self& SetInitialTransformParameterFileName( const std::string initialTransformParmaterFileName );
+    std::string GetInitialTransformParameterFileName( void );
+    Self& RemoveInitialTransformParameterFileName( void );
 
     ParameterMapType ReadParameterFile( const std::string filename );
     Self& WriteParameterFile( const ParameterMapType parameterMap, const std::string filename );
@@ -131,6 +137,7 @@ class SITKCommon_EXPORT SimpleElastix
     VectorOfImage           m_FixedMasks;
     VectorOfImage           m_MovingMasks;
 
+    std::string             m_InitialTransformParameterMapFileName;
     std::string             m_FixedPointSetFileName;
     std::string             m_MovingPointSetFileName;
 
