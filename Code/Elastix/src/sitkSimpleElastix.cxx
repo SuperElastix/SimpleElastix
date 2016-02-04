@@ -135,6 +135,13 @@ SimpleElastix
   return *this;
 }
 
+unsigned int
+SimpleElastix
+::GetNumberOfFixedImages( void )
+{
+  return this->m_FixedImages.size();
+}
+
 SimpleElastix::Self& 
 SimpleElastix
 ::SetMovingImage( const Image& movingImage )
@@ -215,6 +222,13 @@ SimpleElastix
 {
   this->m_MovingImages.clear();
   return *this;
+}
+
+unsigned int
+SimpleElastix
+::GetNumberOfMovingImages( void )
+{
+  return this->m_MovingImages.size();
 }
 
 SimpleElastix::Self& 
@@ -299,6 +313,12 @@ SimpleElastix
   return *this;
 }
 
+unsigned int
+SimpleElastix
+::GetNumberOfFixedMasks( void )
+{
+  return this->m_FixedMasks.size();
+}
 
 SimpleElastix::Self& 
 SimpleElastix
@@ -380,6 +400,13 @@ SimpleElastix
 {
   this->m_MovingMasks.clear();
   return *this;
+}
+
+unsigned int
+SimpleElastix
+::GetNumberOfMovingMasks( void )
+{
+  return this->m_MovingMasks.size();
 }
 
 SimpleElastix::Self& 

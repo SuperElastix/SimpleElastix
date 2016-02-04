@@ -49,6 +49,7 @@ class SITKCommon_EXPORT SimpleElastix
     VectorOfImage& GetFixedImage( void );
     Self& RemoveFixedImage( const unsigned long index );
     Self& RemoveFixedImage( void );
+    unsigned int GetNumberOfFixedImages();
 
     Self& SetMovingImage( const Image& movingImages );
     Self& SetMovingImage( const VectorOfImage& movingImage );
@@ -57,6 +58,7 @@ class SITKCommon_EXPORT SimpleElastix
     VectorOfImage& GetMovingImage( void );
     Self& RemoveMovingImage( const unsigned long index );
     Self& RemoveMovingImage( void );
+    unsigned int GetNumberOfMovingImages();
 
     Self& SetFixedMask( const Image& fixedMask );
     Self& SetFixedMask( const VectorOfImage& fixedMasks );
@@ -65,6 +67,7 @@ class SITKCommon_EXPORT SimpleElastix
     VectorOfImage& GetFixedMask( void );
     Self& RemoveFixedMask( const unsigned long index );
     Self& RemoveFixedMask( void );
+    unsigned int GetNumberOfFixedMasks();
 
     Self& SetMovingMask( const Image& movingMask );
     Self& SetMovingMask( const VectorOfImage& movingMasks );
@@ -73,6 +76,7 @@ class SITKCommon_EXPORT SimpleElastix
     VectorOfImage& GetMovingMask( void );
     Self& RemoveMovingMask( const unsigned long index );
     Self& RemoveMovingMask( void );
+    unsigned int GetNumberOfMovingMasks();
 
     Self& SetFixedPointSetFileName( const std::string movingPointSetFileName );
     std::string GetFixedPointSetFileName( void );
