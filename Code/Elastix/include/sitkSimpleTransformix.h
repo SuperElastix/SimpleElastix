@@ -78,20 +78,20 @@ class SITKCommon_EXPORT SimpleTransformix
     Self& LogToConsoleOn();
     Self& LogToConsoleOff();
 
-    Self& SetTransformParameterMap( const ParameterMapVectorType parameterMapVector );
-    Self& SetTransformParameterMap( const ParameterMapType parameterMap );
+    Self& SetTransformParameterMap( const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapVector );
+    Self& SetTransformParameterMap( const std::map< std::string, std::vector< std::string > > parameterMap );
 
-    ParameterMapType ReadParameterFile( const std::string filename );
-    Self& WriteParameterFile( const ParameterMapType parameterMap, const std::string parameterFileName );
+    std::map< std::string, std::vector< std::string > > ReadParameterFile( const std::string filename );
+    Self& WriteParameterFile( const std::map< std::string, std::vector< std::string > > parameterMap, const std::string parameterFileName );
 
     Self& PrettyPrint( void );
-    Self& PrettyPrint( const ParameterMapType parameterMap );
-    Self& PrettyPrint( const ParameterMapVectorType parameterMapVector );
+    Self& PrettyPrint( const std::map< std::string, std::vector< std::string > > parameterMap );
+    Self& PrettyPrint( const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapVector );
 
     Image Execute( void );
 
     Image GetResultImage( void );
-    ParameterMapVectorType GetTransformParameterMap( void );
+    std::vector< std::map< std::string, std::vector< std::string > > > GetTransformParameterMap( void );
 
   private:
 
@@ -123,8 +123,8 @@ class SITKCommon_EXPORT SimpleTransformix
 };
 
 // Procedural Interface 
-SITKCommon_EXPORT Image Transformix( const Image& inputImage, const SimpleTransformix::ParameterMapType parameterMap, const bool logToConsole = false, const std::string outputDirectory = "." );
-SITKCommon_EXPORT Image Transformix( const Image& inputImage, const SimpleTransformix::ParameterMapVectorType parameterMapVector, const bool logToConsole = false, const std::string outputDirectory = "." );
+SITKCommon_EXPORT Image Transformix( const Image& inputImage, const std::map< std::string, std::vector< std::string > > parameterMap, const bool logToConsole = false, const std::string outputDirectory = "." );
+SITKCommon_EXPORT Image Transformix( const Image& inputImage, const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapVector, const bool logToConsole = false, const std::string outputDirectory = "." );
 
 } // end namespace simple
 } // end namespace itk
