@@ -18,7 +18,7 @@ SimpleTransformix::ExecuteInternal( void )
     TransforimxFilterPointer transformixFilter = TransformixFilterType::New();
 
     if( !this->IsEmpty( this->m_InputImage ) ) {
-      transformixFilter->SetInputImage( static_cast< TInputImage * >( this->GetInputImage().GetITKBase() ) );
+      transformixFilter->SetInputImage( static_cast< TInputImage* >( this->GetInputImage().GetITKBase() ) );
     }
 
     transformixFilter->SetInputPointSetFileName( this->GetInputPointSetFileName() );
@@ -40,6 +40,11 @@ SimpleTransformix::ExecuteInternal( void )
     if( !this->IsEmpty( this->m_InputImage ) )
     {
       this->m_ResultImage = Image( transformixFilter->GetOutput() );
+
+      // Make a deep copy. This is important to prevent the internal data object trying to update its
+      // source (this transformixFilter) outside this function (where it has gone out of scope and been destroyed).
+      // TODO: We should be able to simply call DisconnectPipeline() on the ITK output image but this does not seem to work
+      this->m_ResultImage.MakeUnique();
     }
   }
   catch( itk::ExceptionObject &e )
@@ -47,14 +52,8 @@ SimpleTransformix::ExecuteInternal( void )
     sitkExceptionMacro( << e );
   }
 
-  // Make a deep copy. This is important to prevent the internal data object trying to update its
-  // source (this elastixFilter) outside this function (where it has gone out of scope and been destroyed).
-  // TODO: We should be able to simply call DisconnectPipeline() on the ITK output image but this does not seem to work
-  this->m_ResultImage.MakeUnique();
-
   return this->m_ResultImage;
 }
-
 
 } // end namespace simple
 } // end namespace itk
