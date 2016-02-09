@@ -27,13 +27,13 @@ SimpleTransformix
   this->ComputeDeterminantOfSpatialJacobianOff();
   this->ComputeDeformationFieldOff();
 
-  this->m_OutputDirectory             = ".";
-  this->m_LogFileName                 = std::string();
+  this->SetOutputDirectory( "" );
+  this->SetLogFileName( "" );
   
   this->LogToFileOff();
   this->LogToConsoleOff();
 
-  m_ResultImage = Image();
+  this->m_ResultImage = Image();
 }
 
 SimpleTransformix
@@ -122,7 +122,7 @@ SimpleTransformix::Self&
 SimpleTransformix
 ::SetComputeDeterminantOfSpatialJacobian( const bool computeDeterminantOfSpatialJacobian )
 {
-  this->m_ComputeSpatialJacobian = computeDeterminantOfSpatialJacobian;
+  this->m_ComputeDeterminantOfSpatialJacobian = computeDeterminantOfSpatialJacobian;
   return *this;
 }
 
