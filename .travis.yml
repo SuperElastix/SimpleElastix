@@ -27,4 +27,4 @@ before_script:
 
 script:
   - cmake ../SimpleElastix/SuperBuild
-  - make --jobs=2 | grep -v '^--' | grep -v '^Installing'
+  - make --jobs=2
