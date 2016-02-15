@@ -581,6 +581,14 @@ SimpleElastix
   return *this;
 }
 
+SimpleElastix::Self& 
+SimpleElastix
+::AddParameterMap( const ParameterMapType parameterMap )
+{
+  this->m_ParameterMapVector.push_back( parameterMap );
+  return *this;
+}
+
 SimpleElastix::ParameterMapVectorType 
 SimpleElastix
 ::GetParameterMap( void )

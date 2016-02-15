@@ -306,6 +306,14 @@ SimpleTransformix
   return *this;
 }
 
+SimpleTransformix::Self&
+SimpleTransformix
+::AddTransformParameterMap( const ParameterMapType parameterMap )
+{
+  this->m_TransformParameterMapVector.push_back( parameterMap );
+  return *this;
+}
+
 SimpleTransformix::ParameterMapVectorType
 SimpleTransformix
 ::GetTransformParameterMap( void )

@@ -80,6 +80,7 @@ class SITKCommon_EXPORT SimpleTransformix
 
     Self& SetTransformParameterMap( const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapVector );
     Self& SetTransformParameterMap( const std::map< std::string, std::vector< std::string > > parameterMap );
+    Self& AddTransformParameterMap( const std::map< std::string, std::vector< std::string > > parameterMap );
 
     std::map< std::string, std::vector< std::string > > ReadParameterFile( const std::string filename );
     Self& WriteParameterFile( const std::map< std::string, std::vector< std::string > > parameterMap, const std::string parameterFileName );
