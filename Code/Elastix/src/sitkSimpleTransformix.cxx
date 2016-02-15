@@ -328,6 +328,134 @@ SimpleTransformix
   return this->m_TransformParameterMapVector.size();
 }
 
+SimpleTransformix::Self&
+SimpleTransformix
+::SetTransformParameter( const ParameterKeyType key, const ParameterValueType value )
+{
+  for( unsigned int i = 0; i < this->m_TransformParameterMapVector.size(); i++ )
+  {
+    this->SetTransformParameter( i, key, value );
+  }
+
+  return *this;
+}
+
+SimpleTransformix::Self&
+SimpleTransformix
+::SetTransformParameter( const ParameterKeyType key, const ParameterValueVectorType value )
+{
+  for( unsigned int i = 0; i < this->m_TransformParameterMapVector.size(); i++ )
+  {
+    this->SetTransformParameter( i, key, value );
+  }
+
+  return *this;
+}
+
+SimpleTransformix::Self&
+SimpleTransformix
+::SetTransformParameter( const unsigned int index, const ParameterKeyType key, const ParameterValueType value )
+{
+  if( index >= this->m_TransformParameterMapVector.size() )
+  {
+    sitkExceptionMacro( "Parameter map index is out of range (index: " << index << "; number of transform parameters maps: " << this->m_TransformParameterMapVector.size() << "). Note that indexes are zero-based." );
+  }
+
+  this->m_TransformParameterMapVector[ index ][ key ] = ParameterValueVectorType( 1, value );
+}
+
+SimpleTransformix::Self&
+SimpleTransformix
+::SetTransformParameter( const unsigned int index, const ParameterKeyType key, const ParameterValueVectorType value )
+{
+  if( index >= this->m_TransformParameterMapVector.size() )
+  {
+    sitkExceptionMacro( "Parameter map index is out of range (index: " << index << ", number of transform parameters maps: " << this->m_TransformParameterMapVector.size() << "). Note that indexes are zero-based." );
+  }
+
+  this->m_TransformParameterMapVector[ index ][ key ] = value;
+}
+
+SimpleTransformix::Self&
+SimpleTransformix
+::AddTransformParameter( const ParameterKeyType key, const ParameterValueType value )
+{
+  for( unsigned int i = 0; i < this->m_TransformParameterMapVector.size(); i++ )
+  {
+    this->AddTransformParameter( i, key, value );
+  }
+
+  return *this;
+}
+
+SimpleTransformix::Self&
+SimpleTransformix
+::AddTransformParameter( const unsigned int index, const ParameterKeyType key, const ParameterValueType value )
+{
+  if( index >= this->m_TransformParameterMapVector.size() )
+  {
+    sitkExceptionMacro( "Parameter map index is out of range (index: " << index << ", number of transform parameters maps: " << this->m_TransformParameterMapVector.size() << "). Note that indexes are zero-based." );
+  }
+
+  if( this->m_TransformParameterMapVector[ index ].find( key ) == this->m_TransformParameterMapVector[ index ].end() )
+  {
+    this->SetTransformParameter( index, key, value );
+  }
+  else
+  {
+    this->m_TransformParameterMapVector[ index ][ key ].push_back( value );
+  }
+}
+
+SimpleTransformix::ParameterValueVectorType
+SimpleTransformix
+::GetTransformParameter( const ParameterKeyType key )
+{
+  if( this->m_TransformParameterMapVector.size() > 0 )
+  {
+    sitkExceptionMacro( "An index is needed when more than one transform parameter map is present. Please specify the parameter map number as the first argument." );
+  }
+
+  return this->GetTransformParameter( 0, key );
+}
+
+SimpleTransformix::ParameterValueVectorType
+SimpleTransformix
+::GetTransformParameter( const unsigned int index, const ParameterKeyType key )
+{
+  if( index >= this->m_TransformParameterMapVector.size() )
+  {
+    sitkExceptionMacro( "Parameter map index is out of range (index: " << index << ", number of transform parameters maps: " << this->m_TransformParameterMapVector.size() << "). Note that indexes are zero-based." );
+  }
+
+  return this->m_TransformParameterMapVector[ index ][ key ];
+}
+
+SimpleTransformix::Self&
+SimpleTransformix
+::RemoveTransformParameter( const ParameterKeyType key )
+{
+  for( unsigned int i = 0; i < this->m_TransformParameterMapVector.size(); i++ )
+  {
+    this->RemoveTransformParameter( i, key );
+  }
+
+  return *this;
+}
+
+SimpleTransformix::Self&
+SimpleTransformix
+::RemoveTransformParameter( const unsigned int index, const ParameterKeyType key )
+{
+  if( index >= this->m_TransformParameterMapVector.size() )
+  {
+    sitkExceptionMacro( "Parameter map index is out of range (index: " << index << ", number of transform parameters maps: " << this->m_TransformParameterMapVector.size() << "). Note that indexes are zero-based." );
+  }
+
+  this->m_TransformParameterMapVector[ index ].erase( key );
+
+  return *this;
+}
 
 SimpleTransformix::ParameterMapType 
 SimpleTransformix

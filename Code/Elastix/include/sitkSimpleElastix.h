@@ -115,6 +115,17 @@ class SITKCommon_EXPORT SimpleElastix
     std::string GetInitialTransformParameterFileName( void );
     Self& RemoveInitialTransformParameterFileName( void );
 
+    Self& SetParameter( const std::string key, const std::string value );
+    Self& SetParameter( const std::string key, const std::vector< std::string > value );
+    Self& SetParameter( const unsigned int index, const std::string key, const std::string value );
+    Self& SetParameter( const unsigned int index, const std::string key, const std::vector< std::string > value );
+    Self& AddParameter( const std::string key, const std::string value );
+    Self& AddParameter( const unsigned int index, const std::string key, const std::string value );
+    std::vector< std::string > GetParameter( const std::string key );
+    std::vector< std::string > GetParameter( const unsigned int index, const std::string key );
+    Self& RemoveParameter( const std::string key );
+    Self& RemoveParameter( const unsigned int index, const std::string key );
+
     std::map< std::string, std::vector< std::string > > ReadParameterFile( const std::string filename );
     Self& WriteParameterFile( const std::map< std::string, std::vector< std::string > > parameterMap, const std::string filename );
 

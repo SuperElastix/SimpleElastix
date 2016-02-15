@@ -81,7 +81,19 @@ class SITKCommon_EXPORT SimpleTransformix
     Self& SetTransformParameterMap( const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapVector );
     Self& SetTransformParameterMap( const std::map< std::string, std::vector< std::string > > parameterMap );
     Self& AddTransformParameterMap( const std::map< std::string, std::vector< std::string > > parameterMap );
+    std::vector< std::map< std::string, std::vector< std::string > > > GetTransformParameterMap( void );
     unsigned int GetNumberOfTransformParameterMaps( void );
+
+    Self& SetTransformParameter( const std::string key, const std::string value );
+    Self& SetTransformParameter( const std::string key, const std::vector< std::string > value );
+    Self& SetTransformParameter( const unsigned int index, const std::string key, const std::string value );
+    Self& SetTransformParameter( const unsigned int index, const std::string key, const std::vector< std::string > value );
+    Self& AddTransformParameter( const std::string key, const std::string value );
+    Self& AddTransformParameter( const unsigned int index, const std::string key, const std::string value );
+    std::vector< std::string > GetTransformParameter( const std::string key );
+    std::vector< std::string > GetTransformParameter( const unsigned int index, const std::string key );
+    Self& RemoveTransformParameter( const std::string key );
+    Self& RemoveTransformParameter( const unsigned int index, const std::string key );
 
     std::map< std::string, std::vector< std::string > > ReadParameterFile( const std::string filename );
     Self& WriteParameterFile( const std::map< std::string, std::vector< std::string > > parameterMap, const std::string parameterFileName );

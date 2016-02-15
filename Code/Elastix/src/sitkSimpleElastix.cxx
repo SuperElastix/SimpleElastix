@@ -624,6 +624,135 @@ SimpleElastix
   this->m_InitialTransformParameterMapFileName = "";
 }
 
+SimpleElastix::Self&
+SimpleElastix
+::SetParameter( const ParameterKeyType key, const ParameterValueType value )
+{
+  for( unsigned int i = 0; i < this->m_ParameterMapVector.size(); i++ )
+  {
+    this->SetParameter( i, key, value );
+  }
+
+  return *this;
+}
+
+SimpleElastix::Self&
+SimpleElastix
+::SetParameter( const ParameterKeyType key, const ParameterValueVectorType value )
+{
+  for( unsigned int i = 0; i < this->m_ParameterMapVector.size(); i++ )
+  {
+    this->SetParameter( i, key, value );
+  }
+
+  return *this;
+}
+
+SimpleElastix::Self&
+SimpleElastix
+::SetParameter( const unsigned int index, const ParameterKeyType key, const ParameterValueType value )
+{
+  if( index >= this->m_ParameterMapVector.size() )
+  {
+    sitkExceptionMacro( "Parameter map index is out of range (index: " << index << "; number of parameters maps: " << this->m_ParameterMapVector.size() << "). Note that indexes are zero-based." );
+  }
+
+  this->m_ParameterMapVector[ index ][ key ] = ParameterValueVectorType( 1, value );
+}
+
+SimpleElastix::Self&
+SimpleElastix
+::SetParameter( const unsigned int index, const ParameterKeyType key, const ParameterValueVectorType value )
+{
+  if( index >= this->m_ParameterMapVector.size() )
+  {
+    sitkExceptionMacro( "Parameter map index is out of range (index: " << index << ", number of parameters maps: " << this->m_ParameterMapVector.size() << "). Note that indexes are zero-based." );
+  }
+
+  this->m_ParameterMapVector[ index ][ key ] = value;
+}
+
+SimpleElastix::Self&
+SimpleElastix
+::AddParameter( const ParameterKeyType key, const ParameterValueType value )
+{
+  for( unsigned int i = 0; i < this->m_ParameterMapVector.size(); i++ )
+  {
+    this->AddParameter( i, key, value );
+  }
+
+  return *this;
+}
+
+SimpleElastix::Self&
+SimpleElastix
+::AddParameter( const unsigned int index, const ParameterKeyType key, const ParameterValueType value )
+{
+  if( index >= this->m_ParameterMapVector.size() )
+  {
+    sitkExceptionMacro( "Parameter map index is out of range (index: " << index << ", number of parameters maps: " << this->m_ParameterMapVector.size() << "). Note that indexes are zero-based." );
+  }
+
+  if( this->m_ParameterMapVector[ index ].find( key ) == this->m_ParameterMapVector[ index ].end() )
+  {
+    this->SetParameter( index, key, value );
+  }
+  else
+  {
+    this->m_ParameterMapVector[ index ][ key ].push_back( value );
+  }
+}
+
+SimpleElastix::ParameterValueVectorType
+SimpleElastix
+::GetParameter( const ParameterKeyType key )
+{
+  if( this->m_ParameterMapVector.size() > 0 )
+  {
+    sitkExceptionMacro( "An index is needed when more than one parameter map is present. Please specify the parameter map number as the first argument." );
+  }
+
+  return this->GetParameter( 0, key );
+}
+
+SimpleElastix::ParameterValueVectorType
+SimpleElastix
+::GetParameter( const unsigned int index, const ParameterKeyType key )
+{
+  if( index >= this->m_ParameterMapVector.size() )
+  {
+    sitkExceptionMacro( "Parameter map index is out of range (index: " << index << ", number of parameters maps: " << this->m_ParameterMapVector.size() << "). Note that indexes are zero-based." );
+  }
+
+  return this->m_ParameterMapVector[ index ][ key ];
+}
+
+SimpleElastix::Self&
+SimpleElastix
+::RemoveParameter( const ParameterKeyType key )
+{
+  for( unsigned int i = 0; i < this->m_ParameterMapVector.size(); i++ )
+  {
+    this->RemoveParameter( i, key );
+  }
+
+  return *this;
+}
+
+SimpleElastix::Self&
+SimpleElastix
+::RemoveParameter( const unsigned int index, const ParameterKeyType key )
+{
+  if( index >= this->m_ParameterMapVector.size() )
+  {
+    sitkExceptionMacro( "Parameter map index is out of range (index: " << index << ", number of parameters maps: " << this->m_ParameterMapVector.size() << "). Note that indexes are zero-based." );
+  }
+
+  this->m_ParameterMapVector[ index ].erase( key );
+
+  return *this;
+}
+
 SimpleElastix::ParameterMapType
 SimpleElastix
 ::ReadParameterFile( const std::string fileName )
