@@ -17,22 +17,22 @@ SimpleElastix::DualExecuteInternal( void )
   {
     ElastixFilterPointer elastixFilter = ElastixFilterType::New();
 
-    for( unsigned int i = 0; i < this->m_FixedImages.size(); ++i )
+    for( unsigned int i = 0; i < this->GetNumberOfFixedImages(); ++i )
     {
       elastixFilter->AddFixedImage( static_cast< TFixedImage* >( this->GetFixedImage( i ).GetITKBase() ) );
     }
 
-    for( unsigned int i = 0; i < this->m_MovingImages.size(); ++i )
+    for( unsigned int i = 0; i < this->GetNumberOfMovingImages(); ++i )
     {
       elastixFilter->AddMovingImage( static_cast< TMovingImage* >( this->GetMovingImage( i ).GetITKBase() ) );
     }
 
-    for( unsigned int i = 0; i < this->m_FixedMasks.size(); ++i )
+    for( unsigned int i = 0; i < this->GetNumberOfFixedMasks(); ++i )
     {
       elastixFilter->AddFixedMask( static_cast< TFixedImage* >( this->GetFixedMask( i ).GetITKBase() ) );
     }
 
-    for( unsigned int i = 0; i < this->m_MovingMasks.size(); ++i )
+    for( unsigned int i = 0; i < this->GetNumberOfMovingMasks(); ++i )
     {
       elastixFilter->AddMovingMask( static_cast< TMovingImage* >( this->GetMovingMask( i ).GetITKBase() ) );
     }
@@ -46,7 +46,7 @@ SimpleElastix::DualExecuteInternal( void )
     elastixFilter->SetLogToFile( this->GetLogToFile() );
     elastixFilter->SetLogToConsole( this->GetLogToConsole() );
 
-    if( this->m_ParameterMapVector.size() > 0 )
+    if( this->GetNumberOfParameterMaps() > 0 )
     {
       ParameterObjectPointer parameterObject = ParameterObjectType::New();
       parameterObject->SetParameterMap( this->m_ParameterMapVector );

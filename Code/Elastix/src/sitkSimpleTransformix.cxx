@@ -321,6 +321,13 @@ SimpleTransformix
   return this->m_TransformParameterMapVector;
 }
 
+unsigned int
+SimpleTransformix
+::GetNumberOfTransformParameterMaps( void )
+{
+  return this->m_TransformParameterMapVector.size();
+}
+
 
 SimpleTransformix::ParameterMapType 
 SimpleTransformix
