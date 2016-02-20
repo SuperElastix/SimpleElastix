@@ -175,10 +175,9 @@ While Visual Studio targets 64-bit platforms when we select a 64-bit compiler, t
 The SuperBuild throws :code:`Server SSL certificate verification failed: certificate has expired` during checkout of elastix
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~
-This is quite a common problem with git-svn on some platforms. We need to add the elastix certificate to our list of trusted certificates.
+This is because the SSL certificate for the elastix SVN repository needs to be updated. Until this is fixed, we need to manually add the elastix certificate to our list of trusted certificates.
 
-    - Solution 1: We run :code:`svn info https://svn.bigr.nl/elastix/trunkpublic/` in out terminal. It will then prompt us to "(R)eject, accept (t)emporarily or accept (p)ermanently?" the certificate. Hit 'p' and then enter. It may then ask us for our SVN username, which is :code:`elastixguest`, and password, which is also :code:`elastixguest`. Then we restart the build.
-    - Solution 2: If the above does not work there is the option noted to change the permissions on SVN certificates recursively in ~/.subversion/auth. This is done by doing "chmod -R 777 ~/.subversion/auth". If this doesn't work then our last port of call will be to delete ~/.subversion/auth/svn.ssl.server and then carry out the steps in Solution 1 to accept the re-issued certificate permanently. The commands notd here are linux-specific although you may try this on Windows as well
+    - Solution 1: We run :code:`svn info https://svn.bigr.nl/elastix/trunkpublic/` in out terminal. It will then prompt us to "(R)eject, accept (t)emporarily or accept (p)ermanently?" the certificate. Hit 'p' and then enter. It may then ask us for our SVN username, which is :code:`elastixguest`, and password, which is also :code:`elastixguest`. Then we restart the build. You may have to change permissions recusively in ~/.subversion/auth. This is done by doing "chmod -R 777 ~/.subversion/auth". If all else fails, our last port of call will be to delete ~/.subversion/auth/svn.ssl.server and then carry out the steps in Solution 1. The commands noted here are linux-specific.
 
 PCRE (Perl Compatible Regular Expression) build fails on Mac OS X
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
