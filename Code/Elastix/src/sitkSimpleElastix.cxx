@@ -837,6 +837,24 @@ Image
 SimpleElastix
 ::Execute( void )
 {
+  for( unsigned int i = 0; i < this->GetNumberOfFixedMasks(); ++i )
+  {
+    const PixelIDValueEnum FixedMaskPixelID = this->GetFixedMask( i ).GetPixelID();
+    if( FixedMaskPixelID != sitkUInt8 )
+    {
+      sitkExceptionMacro( "Fixed mask must be of pixel type unsigned char (fixed mask at index" << i << ": " << GetPixelIDValueAsElastixParameter( FixedMaskPixelID ) << ")." );
+    }
+  }
+
+  for( unsigned int i = 0; i < this->GetNumberOfFixedMasks(); ++i )
+  {
+    const PixelIDValueEnum MovingMaskPixelID = this->GetMovingMask( i ).GetPixelID();
+    if( MovingMaskPixelID != sitkUInt8 )
+    {
+      sitkExceptionMacro( "Moving mask must be of pixel type unsigned char (moving mask at index" << i << ": " << GetPixelIDValueAsElastixParameter( MovingMaskPixelID ) << ")." );
+    }
+  }
+
   const PixelIDValueEnum FixedImagePixelID = this->GetFixedImage( 0 ).GetPixelID();
   const unsigned int FixedImageDimension = this->GetFixedImage( 0 ).GetDimension();
   const PixelIDValueEnum MovingImagePixelID = this->GetMovingImage( 0 ).GetPixelID();
