@@ -191,13 +191,11 @@ On recent versions of Mac OS X you may experience the following error when using
     make[1]: *** [CMakeFiles/PCRE.dir/all] Error 2
     make: *** [all] Error 2
 
-This happens during the SWIG build. We can work around this issue by installing our own version of SWIG and set USE_SYSTEM_SWIG to ON or by adding the following flags to the CMake configure command and run it in a *clean* directory:
+This happens during the SWIG build. We can work around this issue by forcing CMake to use clang. Add the following flags to the CMake configure command and run it in a *clean* directory:
 
 ::
 
     cmake -DCMAKE_CXX_COMPILER:STRING=/usr/bin/clang++ -DCMAKE_C_COMPILER:STRING=/usr/bin/clang path/to/SimpleElastix/SuperBuild
-
-This just sets the compiler to the one in "/usr/bin".
 
 Ruby build fails on Mac OS X
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -210,7 +208,7 @@ This error may stem from a space in the path of the build directory. For example
 
 SimpleElastix takes a long time to build!
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The full build take 2+ hours to build on a standard machine. We can speed up compilation by deselecting Examples, Testing and any wrapped languages we don't need.
+The full build take 2+ hours to build on a standard machine. We can speed up compilation by deselecting Examples, Testing and any wrapped languages we don't need. Other than that there is not much we can do. SimpleITK has to compile all filters (including elastix) for all pixel types in order to support runtime selection of the correct template parameters. So yeah, it takes a long time.
 
 I am unable to assign a parameter to a parameter map in a parameter map list
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
