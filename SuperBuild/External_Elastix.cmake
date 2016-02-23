@@ -7,6 +7,9 @@ set( ELASTIX_REVISION 5219 )
 ExternalProject_Add( ${proj} 
   SVN_REPOSITORY ${ELASTIX_REPOSITORY}
   SVN_REVISION -r ${ELASTIX_REVISION}
+  SVN_USERNAME "elastixguest"
+  SVN_PASSWORD "elastixguest"
+  SVN_TRUST_CERT 1
   UPDATE_COMMAND ""
   SOURCE_DIR ${proj}
   BINARY_DIR ${proj}-build
