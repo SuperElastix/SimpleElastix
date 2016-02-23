@@ -31,6 +31,7 @@ class SITKCommon_EXPORT SimpleTransformix
     typedef itk::ParameterFileParser                       ParameterFileParserType;
     typedef ParameterFileParserType::Pointer               ParameterFileParserPointer;
     typedef ParameterObjectType::ParameterKeyType          ParameterKeyType;
+    typedef ParameterObjectType::ParameterValueType        ParameterValueType;
     typedef ParameterObjectType::ParameterValueVectorType  ParameterValueVectorType;
 
     /** To be wrapped by SWIG */ 
@@ -105,7 +106,7 @@ class SITKCommon_EXPORT SimpleTransformix
     Image Execute( void );
 
     Image GetResultImage( void );
-    std::vector< std::map< std::string, std::vector< std::string > > > GetTransformParameterMap( void );
+    
 
   private:
 
