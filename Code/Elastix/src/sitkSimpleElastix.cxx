@@ -842,7 +842,7 @@ SimpleElastix
     const PixelIDValueEnum FixedMaskPixelID = this->GetFixedMask( i ).GetPixelID();
     if( FixedMaskPixelID != sitkUInt8 )
     {
-      sitkExceptionMacro( "Fixed mask must be of pixel type unsigned char (fixed mask at index" << i << ": " << GetPixelIDValueAsElastixParameter( FixedMaskPixelID ) << ")." );
+      sitkExceptionMacro( "Fixed mask must be of pixel type unsigned char (fixed mask at index " << i << ": " << GetPixelIDValueAsElastixParameter( FixedMaskPixelID ) << ")." );
     }
   }
 
@@ -851,7 +851,7 @@ SimpleElastix
     const PixelIDValueEnum MovingMaskPixelID = this->GetMovingMask( i ).GetPixelID();
     if( MovingMaskPixelID != sitkUInt8 )
     {
-      sitkExceptionMacro( "Moving mask must be of pixel type unsigned char (moving mask at index" << i << ": " << GetPixelIDValueAsElastixParameter( MovingMaskPixelID ) << ")." );
+      sitkExceptionMacro( "Moving mask must be of pixel type unsigned char (moving mask at index " << i << ": " << GetPixelIDValueAsElastixParameter( MovingMaskPixelID ) << ")." );
     }
   }
 
@@ -859,7 +859,6 @@ SimpleElastix
   const unsigned int FixedImageDimension = this->GetFixedImage( 0 ).GetDimension();
   const PixelIDValueEnum MovingImagePixelID = this->GetMovingImage( 0 ).GetPixelID();
   const unsigned int MovingImageDimension = this->GetMovingImage( 0 ).GetDimension();
-
   if( this->m_DualMemberFactory->HasMemberFunction( FixedImagePixelID, MovingImagePixelID, FixedImageDimension ) )
   {
     try {
@@ -871,11 +870,9 @@ SimpleElastix
 
   sitkExceptionMacro( << "SimpleElastix does not support the combination of \""
                       << FixedImageDimension << "-dimensional "
-                      << GetPixelIDValueAsString( FixedImagePixelID ) << "\" ("
-                      << GetPixelIDValueAsElastixParameter( FixedImagePixelID ) << ") fixed image and\""
+                      << GetPixelIDValueAsElastixParameter( FixedImagePixelID ) << " fixed image and\""
                       << MovingImageDimension << "-dimensional " 
-                      << GetPixelIDValueAsString( FixedImagePixelID ) << "\" ("
-                      << GetPixelIDValueAsElastixParameter( FixedImagePixelID ) << ") moving image." )
+                      << GetPixelIDValueAsElastixParameter( FixedImagePixelID ) << " moving image." )
 }
 
 Image
@@ -884,7 +881,7 @@ SimpleElastix
 {
   if( this->IsEmpty( this->m_ResultImage ) )
   {
-    sitkExceptionMacro( "No result image was found. Has elastix run yet?" )
+    sitkExceptionMacro( "No result image was found." )
   }
 
   return this->m_ResultImage;
