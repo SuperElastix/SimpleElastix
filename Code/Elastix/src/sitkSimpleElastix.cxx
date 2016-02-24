@@ -104,7 +104,7 @@ SimpleElastix
     return this->m_FixedImages[ index ];
   }
 
-  sitkExceptionMacro( "Index out of range (number of fixed images: " << this->m_FixedImages.size() << ")" );
+  sitkExceptionMacro( "Index out of range (index: " << index << ", number of fixed images: " << this->m_FixedImages.size() << ")" );
 }
 
 SimpleElastix::VectorOfImage&
@@ -124,7 +124,7 @@ SimpleElastix
     return *this;
   }
 
-  sitkExceptionMacro( "Index out of range (number of fixed images: " << this->m_FixedImages.size() << ")" );
+  sitkExceptionMacro( "Index out of range (index: " << index << ", number of fixed images: " << this->m_FixedImages.size() << ")" );
 }
 
 SimpleElastix::Self& 
@@ -193,7 +193,7 @@ SimpleElastix
     return this->m_MovingImages[ index ];
   }
   
-  sitkExceptionMacro( "Index out of range (number of moving images: " << this->m_MovingImages.size() << ")" );
+  sitkExceptionMacro( "Index out of range (index: " << index << ", number of moving images: " << this->m_MovingImages.size() << ")" );
 }
 
 SimpleElastix::VectorOfImage&
@@ -213,7 +213,7 @@ SimpleElastix
     return *this;
   }
 
-  sitkExceptionMacro( "Index out of range (number of moving images: " << this->m_MovingImages.size() << ")" );
+  sitkExceptionMacro( "Index out of range (index: " << index << ", number of moving images: " << this->m_MovingImages.size() << ")" );
 }
 
 SimpleElastix::Self& 
@@ -282,7 +282,7 @@ SimpleElastix
     return this->m_FixedMasks[ index ];
   }
 
-  sitkExceptionMacro( "Index out of range (number of fixed masks: " << this->m_FixedMasks.size() << ")" );
+  sitkExceptionMacro( "Index out of range (index: " << index << ", number of fixed masks: " << this->m_FixedMasks.size() << ")" );
 }
 
 SimpleElastix::VectorOfImage&
@@ -302,7 +302,7 @@ SimpleElastix
     return *this;
   }
 
-  sitkExceptionMacro( "Index out of range (number of fixed masks: " << this->m_FixedMasks.size() << ")" );
+  sitkExceptionMacro( "Index out of range (index: " << index << ", number of fixed masks: " << this->m_FixedMasks.size() << ")" );
 }
 
 SimpleElastix::Self& 
@@ -371,7 +371,7 @@ SimpleElastix
     return this->m_MovingMasks[ index ];
   }
 
-  sitkExceptionMacro( "Index out of range (number of moving masks: " << this->m_MovingMasks.size() << ")" );
+  sitkExceptionMacro( "Index out of range (index: " << index << ", number of moving masks: " << this->m_MovingMasks.size() << ")" );
 }
 
 SimpleElastix::VectorOfImage&
@@ -391,7 +391,7 @@ SimpleElastix
     return *this;
   }
 
-  sitkExceptionMacro( "Index out of range (number of moving masks: " << this->m_MovingMasks.size() << ")" );
+  sitkExceptionMacro( "Index out of range (index: " << index << ", number of moving masks: " << this->m_MovingMasks.size() << ")" );
 }
 
 SimpleElastix::Self& 
