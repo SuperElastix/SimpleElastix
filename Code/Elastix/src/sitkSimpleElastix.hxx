@@ -29,12 +29,12 @@ SimpleElastix::DualExecuteInternal( void )
 
     for( unsigned int i = 0; i < this->GetNumberOfFixedMasks(); ++i )
     {
-      elastixFilter->AddFixedMask( static_cast< TFixedImage* >( this->GetFixedMask( i ).GetITKBase() ) );
+      elastixFilter->AddFixedMask( static_cast< typename ElastixFilterType::FixedMaskType* >( this->GetFixedMask( i ).GetITKBase() ) );
     }
 
     for( unsigned int i = 0; i < this->GetNumberOfMovingMasks(); ++i )
     {
-      elastixFilter->AddMovingMask( static_cast< TMovingImage* >( this->GetMovingMask( i ).GetITKBase() ) );
+      elastixFilter->AddMovingMask( static_cast< typename ElastixFilterType::MovingMaskType* >( this->GetMovingMask( i ).GetITKBase() ) );
     }
 
     elastixFilter->SetInitialTransformParameterFileName( this->GetInitialTransformParameterFileName() );
@@ -73,4 +73,4 @@ SimpleElastix::DualExecuteInternal( void )
 } // end namespace simple
 } // end namespace itk
 
-#endif //
+#endif // __sitksimpleelastix_hxx_
