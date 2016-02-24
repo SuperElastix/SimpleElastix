@@ -32,6 +32,8 @@
 #include "sitkRealAndImaginaryToComplexImageFilter.h"
 #include "sitkImportImageFilter.h"
 
+#include "sitkJoinSeriesImageFilter.h"
+
 #include <itkIntTypes.h>
 
 #include "itkImage.h"
@@ -227,7 +229,7 @@ TEST_F(Image4D,Constructors) {
   EXPECT_EQ( image.GetDirection(), directionI4D );
 
   // Test the constructors for vector images
- std::vector<unsigned int>  s4d(4, 5);
+  std::vector<unsigned int>  s4d(4, 5);
 
   image = itk::simple::Image( s4d, itk::simple::sitkVectorUInt8 );
   EXPECT_EQ ( image.GetDimension(), 4u );
@@ -535,4 +537,20 @@ TEST( IO, Image4D )
 
   EXPECT_EQ ( sitk::Hash( vectorImage ), sitk::Hash( vectorImageRead ) );
 
+}
+
+
+TEST_F(Image4D, JoinSeriesImageFilter)
+{
+  std::vector<unsigned int> size(3);
+  size[0] = 10;
+  size[1] = 11;
+  size[2] = 12;
+
+  sitk::Image img = sitk::Image( size, sitk::sitkUInt8 );
+
+  sitk::Image out = sitk::JoinSeries(img, img, img);
+
+  ASSERT_EQ ( out.GetDimension(), 4 );
+  EXPECT_EQ ( out.GetSize()[3], 3 );
 }
