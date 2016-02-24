@@ -846,7 +846,7 @@ SimpleElastix
     }
   }
 
-  for( unsigned int i = 0; i < this->GetNumberOfFixedMasks(); ++i )
+  for( unsigned int i = 0; i < this->GetNumberOfMovingMasks(); ++i )
   {
     const PixelIDValueEnum MovingMaskPixelID = this->GetMovingMask( i ).GetPixelID();
     if( MovingMaskPixelID != sitkUInt8 )
