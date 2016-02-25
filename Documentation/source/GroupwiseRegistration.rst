@@ -40,6 +40,8 @@ Elastix takes a single N+1 dimensional image for groupwise registration. Therefo
     elastix.SetParameterMap(selx.GetDefaultParameterMap('groupwise'))
     elastix.Execute()
 
+A few things to note. While using :code:`JoinSeries`there may be an error notifying you that the "Inputs do not occupy the same physical space!". These can be caused by slight differences between the image origins, spacing, or axes. The tolerance that SimpleITK uses for these can be adjusted using :code: `sitk.ProcessObject.SetGlobalDefaultDirectionTolerance(x)` and :code: `sitk.ProcessObject.SetGlobalDefaultCoordinateTolerance(x)`. Furthermore, you may need to change the origin to make sure they all align. This can be done by copying the origin of one of the images :code:`origin = firstImage.GetOrigin()` and setting it to the others :code:`otherImages.SetOrigin(origin)`
+
 While the groupwise transform works only on the moving image we need to pass a dummy fixed image is to prevent elastix from throwing errors. This does not consume extra memory as only pointers are passed internally. 
 
 The result image is shown in Figure 13. It is clear that anatomical correpondence is obtained in many regions of the brain. However, there are a some anatomical regions that have not been registered correctly, particularly near Corpus Collosum. Generally these kinds of difficult registration problems require a lot of parameter tuning. No way around that. In a later chapter we introduce methods for assessment of registration quality.
