@@ -97,7 +97,7 @@ DualMemberFunctionFactory< TMemberFunctionPointer >
   assert( pixelID1 >= 0 && pixelID1 < typelist::Length< InstantiatedPixelIDTypeList >::Result );
   assert( pixelID2 >= 0 && pixelID2 < typelist::Length< InstantiatedPixelIDTypeList >::Result );
 
-  sitkStaticAssert( TImageType1::ImageDimension == 2 || TImageType1::ImageDimension == 3,
+  sitkStaticAssert( TImageType1::ImageDimension == 2 || TImageType1::ImageDimension == 3 || TImageType1::ImageDimension == 4,
                     "Image Dimension out of range" );
   sitkStaticAssert( int(TImageType1::ImageDimension) == int(TImageType2::ImageDimension),
                     "Image Dimensions do not match" );
@@ -113,6 +113,9 @@ DualMemberFunctionFactory< TMemberFunctionPointer >
 
     switch( int(TImageType1::ImageDimension) )
       {
+      case 4:
+        Superclass::m_PFunction4[ key ] = Superclass::BindObject( pfunc, m_ObjectPointer );
+        break;
       case 3:
         Superclass::m_PFunction3[ key ] = Superclass::BindObject( pfunc, m_ObjectPointer );
         break;
@@ -151,6 +154,9 @@ DualMemberFunctionFactory< TMemberFunctionPointer >
 
     switch ( imageDimension )
       {
+      case 4:
+        // check if tr1::function has been set in map
+        return Superclass::m_PFunction4.find( key ) != Superclass::m_PFunction4.end();
       case 3:
         // check if tr1::function has been set in map
         return Superclass::m_PFunction3.find( key ) != Superclass::m_PFunction3.end();
@@ -187,6 +193,20 @@ DualMemberFunctionFactory< TMemberFunctionPointer >
 
   switch ( imageDimension )
     {
+    case 4:
+      // check if tr1::function has been set
+      if ( Superclass::m_PFunction4.find( key ) != Superclass::m_PFunction4.end() )
+        {
+        return Superclass::m_PFunction4[ key ];
+        }
+
+      // todo updated exceptions here
+      sitkExceptionMacro ( << "Pixel type: "
+                           << GetPixelIDValueAsString(pixelID1)
+                           << " is not supported in 4D by"
+                           << typeid(ObjectType).name() );
+
+      break;
     case 3:
       // check if tr1::function has been set
       if ( Superclass::m_PFunction3.find( key ) != Superclass::m_PFunction3.end() )
