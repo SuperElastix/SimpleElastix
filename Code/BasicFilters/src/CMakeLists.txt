@@ -39,6 +39,9 @@ set ( SimpleITKBasicFilters1Source
   sitkCastImageFilter-3.cxx
   sitkCastImageFilter-3l.cxx
   sitkCastImageFilter-3v.cxx
+  sitkCastImageFilter-4.cxx
+  sitkCastImageFilter-4l.cxx
+  sitkCastImageFilter-4v.cxx
   sitkCastImageFilter.cxx
   sitkHashImageFilter.cxx
   sitkBSplineTransformInitializerFilter.cxx

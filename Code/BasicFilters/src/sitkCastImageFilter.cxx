@@ -41,7 +41,9 @@ CastImageFilter::CastImageFilter ()
   this->RegisterMemberFactory3();
   this->RegisterMemberFactory3v();
   this->RegisterMemberFactory3l();
-
+  this->RegisterMemberFactory4();
+  this->RegisterMemberFactory4v();
+  this->RegisterMemberFactory4l();
 
 }
 

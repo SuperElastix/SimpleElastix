@@ -27,6 +27,7 @@ namespace simple
 
 void CastImageFilter::RegisterMemberFactory3()
 {
+  
   // cast between complex pixels and complex pixel
   m_DualMemberFactory->RegisterMemberFunctions<ComplexPixelIDTypeList, ComplexPixelIDTypeList, 3, CastAddressor<MemberFunctionType> > ();
 
