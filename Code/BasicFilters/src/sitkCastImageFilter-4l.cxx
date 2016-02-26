@@ -25,14 +25,14 @@ namespace simple
 {
 
 
-void CastImageFilter::RegisterMemberFactory3l()
+void CastImageFilter::RegisterMemberFactory4l()
 {
-  
+
   // basic to Label
-  m_DualMemberFactory->RegisterMemberFunctions<IntegerPixelIDTypeList, LabelPixelIDTypeList, 3, ToLabelAddressor<MemberFunctionType> > ();
+  m_DualMemberFactory->RegisterMemberFunctions<IntegerPixelIDTypeList, LabelPixelIDTypeList, 4, ToLabelAddressor<MemberFunctionType> > ();
 
  // Label to basic
-  m_DualMemberFactory->RegisterMemberFunctions<LabelPixelIDTypeList, IntegerPixelIDTypeList, 3, LabelToAddressor<MemberFunctionType> > ();
+  m_DualMemberFactory->RegisterMemberFunctions<LabelPixelIDTypeList, IntegerPixelIDTypeList, 4, LabelToAddressor<MemberFunctionType> > ();
 
 }
 
