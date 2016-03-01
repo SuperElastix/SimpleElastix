@@ -75,7 +75,7 @@ The example above used procedural-style function call. While the procedural inte
     elastix.Execute()
 
     resultImage = elastix.GetResultImage()
-    transformParameterMap = elastix.GetTransformParameters()
+    transformParameterMap = elastix.GetTransformParameterMap()
 
 This is more verbose but also a lot more powerful. We can now warp an entire population of images (e.g. binary images of segmented brain regions) using the same parameter map and a single instance of transformix:
 
