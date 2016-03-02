@@ -15,10 +15,9 @@ SimpleElastix
   this->m_DualMemberFactory->RegisterMemberFunctions< BasicPixelIDTypeList, BasicPixelIDTypeList, 2 > ();
   this->m_DualMemberFactory->RegisterMemberFunctions< BasicPixelIDTypeList, BasicPixelIDTypeList, 3 > ();
 
-  // TODO: Add support for 4D images to dual member function factory
-  // #ifdef SITK_4D_IMAGES
-  //   m_MemberFactory->RegisterMemberFunctions< BasicPixelIDTypeList, BasicPixelIDTypeList, 4 >();
-  // #endif
+  #ifdef SITK_4D_IMAGES
+    this->m_DualMemberFactory->RegisterMemberFunctions< BasicPixelIDTypeList, BasicPixelIDTypeList, 4 > ();
+  #endif
  
   m_FixedImages                 = VectorOfImage();
   m_MovingImages                = VectorOfImage();
@@ -868,9 +867,9 @@ SimpleElastix
     }
   }
 
-  sitkExceptionMacro( << "SimpleElastix does not support the combination of \""
+  sitkExceptionMacro( << "SimpleElastix does not support the combination of "
                       << FixedImageDimension << "-dimensional "
-                      << GetPixelIDValueAsElastixParameter( FixedImagePixelID ) << " fixed image and\""
+                      << GetPixelIDValueAsElastixParameter( FixedImagePixelID ) << " fixed image and a "
                       << MovingImageDimension << "-dimensional " 
                       << GetPixelIDValueAsElastixParameter( FixedImagePixelID ) << " moving image." )
 }
