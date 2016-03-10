@@ -104,6 +104,7 @@ class SITKCommon_EXPORT SimpleElastix
     Self& LogToConsoleOn();
     Self& LogToConsoleOff();
 
+    Self& SetParameterMap( const std::string transformName, const unsigned int numberOfResolutions = 4u, const double finalGridSpacingInPhysicalUnits = 10.0 );
     Self& SetParameterMap( const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapVector );
     Self& SetParameterMap( const std::map< std::string, std::vector< std::string > > parameterMap );
     Self& AddParameterMap( const std::map< std::string, std::vector< std::string > > parameterMap );

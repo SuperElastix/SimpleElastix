@@ -564,6 +564,16 @@ SimpleElastix
 
 SimpleElastix::Self& 
 SimpleElastix
+::SetParameterMap( const std::string transformName, const unsigned int numberOfResolutions, const double finalGridSpacingInPhysicalUnits )
+{
+  ParameterObjectPointer parameterObject = ParameterObjectType::New();
+  ParameterMapType parameterMap = parameterObject->GetParameterMap( transformName, numberOfResolutions, finalGridSpacingInPhysicalUnits );
+  this->SetParameterMap( parameterMap );
+  return *this;
+}
+
+SimpleElastix::Self& 
+SimpleElastix
 ::SetParameterMap( const ParameterMapType parameterMap )
 {
   ParameterMapVectorType parameterMapVector = ParameterMapVectorType( 1 );
