@@ -851,7 +851,7 @@ SimpleElastix
     const PixelIDValueEnum FixedMaskPixelID = this->GetFixedMask( i ).GetPixelID();
     if( FixedMaskPixelID != sitkUInt8 )
     {
-      sitkExceptionMacro( "Fixed mask must be of pixel type unsigned char (fixed mask at index " << i << ": " << GetPixelIDValueAsElastixParameter( FixedMaskPixelID ) << ")." );
+      sitkExceptionMacro( "Fixed mask must be of pixel type unsigned char (fixed mask at index " << i << " is of type " << GetPixelIDValueAsElastixParameter( FixedMaskPixelID ) << ")." );
     }
   }
 
@@ -860,7 +860,7 @@ SimpleElastix
     const PixelIDValueEnum MovingMaskPixelID = this->GetMovingMask( i ).GetPixelID();
     if( MovingMaskPixelID != sitkUInt8 )
     {
-      sitkExceptionMacro( "Moving mask must be of pixel type unsigned char (moving mask at index " << i << ": " << GetPixelIDValueAsElastixParameter( MovingMaskPixelID ) << ")." );
+      sitkExceptionMacro( "Moving mask must be of pixel type unsigned char (moving mask at index " << i << " is of type " << GetPixelIDValueAsElastixParameter( MovingMaskPixelID ) << ")." );
     }
   }
 

@@ -163,6 +163,7 @@ class SITKCommon_EXPORT SimpleElastix
 
     ParameterMapVectorType  m_ParameterMapVector;
     ParameterMapVectorType  m_TransformParameterMapVector;
+    ParameterMapVectorType  m_InverseTransformParameterMapVector;
 
     std::string             m_OutputDirectory;
     std::string             m_LogFileName;
