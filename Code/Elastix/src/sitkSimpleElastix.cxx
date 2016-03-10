@@ -870,11 +870,7 @@ SimpleElastix
   const unsigned int MovingImageDimension = this->GetMovingImage( 0 ).GetDimension();
   if( this->m_DualMemberFactory->HasMemberFunction( FixedImagePixelID, MovingImagePixelID, FixedImageDimension ) )
   {
-    try {
-      return this->m_DualMemberFactory->GetMemberFunction( FixedImagePixelID, MovingImagePixelID, FixedImageDimension )();
-    } catch( itk::ExceptionObject &e ) {
-      sitkExceptionMacro( << e );
-    }
+    return this->m_DualMemberFactory->GetMemberFunction( FixedImagePixelID, MovingImagePixelID, FixedImageDimension )();
   }
 
   sitkExceptionMacro( << "SimpleElastix does not support the combination of "

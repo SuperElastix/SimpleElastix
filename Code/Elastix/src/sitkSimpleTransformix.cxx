@@ -547,11 +547,7 @@ SimpleTransformix
 
   if( this->m_MemberFactory->HasMemberFunction( InputImagePixelEnum, InputImageDimension ) )
   {
-    try {
-      return this->m_MemberFactory->GetMemberFunction( InputImagePixelEnum, InputImageDimension )();
-    } catch( itk::ExceptionObject &e ) {
-      sitkExceptionMacro( << e );
-    }
+    return this->m_MemberFactory->GetMemberFunction( InputImagePixelEnum, InputImageDimension )();
   }
 
   sitkExceptionMacro( << "SimpleTransformix does not support the combination of image type \""
