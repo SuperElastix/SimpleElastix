@@ -64,6 +64,14 @@ SimpleTransformix
   return this->m_InputImage;
 }
 
+SimpleTransformix::Self&
+SimpleTransformix
+::RemoveInputImage( void )
+{
+  this->SetInputImage( Image() );
+  return *this;
+}
+
 SimpleTransformix::Self& 
 SimpleTransformix
 ::SetInputPointSetFileName( const std::string inputPointSetFileName )

@@ -41,6 +41,7 @@ class SITKCommon_EXPORT SimpleTransformix
     // Images
     Self& SetInputImage( const Image& inputImage );
     Image& GetInputImage( void );
+    Self& RemoveInputImage( void );
 
     Self& SetInputPointSetFileName( const std::string inputPointSetFileName );
     std::string GetInputPointSetFileName( void );
