@@ -336,7 +336,7 @@ SimpleElastix
     ParameterValuesType gridSpacingSchedule = ParameterValuesType();
     for( unsigned int resolution = 0; resolution < numberOfResolutions; ++resolution )
     {
-      gridSpacingSchedule.insert( gridSpacingSchedule.begin(), to_string( pow( 2, resolution ) ) ); 
+      gridSpacingSchedule.insert( gridSpacingSchedule.begin(), to_string( 1 << resolution ) ); 
     }
 
     parameterMap[ "GridSpacingSchedule" ] = gridSpacingSchedule;
