@@ -32,7 +32,7 @@ VariableListToArgs( ITK_VARS  ep_itk_args )
 
 
 set(proj ITK)  ## Use ITK convention of calling it ITK
-set(ITK_REPOSITORY git://itk.org/ITK.git)
+set(ITK_REPOSITORY http://itk.org/ITK.git)
 
 # NOTE: it is very important to update the ITK_DIR path with the ITK version
 set(ITK_TAG_COMMAND GIT_TAG v4.8.2)
