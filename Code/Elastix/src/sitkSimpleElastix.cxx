@@ -37,6 +37,12 @@ SimpleElastix
   this->LogToConsoleOff();
 
   m_ResultImage                 = Image();
+
+  ParameterObjectPointer defaultParameterObject = ParameterObjectType::New();
+  defaultParameterObject->AddParameterMap( "translation" );
+  defaultParameterObject->AddParameterMap( "affine" );
+  defaultParameterObject->AddParameterMap( "bspline" );
+  this->SetParameterMap( defaultParameterObject->GetParameterMap() );
 }
 
 SimpleElastix

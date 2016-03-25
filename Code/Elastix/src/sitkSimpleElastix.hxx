@@ -46,12 +46,9 @@ SimpleElastix::DualExecuteInternal( void )
     elastixFilter->SetLogToFile( this->GetLogToFile() );
     elastixFilter->SetLogToConsole( this->GetLogToConsole() );
 
-    if( this->GetNumberOfParameterMaps() > 0 )
-    {
-      ParameterObjectPointer parameterObject = ParameterObjectType::New();
-      parameterObject->SetParameterMap( this->m_ParameterMapVector );
-      elastixFilter->SetParameterObject( parameterObject );
-    }
+    ParameterObjectPointer parameterObject = ParameterObjectType::New();
+    parameterObject->SetParameterMap( this->m_ParameterMapVector );
+    elastixFilter->SetParameterObject( parameterObject );
 
     this->m_ResultImage = Image( elastixFilter->GetOutput() );
     this->m_TransformParameterMapVector = elastixFilter->GetTransformParameterObject()->GetParameterMap();
