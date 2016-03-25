@@ -695,6 +695,18 @@ SimpleElastix
 
 SimpleElastix::Self&
 SimpleElastix
+::AddParameter( const ParameterKeyType key, const ParameterValueVectorType value )
+{
+  for( unsigned int i = 0; i < this->m_ParameterMapVector.size(); i++ )
+  {
+    this->AddParameter( i, key, value );
+  }
+
+  return *this;
+}
+
+SimpleElastix::Self&
+SimpleElastix
 ::AddParameter( const unsigned int index, const ParameterKeyType key, const ParameterValueType value )
 {
   if( index >= this->m_ParameterMapVector.size() )
@@ -709,6 +721,28 @@ SimpleElastix
   else
   {
     this->m_ParameterMapVector[ index ][ key ].push_back( value );
+  }
+}
+
+SimpleElastix::Self&
+SimpleElastix
+::AddParameter( const unsigned int index, const ParameterKeyType key, const ParameterValueVectorType value )
+{
+  if( index >= this->m_ParameterMapVector.size() )
+  {
+    sitkExceptionMacro( "Parameter map index is out of range (index: " << index << ", number of parameters maps: " << this->m_ParameterMapVector.size() << "). Note that indexes are zero-based." );
+  }
+
+  if( this->m_ParameterMapVector[ index ].find( key ) == this->m_ParameterMapVector[ index ].end() )
+  {
+    this->SetParameter( index, key, value );
+  }
+  else
+  {
+    for( unsigned int i = 0; i < value.size(); i++ )
+    {
+      this->m_ParameterMapVector[ index ][ key ].push_back( value[ i ] );
+    }
   }
 }
 

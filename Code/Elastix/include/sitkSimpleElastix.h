@@ -122,6 +122,8 @@ class SITKCommon_EXPORT SimpleElastix
     Self& SetParameter( const unsigned int index, const std::string key, const std::vector< std::string > value );
     Self& AddParameter( const std::string key, const std::string value );
     Self& AddParameter( const unsigned int index, const std::string key, const std::string value );
+    Self& AddParameter( const std::string key, const std::vector< std::string > value );
+    Self& AddParameter( const unsigned int index, const std::string key, const std::vector< std::string > value );
     std::vector< std::string > GetParameter( const std::string key );
     std::vector< std::string > GetParameter( const unsigned int index, const std::string key );
     Self& RemoveParameter( const std::string key );
