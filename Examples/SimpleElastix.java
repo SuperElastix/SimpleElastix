@@ -29,7 +29,7 @@ class SimpleElastix {
     // Write result image
     ImageFileWriter writer = new org.itk.simple.ImageFileWriter();
     writer.setFileName(argv[3]);
-    writer.execute(elastix.getResultImage()); 
+    writer.execute(elastix.getResultImage(), "."); 
 
     elastix.prettyPrint(elastix.getTransformParameterMapList());
 
