@@ -137,9 +137,8 @@ class SITKCommon_EXPORT SimpleElastix
     Self& PrettyPrint( const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapVector );
 
     Image Execute( void );
-
-    Image GetResultImage( void );
     std::vector< std::map< std::string, std::vector< std::string > > > GetTransformParameterMap( void );
+    Image GetResultImage( void );
 
     std::vector< std::map< std::string, std::vector< std::string > > > ExecuteInverse( void );
     std::vector< std::map< std::string, std::vector< std::string > > > GetInverseTransformParameterMap( void );

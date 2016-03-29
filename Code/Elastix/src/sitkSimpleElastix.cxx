@@ -920,18 +920,6 @@ SimpleElastix
                       << GetPixelIDValueAsElastixParameter( FixedImagePixelID ) << " moving image." )
 }
 
-Image
-SimpleElastix
-::GetResultImage( void )
-{
-  if( this->IsEmpty( this->m_ResultImage ) )
-  {
-    sitkExceptionMacro( "No result image was found." )
-  }
-
-  return this->m_ResultImage;
-}
-
 SimpleElastix::ParameterMapVectorType 
 SimpleElastix
 ::GetTransformParameterMap( void )
@@ -942,6 +930,18 @@ SimpleElastix
   }
 
   return this->m_TransformParameterMapVector;
+}
+
+Image
+SimpleElastix
+::GetResultImage( void )
+{
+  if( this->IsEmpty( this->m_ResultImage ) )
+  {
+    sitkExceptionMacro( "No result image was found." )
+  }
+
+  return this->m_ResultImage;
 }
 
 SimpleElastix::ParameterMapVectorType
