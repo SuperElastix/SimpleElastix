@@ -1073,8 +1073,7 @@ WriteParameterFile( const SimpleElastix::ParameterMapType parameterMap, const st
 void 
 PrettyPrint( const SimpleElastix::ParameterMapType parameterMap )
 {
-  SimpleElastix::ParameterMapVectorType parameterMapVector = SimpleElastix::ParameterMapVectorType( 1 );
-  parameterMapVector[ 0 ] = parameterMap;
+  SimpleElastix::ParameterMapVectorType parameterMapVector = SimpleElastix::ParameterMapVectorType( 1, parameterMap );
   PrettyPrint( parameterMapVector );
 }
 
@@ -1122,8 +1121,7 @@ Elastix( const Image& fixedImage, const Image& movingImage, const std::string de
 Image
 Elastix( const Image& fixedImage, const Image& movingImage, const SimpleElastix::ParameterMapType parameterMap, const bool logToConsole, const bool logToFile, const std::string outputDirectory )
 {
-  SimpleElastix::ParameterMapVectorType parameterMapVector = SimpleElastix::ParameterMapVectorType( 1 );
-  parameterMapVector[ 0 ] = parameterMap;
+  SimpleElastix::ParameterMapVectorType parameterMapVector = SimpleElastix::ParameterMapVectorType( 1, parameterMap );
   return Elastix( fixedImage, movingImage, parameterMapVector, logToConsole, logToFile, outputDirectory );
 }
 
@@ -1150,8 +1148,7 @@ Elastix( const Image& fixedImage, const Image& movingImage, const std::string de
 Image
 Elastix( const Image& fixedImage, const Image& movingImage, const SimpleElastix::ParameterMapType parameterMap, const Image& fixedMask, const Image& movingMask, bool logToConsole, const bool logToFile, std::string outputDirectory )
 {
-  SimpleElastix::ParameterMapVectorType parameterMapVector = SimpleElastix::ParameterMapVectorType( 1 );
-  parameterMapVector[ 0 ] = parameterMap;
+  SimpleElastix::ParameterMapVectorType parameterMapVector = SimpleElastix::ParameterMapVectorType( 1, parameterMap );
   return Elastix( fixedImage, movingImage, parameterMapVector, fixedMask, movingMask, logToConsole, logToFile, outputDirectory );
 }
 
