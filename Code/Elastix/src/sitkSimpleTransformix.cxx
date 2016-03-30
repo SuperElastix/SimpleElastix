@@ -370,6 +370,8 @@ SimpleTransformix
   }
 
   this->m_TransformParameterMapVector[ index ][ key ] = ParameterValueVectorType( 1, value );
+
+  return *this;
 }
 
 SimpleTransformix::Self&
@@ -382,6 +384,8 @@ SimpleTransformix
   }
 
   this->m_TransformParameterMapVector[ index ][ key ] = value;
+
+  return *this;
 }
 
 SimpleTransformix::Self&
@@ -413,6 +417,8 @@ SimpleTransformix
   {
     this->m_TransformParameterMapVector[ index ][ key ].push_back( value );
   }
+
+  return *this;
 }
 
 SimpleTransformix::ParameterValueVectorType
