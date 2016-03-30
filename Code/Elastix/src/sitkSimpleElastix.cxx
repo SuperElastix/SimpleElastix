@@ -924,9 +924,9 @@ SimpleElastix::ParameterMapVectorType
 SimpleElastix
 ::GetTransformParameterMap( void )
 {
-  if( this->m_InverseTransformParameterMapVector.size() == 0 )
+  if( this->m_TransformParameterMapVector.size() == 0 )
   {
-    sitkExceptionMacro( "No transform parameter map found. Run registration with Execute()." );
+    sitkExceptionMacro( "Number of transform parameter maps: 0. Run registration with Execute()." );
   }
 
   return this->m_TransformParameterMapVector;
@@ -1029,7 +1029,7 @@ SimpleElastix
 {
   if( this->m_InverseTransformParameterMapVector.size() == 0 )
   {
-    sitkExceptionMacro( "No inverse transform parameter map found. Run inverse registration with ExecuteInverse()." );
+    sitkExceptionMacro( "Number of inverse transform parameter maps: 0. Run inverse registration with ExecuteInverse()." );
   }
 
   return this->m_InverseTransformParameterMapVector;
