@@ -954,96 +954,89 @@ SimpleElastix
   return this->m_ResultImage;
 }
 
-SimpleElastix::ParameterMapVectorType
-SimpleElastix
-::ExecuteInverse( void )
-{
-  if( this->GetFixedImage().size() == 0 )
-  {
-    sitkExceptionMacro( "No fixed images found. Elastix needs the fixed image of the forward transformation to compute the inverse transform.")
-  }
+// SimpleElastix::ParameterMapVectorType
+// SimpleElastix
+// ::ExecuteInverse( void )
+// {
+//   if( this->GetFixedImage().size() == 0 )
+//   {
+//     sitkExceptionMacro( "No fixed images found. Elastix needs the fixed image of the forward transformation to compute the inverse transform.")
+//   }
 
-  if( this->m_TransformParameterMapVector.size() == 0 )
-  {
-    sitkExceptionMacro( "No forward transform parameter map found. Run forward registration before computing the inverse.")
-  }
+//   if( this->m_TransformParameterMapVector.size() == 0 )
+//   {
+//     sitkExceptionMacro( "No forward transform parameter map found. Run forward registration before computing the inverse.")
+//   }
 
-  // Write forward transform parameter file to disk
-  ParameterMapVectorType forwardTransformParameterMaps = this->m_TransformParameterMapVector;
-  std::vector< std::string > forwardTransformParameterFileNames;
-  for( unsigned int i = 0; i < forwardTransformParameterMaps.size(); i++ )
-  {
-    ParameterObjectPointer forwardTransformParameterMapObject = ParameterObjectType::New();
+//   // Write forward transform parameter file to disk
+//   ParameterMapVectorType forwardTransformParameterMaps = this->m_TransformParameterMapVector;
+//   std::vector< std::string > forwardTransformParameterFileNames;
+//   for( unsigned int i = 0; i < forwardTransformParameterMaps.size(); i++ )
+//   {
+//     ParameterObjectPointer forwardTransformParameterMapObject = ParameterObjectType::New();
 
-    if( i > 0 )
-    {
-      // Chain transform parameter file
-      forwardTransformParameterFileNames.push_back( this->GetOutputDirectory() + "/forwardTransformParameterFile." + forwardTransformParameterMapObject->ToString( i-1 ) + ".txt" );
-      forwardTransformParameterMaps[ i ][ "InitialTransformParametersFileName" ] = ParameterValueVectorType( 1, forwardTransformParameterFileNames[ forwardTransformParameterFileNames.size()-1 ] );
-    }
-    else
-    { 
-      // Head of chain
-      forwardTransformParameterFileNames.push_back( this->GetOutputDirectory() + "/forwardTransformParameterFile." + forwardTransformParameterMapObject->ToString( i ) + ".txt" );
-      forwardTransformParameterMaps[ i ][ "InitialTransformParametersFileName" ] = ParameterValueVectorType( 1, "NoInitialTransform" );
-    }
+//     if( i > 0 )
+//     {
+//       // Chain transform parameter file
+//       forwardTransformParameterFileNames.push_back( this->GetOutputDirectory() + "/forwardTransformParameterFile." + forwardTransformParameterMapObject->ToString( i-1 ) + ".txt" );
+//       forwardTransformParameterMaps[ i ][ "InitialTransformParametersFileName" ] = ParameterValueVectorType( 1, forwardTransformParameterFileNames[ forwardTransformParameterFileNames.size()-1 ] );
+//     }
+//     else
+//     { 
+//       // Head of chain
+//       forwardTransformParameterFileNames.push_back( this->GetOutputDirectory() + "/forwardTransformParameterFile." + forwardTransformParameterMapObject->ToString( i ) + ".txt" );
+//       forwardTransformParameterMaps[ i ][ "InitialTransformParametersFileName" ] = ParameterValueVectorType( 1, "NoInitialTransform" );
+//     }
 
-    forwardTransformParameterMapObject->SetParameterMap( forwardTransformParameterMaps[ i ] );
-    forwardTransformParameterMapObject->WriteParameterFile( forwardTransformParameterFileNames[ i ] );
-  }
+//     forwardTransformParameterMapObject->SetParameterMap( forwardTransformParameterMaps[ i ] );
+//     forwardTransformParameterMapObject->WriteParameterFile( forwardTransformParameterFileNames[ i ] );
+//   }
 
-  // Setup inverse transform parameter map
-  ParameterMapVectorType inverseParameterMap = this->m_ParameterMapVector;
-  for( unsigned int i = 0; i < inverseParameterMap.size(); i++ )
-  {
-    inverseParameterMap[ i ][ "Registration" ]        = ParameterValueVectorType( 1, "MultiResolutionRegistration" );
-    inverseParameterMap[ i ][ "Metric" ]              = ParameterValueVectorType( 1, "DisplacementMagnitudePenalty" );
-  }
+//   // Setup inverse transform parameter map
+//   ParameterMapVectorType inverseParameterMap = this->m_ParameterMapVector;
+//   for( unsigned int i = 0; i < inverseParameterMap.size(); i++ )
+//   {
+//     inverseParameterMap[ i ][ "Registration" ] = ParameterValueVectorType( 1, "MultiResolutionRegistration" );
+//     inverseParameterMap[ i ][ "Metric" ] = ParameterValueVectorType( 1, "DisplacementMagnitudePenalty" );
+//   }
 
-  // Setup inverse registration
-  SimpleElastix selx;
-  selx.SetInitialTransformParameterFileName( forwardTransformParameterFileNames[ 0 ] );
-  selx.SetParameterMap( inverseParameterMap );  
+//   // Setup inverse registration
+//   SimpleElastix selx;
+//   selx.SetInitialTransformParameterFileName( forwardTransformParameterFileNames[ 0 ] );
+//   selx.SetParameterMap( inverseParameterMap );  
 
-  // Pass options from this SimpleElastix
-  selx.SetFixedImage( this->GetFixedImage( 0 ) ); 
-  selx.SetMovingImage( this->GetFixedImage( 0 ) ); // <-- The fixed image is also used as the moving image. This is not a bug.
-  selx.SetOutputDirectory( this->GetOutputDirectory() );
-  selx.SetLogFileName( this->GetLogFileName() );
-  selx.SetLogToFile( this->GetLogToFile() );
-  selx.SetLogToConsole( this->GetLogToConsole() );
-  selx.Execute();
+//   // Pass options from this SimpleElastix
+//   selx.SetFixedImage( this->GetFixedImage( 0 ) ); 
+//   selx.SetMovingImage( this->GetFixedImage( 0 ) ); // <-- The fixed image is also used as the moving image. This is not a bug.
+//   selx.SetOutputDirectory( this->GetOutputDirectory() );
+//   selx.SetLogFileName( this->GetLogFileName() );
+//   selx.SetLogToFile( this->GetLogToFile() );
+//   selx.SetLogToConsole( this->GetLogToConsole() );
+//   selx.Execute();
 
-  for( unsigned int i = 0; i < forwardTransformParameterFileNames.size(); i++ )
-  {
-    ParameterObjectPointer forwardTransformParameterMapObject = ParameterObjectType::New();
+//   for( unsigned int i = 0; i < forwardTransformParameterFileNames.size(); i++ )
+//   {
+//     // TODO: Delete forward transform parameter files on disk
+//   }
 
-    // While we could continue here if the file deletion fails, chances are something 
-    // else is seriously wrong and the user would have a harder time debugging 
-    // if( REMOVE_FILE )
-    // {
-    //   sitkExceptionMacro( "Failed to delete " << forwardTransformParameterFileNames[ i ] << ". Make sure you have correct file permissions. " );
-    // }
-  }
+//   // Unlink the first transform parameter map
+//   ParameterMapVectorType inverseTransformParameterMap = selx.GetTransformParameterMap();
+//   inverseTransformParameterMap[ 0 ][ "InitialTransformParametersFileName" ] = ParameterValueVectorType( 1, "NoInitialTransform" );
+//   this->m_InverseTransformParameterMapVector = inverseTransformParameterMap;
+//   return this->m_InverseTransformParameterMapVector;
+// }
 
-  // Unlink the first transform parameter map
-  ParameterMapVectorType inverseTransformParameterMap = selx.GetTransformParameterMap();
-  inverseTransformParameterMap[ 0 ][ "InitialTransformParametersFileName" ] = ParameterValueVectorType( 1, "NoInitialTransform" );
-  this->m_InverseTransformParameterMapVector = inverseTransformParameterMap;
-  return this->m_InverseTransformParameterMapVector;
-}
+// SimpleElastix::ParameterMapVectorType 
+// SimpleElastix
+// ::GetInverseTransformParameterMap( void )
+// {
+//   if( this->m_InverseTransformParameterMapVector.size() == 0 )
+//   {
+//     sitkExceptionMacro( "Number of inverse transform parameter maps: 0. Run inverse registration with ExecuteInverse()." );
+//   }
 
-SimpleElastix::ParameterMapVectorType 
-SimpleElastix
-::GetInverseTransformParameterMap( void )
-{
-  if( this->m_InverseTransformParameterMapVector.size() == 0 )
-  {
-    sitkExceptionMacro( "Number of inverse transform parameter maps: 0. Run inverse registration with ExecuteInverse()." );
-  }
-
-  return this->m_InverseTransformParameterMapVector;
-}
+//   return this->m_InverseTransformParameterMapVector;
+// }
 
 bool
 SimpleElastix
