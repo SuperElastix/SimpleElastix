@@ -1,9 +1,9 @@
 Parameter Maps
 ==============
 
-In the previous section we saw how to configure an entire multi-resolution registration process with a single parameter. Here, we will examine how SimpleElastix configures registration components internally. Knowing the internal mechanisms is not strictly necessary to register simple anatomical structures but will help you solve complex problems that most likely require modifications to default parameters to obtain good results. 
+In the previous section we saw how to configure an entire multi-resolution registration process with a single parameter. Here, we will examine how SimpleElastix configures registration components internally. Knowing the internal mechanisms is not strictly necessary to register simple anatomical structures, but it will help you solve complex problems that require problem-specific tuning. 
 
-Elastix introduces the concept of a "parameter map" to configure the registration procedure. A parameter map is a collection of key-value pairs that completely defines the components of the registration and any settings they might require. Only input images and output options need to be specified seperately. Elastix will read a given parameter map and load the specified components at runtime. 
+Elastix introduces the concept of a parameter map to configure the registration procedure. A parameter map is a collection of key-value pairs that atomically defines the components of the registration and any settings they might require. Only input images and output options need to be specified seperately. Elastix will read a given parameter map and load the specified components at runtime. 
 
 The original elastix and transformix command line programs read text files from disk in which parameters are specified according to the following format:
 
@@ -96,7 +96,7 @@ We will study other parameter maps more closely in later examples. For now, we s
 
 The first thing to note is that the parameter map is enumerated. SimpleElastix can take a vector of parameter maps and apply the corresponding registrations sequentially. The resulting transform is called a composite transform since the final transformation is a composition of sequentially applied deformation fields. For example, a non-rigid registration is often initialized with an affine transformation (translation, scale, rotation, shearing) to bring the objects into rough alignment. This makes the registration less suscetible to local minima. You can also ask SimpleElastix to add the individual deformation fields and apply them in one go, but make sure you know what you are doing before opting for this apprach. 
 
-Let's examine the parameters in detail.
+Let's examine the parameters above in detail.
 
 Important Parameters
 --------------------
@@ -111,8 +111,5 @@ A :code:`BSplineInterpolator` of order 2 is used to resample the result image fr
 
 Another important parameter is :code:`AutomaticParameterEstimation` which controls whether the :code:`AdaptiveStochasticGradientDescent` optimizer should estimate its own convergence parameters or allow you to set them. Automatically obtained parameters work well in most cases and facilitates a complete hands-off approach which is highly recommended. Optimizers can be tricky to tune by hand. 
 
-:code:`DefaultPixelValue` sets value of pixels outside the moving image grid. The rest of the key-value pairs are component specific parameters. There are multiple choices available for each type of component. For example, you can construct an image pyramid with recursive sampling or via Gaussian Smoothing. Each choice has its own pros and cons. Consult the registration components secton for a description of all types of available components. 
-
-.. Working With Parameter Maps
-.. ---------------------------
+:code:`DefaultPixelValue` sets value of pixels outside the moving image grid. The rest of the key-value pairs are component specific parameters. There are multiple choices available for each type of component. For example, you can construct an image pyramid with recursive sampling or via Gaussian Smoothing. Each choice has its own pros and cons. Consult the Registration Components secton for a description of all types of available components. 
  

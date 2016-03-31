@@ -1,12 +1,12 @@
 Hello World
 ===========
 
-This example illustrates the easiest way to use SimpleElastix. With *one* function call you can specify the fixed image, the moving image and the type of registration you want to perform. SimpleElastix will then register your images using sensible default parameters that work well in most cases. In later examples we shall see how to tweak the default parameters if you are not happy with the initial results, but for now we keep it simple for illustrative purposes.
+This example illustrates the easiest way to use SimpleElastix. With a single function call we can specify the fixed image, the moving image and the type of registration you want to perform. SimpleElastix will then register our images using sensible default parameters that work well in most cases. In later examples we shall see how to tweak the default parameters, but for now we keep it simple for illustrative purposes.
 
 Registration With Translation Transform
 ---------------------------------------
 
-Say you want to register the following two brain MRIs.
+Say we want to register the following two brain MRIs.
 
 .. _fig: 
 
@@ -39,7 +39,7 @@ That's it! We have effectively registered two images using a robust multi-resolu
 
 :code:`sitk.ReadImage()` is the generic image file reader of SimpleITK which loads an image from disk and pass a SimpleITK image object to SimpleElastix. You can apply any SimpleITK filter to the fixed and moving image before passing them to SimpleElastix. 
 
-The final parameter :code:`"translation"` specifies the desired type of registration. In the next section we will take a close look at parameter maps and examine what what happens under the hood when you specify this parameter. It is obvious from the figure below that a translation transform is sufficient to align these images.
+The final parameter :code:`"translation"` specifies the desired type of registration. In the Parameter Maps section we will take a close look at parameter maps and examine what what happens under the hood when you specify this parameter. It is obvious from the figure below that a translation transform is sufficient to align these images.
 
 .. _fig2: 
 
@@ -57,7 +57,7 @@ The final parameter :code:`"translation"` specifies the desired type of registra
 Object-Oriented Interface
 -------------------------
 
-The example above used procedural-style function call. While the procedural interface may be useful in rapid prototyping, it trades off flexibility for code simplicity. For example, the final deformation field cannot be retrived and applied to another image. This is a problem if you want to subsequently warp other images, e.g. a label image, using the same transformation. Further, image quality is reduced from resampling the resulting image twice. To this end, SimpleElastix comes with a powerful object-oriented interface suitable for more advanced use cases and scripting purposes. In the next example, we perform the same Hello World example, but this time using the object oriented interface:
+The example above used procedural-style function call. While the procedural interface may be useful in rapid prototyping, it trades off flexibility for code simplicity. For example, the final deformation field cannot be retrived and applied to another image. This is a problem if we want to subsequently warp other images, e.g. a label image, using the same transformation. Further, image quality is reduced from resampling the resulting image twice. To this end, SimpleElastix comes with a powerful object-oriented interface suitable for more advanced use cases and scripting purposes. In the next example, we perform the same Hello World example, but this time using the object oriented interface:
 
 ::
 

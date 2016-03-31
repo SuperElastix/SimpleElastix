@@ -3,23 +3,23 @@
 Introduction
 ============
 
-If you are completely new to SimpleElastix, or even medical image registration in general, you might not know where to start or what questions to ask. This document will walk you through the basics.
+If you are completely new to SimpleElastix, or even medical image registration in general, you might not know where to start or what questions to ask. This section will walk you through the basics.
 
 Image Registration
 ------------------
 
-Image registration is the process of transforming images into a common coordinate system so corresponding pixels represent homologous biological points. This is a prerequisite for a wide range of medical image analysis tasks and a key algorithmic component for statistical analysis and machine learning in medical image processing. For example, registration can be used to obtain an anatomically normalized reference frame in which brain regions of different patients can be compared. Computer scientists and medical doctors use this information to build computational models of disease processes.
+Image registration is the process of transforming images into a common coordinate system so corresponding pixels represent homologous biological points. For example, registration can be used to obtain an anatomically normalized reference frame in which brain regions from different patients can be compared. Computer scientists and medical doctors use this information to build computational models of disease processes.
 
-Many body parts are rutinely registered in clinical practice and even more so in research. The outputs are used in many different applications ranging from segmentation of anatomical structures to computer-aided diagnosis, monitoring of disease progression, surgical intervention and treatment planning. The surge in availability of scanners, computing power and potential to save time, money and lives makes medical image registration an increasingly relevant field of study. In the future, patient-specific computational models may deliver the next paradigm shift in modern diagnosis and treatment methods.
+In the past decade there has been increasing interest in relating information in different medical images spurred by a growing availability of scanners, modalities and computing power. Clinical applications include segmentation of anatomical structures, computer-aided diagnosis, monitoring of disease progression, surgical intervention and treatment planning. 
 
-Open access to state-of-the-art methods is essential to reach this goal. They all say you should stand on the shoulders of giants, but how do you get up there? One option is to use SimpleElastix.
+A significant amount of research has focused on developing the registration algorithms themselves. However, less research has focused on accessibility, interoperability and extensibility of these algorithms. Scientific source code is typically not published, is difficult to use because it has not been written with other researchers in mind or is lacking documentation. This is a problem since image registration is a prerequisite for a wide range of medical image analysis tasks and a key algorithmic component for image-based studies. Open source, user-friendly implementations of scientific software make state-of-the-art methods accessible to a wider audience, promote opportunities for scientific advancement, and support the fundamental scientific principle of reproducibility. To this end, we have developed the SimpleElastix software package.
 
 SimpleElastix
 -------------
 
-SimpleElastix is a fork of SimpleITK that integrates elastix and transformix. SimpleITK is a simplified layer built on top of the well-known C++ Insight Segmentation and Registration Toolkit (ITK) that makes it dead simple to call ITK from other languages, e.g. Python, Java and R. Elastix is a medical image registraiton library also based on ITK that consists of a collection of algorithms commonly used to solve medical image registration problems. SimpleElastix makes these registration algorithms available in Python, Java, R, Ruby, Octave, Lua, Tcl and C# via the SimpleITK build infrastructure. The goal is to bring robust registration algorithms to a wider audience and make it easier to use elastix for e.g. Java-based enterprise applications or rapid Python prototyping.
+Elastix \cite{Klein2010} is an open source, command-line program for intensity-based registration of medical images that allows the user to quickly configure, test, and compare different registration methods. SimpleElastix is an extension of SimpleITK \cite{Lowekamp2013} that allows you to configure and run Elastix entirely in Python, Java, R, Octave, Ruby, Lua, Tcl and C\# on Linux, Mac and Windows. The goal is to bring robust registration algorithms to a wider audience and make it easier to use elastix for e.g. Java-based enterprise applications or rapid Python prototyping. 
 
-SimpleElastix takes a fixed and a moving image and bring the two into alignment, obtaining a result image and a transform parameter map. The transform parameter map contain all information needed to reproduce a transformation from the moving image to the fixed. SimpleTransformix is an accompying program that can take a transform parameter map and apply the transformation to points sets, index and other images, e.g. an original (higher-reslotion) image or label image for atlas-based segmentations. It can also write the deformation field and transform jacobian to disk. 
+SimpleElastix takes a fixed and a moving image and bring the two into alignment, obtaining a result image and a transform parameter map. The transform parameter map contain all information needed to reproduce a transformation from the moving image to the fixed. SimpleTransformix is an accompying program that can take a transform parameter map and apply the transformation to points sets, index and other images, e.g. an original (higher-reslotion) image or label image for atlas-based segmentations.
 
 A lot of research has focused on making elastix computationally efficient and easy to use. Stochastic sampling (Klein et al. 2007), multi-threading and code optimizations (Shamonin et al 2014) makes registration run fast without sacrificing robustness. A simple parameter interface and modular architecture allows you to configure registration components at runtime and easily try out different registration methods. 
 
@@ -41,29 +41,16 @@ A transform :math:`T(x)` represents the spatial mapping of points from the fixed
 
 A similarity metric provides a measure of how well the fixed image matches the moving image. This measure forms a quantitative criterion to be optimized by an optimizer over the search space defined by the parameters of the transform. In general, the registration procedure is formulated as an optimization problem in which a cost function :math:`C` is minimized with respect to :math:`T`. Mathematically, :math:`I_M(x)` is deformed to match :math:`I_F(x)` by finding a coordinate transformation :math:`T(x)` that makes :math:`I_M(T(x))` spatially aligned with :math:`I_F(x)`. This simply means that the optimizer adjusts the parameters of the transform in a way that minimizes the difference between the two images.
 
-The metric is a key component in the registration process. It uses information from the fixed and moving image to evaluate the fitness value. The derivatives are passed to the optimizer which asks transform to update its parameters accordingly. This process is repeated until a convergence criteria is met. The information can be pixel intensities, point positions, pre-computed image features or anything you might want to optimize. You just have to define a metric for it.
+The metric is a key component in the registration process. It uses information from the fixed and moving image to compute a similarity value. The derivative of this value tells us in which direction we should move the moving image for better alignment. The moving image is moved in small steps, and thes process is repeated until a convergence criteria is met. The metric can use pixel intensities, point positions, pre-computed image features or anything we might want to optimize. We just have to define a metric for it.
 
-Sometimes a regularisation term is added to the cost function to penalize unwanted transformations. For example, if you expect your transform to be reasonably smooth, you can penalize sharp deformations. Further, a multi-resolution approach is typically adopted where you start from coarse images and gradually sharpen images. This increase the capture range and makes registration much less prone to local minima. 
+Sometimes a regularisation term is added to the cost function to penalize unwanted transformations. For example, if we expect your transform to be reasonably smooth, we can penalize sharp deformations. Further, a multi-resolution approach is typically adopted where we start with a high level of smoothing and gradually sharpen the images. This increases the capture range and makes registration much less prone to local minima. 
 
-Many different transforms, metrics and optimizers are available in SimpleElastix. In theory, the combinatorial number of choices of registration components can be daunting. In practice, you will develop an intuition about which algorithms are better suited to different types of problems. Choosing the right method for a particular problem will always be a trial-and-error process even for experts, but with the right tools you  can focus more on the problem and less on implementation.
+Many different transforms, metrics and optimizers are available in SimpleElastix. In theory, the combinatorial number of choices of registration components can be daunting. In practice, you will develop an intuition about which algorithms are better suited to different types of problems. Choosing the right method for a particular problem will always be a trial-and-error process even for experts, but with the right tools you can focus more on the problem and less on implementation.
 
 Registration Components
 -----------------------
 
-In this section we introduce the different choices for the different types of components and common terminology. For a technical discussion and equations see the `elastix manual <http://elastix.isi.uu.nl/download/elastix_manual_v4.7.pdf>`_. For documentation of source code see the `elastix doxygen pages <http://elastix.isi.uu.nl/doxygen/index.html>`_ where you will also find a `complete list of available parameters <http://elastix.isi.uu.nl/doxygen/parameter.html>`_.
-
-Images
-~~~~~~
-It is important to know the appropriate definitions and terms when working with medical images. In particular, information associated with physical spacing between pixels and position on the image grid with respect to world coordinate system is extremely important. Improperly defined spacing and origins will most likely result in inconsistent results. The main geometrical concepts associated with an image object are depicted in Figure 7. 
-
-.. figure:: _static/ImageConcepts.png
-    :align: right
-    :figwidth: 95%
-    :width: 95% 
-
-    Figure 7: Geometrical concepts associated with the ITK image. Adopted from Ibanez et al. (2005).
-
-Above, circles are used to represent the centre of pixels. The value of the pixel is assumed to be a Dirac Delta Function located at the pixel centre. Pixel spacing is measured between the pixel centres and can be different along each dimension. The image origin is associated with the coordinates of the first pixel in the image. A pixel is considered to be the rectangular region surrounding the pixel centre holding the data value.
+In this section we introduce common terminology and some of the choices for different types of components. For a technical discussion and equations see the `elastix manual <http://elastix.isi.uu.nl/download/elastix_manual_v4.7.pdf>`_. For documentation of source code see the `elastix doxygen pages <http://elastix.isi.uu.nl/doxygen/index.html>`_ where you will also find a `complete list of available parameters <http://elastix.isi.uu.nl/doxygen/parameter.html>`_.
 
 Image Pyramids
 ~~~~~~~~~~~~~~
@@ -149,5 +136,18 @@ Several methods for interpolation exist, varying in quality and speed. The :code
 The :code:`LinearInterpolator` returns a weighted average of surrounding voxels using distances as weights. In elastix, this method is highly optimized and very fast. In general, you will probably want to use this method together with the random coordinate sampler during the optimization process for best performance (in the time sense).
 
 The :code:`BSplineInterpolator` (or the more memory effecient :code:`BSplineInterpolatorFloat`) interpolates pixel values using b-spline approximations of user-defined order :math:`N`. First order b-splines corresponds to linear intepolation in which case you might as well use the linear interpolator. To generate the final result image a higher-order interpolation is usually required for which :math:`N = 3` is recommended. The final interpolator is called a ResampleInterpolator. Any one of the above methods can be used, but you need to prepend the name with Final, for example :code:`FinalBSplineInterpolatorFloat`
+
+Images
+~~~~~~
+As a final note in this section, it is important to know the appropriate definitions and terms when working with medical images. In particular, information associated with physical spacing between pixels and position on the image grid with respect to world coordinate system is extremely important. Improperly defined spacing and origins will most likely result in inconsistent results. The main geometrical concepts associated with an image object are depicted in Figure 7. 
+
+.. figure:: _static/ImageConcepts.png
+    :align: right
+    :figwidth: 95%
+    :width: 95% 
+
+    Figure 7: Geometrical concepts associated with the ITK image. Adopted from Ibanez et al. (2005).
+
+Above, circles are used to represent the centre of pixels. The value of the pixel is assumed to be a Dirac Delta Function located at the pixel centre. Pixel spacing is measured between the pixel centres and can be different along each dimension. The image origin is associated with the coordinates of the first pixel in the image. A pixel is considered to be the rectangular region surrounding the pixel centre holding the data value.
 
 In the next section we introduce the SimpleElastix Hello World example. 

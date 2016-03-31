@@ -3,14 +3,14 @@
 Getting Started
 ===============
 
-This page explains how to install SimpleElastix. The process typically involves compiling the C++ project and linking against a target language from which you would like to use SimpleElastix. SimpleElastix can be linked against Python, Java, R, Ruby, Octave, Lua, Tcl and C#. 
+This page explains how to install SimpleElastix. The process involves compiling the C++ project and linking against a target language from which you would like to use SimpleElastix. SimpleElastix can be linked against Python, Java, R, Ruby, Octave, Lua, Tcl and C#. 
 
 .. _Linux:
 
 SuperBuild On Linux
 -------------------
 
-SimpleElastix integrates elastix and transformix with the SimpleITK SuperBuild. The SuperBuild is nothing but a nerdy term for a script that will download and install dependencies (in this case elastix, ITK and SWIG) before compiling the main project. To build SimpleElastix in unix-like environments, clone the repository and invoke the SuperBuild. 
+SimpleElastix integrates elastix and transformix with the SimpleITK SuperBuild. The SuperBuild is a script that automatically downloads and installs dependencies (in this case elastix, ITK and SWIG) before compiling the main project. The following steps assume that CMake, git and a compiler toolchain is installed. To build SimpleElastix, clone the repository and invoke the SuperBuild. 
 
 ::
 
@@ -20,7 +20,7 @@ SimpleElastix integrates elastix and transformix with the SimpleITK SuperBuild. 
     $ cmake ../SimpleElastix/SuperBuild
     $ make -j4
 
-The SuperBuild will download and install dependencies (elastix, ITK and SWIG) and compile SimpleElastix. When we have built the project, we can find language packages in the :code:`${BUILD_DIRECTORY}/SimpleITK-build/Wrapping` directory. For example, to install the python module onto your system, navigate to
+When the project has been built, we can find language packages in the :code:`${BUILD_DIRECTORY}/SimpleITK-build/Wrapping` directory. For example, to install the python module onto your system, navigate to
 
 ::
 
@@ -34,7 +34,7 @@ and run the following command:
 
 This will install the SimpleITK python module with SimpleElastix unto your system, which can then be imported into your scripts like any other python module. 
 
-Target language dependencies need to be pre-installed. The :code:`apt-get` packages are  
+Target language dependencies need to be pre-installed. The relevant :code:`apt-get` packages are  
 
 ::
 
@@ -51,19 +51,16 @@ Note that this project takes around an hour to build on a quad-core machine. Sim
 SuperBuild On Mac OS X
 ----------------------
 
-The Mac OS X installation procedure is identical to that of Linux. We will use CMake to generate build files and Clang to compile the project. First, however, we make sure that a working compiler is installed:
+The Mac OS X installation procedure is identical to that of Linux, so simply follow the Linux installation steps above to install SimpleElastix. Mac OS X comes with Python and Tcl preinstalled. Other target-language dependencies need to be installed seperately. This can be done with `Macports <https://www.macports.org/>`_ or `Homebrew <http://http://brew.sh/>`_.
 
-- Open the OS X terminal and run :code:`make`. OS X will know if the Xcode Command Line Tools is missing and prompt you to install them if this is the case.
-- If you see an error message from the make program, the tools are installed and you can follow the Linux installation instructions above.
-
-Target-language dependencies also need to be installed seperately. This can be done with `Macports <https://www.macports.org/>`_ or `Homebrew <http://http://brew.sh/>`_. Mac OS X comes with Python and Tcl preinstalled.
+It is assumed that a CMake, git and a compiler toolchain has already been installed. We can check for a working compiler by opening the OS X terminal and run :code:`make`. OS X will know if the Xcode Command Line Tools is missing and prompt you to install them if this is the case. If the make program throws an error message, the tools have already been installed.
 
 .. _Windows:
 
 SuperBuild On Windows
 ---------------------
 
-SimpleElastix integrates elastix and transformix with the SimpleITK SuperBuild. The SuperBuild is nothing but a nerdy term for a script that will download and install dependencies (in this case elastix, ITK and SWIG) before compiling the main project.
+SimpleElastix integrates elastix and transformix with the SimpleITK SuperBuild. The SuperBuild is a script that automatically downloads and installs dependencies (in this case elastix, ITK and SWIG) before compiling the main project.
 
 In this guide we will use CMake to generate build files and the Visual Studio compiler to compile the project. 
 
@@ -120,7 +117,7 @@ In this guide we will use CMake to generate build files and the Visual Studio co
 
 Manually Building On Linux
 --------------------------
-The following approach allows us to use a system version of ITK or our own version of elastix. In the latter case, we start out with the elastix source code at https://github.com/kaspermarstal/elastix which includes some changes that make elastix play nicely with SimpleITK. 
+The following approach allows us to use a system version of ITK or our own version of elastix. 
 
 1. Setup the prerequisites
     - `sudo apt-get install cmake swig monodevelop r-base r-base-dev ruby python python-dev tcl tcl-dev tk tk-dev`.
@@ -134,7 +131,7 @@ The following approach allows us to use a system version of ITK or our own versi
     - Set ITK_DIR to the location of the ITK build directory
     - Configure CMake. Set the following CMake variables: BUILD_EXECUTABLE=OFF, USE_KNNGraphAlphaMutualInformationMetric=OFF 
     - Set appropriate ELASTIX_IMAGE_2/3/4D_PIXELTYPES and any components that you might require.
-    - Make sure your own compontents are properly registered by the elastix build system if you are writing your own components.
+    - If you are developing your own elastix components, make sure they are properly registered by the elastix build system.
     - Compile elastix. Make sure to configure the build settings exactly the same as ITK e.g. Release x64.
 5. Build SimpleElastix. 
     - Clone SimpleElastix from `github.com/kaspermarstal/SimpleElastix <https://github.com/kaspermarstal/SimpleElastix>`_.
