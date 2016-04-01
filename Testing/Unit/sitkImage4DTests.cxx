@@ -49,6 +49,7 @@ const double adir[] = { 0.0,  0.0,  0.0, 1.0,
                         0.0,  0.0, -1.0, 0.0 };
 
 using  itk::simple::InstantiatedPixelIDTypeList;
+namespace sitk = itk::simple;
 
 class Image4D : public ::testing::Test {
 public:
@@ -126,7 +127,7 @@ public:
 
 };
 
-TEST_F(Image4D,Create) {
+TEST_F( Image4D, Create ) {
   ASSERT_TRUE ( shortImage->GetITKBase() != NULL );
   EXPECT_EQ ( shortImage->GetWidth(), itkShortImage->GetLargestPossibleRegion().GetSize()[0] ) << " Checking image width";
   EXPECT_EQ ( shortImage->GetHeight(), itkShortImage->GetLargestPossibleRegion().GetSize()[1] ) << " Checking image height";
@@ -135,7 +136,7 @@ TEST_F(Image4D,Create) {
 
 }
 
-TEST_F(Image4D,ImageDataType) {
+TEST_F( Image4D, ImageDataType ) {
 
   // this test checks that the DataType of the images are correct
   int result;
@@ -188,7 +189,7 @@ TEST_F(Image4D,ImageDataType) {
 
 }
 
-TEST_F(Image4D,Constructors) {
+TEST_F( Image4D, Constructors ) {
   itk::simple::HashImageFilter hasher;
   int result;
 
@@ -290,7 +291,7 @@ TEST_F(Image4D,Constructors) {
 
 }
 
-TEST_F(Image4D,Transforms) {
+TEST_F (Image4D,Transforms ) {
 
   // Origin is [0.0, 1.1, 2.2, 3.3]
   // Spacing is [10, 11, 12, 13]
@@ -331,7 +332,7 @@ TEST_F(Image4D,Transforms) {
   }
 }
 
-TEST_F(Image4D,Properties) {
+TEST_F( Image4D,Properties ) {
 
   // GetOrigin
   std::vector<double> origin = shortImage->GetOrigin();
@@ -400,9 +401,7 @@ TEST_F(Image4D,Properties) {
   ASSERT_ANY_THROW( shortImage->SetDirection( std::vector<double>( adir, adir + 8 ) ) );
 }
 
-namespace sitk = itk::simple;
-
-TEST_F(Image4D, CopyInformation)
+TEST_F( Image4D, CopyInformation )
 {
   std::vector<unsigned int> s4d(4,10);
   sitk::Image img1d( 10, 20, sitk::sitkFloat32 );
@@ -428,7 +427,7 @@ TEST_F(Image4D, CopyInformation)
 
 }
 
-TEST_F(Image4D, CopyOnWrite)
+TEST_F( Image4D, CopyOnWrite )
 {
   std::vector<unsigned int> s4d(4,10);
   // test that a just constructed image only have 1 referecne
@@ -472,7 +471,7 @@ TEST_F(Image4D, CopyOnWrite)
 }
 
 
-TEST( IO, Image4D )
+TEST_F( Image4D, IO )
 {
   // Image
 
@@ -541,7 +540,7 @@ TEST( IO, Image4D )
 }
 
 
-TEST_F(Image4D, JoinSeriesImageFilter)
+TEST_F( Image4D, JoinSeriesImageFilter )
 {
   std::vector<unsigned int> size(3);
   size[0] = 10;
@@ -556,7 +555,7 @@ TEST_F(Image4D, JoinSeriesImageFilter)
   EXPECT_EQ ( out.GetSize()[3], 3 );
 }
 
-TEST_F(Image4D, ExtractImageFilter)
+TEST_F( Image4D, ExtractImageFilter )
 {
   std::vector<unsigned int> size(4);
   size[0] = 10;
@@ -575,5 +574,5 @@ TEST_F(Image4D, ExtractImageFilter)
   sitk::Image out = sitk::Extract(img, extractSize);
 
   ASSERT_EQ ( out.GetDimension(), 3 );
-  EXPECT_EQ ( out.GetSize()[3], 13 );
+  EXPECT_EQ ( out.GetSize()[2], 13 );
 }

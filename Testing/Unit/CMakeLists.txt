@@ -39,7 +39,6 @@ set ( SimpleITKUnitTestSource
 if ( SITK_4D_IMAGES )
   list ( APPEND SimpleITKUnitTestSource
     sitkImage4DTests.cxx
-    sitkSimpleElastix4DTests.cxx
     )
 endif()
 
