@@ -2,7 +2,7 @@ set( proj elastix )
 
 file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/${proj}-build/CMakeCacheInit.txt" "${ep_common_cache}" )
 set( ELASTIX_REPOSITORY http://github.com/kaspermarstal/elastix )
-set( ELASTIX_TAG c49f4e51cd2eeaa86459abc80ac457d0d9a53f00 )
+set( ELASTIX_TAG 1a49b457edb5bde3f27be710730c8185df74f4e8 )
 
 ExternalProject_Add( ${proj} 
   GIT_REPOSITORY ${ELASTIX_REPOSITORY}
