@@ -34,11 +34,8 @@ class SITKCommon_EXPORT SimpleTransformix
     typedef ParameterObjectType::ParameterValueType        ParameterValueType;
     typedef ParameterObjectType::ParameterValueVectorType  ParameterValueVectorType;
 
-    /** To be wrapped by SWIG */ 
-
     const std::string GetName( void );
 
-    // Images
     Self& SetInputImage( const Image& inputImage );
     Image& GetInputImage( void );
     Self& RemoveInputImage( void );

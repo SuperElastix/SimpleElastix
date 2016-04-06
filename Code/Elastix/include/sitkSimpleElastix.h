@@ -38,8 +38,6 @@ class SITKCommon_EXPORT SimpleElastix
     typedef ParameterObjectType::ParameterValueVectorType       ParameterValueVectorType;
     typedef ParameterObjectType::ParameterValueVectorIterator   ParameterValueVectorIterator;
 
-    /** To be wrapped by SWIG */ 
-
     const std::string GetName( void );
 
     Self& SetFixedImage( const Image& fixedImage );
