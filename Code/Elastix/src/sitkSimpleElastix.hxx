@@ -10,8 +10,10 @@ template< typename TFixedImage, typename TMovingImage >
 Image
 SimpleElastix::DualExecuteInternal( void )
 {
-  typedef elastix::ElastixFilter< TFixedImage, TMovingImage > ElastixFilterType;
-  typedef typename ElastixFilterType::Pointer ElastixFilterPointer;
+  typedef elastix::ElastixFilter< TFixedImage, TMovingImage >   ElastixFilterType;
+  typedef typename ElastixFilterType::Pointer                   ElastixFilterPointer;
+  typedef typename ElastixFilterType::FixedMaskType             FixedMaskType;
+  typedef typename ElastixFilterType::MovingMaskType            MovingMaskType;
 
   try
   {
@@ -29,15 +31,16 @@ SimpleElastix::DualExecuteInternal( void )
 
     for( unsigned int i = 0; i < this->GetNumberOfFixedMasks(); ++i )
     {
-      elastixFilter->AddFixedMask( static_cast< typename ElastixFilterType::FixedMaskType* >( this->GetFixedMask( i ).GetITKBase() ) );
+      elastixFilter->AddFixedMask( static_cast< FixedMaskType* >( this->GetFixedMask( i ).GetITKBase() ) );
     }
 
     for( unsigned int i = 0; i < this->GetNumberOfMovingMasks(); ++i )
     {
-      elastixFilter->AddMovingMask( static_cast< typename ElastixFilterType::MovingMaskType* >( this->GetMovingMask( i ).GetITKBase() ) );
+      elastixFilter->AddMovingMask( static_cast< MovingMaskType* >( this->GetMovingMask( i ).GetITKBase() ) );
     }
 
     elastixFilter->SetInitialTransformParameterFileName( this->GetInitialTransformParameterFileName() );
+
     elastixFilter->SetFixedPointSetFileName( this->GetFixedPointSetFileName() );
     elastixFilter->SetMovingPointSetFileName( this->GetMovingPointSetFileName() );
 
@@ -55,10 +58,10 @@ SimpleElastix::DualExecuteInternal( void )
   }
   catch( itk::ExceptionObject &e )
   {
-    sitkExceptionMacro( << e );
+    sitkExceptionMacro( e );
   }
 
-  // Make a deep copy. This is important to prevent the internal data object trying to update its
+  // Making a deep copy is important to prevent the internal data object trying to update its
   // source (this elastixFilter) outside this function (where it has gone out of scope and been destroyed).
   // TODO: We should be able to simply call DisconnectPipeline() on the ITK output image but this does not seem to work
   this->m_ResultImage.MakeUnique();
