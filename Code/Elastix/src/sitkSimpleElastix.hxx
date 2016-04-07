@@ -58,13 +58,8 @@ SimpleElastix::DualExecuteInternal( void )
   }
   catch( itk::ExceptionObject &e )
   {
-    sitkExceptionMacro( e );
+    sitkExceptionMacro( << e );
   }
-
-  // Making a deep copy is important to prevent the internal data object trying to update its
-  // source (this elastixFilter) outside this function (where it has gone out of scope and been destroyed).
-  // TODO: We should be able to simply call DisconnectPipeline() on the ITK output image but this does not seem to work
-  this->m_ResultImage.MakeUnique();
 
   return this->m_ResultImage;
 }
