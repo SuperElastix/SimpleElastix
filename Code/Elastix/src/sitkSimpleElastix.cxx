@@ -12,11 +12,11 @@ SimpleElastix
 {
   // Register this class with SimpleITK
   this->m_DualMemberFactory.reset( new detail::DualMemberFunctionFactory< MemberFunctionType >( this ) );
-  this->m_DualMemberFactory->RegisterMemberFunctions< BasicPixelIDTypeList, BasicPixelIDTypeList, 2 > ();
-  this->m_DualMemberFactory->RegisterMemberFunctions< BasicPixelIDTypeList, BasicPixelIDTypeList, 3 > ();
+  this->m_DualMemberFactory->RegisterMemberFunctions< BasicPixelIDTypeList, BasicPixelIDTypeList, 2 >();
+  this->m_DualMemberFactory->RegisterMemberFunctions< BasicPixelIDTypeList, BasicPixelIDTypeList, 3 >();
 
   #ifdef SITK_4D_IMAGES
-    this->m_DualMemberFactory->RegisterMemberFunctions< BasicPixelIDTypeList, BasicPixelIDTypeList, 4 > ();
+    this->m_DualMemberFactory->RegisterMemberFunctions< BasicPixelIDTypeList, BasicPixelIDTypeList, 4 >();
   #endif
  
   m_FixedImages                 = VectorOfImage();
@@ -896,6 +896,16 @@ Image
 SimpleElastix
 ::Execute( void )
 {
+  if( this->GetNumberOfFixedImages() == 0 )
+  {
+    sitkExceptionMacro( "Fixed image not set." );
+  }
+
+  if( this->GetNumberOfMovingImages() == 0 )
+  {
+    sitkExceptionMacro( "Moving image not set." );
+  }
+
   for( unsigned int i = 0; i < this->GetNumberOfFixedMasks(); ++i )
   {
     const PixelIDValueEnum FixedMaskPixelID = this->GetFixedMask( i ).GetPixelID();
@@ -948,7 +958,7 @@ SimpleElastix
 {
   if( this->IsEmpty( this->m_ResultImage ) )
   {
-    sitkExceptionMacro( "No result image was found." )
+    sitkExceptionMacro( "No result image found. Run registration with Execute()." )
   }
 
   return this->m_ResultImage;
