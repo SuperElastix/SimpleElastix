@@ -299,7 +299,7 @@ TEST( SimpleElastix, MultipleFixedAndMovingImages )
 TEST( SimpleElastix, RegistrationWithPointSets )
 {
   // We generate the point sets manually
-  std::string fixedPointSetFileName = dataFinder.GetFile( "Input/FixedPointSet.pts" );
+  std::string fixedPointSetFileName = dataFinder.GetOutputDirectory() + "FixedPointSet.pts";
   std::ofstream fixedPointSetFile;
   fixedPointSetFile.open( fixedPointSetFileName );
   fixedPointSetFile << "point\n";
@@ -307,7 +307,7 @@ TEST( SimpleElastix, RegistrationWithPointSets )
   fixedPointSetFile << "128.0 128.0\n";
   fixedPointSetFile.close();
 
-  std::string movingPointSetFileName = dataFinder.GetFile( "Input/MovingPointSet.pts" );
+  std::string movingPointSetFileName = dataFinder.GetOutputDirectory() + "MovingPointSet.pts";
   std::ofstream movingPointSetFile;
   movingPointSetFile.open( movingPointSetFileName );
   movingPointSetFile << "point\n";
@@ -335,7 +335,7 @@ TEST( SimpleElastix, RegistrationWithPointSets )
 
 TEST( SimpleElastix, InitialTransform )
 {
-  std::string initialTransformParameterFileName = dataFinder.GetFile( "Input/InitialTransformTestParameterFile.txt" );
+  std::string initialTransformParameterFileName = dataFinder.GetOutputDirectory() + "InitialTransformTestParameterFile.txt";
   Image fixedImage = ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
   Image movingImage = ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
   Image resultImage1; 
