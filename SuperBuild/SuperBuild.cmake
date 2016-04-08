@@ -102,9 +102,9 @@ mark_as_advanced( SITK_4D_IMAGES )
 # Setup build type
 #------------------------------------------------------------------------------
 
-# By default, let's build as Debug
+# By default, let's build as Release
 if(NOT DEFINED CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Debug")
+  set(CMAKE_BUILD_TYPE "Release")
 endif()
 
 # let a dashboard override the default.
