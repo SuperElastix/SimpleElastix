@@ -36,13 +36,13 @@ class SITKCommon_EXPORT SimpleTransformix
 
     const std::string GetName( void );
 
-    Self& SetInputImage( const Image& inputImage );
-    Image& GetInputImage( void );
-    Self& RemoveInputImage( void );
+    Self& SetMovingImage( const Image& movingImage );
+    Image& GetMovingImage( void );
+    Self& RemoveMovingImage( void );
 
-    Self& SetInputPointSetFileName( const std::string inputPointSetFileName );
-    std::string GetInputPointSetFileName( void );
-    Self& RemoveInputPointSetFileName( void );
+    Self& SetMovingPointSetFileName( const std::string movingPointSetFileName );
+    std::string GetMovingPointSetFileName( void );
+    Self& RemoveMovingPointSetFileName( void );
 
     Self& SetComputeSpatialJacobian( const bool );
     bool GetComputeSpatialJacobian( void );
@@ -112,16 +112,16 @@ class SITKCommon_EXPORT SimpleTransformix
 
     // Definitions for SimpleITK member factory
     typedef Image (Self::*MemberFunctionType)( void );
-    template< class TInputImage > Image ExecuteInternal ( void );
+    template< class TMovingImage > Image ExecuteInternal ( void );
     friend struct detail::MemberFunctionAddressor< MemberFunctionType >;
     std::auto_ptr< detail::MemberFunctionFactory< MemberFunctionType > > m_MemberFactory;
 
-    Image                   m_InputImage;
+    Image                   m_MovingImage;
 
     bool                    m_ComputeSpatialJacobian;
     bool                    m_ComputeDeterminantOfSpatialJacobian;
     bool                    m_ComputeDeformationField;
-    std::string             m_InputPointSetFileName;
+    std::string             m_MovingPointSetFileName;
 
     ParameterMapVectorType  m_TransformParameterMapVector;
 
@@ -136,8 +136,8 @@ class SITKCommon_EXPORT SimpleTransformix
 };
 
 // Procedural Interface 
-SITKCommon_EXPORT Image Transformix( const Image& inputImage, const std::map< std::string, std::vector< std::string > > parameterMap, const bool logToConsole = false, const std::string outputDirectory = "." );
-SITKCommon_EXPORT Image Transformix( const Image& inputImage, const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapVector, const bool logToConsole = false, const std::string outputDirectory = "." );
+SITKCommon_EXPORT Image Transformix( const Image& movingImage, const std::map< std::string, std::vector< std::string > > parameterMap, const bool logToConsole = false, const std::string outputDirectory = "." );
+SITKCommon_EXPORT Image Transformix( const Image& movingImage, const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapVector, const bool logToConsole = false, const std::string outputDirectory = "." );
 
 } // end namespace simple
 } // end namespace itk

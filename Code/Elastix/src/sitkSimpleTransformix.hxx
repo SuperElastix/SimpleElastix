@@ -6,22 +6,22 @@
 namespace itk {
   namespace simple {
 
-template< typename TInputImage >
+template< typename TMovingImage >
 Image
 SimpleTransformix::ExecuteInternal( void )
 {
-  typedef elastix::TransformixFilter< TInputImage > TransformixFilterType;
+  typedef elastix::TransformixFilter< TMovingImage > TransformixFilterType;
   typedef typename TransformixFilterType::Pointer TransforimxFilterPointer;
 
   try
   {
     TransforimxFilterPointer transformixFilter = TransformixFilterType::New();
 
-    if( !this->IsEmpty( this->m_InputImage ) ) {
-      transformixFilter->SetInputImage( static_cast< TInputImage* >( this->GetInputImage().GetITKBase() ) );
+    if( !this->IsEmpty( this->m_MovingImage ) ) {
+      transformixFilter->SetInput( static_cast< TMovingImage* >( this->GetMovingImage().GetITKBase() ) );
     }
 
-    transformixFilter->SetInputPointSetFileName( this->GetInputPointSetFileName() );
+    transformixFilter->SetInputPointSetFileName( this->GetMovingPointSetFileName() );
     transformixFilter->SetComputeSpatialJacobian( this->GetComputeSpatialJacobian() );
     transformixFilter->SetComputeDeterminantOfSpatialJacobian( this->GetComputeDeterminantOfSpatialJacobian() );
     transformixFilter->SetComputeDeformationField( this->GetComputeDeformationField() );
@@ -37,7 +37,7 @@ SimpleTransformix::ExecuteInternal( void )
 
     transformixFilter->Update();
 
-    if( !this->IsEmpty( this->m_InputImage ) )
+    if( !this->IsEmpty( this->GetMovingImage() ) )
     {
       this->m_ResultImage = Image( transformixFilter->GetOutput() );
 

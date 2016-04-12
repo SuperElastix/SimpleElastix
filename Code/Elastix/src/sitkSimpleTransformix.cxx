@@ -21,7 +21,7 @@ SimpleTransformix
     m_MemberFactory->RegisterMemberFunctions< BasicPixelIDTypeList, 4 >();
   #endif
 
-  this->SetInputImage( Image() );
+  this->SetMovingImage( Image() );
 
   this->ComputeSpatialJacobianOff();
   this->ComputeDeterminantOfSpatialJacobianOff();
@@ -51,47 +51,47 @@ SimpleTransformix
 
 SimpleTransformix::Self&
 SimpleTransformix
-::SetInputImage( const Image& inputImage )
+::SetMovingImage( const Image& movingImage )
 {
-  this->m_InputImage = inputImage;
+  this->m_MovingImage = movingImage;
   return *this;
 }
 
 Image&
 SimpleTransformix
-::GetInputImage( void )
+::GetMovingImage( void )
 {
-  return this->m_InputImage;
+  return this->m_MovingImage;
 }
 
 SimpleTransformix::Self&
 SimpleTransformix
-::RemoveInputImage( void )
+::RemoveMovingImage( void )
 {
-  this->SetInputImage( Image() );
+  this->SetMovingImage( Image() );
   return *this;
 }
 
 SimpleTransformix::Self& 
 SimpleTransformix
-::SetInputPointSetFileName( const std::string inputPointSetFileName )
+::SetMovingPointSetFileName( const std::string movingPointSetFileName )
 {
-  this->m_InputPointSetFileName = inputPointSetFileName;
+  this->m_MovingPointSetFileName = movingPointSetFileName;
   return *this;
 }
 
 std::string 
 SimpleTransformix
-::GetInputPointSetFileName( void )
+::GetMovingPointSetFileName( void )
 {
-  return this->m_InputPointSetFileName;
+  return this->m_MovingPointSetFileName;
 }
 
 SimpleTransformix::Self&
 SimpleTransformix
-::RemoveInputPointSetFileName( void )
+::RemoveMovingPointSetFileName( void )
 {
-  this->m_InputPointSetFileName = std::string();
+  this->m_MovingPointSetFileName = std::string();
   return *this;
 }
 
@@ -556,18 +556,17 @@ Image
 SimpleTransformix
 ::Execute( void )
 {
-  const PixelIDValueEnum InputImagePixelEnum = this->m_InputImage.GetPixelID();
-  const unsigned int InputImageDimension = this->m_InputImage.GetDimension();
+  const PixelIDValueEnum MovingImagePixelEnum = this->m_MovingImage.GetPixelID();
+  const unsigned int MovingImageDimension = this->m_MovingImage.GetDimension();
 
-  if( this->m_MemberFactory->HasMemberFunction( InputImagePixelEnum, InputImageDimension ) )
+  if( this->m_MemberFactory->HasMemberFunction( MovingImagePixelEnum, MovingImageDimension ) )
   {
-    return this->m_MemberFactory->GetMemberFunction( InputImagePixelEnum, InputImageDimension )();
+    return this->m_MemberFactory->GetMemberFunction( MovingImagePixelEnum, MovingImageDimension )();
   }
 
-  sitkExceptionMacro( << "SimpleTransformix does not support the combination of image type \""
-                      << GetPixelIDValueAsString( InputImagePixelEnum ) << "\" ("
-                      << GetPixelIDValueAsElastixParameter( InputImagePixelEnum ) << ") and dimension "
-                      << InputImageDimension << "." );
+  sitkExceptionMacro( << "SimpleTransformix does not support the combination of image type "
+                      << GetPixelIDValueAsElastixParameter( MovingImagePixelEnum ) << " and dimension "
+                      << MovingImageDimension << "." );
 }
 
 Image
@@ -596,18 +595,18 @@ SimpleTransformix
  */
 
 Image
-Transformix( const Image& inputImage, const SimpleTransformix::ParameterMapType parameterMap, const bool logToConsole, const std::string outputDirectory )
+Transformix( const Image& movingImage, const SimpleTransformix::ParameterMapType parameterMap, const bool logToConsole, const std::string outputDirectory )
 {
   SimpleTransformix::ParameterMapVectorType parameterMapVector;
   parameterMapVector.push_back( parameterMap );
-  return Transformix( inputImage, parameterMapVector, logToConsole, outputDirectory );
+  return Transformix( movingImage, parameterMapVector, logToConsole, outputDirectory );
 }
 
 Image
-Transformix( const Image& inputImage, const SimpleTransformix::ParameterMapVectorType parameterMapVector, const bool logToConsole, const std::string outputDirectory )
+Transformix( const Image& movingImage, const SimpleTransformix::ParameterMapVectorType parameterMapVector, const bool logToConsole, const std::string outputDirectory )
 {
   SimpleTransformix stfx;
-  stfx.SetInputImage( inputImage );
+  stfx.SetMovingImage( movingImage );
   stfx.SetTransformParameterMap( parameterMapVector );
   stfx.SetOutputDirectory( outputDirectory );
   stfx.LogToFileOn();
