@@ -34,6 +34,8 @@ set ( SimpleITKUnitTestSource
   sitkParameterMapTests.cxx
   sitkSimpleElastixTests.cxx
   sitkSimpleTransformixTests.cxx
+  sitkElastixFilterTests.cxx
+  sitkTransformixFilterTests.cxx
   )
 
 if ( SITK_4D_IMAGES )
