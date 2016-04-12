@@ -2,6 +2,9 @@
 # TODO: Transformix memcheck script
 
 elastix() {
+  # Write parameter file
+  (echo "import SimpleITK as sitk" ; echo "sitk.WriteParameterFile(sitk.GetDefaultParameterMap('affine'), '@CMAKE_BINARY_DIR@/Utilities/SimpleElastix/affineParameterMap.txt')") | python
+
   # Assert valgrind executable exist
   if [ ! -f "@CMAKE_BINARY_DIR@/bin/ElastixFilter" ]; then
     echo "ElastixFilter executable not found. Set BUILD_EXAMPLES to ON."
@@ -11,9 +14,6 @@ elastix() {
   if [ ! -f "@CMAKE_BINARY_DIR@/ExternalData/Testing/Data/Input/BrainProtonDensitySliceBorder20.png" ] || [ ! -f "@CMAKE_BINARY_DIR@/ExternalData/Testing/Data/Input/BrainProtonDensitySliceR10X13Y17.png" ]; then
     echo "Test data not found. Set BUILD_TESTING to ON."
   fi
-
-  # Write parameter file
-  (echo "import SimpleITK as sitk" ; echo "sitk.WriteParameterFile(sitk.GetDefaultParameterMap('affine'), '@CMAKE_BINARY_DIR@/Utilities/SimpleElastix/affineParameterMap.txt')") | python
 
   # Run elastix memcheck
   valgrind --leak-check=yes --track-origins=yes @CMAKE_BINARY_DIR@/bin/ElastixFilter @CMAKE_BINARY_DIR@/ExternalData/Testing/Data/Input/BrainProtonDensitySliceBorder20.png @CMAKE_BINARY_DIR@/ExternalData/Testing/Data/Input/BrainProtonDensitySliceR10X13Y17.png @CMAKE_BINARY_DIR@/Utilities/SimpleElastix/affineParameterMap.txt @CMAKE_BINARY_DIR@/Utilities/SimpleElastix/resultImage.nii.gz >@CMAKE_CURRENT_BINARY_DIR@/valgrind_std.out 2>@CMAKE_CURRENT_BINARY_DIR@/valgrind_err.out   
