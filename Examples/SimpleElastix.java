@@ -7,7 +7,7 @@ class SimpleElastix {
     // If you get "no SimpleITKJava in java.library.path" point java.library.path to lib/libSimpeITKJava.jnilib
 
     if ( argv.length < 4 ) {
-      System.out.println("Usage: java -cp SimpleElastixJava.jar SimpleElastix <fixedImage> <movingImage> <parameterFile> <output>");
+      System.out.println("Usage: java -cp SimpleElastixJava.jar SimpleElastix <fixedImage> <movingImage> <parameterFile> <outputDirectory>");
       return;
     }
 

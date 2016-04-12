@@ -51,7 +51,6 @@ int main( int argc, char* argv[] ) {
     ResultImageWriterPointer resultImageWriter = ResultImageWriterType::New();
     resultImageWriter->SetFileName( argv[4] );
     resultImageWriter->SetInput( elastixFilter->GetOutput() );
-
     resultImageWriter->Update();
   } 
   catch( itk::ExceptionObject &e )
