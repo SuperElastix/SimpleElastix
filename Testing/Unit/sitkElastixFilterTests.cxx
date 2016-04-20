@@ -54,10 +54,10 @@ TEST( ElastixFilterTest, UpdateOnDownstreamUpdate )
   typedef ElastixFilter< ImageType, ImageType > ElastixFilterType;
 
   ImageFileReaderType::Pointer fixedImageReader = ImageFileReaderType::New();
-  fixedImageReader->SetFileName( "/Users/kasper/Development/build/SimpleElastixDebug/SimpleITK-build/ExternalData/Testing/Data/Input/BrainProtonDensitySliceBorder20.png" );
+  fixedImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
 
   ImageFileReaderType::Pointer movingImageReader = ImageFileReaderType::New();
-  movingImageReader->SetFileName( "/Users/kasper/Development/build/SimpleElastixDebug/SimpleITK-build/ExternalData/Testing/Data/Input/BrainProtonDensitySliceR10X13Y17.png" );
+  movingImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceR10X13Y17.png" ) );
 
   ElastixFilterType::Pointer elastixFilter;
   EXPECT_NO_THROW( elastixFilter = ElastixFilterType::New() );
