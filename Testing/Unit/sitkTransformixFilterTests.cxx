@@ -36,7 +36,6 @@ TEST( TransformixFilterTest, UpdateOnDownstreamUpdate )
   EXPECT_NO_THROW( elastixFilter = ElastixFilterType::New() );
   EXPECT_NO_THROW( elastixFilter->SetFixedImage( fixedImageReader->GetOutput() ) );
   EXPECT_NO_THROW( elastixFilter->SetMovingImage( movingImageReader->GetOutput() ) );
-  elastixFilter->LogToConsoleOn();
   
   TransformixFilterType::Pointer transformixFilter;
   EXPECT_NO_THROW( transformixFilter = TransformixFilterType::New() );
@@ -141,11 +140,8 @@ TEST( TransformixFilterTest, ComputeSpatialJacobian )
   EXPECT_NO_THROW( transformixFilter = TransformixFilterType::New() );
   EXPECT_NO_THROW( transformixFilter->SetOutputDirectory( dataFinder.GetOutputDirectory() ) );
   EXPECT_NO_THROW( transformixFilter->SetTransformParameterObject( elastixFilter->GetTransformParameterObject() ) );
-  EXPECT_NO_THROW( transformixFilter->LogToConsoleOn() );
-  EXPECT_NO_THROW( transformixFilter->LogToFileOn() );
   EXPECT_NO_THROW( transformixFilter->ComputeSpatialJacobianOn() );
   EXPECT_NO_THROW( transformixFilter->Update() );
-
 }
 
 TEST( TransformixFilterTest, ComputeDeterminantOfSpatialJacobian )

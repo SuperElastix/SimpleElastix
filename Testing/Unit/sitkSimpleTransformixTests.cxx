@@ -27,7 +27,7 @@ TEST( SimpleTransformix, ObjectOrientedInterface )
   EXPECT_EQ( stfx.GetTransformParameterMap().size(), 0u );
 
   ASSERT_THROW( stfx.Execute(), GenericException );
-  EXPECT_NO_THROW( stfx.SetInputImage( movingImage ) );
+  EXPECT_NO_THROW( stfx.SetMovingImage( movingImage ) );
   ASSERT_THROW( stfx.Execute(), GenericException );
 
   EXPECT_NO_THROW( stfx.SetTransformParameterMap( silx.GetTransformParameterMap() ) );
@@ -89,16 +89,18 @@ TEST( SimpleTransformix, Transformation4D )
   Image resultImage1;
   Image resultImage2;
 
-  SimpleElastix silx; silx.LogToConsoleOn();
+  SimpleElastix silx;
   silx.SetParameterMap( "groupwise" );
-  silx.SetParameter("MaximumNumberOfIterations", "8.0");
-  silx.SetParameter("FinalGridSpacingInPhysicalUnits", "32.0");
+  silx.SetParameter( "MaximumNumberOfIterations", "8.0" );
+  silx.SetParameter( "FinalGridSpacingInPhysicalUnits", "32.0" );
   silx.SetFixedImage( fixedImage );
   silx.SetMovingImage( movingImage1 );
   resultImage1 = silx.Execute();
 
+  silx.PrettyPrint(silx.GetTransformParameterMap());
+
   SimpleTransformix stfx; stfx.LogToConsoleOn();
-  stfx.SetInputImage( movingImage2 );
+  stfx.SetMovingImage( movingImage2 );
   stfx.SetTransformParameterMap( silx.GetTransformParameterMap() );
   resultImage2 = stfx.Execute();
 }
