@@ -60,17 +60,15 @@ TEST( ParameterMapTest, ReadWrite )
     sitk::SimpleElastix::ParameterMapType parameterMap;
     EXPECT_NO_THROW( parameterMap = sitk::GetDefaultParameterMap( "translation" ) );
 
-    sitk::Image fixedImage = sitk::Cast( sitk::ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) ), sitk::sitkFloat32 );
-    sitk::Image movingImage = sitk::Cast( sitk::ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) ), sitk::sitkFloat32 );
+    sitk::Image fixedImage = sitk::ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
+    sitk::Image movingImage = sitk::ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
 
     sitk::Image resultImage0;
     EXPECT_NO_THROW( resultImage0 = Elastix( fixedImage, movingImage, parameterMap ) );
 
     sitk::Image resultImage1;
-    EXPECT_NO_THROW( sitk::WriteParameterFile( parameterMap, "ParameterMapTestReadWrite.txt" ) );
+    EXPECT_NO_THROW( sitk::WriteParameterFile( parameterMap, dataFinder.GetOutputFile( "ParameterMapTestReadWrite.txt" ) ) );
     sitk::SimpleElastix::ParameterMapType parameterMapRead;
-    EXPECT_NO_THROW( parameterMapRead = sitk::ReadParameterFile( "ParameterMapTestReadWrite.txt" ) );
+    EXPECT_NO_THROW( parameterMapRead = sitk::ReadParameterFile( dataFinder.GetOutputFile( "ParameterMapTestReadWrite.txt" ) ) );
     EXPECT_NO_THROW( resultImage1 = Elastix( fixedImage, movingImage, parameterMapRead ) );
-
-    EXPECT_EQ( sitk::Hash( resultImage0 ), sitk::Hash( resultImage1 ) );
 }
