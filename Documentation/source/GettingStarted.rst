@@ -160,7 +160,7 @@ While Visual Studio targets 64-bit platforms when we select a 64-bit compiler, t
     - Solution 1: Set the environment variable :code:`_IsNativeEnvironment=true` in command prompt, then call the Visual Studio  executable from command line. For example, in the case of VS2013:
     ::
 
-        c:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\devenv.exe" c:\SimpleElastix\build\SimpleITK-build\SimpleITK.sln)
+        start "c:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\devenv.exe" c:\SimpleElastix\build\SimpleITK-build\SimpleITK.sln
     - Solution 2: In Visual Studio, edit your .vcxproj file and insert the following after the :code:`<Import...Microsoft.Cpp.Defaults>` line:
     ::
 
