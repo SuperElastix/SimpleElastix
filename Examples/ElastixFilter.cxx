@@ -4,7 +4,6 @@
 #include "elxElastixFilter.h"
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
-#include "itkMacro.h"
 
 int main( int argc, char* argv[] ) {
 
@@ -14,7 +13,6 @@ int main( int argc, char* argv[] ) {
   }
 
   typedef itk::Image< float, 2u > ImageType;
-  typedef typename ImageType::Pointer ImagePointer;
 
   typedef elastix::ElastixFilter< ImageType, ImageType > ElastixFilterType;
   typedef typename ElastixFilterType::Pointer ElastixPointer;
