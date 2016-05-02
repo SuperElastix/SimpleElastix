@@ -838,58 +838,6 @@ SimpleElastix
   return parameterObject->GetParameterMap( transformName, numberOfResolutions, finalGridSpacingInPhysicalUnits );
 }
 
-SimpleElastix::Self&
-SimpleElastix
-::PrettyPrint( void )
-{
-  this->PrettyPrint( this->GetParameterMap() );
-  return *this;
-}
-
-SimpleElastix::Self& 
-SimpleElastix
-::PrettyPrint( const ParameterMapType parameterMap )
-{
-  ParameterMapVectorType parameterMapVector = ParameterMapVectorType( 1 );
-  parameterMapVector[ 0 ] = parameterMap;
-  this->PrettyPrint( parameterMapVector );
-  return *this;
-}
-
-SimpleElastix::Self& 
-SimpleElastix
-::PrettyPrint( const ParameterMapVectorType parameterMapList )
-{
-  for( unsigned int i = 0; i < parameterMapList.size(); ++i )
-  {
-    std::cout << "ParameterMap " << i << ": " << std::endl;
-    ParameterMapConstIterator parameterMapIterator = parameterMapList[ i ].begin();
-    ParameterMapConstIterator parameterMapIteratorEnd = parameterMapList[ i ].end();
-    while( parameterMapIterator != parameterMapIteratorEnd )
-    {
-      std::cout << "  (" << parameterMapIterator->first;
-      ParameterValueVectorType parameterMapValueVector = parameterMapIterator->second;
-      
-      for(unsigned int j = 0; j < parameterMapValueVector.size(); ++j)
-      {
-        std::stringstream stream( parameterMapValueVector[ j ] );
-        float number;
-        stream >> number;
-        if( stream.fail() ) {
-           std::cout << " \"" << parameterMapValueVector[ j ] << "\"";
-        }
-        else
-        {
-          std::cout << " " << number;
-        }      
-      }
-      
-      std::cout << ")" << std::endl;
-      parameterMapIterator++;
-    }
-  }
-
-  return *this;
 }
 
 Image
@@ -1083,18 +1031,19 @@ WriteParameterFile( const SimpleElastix::ParameterMapType parameterMap, const st
   selx.WriteParameterFile( parameterMap, filename );
 }
 
-void 
-PrettyPrint( const SimpleElastix::ParameterMapType parameterMap )
+void
+PrintParameterMap( const SimpleElastix::ParameterMapType parameterMap )
 {
   SimpleElastix::ParameterMapVectorType parameterMapVector = SimpleElastix::ParameterMapVectorType( 1, parameterMap );
-  PrettyPrint( parameterMapVector );
+  PrintParameterMap( parameterMapVector );
 }
 
 void
-PrettyPrint( const SimpleElastix::ParameterMapVectorType parameterMapVector )
+PrintParameterMap( const SimpleElastix::ParameterMapVectorType parameterMapVector )
 {
-  SimpleElastix selx;
-  selx.PrettyPrint( parameterMapVector );
+  SimpleElastix::ParameterObjectPointer parameterObject = SimpleElastix::ParameterObjectType::New();
+  parameterObject->SetParameterMap( parameterMapVector );
+  parameterObject->Print( std::cout );
 }
 
 Image
