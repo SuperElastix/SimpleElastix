@@ -10,7 +10,7 @@ This page explains how to install SimpleElastix. The process involves compiling 
 SuperBuild On Linux
 -------------------
 
-SimpleElastix integrates elastix and transformix with the SimpleITK SuperBuild. The SuperBuild is a script that automatically downloads and installs dependencies (in this case elastix, ITK and SWIG) before compiling the main project. The following steps assume that CMake, git and a compiler toolchain is installed. To build SimpleElastix, clone the repository and invoke the SuperBuild. 
+SimpleElastix can be compiled with the SuperBuild. The SuperBuild is a script that automatically downloads and install any dependencies so you can don't have to install elastix, ITK or SWIG on beforehand. The only thing you need is CMake, git and a compiler toolchain. To build SimpleElastix, use the following steps to download the code and start the build:
 
 ::
 
@@ -53,16 +53,14 @@ SuperBuild On Mac OS X
 
 The Mac OS X installation procedure is identical to that of Linux, so simply follow the Linux installation steps above to install SimpleElastix. Mac OS X comes with Python and Tcl preinstalled. Other target-language dependencies need to be installed seperately. This can be done with `Macports <https://www.macports.org/>`_ or `Homebrew <http://http://brew.sh/>`_.
 
-It is assumed that a CMake, git and a compiler toolchain has already been installed. We can check for a working compiler by opening the OS X terminal and run :code:`make`. OS X will know if the Xcode Command Line Tools is missing and prompt you to install them if this is the case. If the make program throws an error message, the tools have already been installed.
+It is assumed that a CMake, git and a compiler toolchain has already been installed. We can check for a working compiler by opening the OS X terminal and run :code:`make`. OS X will know if the Xcode Command Line Tools is missing and prompt you to install them if this is the case. 
 
 .. _Windows:
 
 SuperBuild On Windows
 ---------------------
 
-SimpleElastix integrates elastix and transformix with the SimpleITK SuperBuild. The SuperBuild is a script that automatically downloads and installs dependencies (in this case elastix, ITK and SWIG) before compiling the main project.
-
-In this guide we will use CMake to generate build files and the Visual Studio compiler to compile the project. 
+SimpleElastix can be compiled with the SuperBuild. The SuperBuild is a script that automatically downloads and install any dependencies so you can don't have to install elastix, ITK or SWIG on beforehand. The only thing you need is CMake, git and a compiler toolchain. In this guide we will use CMake to generate build files and the Visual Studio compiler to compile the project. 
 
 1. Setup directories.
     - Download and install `CMake GUI <http://www.cmake.org/download/>`_.
@@ -117,11 +115,11 @@ In this guide we will use CMake to generate build files and the Visual Studio co
 
 Manually Building On Linux
 --------------------------
-The following approach allows us to use a system version of ITK or our own version of elastix. 
+The following approach allows us to a locally installed version of ITK and/or elastix. 
 
 1. Setup the prerequisites
     - `sudo apt-get install cmake swig monodevelop r-base r-base-dev ruby python python-dev tcl tcl-dev tk tk-dev`.
-2. Install the matching version of SWIG >= 3.0.5
+2. Install SWIG >= 3.0.5
 3. Install ITK. Configure CMake using the same approach as above.
     - Clone ITK from `github.com/InsightSoftwareConsortium/ITK <https://github.com/InsightSoftwareConsortium/ITK>`_.
     - Configure CMake. Set the following CMake variables: BUILD_SHARED_LIBS=OFF, ITK_USE_REVIEW=ON, ITK_WRAP_*=OFF.
@@ -155,7 +153,7 @@ The language package may be configured incorrectly or the necessary folders may 
 
 Visual Studio throws :code:`LNK1102 out of memory` error even though I selected the 64-bit compiler
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-While Visual Studio targets 64-bit platforms when we select a 64-bit compiler, the Visual Studio toolchain itself will be 32-bit by default. We may therefore experience an out-of-memory error even though you compile a 64-bit vesion of elastix, especially during the linking stage. There are (at least) two ways we can try switch to a 64-bit toolchain (we say "try" because these methods work, someimes they don't).
+While Visual Studio targets 64-bit platforms when we select a 64-bit compiler, the Visual Studio toolchain itself will be 32-bit by default. We may therefore experience an out-of-memory error even though you compile a 64-bit vesion of elastix, especially during the linking stage. There are (at least) two ways we can try switch to a 64-bit toolchain ("try" because these methods work, someimes they don't).
 
     - Solution 1: Set the environment variable :code:`_IsNativeEnvironment=true` in command prompt, then call the Visual Studio  executable from command line. For example, in the case of VS2013:
     ::
@@ -205,7 +203,7 @@ This error may stem from a space in the path of the build directory. For example
 
 SimpleElastix takes a long time to build!
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The full build take 2+ hours to build on a standard machine. We can speed up compilation by deselecting Examples, Testing and any wrapped languages we don't need. Other than that there is not much we can do. SimpleITK has to compile all filters (including elastix) for all pixel types in order to support runtime selection of the correct template parameters. So yeah, it takes a long time.
+The full build take 2+ hours to build on a standard machine. We can speed up compilation by deselecting Examples, Testing and any wrapped languages we don't need. Other than that there is not much we can do. SimpleITK has to compile all filters (including elastix) for all pixel types in order to support runtime selection of the correct template parameters. 
 
 I am unable to assign a parameter to a parameter map in a parameter map list
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
