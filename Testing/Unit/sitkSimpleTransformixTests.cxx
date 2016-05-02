@@ -97,9 +97,9 @@ TEST( SimpleTransformix, Transformation4D )
   silx.SetMovingImage( movingImage1 );
   resultImage1 = silx.Execute();
 
-  silx.PrettyPrint(silx.GetTransformParameterMap());
+  silx.PrintParameterMap(silx.GetTransformParameterMap());
 
-  SimpleTransformix stfx; stfx.LogToConsoleOn();
+  SimpleTransformix stfx;
   stfx.SetMovingImage( movingImage2 );
   stfx.SetTransformParameterMap( silx.GetTransformParameterMap() );
   resultImage2 = stfx.Execute();

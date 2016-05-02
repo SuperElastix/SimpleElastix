@@ -47,12 +47,12 @@ TEST( ParameterMapTest, ProceduralInterface )
 {
     sitk::SimpleElastix::ParameterMapType parameterMap;
     EXPECT_NO_THROW( parameterMap = sitk::GetDefaultParameterMap( "translation" ) );
-    EXPECT_NO_THROW( sitk::PrettyPrint( parameterMap ) );
+    EXPECT_NO_THROW( sitk::PrintParameterMap( parameterMap ) );
 
     sitk::SimpleElastix::ParameterMapVectorType parameterMapVector;
     parameterMapVector.push_back( parameterMap );
     parameterMapVector.push_back( parameterMap );
-    EXPECT_NO_THROW( sitk::PrettyPrint( parameterMapVector ) );
+    EXPECT_NO_THROW( sitk::PrintParameterMap( parameterMapVector ) );
 }
 
 TEST( ParameterMapTest, ReadWrite )

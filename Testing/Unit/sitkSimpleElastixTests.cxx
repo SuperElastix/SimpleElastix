@@ -268,7 +268,7 @@ TEST( SimpleElastix, ProceduralInterface )
   EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMapVector, fixedMask, movingMask, false, true, outputDirectory ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
 
-  EXPECT_NO_THROW( PrettyPrint( parameterMapVector ) );
+  EXPECT_NO_THROW( PrintParameterMap( parameterMapVector ) );
 }
 
 TEST( SimpleElastix, MultipleFixedAndMovingImages )
