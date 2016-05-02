@@ -52,10 +52,11 @@ SimpleElastix::DualExecuteInternal( void )
     ParameterObjectPointer parameterObject = ParameterObjectType::New();
     parameterObject->SetParameterMap( this->m_ParameterMapVector );
     elastixFilter->SetParameterObject( parameterObject );
-
-    this->m_ResultImage = Image( elastixFilter->GetOutput() );
+    
     elastixFilter->Update();
 
+    this->m_ResultImage = Image( elastixFilter->GetOutput() );
+    this->m_ResultImage.MakeUnique();
     this->m_TransformParameterMapVector = elastixFilter->GetTransformParameterObject()->GetParameterMap();
   }
   catch( itk::ExceptionObject &e )

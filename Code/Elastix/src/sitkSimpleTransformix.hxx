@@ -34,13 +34,14 @@ SimpleTransformix::ExecuteInternal( void )
     ParameterObjectPointer parameterObject = ParameterObjectType::New();
     parameterObject->SetParameterMap( this->m_TransformParameterMapVector );
     transformixFilter->SetTransformParameterObject( parameterObject );
+    
+    transformixFilter->Update();
 
     if( !this->IsEmpty( this->GetMovingImage() ) )
     {
       this->m_ResultImage = Image( transformixFilter->GetOutput() );
+      this->m_ResultImage.MakeUnique();
     }
-
-    transformixFilter->Update();
   }
   catch( itk::ExceptionObject &e )
   {
