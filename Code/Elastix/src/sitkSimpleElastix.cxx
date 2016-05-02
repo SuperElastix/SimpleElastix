@@ -38,11 +38,11 @@ SimpleElastix
 
   m_ResultImage                 = Image();
 
-  ParameterObjectPointer defaultParameterObject = ParameterObjectType::New();
-  defaultParameterObject->AddParameterMap( "translation" );
-  defaultParameterObject->AddParameterMap( "affine" );
-  defaultParameterObject->AddParameterMap( "bspline" );
-  this->SetParameterMap( defaultParameterObject->GetParameterMap() );
+  ParameterMapVectorType defaultParameterMap;
+  defaultParameterMap.push_back( ParameterObjectType::GetDefaultParameterMap( "translation" ) );
+  defaultParameterMap.push_back( ParameterObjectType::GetDefaultParameterMap( "affine" ) );
+  defaultParameterMap.push_back( ParameterObjectType::GetDefaultParameterMap( "bspline" ) );
+  this->SetParameterMap( defaultParameterMap );
 }
 
 SimpleElastix
@@ -572,8 +572,7 @@ SimpleElastix::Self&
 SimpleElastix
 ::SetParameterMap( const std::string transformName, const unsigned int numberOfResolutions, const double finalGridSpacingInPhysicalUnits )
 {
-  ParameterObjectPointer parameterObject = ParameterObjectType::New();
-  ParameterMapType parameterMap = parameterObject->GetParameterMap( transformName, numberOfResolutions, finalGridSpacingInPhysicalUnits );
+  ParameterMapType parameterMap = ParameterObjectType::GetDefaultParameterMap( transformName, numberOfResolutions, finalGridSpacingInPhysicalUnits );
   this->SetParameterMap( parameterMap );
   return *this;
 }
