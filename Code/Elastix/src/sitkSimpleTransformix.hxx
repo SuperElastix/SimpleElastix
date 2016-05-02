@@ -35,12 +35,12 @@ SimpleTransformix::ExecuteInternal( void )
     parameterObject->SetParameterMap( this->m_TransformParameterMapVector );
     transformixFilter->SetTransformParameterObject( parameterObject );
 
-    transformixFilter->Update();
-
     if( !this->IsEmpty( this->GetMovingImage() ) )
     {
       this->m_ResultImage = Image( transformixFilter->GetOutput() );
     }
+
+    transformixFilter->Update();
   }
   catch( itk::ExceptionObject &e )
   {

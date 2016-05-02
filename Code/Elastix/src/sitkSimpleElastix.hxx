@@ -54,6 +54,8 @@ SimpleElastix::DualExecuteInternal( void )
     elastixFilter->SetParameterObject( parameterObject );
 
     this->m_ResultImage = Image( elastixFilter->GetOutput() );
+    elastixFilter->Update();
+
     this->m_TransformParameterMapVector = elastixFilter->GetTransformParameterObject()->GetParameterMap();
   }
   catch( itk::ExceptionObject &e )
