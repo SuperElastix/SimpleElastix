@@ -1,15 +1,22 @@
 What is SimpleElastix?
 ======================
-The goal of SimpleElastix is to bring the robust C++ medical image registration algorithms of the [elastix](http://elastix.isi.uu.nl/ "Elastix website") library to a wider audience by integrating elastix with [SimpleITK](https://github.com/SimpleITK/SimpleITK "SimpleITK github repository"). Image registration is the process of transforming images into a common coordinate system so corresponding pixels represent homologous biological points. This is a prerequisite for a wide range of medical image analysis tasks and a key algorithmic component for statistical analysis and machine learning in medical image processing. This package provides
+SimpleElastix is an extension of [SimpleITK](https://github.com/SimpleITK/SimpleITK "SimpleITK github repository") that offers a user-friendly API to the popular image registration algorithms of the [elastix](http://elastix.isi.uu.nl/ "Elastix website") C++ library. This makes state-of-the-art medical image registration really easy to do in languages like Python, Java, C# and R. Image registration is the process of transforming images into a common coordinate system so corresponding pixels represent homologous biological points. This package provides
 
-- elastix and transformix bindings for Python, Java, R, Ruby, Octave, Lua, Tcl and C# (see [elastix manual](http://elastix.isi.uu.nl/download/elastix_manual_v4.7.pdf "elastix manual") for a list of supported registration algorithms).
-- Installation, examples, usage and introductory material at [simpleelastix.readthedocs.org](https://simpleelastix.readthedocs.org/).
-- A user-friendly API that aligns with the design philosophy of SimpleITK, developed specifically for rapid prototyping and use in scripting languages. If you are interested, [The Design of SimpleITK](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3874546/ "PubMed") is a great read.
-- Pre-configured parameter files that should serve as good starting points for new users.
-- A SuperBuild that automatically compiles and installs SimpleElastix and any dependencies.
+- elastix and transformix bindings for C++, Python, Java, R, Ruby, Octave, Lua, Tcl and C# (see [elastix manual](http://elastix.isi.uu.nl/download/elastix_manual_v4.7.pdf "elastix manual") for a list of supported registration algorithms).
+- Pre-configured registration methods that serve as good starting points for new users.
+- Installation guides, examples, and introductory material at [simpleelastix.readthedocs.org](https://simpleelastix.readthedocs.org/).
+- A user-friendly API that aligns with the design philosophy of SimpleITK developed specifically for rapid prototyping. If you are interested, [The Design of SimpleITK](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3874546/ "PubMed") is a great read.
 - The complete set of SimpleITK image processing algorithms.
 
-Enough talk, time for some examples! Say you need to compare the volume, mean intensity and standard deviation of (possibly multiple) anatomical structures across a population of images using an atlas segmentation. This is accomplished using the following lines of Python code:
+Enough talk, time for some examples! We will use Python for the following code. Say you need to register two images. This can be accomplished with a single line of code:
+
+```python
+resultImage = SimpleITK.Elastix(sitk.ReadImage("fixedImage.dcm", "movingImage.dcm"))
+```
+
+Under the hood, Elastix will use stochastic optimization for maximum speed, a multi-resolution strategy and several different transform of increasing complexity for maximum robustness. All aspects of the registration procedure can be customized via [parameter maps](https://simpleelastix.readthedocs.io/ParameterMaps.html). 
+
+SimpleElastix can also be used for more complex image processing pipelines. Say you want to compare the volume, mean intensity and standard deviation of the intensity of anatomical structures across a population of images using an atlas segmentation. We can accomplish this task like this:
 
 ```python
 import SimpleITK as sitk
@@ -44,7 +51,7 @@ for filename in population
   # etc etc
 ```
 
-That was easy. The example demonstrates the efficiency of combining SimpleElastix's object oriented interface (the way we used elastix to register images) and procedural interface (the way we used transformix to warp labels) with SimpleITK (the way we computed statistics). Previously, using elastix and transformix on large datasets would incur a significant overhead, from scripting command line invocations and arguments to copying images and transform parameter files across folders. With SimpleElastix this complexity is easier to manage and more memory and disk I/O efficient. For more examples see [the documentation](https://simpleelastix.readthedocs.org/) or the [Examples/SimpleElastix](Examples/SimpleElastix) directory. 
+This example demonstrates the efficiency of combining SimpleElastix's object oriented interface (the way we used elastix to register images) and procedural interface (the way we used transformix to warp labels) with SimpleITK (the way we computed statistics). Previously, using elastix and transformix on large datasets would incur a significant overhead, from scripting command line invocations and arguments to copying images and transform parameter files across folders. With SimpleElastix this complexity is easier to manage and more memory and disk I/O efficient. For more examples see [the documentation](https://simpleelastix.readthedocs.org/) or the [Examples/SimpleElastix](Examples/SimpleElastix) directory. 
 
 ### Building with the SuperBuild
 SimpleElastix integrates elastix and transformix with the SimpleITK SuperBuild. Simply clone this repository and invoke the SuperBuild.
