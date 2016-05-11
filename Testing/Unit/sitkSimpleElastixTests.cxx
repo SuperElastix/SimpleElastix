@@ -293,6 +293,7 @@ TEST( SimpleElastix, MultipleFixedAndMovingImages )
   EXPECT_NO_THROW( silx.AddMovingImage( movingImage0 ) );
   EXPECT_NO_THROW( silx.AddMovingImage( movingImage1 ) );
   EXPECT_NO_THROW( resultImage = silx.Execute() );
+  EXPECT_NO_THROW( resultImage = silx.Execute() );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
 }
 
