@@ -110,10 +110,6 @@ class SITKCommon_EXPORT SimpleElastix
     std::map< std::string, std::vector< std::string > > GetDefaultParameterMap( const std::string transformName, const unsigned int numberOfResolutions = 4, const double finalGridSpacingInPhysicalUnits = 10.0 );
     unsigned int GetNumberOfParameterMaps( void );
 
-    Self& SetInitialTransformParameterFileName( const std::string initialTransformParmaterFileName );
-    std::string GetInitialTransformParameterFileName( void );
-    Self& RemoveInitialTransformParameterFileName( void );
-
     Self& SetParameter( const std::string key, const std::string value );
     Self& SetParameter( const std::string key, const std::vector< std::string > value );
     Self& SetParameter( const unsigned int index, const std::string key, const std::string value );
@@ -126,6 +122,10 @@ class SITKCommon_EXPORT SimpleElastix
     std::vector< std::string > GetParameter( const unsigned int index, const std::string key );
     Self& RemoveParameter( const std::string key );
     Self& RemoveParameter( const unsigned int index, const std::string key );
+
+    Self& SetInitialTransformParameterFileName( const std::string initialTransformParmaterFileName );
+    std::string GetInitialTransformParameterFileName( void );
+    Self& RemoveInitialTransformParameterFileName( void );
 
     std::map< std::string, std::vector< std::string > > ReadParameterFile( const std::string filename );
     Self& WriteParameterFile( const std::map< std::string, std::vector< std::string > > parameterMap, const std::string filename );

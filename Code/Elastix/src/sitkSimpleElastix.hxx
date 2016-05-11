@@ -21,22 +21,22 @@ SimpleElastix::DualExecuteInternal( void )
 
     for( unsigned int i = 0; i < this->GetNumberOfFixedImages(); ++i )
     {
-      elastixFilter->AddFixedImage( static_cast< TFixedImage* >( this->GetFixedImage( i ).GetITKBase() ) );
+      elastixFilter->AddFixedImage( itkDynamicCastInDebugMode< TFixedImage* >( this->GetFixedImage( i ).GetITKBase() ) );
     }
 
     for( unsigned int i = 0; i < this->GetNumberOfMovingImages(); ++i )
     {
-      elastixFilter->AddMovingImage( static_cast< TMovingImage* >( this->GetMovingImage( i ).GetITKBase() ) );
+      elastixFilter->AddMovingImage( itkDynamicCastInDebugMode< TMovingImage* >( this->GetMovingImage( i ).GetITKBase() ) );
     }
 
     for( unsigned int i = 0; i < this->GetNumberOfFixedMasks(); ++i )
     {
-      elastixFilter->AddFixedMask( static_cast< FixedMaskType* >( this->GetFixedMask( i ).GetITKBase() ) );
+      elastixFilter->AddFixedMask( itkDynamicCastInDebugMode< FixedMaskType* >( this->GetFixedMask( i ).GetITKBase() ) );
     }
 
     for( unsigned int i = 0; i < this->GetNumberOfMovingMasks(); ++i )
     {
-      elastixFilter->AddMovingMask( static_cast< MovingMaskType* >( this->GetMovingMask( i ).GetITKBase() ) );
+      elastixFilter->AddMovingMask( itkDynamicCastInDebugMode< MovingMaskType* >( this->GetMovingMask( i ).GetITKBase() ) );
     }
 
     elastixFilter->SetInitialTransformParameterFileName( this->GetInitialTransformParameterFileName() );
