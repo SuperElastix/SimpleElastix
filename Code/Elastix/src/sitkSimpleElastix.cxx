@@ -850,28 +850,53 @@ SimpleElastix
     sitkExceptionMacro( "Moving image not set." );
   }
 
+  const PixelIDValueEnum FixedImagePixelID = this->GetFixedImage( 0 ).GetPixelID();
+  const unsigned int FixedImageDimension = this->GetFixedImage( 0 ).GetDimension();
+  const PixelIDValueEnum MovingImagePixelID = this->GetMovingImage( 0 ).GetPixelID();
+  const unsigned int MovingImageDimension = this->GetMovingImage( 0 ).GetDimension();
+
+  for( unsigned int i = 1; i < this->GetNumberOfFixedImages(); ++i )
+  {
+    if( this->GetFixedImage( i ).GetPixelID() != MovingImagePixelID )
+    {
+      sitkExceptionMacro( "Fixed images must be of same pixel type (fixed image at index 0 is of type " 
+                       << GetPixelIDValueAsElastixParameter( this->GetFixedImage( 0 ).GetPixelID() ) << ", "
+                       << "fixed image at index " << i << " is of type \""
+                       << GetPixelIDValueAsElastixParameter( this->GetFixedImage( i ).GetPixelID() ) 
+                       << "\")." );
+    }
+  }
+
+  for( unsigned int i = 1; i < this->GetNumberOfMovingImages(); ++i )
+  {
+    if( this->GetMovingImage( i ).GetPixelID() != MovingImagePixelID )
+    {
+      sitkExceptionMacro( "Fixed images must be of same pixel type (fixed image at index 0 is of type " 
+                       << GetPixelIDValueAsElastixParameter( this->GetMovingImage( 0 ).GetPixelID() ) << ", "
+                       << "fixed image at index " << i << " is of type \""
+                       << GetPixelIDValueAsElastixParameter( this->GetMovingImage( i ).GetPixelID() ) 
+                       << "\")." );
+    }
+  }
+
   for( unsigned int i = 0; i < this->GetNumberOfFixedMasks(); ++i )
   {
-    const PixelIDValueEnum FixedMaskPixelID = this->GetFixedMask( i ).GetPixelID();
-    if( FixedMaskPixelID != sitkUInt8 )
+    if( this->GetFixedMask( i ).GetPixelID() != sitkUInt8 )
     {
-      sitkExceptionMacro( "Fixed mask must be of pixel type unsigned char (fixed mask at index " << i << " is of type " << GetPixelIDValueAsElastixParameter( FixedMaskPixelID ) << ")." );
+      sitkExceptionMacro( "Fixed mask must be of pixel type unsigned char (fixed mask at index " 
+                       << i << " is of type \"" << GetPixelIDValueAsElastixParameter( this->GetFixedMask( i ).GetPixelID() ) << "\")." );
     }
   }
 
   for( unsigned int i = 0; i < this->GetNumberOfMovingMasks(); ++i )
   {
-    const PixelIDValueEnum MovingMaskPixelID = this->GetMovingMask( i ).GetPixelID();
-    if( MovingMaskPixelID != sitkUInt8 )
+    if( this->GetMovingMask( i ).GetPixelID() != sitkUInt8 )
     {
-      sitkExceptionMacro( "Moving mask must be of pixel type unsigned char (moving mask at index " << i << " is of type " << GetPixelIDValueAsElastixParameter( MovingMaskPixelID ) << ")." );
+      sitkExceptionMacro( "Moving mask must be of pixel type unsigned char (moving mask at index " 
+                       << i << " is of type \"" << GetPixelIDValueAsElastixParameter( this->GetMovingMask( i ).GetPixelID() ) << "\")." );
     }
   }
 
-  const PixelIDValueEnum FixedImagePixelID = this->GetFixedImage( 0 ).GetPixelID();
-  const unsigned int FixedImageDimension = this->GetFixedImage( 0 ).GetDimension();
-  const PixelIDValueEnum MovingImagePixelID = this->GetMovingImage( 0 ).GetPixelID();
-  const unsigned int MovingImageDimension = this->GetMovingImage( 0 ).GetDimension();
   if( this->m_DualMemberFactory->HasMemberFunction( FixedImagePixelID, MovingImagePixelID, FixedImageDimension ) )
   {
     return this->m_DualMemberFactory->GetMemberFunction( FixedImagePixelID, MovingImagePixelID, FixedImageDimension )();
