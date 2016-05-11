@@ -27,7 +27,9 @@ ExternalProject_Add( ${proj}
   -DUSE_AdvancedMattesMutualInformationMetric:BOOL=ON                                           
   -DUSE_AdvancedMeanSquaresMetric:BOOL=ON                                           
   -DUSE_AdvancedNormalizedCorrelationMetric:BOOL=ON                                           
-  -DUSE_AffineDTITransformElastix:BOOL=ON                                           
+  -DUSE_AffineDTITransformElastix:BOOL=ON
+  -DUSE_AffineLogStackTransform:BOOL=ON
+  -DUSE_AffineLogTransformElastix=ON                                        
   -DUSE_BSplineInterpolator:BOOL=ON                                           
   -DUSE_BSplineInterpolatorFloat:BOOL=ON                                           
   -DUSE_BSplineResampleInterpolator:BOOL=ON                                           
@@ -69,7 +71,9 @@ ExternalProject_Add( ${proj}
   -DUSE_NearestNeighborInterpolator:BOOL=ON                                           
   -DUSE_NearestNeighborResampleInterpolator:BOOL=ON                                           
   -DUSE_NormalizedGradientCorrelationMetric:BOOL=ON                                           
-  -DUSE_NormalizedMutualInformationMetric:BOOL=ON                                           
+  -DUSE_NormalizedMutualInformationMetric:BOOL=ON
+  -DUSE_PCAMetric:BOOL=ON
+  -DUSE_PCAMetric2:BOOL=ON                                   
   -DUSE_PatternIntensityMetric:BOOL=ON                                           
   -DUSE_PolydataDummyPenalty:BOOL=ON                                           
   -DUSE_Powell:BOOL=ON
