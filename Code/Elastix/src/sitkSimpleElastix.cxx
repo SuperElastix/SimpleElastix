@@ -455,7 +455,7 @@ SimpleElastix::Self&
 SimpleElastix
 ::RemoveMovingPointSetFileName( void )
 {
-  this->m_MovingPointSetFileName = std::string();
+  this->m_MovingPointSetFileName = "";
   return *this;
 }
 
@@ -478,7 +478,7 @@ SimpleElastix::Self&
 SimpleElastix
 ::RemoveOutputDirectory( void )
 {
-  this->m_OutputDirectory = std::string();
+  this->m_OutputDirectory = "";
   return *this;
 }
 
@@ -501,7 +501,7 @@ SimpleElastix::Self&
 SimpleElastix
 ::RemoveLogFileName( void )
 {
-  this->m_LogFileName = std::string();
+  this->m_LogFileName = "";
   return *this;
 }
 
@@ -580,8 +580,7 @@ SimpleElastix::Self&
 SimpleElastix
 ::SetParameterMap( const ParameterMapType parameterMap )
 {
-  ParameterMapVectorType parameterMapVector = ParameterMapVectorType( 1 );
-  parameterMapVector[ 0 ] = parameterMap;
+  ParameterMapVectorType parameterMapVector = ParameterMapVectorType( 1, parameterMap );
   this->SetParameterMap( parameterMapVector );
   return *this;
 }

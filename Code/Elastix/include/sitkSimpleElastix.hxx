@@ -40,7 +40,6 @@ SimpleElastix::DualExecuteInternal( void )
     }
 
     elastixFilter->SetInitialTransformParameterFileName( this->GetInitialTransformParameterFileName() );
-
     elastixFilter->SetFixedPointSetFileName( this->GetFixedPointSetFileName() );
     elastixFilter->SetMovingPointSetFileName( this->GetMovingPointSetFileName() );
 
