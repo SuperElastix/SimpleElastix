@@ -170,7 +170,7 @@ SimpleElastix
     sitkExceptionMacro( "Cannot set moving images from empty vector" );
   }
 
-  this->RemoveFixedImage();
+  this->RemoveMovingImage();
   this->m_MovingImages = movingImages;
 
   return *this;
