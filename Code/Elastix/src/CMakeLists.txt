@@ -3,7 +3,6 @@ include( ${ITK_USE_FILE} )
 
 set( SimpleElastixSource
   sitkSimpleElastix.cxx
-  sitkSimpleElastix.hxx
 )
 
 add_library( SimpleElastix ${SimpleElastixSource} )
@@ -13,7 +12,6 @@ sitk_install_exported_target( SimpleElastix )
 
 set( SimpleTransformixSource
   sitkSimpleTransformix.cxx
-  sitkSimpleTransformix.hxx
 )
 
 add_library( SimpleTransformix ${SimpleTransformixSource} )
