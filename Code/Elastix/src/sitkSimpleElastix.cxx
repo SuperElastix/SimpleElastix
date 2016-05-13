@@ -432,7 +432,7 @@ SimpleElastix::Self&
 SimpleElastix
 ::RemoveFixedPointSetFileName( void )
 {
-  this->m_FixedPointSetFileName = std::string();
+  this->m_FixedPointSetFileName = "";
   return *this;
 }
 
@@ -856,7 +856,7 @@ SimpleElastix
 
   for( unsigned int i = 1; i < this->GetNumberOfFixedImages(); ++i )
   {
-    if( this->GetFixedImage( i ).GetPixelID() != MovingImagePixelID )
+    if( this->GetFixedImage( i ).GetPixelID() != FixedImagePixelID )
     {
       sitkExceptionMacro( "Fixed images must be of same pixel type (fixed image at index 0 is of type " 
                        << GetPixelIDValueAsElastixParameter( this->GetFixedImage( 0 ).GetPixelID() ) << ", "
