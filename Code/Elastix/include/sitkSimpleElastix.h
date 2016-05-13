@@ -156,7 +156,8 @@ class SITKCommon_EXPORT SimpleElastix
     VectorOfImage           m_MovingImages;
     VectorOfImage           m_FixedMasks;
     VectorOfImage           m_MovingMasks;
-
+    Image                   m_ResultImage;
+    
     std::string             m_InitialTransformParameterMapFileName;
     std::string             m_FixedPointSetFileName;
     std::string             m_MovingPointSetFileName;
@@ -171,7 +172,7 @@ class SITKCommon_EXPORT SimpleElastix
     bool                    m_LogToFile;
     bool                    m_LogToConsole;
     
-    Image                   m_ResultImage;
+    
 };
 
 // Procedural Interface 

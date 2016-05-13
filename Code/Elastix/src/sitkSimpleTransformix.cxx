@@ -17,23 +17,25 @@ SimpleTransformix
   this->m_MemberFactory->RegisterMemberFunctions< BasicPixelIDTypeList, 2 >();
   this->m_MemberFactory->RegisterMemberFunctions< BasicPixelIDTypeList, 3 >();
 
-  #ifdef SITK_4D_IMAGES
-    m_MemberFactory->RegisterMemberFunctions< BasicPixelIDTypeList, 4 >();
-  #endif
+#ifdef SITK_4D_IMAGES
+  m_MemberFactory->RegisterMemberFunctions< BasicPixelIDTypeList, 4 >();
+#endif
 
-  this->SetMovingImage( Image() );
-
-  this->ComputeSpatialJacobianOff();
-  this->ComputeDeterminantOfSpatialJacobianOff();
-  this->ComputeDeformationFieldOff();
-
-  this->SetOutputDirectory( "" );
-  this->SetLogFileName( "" );
-  
-  this->LogToFileOff();
-  this->LogToConsoleOff();
-
+  this->m_MovingImage = Image();
   this->m_ResultImage = Image();
+
+  this->m_TransformParameterMapVector = ParameterMapVectorType();
+
+  this->m_ComputeSpatialJacobian = false;
+  this->m_ComputeDeterminantOfSpatialJacobian = false;
+  this->m_ComputeDeformationField = false;
+  this->m_MovingPointSetFileName = "";
+
+  this->m_SetOutputDirectory = "";
+  this->m_SetLogFileName = "";
+  
+  this->m_LogToFile = "";
+  this->m_LogToConsole = "";
 }
 
 SimpleTransformix

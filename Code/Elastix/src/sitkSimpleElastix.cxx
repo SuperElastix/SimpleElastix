@@ -15,28 +15,27 @@ SimpleElastix
   this->m_DualMemberFactory->RegisterMemberFunctions< BasicPixelIDTypeList, BasicPixelIDTypeList, 2 >();
   this->m_DualMemberFactory->RegisterMemberFunctions< BasicPixelIDTypeList, BasicPixelIDTypeList, 3 >();
 
-  #ifdef SITK_4D_IMAGES
-    this->m_DualMemberFactory->RegisterMemberFunctions< BasicPixelIDTypeList, BasicPixelIDTypeList, 4 >();
-  #endif
+#ifdef SITK_4D_IMAGES
+  this->m_DualMemberFactory->RegisterMemberFunctions< BasicPixelIDTypeList, BasicPixelIDTypeList, 4 >();
+#endif
  
   m_FixedImages                 = VectorOfImage();
   m_MovingImages                = VectorOfImage();
   m_FixedMasks                  = VectorOfImage();
   m_MovingMasks                 = VectorOfImage();
+  m_ResultImage                 = Image();
 
   m_ParameterMapVector          = ParameterMapVectorType();
   m_TransformParameterMapVector = ParameterMapVectorType();
 
-  m_FixedPointSetFileName       = std::string();
-  m_MovingPointSetFileName      = std::string();
+  m_FixedPointSetFileName       = "";
+  m_MovingPointSetFileName      = "";
 
   m_OutputDirectory             = ".";
-  m_LogFileName                 = std::string();
+  m_LogFileName                 = "";
 
-  this->LogToFileOff();
-  this->LogToConsoleOff();
-
-  m_ResultImage                 = Image();
+  this->m_LogToFile = false;
+  this->m_LogToConsole = false;
 
   ParameterMapVectorType defaultParameterMap;
   defaultParameterMap.push_back( ParameterObjectType::GetDefaultParameterMap( "translation" ) );

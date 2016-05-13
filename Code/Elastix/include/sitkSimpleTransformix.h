@@ -117,13 +117,14 @@ class SITKCommon_EXPORT SimpleTransformix
     std::auto_ptr< detail::MemberFunctionFactory< MemberFunctionType > > m_MemberFactory;
 
     Image                   m_MovingImage;
+    Image                   m_ResultImage;
+
+    ParameterMapVectorType  m_TransformParameterMapVector;
 
     bool                    m_ComputeSpatialJacobian;
     bool                    m_ComputeDeterminantOfSpatialJacobian;
     bool                    m_ComputeDeformationField;
     std::string             m_MovingPointSetFileName;
-
-    ParameterMapVectorType  m_TransformParameterMapVector;
 
     std::string             m_OutputDirectory;
     std::string             m_LogFileName;
@@ -131,7 +132,7 @@ class SITKCommon_EXPORT SimpleTransformix
     bool                    m_LogToConsole;
     bool                    m_LogToFile;
 
-    Image                   m_ResultImage;
+    
 
 };
 
