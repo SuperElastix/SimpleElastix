@@ -31,8 +31,8 @@ SimpleTransformix
   this->m_ComputeDeformationField = false;
   this->m_MovingPointSetFileName = "";
 
-  this->m_SetOutputDirectory = "";
-  this->m_SetLogFileName = "";
+  this->m_OutputDirectory = "";
+  this->m_LogFileName = "";
   
   this->m_LogToFile = "";
   this->m_LogToConsole = "";
