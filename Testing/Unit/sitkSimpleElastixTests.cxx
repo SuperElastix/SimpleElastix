@@ -101,6 +101,7 @@ TEST( SimpleElastix, ProceduralInterface )
   Image movingImage = ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
   Image resultImage; 
 
+  std::string defaultParameterMapName = "translation";
   std::string outputDirectory = ".";
 
   EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage ) );
@@ -126,30 +127,30 @@ TEST( SimpleElastix, ProceduralInterface )
   EXPECT_NO_THROW( Elastix( fixedImage, movingImage, false, true, outputDirectory ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
 
-  EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, "translation") );
+  EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, defaultParameterMapName ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, "translation", true ) );
+  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, defaultParameterMapName, true ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, "translation", false ) );
+  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, defaultParameterMapName, false ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, "translation", true, true ) );
+  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, defaultParameterMapName, true, true ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, "translation", false, false ) );
+  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, defaultParameterMapName, false, false ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, "translation", true, false ) );
+  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, defaultParameterMapName, true, false ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, "translation", false, true ) );
+  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, defaultParameterMapName, false, true ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, "translation", true, true, outputDirectory ) );
+  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, defaultParameterMapName, true, true, outputDirectory ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, "translation", false, false, outputDirectory ) );
+  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, defaultParameterMapName, false, false, outputDirectory ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, "translation", true, false, outputDirectory ) );
+  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, defaultParameterMapName, true, false, outputDirectory ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, "translation", false, true, outputDirectory ) );
+  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, defaultParameterMapName, false, true, outputDirectory ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
 
-  SimpleElastix::ParameterMapType parameterMap = GetDefaultParameterMap( "translation" );
+  SimpleElastix::ParameterMapType parameterMap = GetDefaultParameterMap( defaultParameterMapName );
   EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMap ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
   EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMap, true ) );
@@ -174,7 +175,7 @@ TEST( SimpleElastix, ProceduralInterface )
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
 
   SimpleElastix::ParameterMapVectorType parameterMapVector;
-  parameterMapVector.push_back( GetDefaultParameterMap( "translation" ) );
+  parameterMapVector.push_back( GetDefaultParameterMap( defaultParameterMapName ) );
   parameterMapVector.push_back( GetDefaultParameterMap( "rigid" ) );
   EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMapVector ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
@@ -199,27 +200,27 @@ TEST( SimpleElastix, ProceduralInterface )
   EXPECT_NO_THROW( Elastix( fixedImage, movingImage, parameterMapVector, false, true, outputDirectory ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
 
-  EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, "translation", fixedMask, movingMask ) );
+  EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, defaultParameterMapName, fixedMask, movingMask ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, "translation", fixedMask, movingMask, true ) );
+  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, defaultParameterMapName, fixedMask, movingMask, true ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, "translation", fixedMask, movingMask, false ) );
+  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, defaultParameterMapName, fixedMask, movingMask, false ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, "translation", fixedMask, movingMask, true, true ) );
+  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, defaultParameterMapName, fixedMask, movingMask, true, true ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, "translation", fixedMask, movingMask, false, false ) );
+  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, defaultParameterMapName, fixedMask, movingMask, false, false ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, "translation", fixedMask, movingMask, true, false ) );
+  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, defaultParameterMapName, fixedMask, movingMask, true, false ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, "translation", fixedMask, movingMask, false, true ) );
+  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, defaultParameterMapName, fixedMask, movingMask, false, true ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, "translation", fixedMask, movingMask, true, true, outputDirectory ) );
+  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, defaultParameterMapName, fixedMask, movingMask, true, true, outputDirectory ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, "translation", fixedMask, movingMask, false, false, outputDirectory ) );
+  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, defaultParameterMapName, fixedMask, movingMask, false, false, outputDirectory ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, "translation", fixedMask, movingMask, true, false, outputDirectory ) );
+  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, defaultParameterMapName, fixedMask, movingMask, true, false, outputDirectory ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, "translation", fixedMask, movingMask, false, true, outputDirectory ) );
+  EXPECT_NO_THROW( Elastix( fixedImage, movingImage, defaultParameterMapName, fixedMask, movingMask, false, true, outputDirectory ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
 
   EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMap ) );
