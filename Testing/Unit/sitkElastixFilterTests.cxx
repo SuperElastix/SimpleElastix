@@ -115,16 +115,17 @@ TEST( ElastixFilterTest, TranslationWithPointSets2D )
   EXPECT_NO_THROW( parameterObject = ParameterObject::New() );
   EXPECT_NO_THROW( parameterObject->SetParameterMap( parameterMap ) );
 
-  // We generate the point sets manually
+  std::string fixedPointSetFileName = dataFinder.GetFile( "Input/FixedPointSet.pts" );
   std::ofstream fixedPointSetFile;
-  fixedPointSetFile.open( dataFinder.GetFile( "Input/FixedPointSet.pts" ) );
+  fixedPointSetFile.open( fixedPointSetFileName.c_str() );
   fixedPointSetFile << "point\n";
   fixedPointSetFile << "1\n";
   fixedPointSetFile << "128.0 128.0\n";
   fixedPointSetFile.close();
 
+  std::string movingPointSetFileName = dataFinder.GetFile( "Input/MovingPointSet.pts" );
   std::ofstream movingPointSetFile;
-  movingPointSetFile.open( dataFinder.GetFile( "Input/MovingPointSet.pts" ) );
+  movingPointSetFile.open( movingPointSetFileName.c_str() );
   movingPointSetFile << "point\n";
   movingPointSetFile << "1\n";
   movingPointSetFile << "115.0 111.0\n";

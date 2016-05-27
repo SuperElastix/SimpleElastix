@@ -205,10 +205,10 @@ TEST( TransformixFilterTest, TransformPointSet )
 
   ImageFileReaderType::Pointer movingImageReader = ImageFileReaderType::New();
   movingImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceR10X13Y17.png" ) );
-
-  // We generate point set manually
+  
+  const std::string inputPointSetFileName = dataFinder.GetOutputFile( "InputPoints.pts" );
   std::ofstream fixedMeshFile;
-  fixedMeshFile.open( dataFinder.GetOutputFile( "InputPoints.pts" ));
+  fixedMeshFile.open( inputPointSetFileName.c_str() );
   fixedMeshFile << "point\n";
   fixedMeshFile << "1\n";
   fixedMeshFile << "128.0 128.0\n";
