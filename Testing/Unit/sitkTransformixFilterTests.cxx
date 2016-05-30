@@ -36,6 +36,7 @@ TEST( TransformixFilterTest, UpdateOnDownstreamUpdate )
   EXPECT_NO_THROW( elastixFilter = ElastixFilterType::New() );
   EXPECT_NO_THROW( elastixFilter->SetFixedImage( fixedImageReader->GetOutput() ) );
   EXPECT_NO_THROW( elastixFilter->SetMovingImage( movingImageReader->GetOutput() ) );
+  EXPECT_NO_THROW( elastixFilter->Update() );
   
   TransformixFilterType::Pointer transformixFilter;
   EXPECT_NO_THROW( transformixFilter = TransformixFilterType::New() );
@@ -67,6 +68,7 @@ TEST( TransformixFilterTest, GetInputImageFromElastixFilter )
   EXPECT_NO_THROW( elastixFilter = ElastixFilterType::New() );
   EXPECT_NO_THROW( elastixFilter->SetFixedImage( fixedImageReader->GetOutput() ) );
   EXPECT_NO_THROW( elastixFilter->SetMovingImage( movingImageReader->GetOutput() ) );
+  EXPECT_NO_THROW( elastixFilter->Update() );
 
   TransformixFilterType::Pointer transformixFilter;
   EXPECT_NO_THROW( transformixFilter = TransformixFilterType::New() );
@@ -104,10 +106,7 @@ TEST( TransformixFilterTest, UpdateOnGetTransformParameterObject )
   EXPECT_NO_THROW( transformixFilter = TransformixFilterType::New() );
   EXPECT_NO_THROW( transformixFilter->SetInput( movingImageReader->GetOutput() ) );
   EXPECT_NO_THROW( transformixFilter->SetOutputDirectory( dataFinder.GetOutputDirectory() ) );
-  EXPECT_NO_THROW( transformixFilter->SetTransformParameterObject( elastixFilter->GetTransformParameterObject() ) );
-
-  EXPECT_NO_THROW( transformParameters = transformixFilter->GetTransformParameterObject() );
-  EXPECT_TRUE( transformParameters->GetParameterMap().size() > 0 );
+  EXPECT_THROW( transformixFilter->SetTransformParameterObject( elastixFilter->GetTransformParameterObject() ), itk::ExceptionObject );
 }
 
 TEST( TransformixFilterTest, ComputeSpatialJacobian )
@@ -129,6 +128,7 @@ TEST( TransformixFilterTest, ComputeSpatialJacobian )
   EXPECT_NO_THROW( elastixFilter = ElastixFilterType::New() );
   EXPECT_NO_THROW( elastixFilter->SetFixedImage( fixedImageReader->GetOutput() ) );
   EXPECT_NO_THROW( elastixFilter->SetMovingImage( movingImageReader->GetOutput() ) );
+  EXPECT_NO_THROW( elastixFilter->Update() );
 
   TransformixFilterType::Pointer transformixFilter;
   EXPECT_NO_THROW( transformixFilter = TransformixFilterType::New() );
@@ -156,6 +156,7 @@ TEST( TransformixFilterTest, ComputeDeterminantOfSpatialJacobian )
   EXPECT_NO_THROW( elastixFilter = ElastixFilterType::New() );
   EXPECT_NO_THROW( elastixFilter->SetFixedImage( fixedImageReader->GetOutput() ) );
   EXPECT_NO_THROW( elastixFilter->SetMovingImage( movingImageReader->GetOutput() ) );
+  EXPECT_NO_THROW( elastixFilter->Update() );
 
   TransformixFilterType::Pointer transformixFilter;
   EXPECT_NO_THROW( transformixFilter = TransformixFilterType::New() );
@@ -183,6 +184,7 @@ TEST( TransformixFilterTest, ComputeDeformationField )
   EXPECT_NO_THROW( elastixFilter = ElastixFilterType::New() );
   EXPECT_NO_THROW( elastixFilter->SetFixedImage( fixedImageReader->GetOutput() ) );
   EXPECT_NO_THROW( elastixFilter->SetMovingImage( movingImageReader->GetOutput() ) );
+  EXPECT_NO_THROW( elastixFilter->Update() );
 
   TransformixFilterType::Pointer transformixFilter;
   EXPECT_NO_THROW( transformixFilter = TransformixFilterType::New() );
@@ -218,6 +220,7 @@ TEST( TransformixFilterTest, TransformPointSet )
   EXPECT_NO_THROW( elastixFilter = ElastixFilterType::New() );
   EXPECT_NO_THROW( elastixFilter->SetFixedImage( fixedImageReader->GetOutput() ) );
   EXPECT_NO_THROW( elastixFilter->SetMovingImage( movingImageReader->GetOutput() ) );
+  EXPECT_NO_THROW( elastixFilter->Update() );
 
   TransformixFilterType::Pointer transformixFilter;
   EXPECT_NO_THROW( transformixFilter = TransformixFilterType::New() );
@@ -273,15 +276,14 @@ TEST( TransformixFilterTest, BSpline4D )
   parameterObject->SetParameterMap( parameterMap );
 
   ImageFileReaderType::Pointer imageReader = ImageFileReaderType::New();
-  imageReader->SetFileName( "/Users/kasper/Development/build/SimpleElastix/SimpleITK-build/ExternalData/Testing/Data/Input/4D.nii.gz" );
+  imageReader->SetFileName( dataFinder.GetFile( "Input/4D.nii.gz" ) );
 
   ElastixFilterType::Pointer elastixFilter;
   EXPECT_NO_THROW( elastixFilter = ElastixFilterType::New() );
   EXPECT_NO_THROW( elastixFilter->SetFixedImage( imageReader->GetOutput() ) );
   EXPECT_NO_THROW( elastixFilter->SetMovingImage( imageReader->GetOutput() ) );
   EXPECT_NO_THROW( elastixFilter->SetParameterObject( parameterObject ) );
-  elastixFilter->Update();
-  elastixFilter->GetTransformParameterObject()->Print( std::cout );
+  EXPECT_NO_THROW( elastixFilter->Update() );
 
   TransformixFilterType::Pointer transformixFilter;
   EXPECT_NO_THROW( transformixFilter = TransformixFilterType::New() );

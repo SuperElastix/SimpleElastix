@@ -360,8 +360,8 @@ TEST( SimpleElastix, InitialTransform )
 
 TEST( SimpleElastix, InverseTransform )
 {
-  Image fixedImage = ReadImage( "/Users/kasper/Development/build/SimpleElastix/SimpleITK-build/ExternalData/Testing/Data/Input/BrainProtonDensitySliceBorder20.png" );
-  Image movingImage = ReadImage( "/Users/kasper/Development/build/SimpleElastix/SimpleITK-build/ExternalData/Testing/Data/Input/BrainProtonDensitySliceShifted13x17y.png" );
+  Image fixedImage = ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
+  Image movingImage = ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
   Image resultImage; 
 
   SimpleElastix silx; silx.LogToConsoleOn(); 

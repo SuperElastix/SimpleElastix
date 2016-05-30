@@ -94,8 +94,7 @@ TEST( ElastixFilterTest, UpdateOnGetTransformParametersEuler2D )
   EXPECT_NO_THROW( elastixFilter->SetFixedImage( fixedImageReader->GetOutput() ) );
   EXPECT_NO_THROW( elastixFilter->SetMovingImage( movingImageReader->GetOutput() ) );
   EXPECT_NO_THROW( elastixFilter->SetParameterObject( parameterObject ) );
-  EXPECT_NO_THROW( transformParameters = elastixFilter->GetTransformParameterObject() );
-  EXPECT_TRUE( transformParameters->GetParameterMap()[ 0 ].size() > 0 );
+  EXPECT_THROW( transformParameters = elastixFilter->GetTransformParameterObject(), itk::ExceptionObject );
 }
 
 TEST( ElastixFilterTest, TranslationWithPointSets2D )
@@ -115,7 +114,7 @@ TEST( ElastixFilterTest, TranslationWithPointSets2D )
   EXPECT_NO_THROW( parameterObject = ParameterObject::New() );
   EXPECT_NO_THROW( parameterObject->SetParameterMap( parameterMap ) );
 
-  std::string fixedPointSetFileName = dataFinder.GetFile( "Input/FixedPointSet.pts" );
+  std::string fixedPointSetFileName = dataFinder.GetOutputFile( "FixedPointSet.pts" );
   std::ofstream fixedPointSetFile;
   fixedPointSetFile.open( fixedPointSetFileName.c_str() );
   fixedPointSetFile << "point\n";
@@ -123,7 +122,7 @@ TEST( ElastixFilterTest, TranslationWithPointSets2D )
   fixedPointSetFile << "128.0 128.0\n";
   fixedPointSetFile.close();
 
-  std::string movingPointSetFileName = dataFinder.GetFile( "Input/MovingPointSet.pts" );
+  std::string movingPointSetFileName = dataFinder.GetOutputFile( "MovingPointSet.pts" );
   std::ofstream movingPointSetFile;
   movingPointSetFile.open( movingPointSetFileName.c_str() );
   movingPointSetFile << "point\n";
@@ -140,9 +139,9 @@ TEST( ElastixFilterTest, TranslationWithPointSets2D )
   ElastixFilterType::Pointer elastixFilter;
   EXPECT_NO_THROW( elastixFilter = ElastixFilterType::New() );
   EXPECT_NO_THROW( elastixFilter->SetFixedImage( fixedImageReader->GetOutput() ) );
-  EXPECT_NO_THROW( elastixFilter->SetFixedPointSetFileName( dataFinder.GetFile( "Input/FixedPointSet.pts" )  ) );
+  EXPECT_NO_THROW( elastixFilter->SetFixedPointSetFileName( dataFinder.GetOutputFile( "FixedPointSet.pts" ) ) );
   EXPECT_NO_THROW( elastixFilter->SetMovingImage( movingImageReader->GetOutput() ) );
-  EXPECT_NO_THROW( elastixFilter->SetMovingPointSetFileName( dataFinder.GetFile( "Input/MovingPointSet.pts" ) ) );
+  EXPECT_NO_THROW( elastixFilter->SetMovingPointSetFileName( dataFinder.GetOutputFile( "MovingPointSet.pts" ) ) );
   EXPECT_NO_THROW( elastixFilter->SetParameterObject( parameterObject ) );
 
   ImageFileWriterType::Pointer writer = ImageFileWriterType::New();
@@ -218,6 +217,7 @@ TEST( ElastixFilterTest, InitialTransformTestEuler2D )
   EXPECT_NO_THROW( initialElastixFilter->SetFixedImage( fixedImageReader->GetOutput() ) );
   EXPECT_NO_THROW( initialElastixFilter->SetMovingImage( movingImageReader->GetOutput() ) );
   EXPECT_NO_THROW( initialElastixFilter->SetParameterObject( parameterObject ) );
+  EXPECT_NO_THROW( initialElastixFilter->Update() );
   EXPECT_NO_THROW( initialElastixFilter->GetTransformParameterObject()->WriteParameterFile( "initialTransformTestEuler2D.txt" ) );
 
   ElastixFilterType::Pointer elastixFilter;
@@ -260,6 +260,7 @@ TEST( ElastixFilterTest, InverseTransformTestEuler2D )
   EXPECT_NO_THROW( forwardElastixFilter->SetFixedImage( fixedImageReader->GetOutput() ) );
   EXPECT_NO_THROW( forwardElastixFilter->SetMovingImage( movingImageReader->GetOutput() ) );
   EXPECT_NO_THROW( forwardElastixFilter->SetParameterObject( parameterObject ) );
+  EXPECT_NO_THROW( forwardElastixFilter->Update() );
   EXPECT_NO_THROW( forwardElastixFilter->GetTransformParameterObject()->WriteParameterFile( dataFinder.GetOutputFile( "inverseTransformTestEuler2D.txt" ) ) );
 
   // Inverse registration
