@@ -14,7 +14,7 @@ transformix = sitk.SimpleTransformix()
 
 # Read Input
 transformix.SetInputImage(sitk.ReadImage(str(sys.argv[4])))
-transformix.SetParameterMapList(elastix.GetTransformParameterMapList())
+transformix.SetParameterMap(elastix.GetTransformParameterMap())
 
 # Perform warp
 transformix.LogToConsoleOn()

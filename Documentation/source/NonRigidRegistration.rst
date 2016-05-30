@@ -24,10 +24,10 @@ The following code runs multi-resolution affine initialization and starts a non-
 	elastix.SetFixedImage(sitk.ReadImage("fixedImage.nii"))
 	elastix.SetMovingImage(sitk.ReadImage("movingImage.nii"))
 
-	plist = sitk.ParameterMapList()
-	plist.append(sitk.GetDefaultParameterMap("affine"))
-	plist.append(sitk.GetDefaultParameterMap("nonrigid"))
-	elastix.SetParameterMap(plist)
+	parameterMapVector = sitk.VectorOfParameterMap()
+	parameterMapVector.append(sitk.GetDefaultParameterMap("affine"))
+	parameterMapVector.append(sitk.GetDefaultParameterMap("bspline"))
+	elastix.SetParameterMap(parameterMapVector)
 
 	elastix.Execute()
 	sitk.WriteImage(elastix.GetResultImage())

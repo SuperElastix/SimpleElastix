@@ -31,7 +31,7 @@ class SimpleElastix {
     writer.setFileName(argv[3]);
     writer.execute(elastix.getResultImage(), "."); 
 
-    elastix.prettyPrint(elastix.getTransformParameterMapList());
+    elastix.prettyPrint(elastix.getTransformParameterMap());
 
   }
 
