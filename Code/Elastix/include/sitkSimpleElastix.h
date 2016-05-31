@@ -139,9 +139,9 @@ class SITKCommon_EXPORT SimpleElastix
     std::vector< std::map< std::string, std::vector< std::string > > > ExecuteInverse( std::vector< std::map< std::string, std::vector< std::string > > > inverseParameterMapVector );
     std::vector< std::map< std::string, std::vector< std::string > > > GetInverseTransformParameterMap( void );
 
-    void PrintParameterMap( void ) const;
-    void PrintParameterMap( const ParameterMapType parameterMapVector ) const;
-    void PrintParameterMap( const ParameterMapVectorType parameterMapVector ) const;
+    Self& PrintParameterMap( void );
+    Self& PrintParameterMap( const ParameterMapType parameterMapVector );
+    Self& PrintParameterMap( const ParameterMapVectorType parameterMapVector );
 
   private:
 

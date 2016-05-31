@@ -935,7 +935,7 @@ SimpleElastix::ParameterMapVectorType
 SimpleElastix
 ::ExecuteInverse( void )
 {
-  return this->ExecuteInverse( this->m_ParameterMapVector );
+  return this->ExecuteInverse( this->GetParameterMap() );
 }
 
 SimpleElastix::ParameterMapVectorType
@@ -1041,27 +1041,35 @@ SimpleElastix
   return this->m_InverseTransformParameterMapVector;
 }
 
-void
+SimpleElastix::Self&
 SimpleElastix
-::PrintParameterMap( void ) const
+::PrintParameterMap( void )
 {
-  this->PrintParameterMap( this->m_ParameterMapVector );
+  if( this->GetNumberOfParameterMaps() == 0 )
+  {
+    sitkExceptionMacro( "Cannot print parameter maps: Number of parameter maps is 0." )
+  }
+
+  this->PrintParameterMap( this->GetParameterMap() );
+  return *this;
 }
 
-void
+SimpleElastix::Self&
 SimpleElastix
-::PrintParameterMap( const ParameterMapType parameterMap ) const
+::PrintParameterMap( const ParameterMapType parameterMap )
 {
   this->PrintParameterMap( ParameterMapVectorType( 1, parameterMap ) );
+  return *this;
 }
 
-void
+SimpleElastix::Self&
 SimpleElastix
-::PrintParameterMap( const ParameterMapVectorType parameterMapVector ) const
+::PrintParameterMap( const ParameterMapVectorType parameterMapVector )
 {
   ParameterObjectPointer parameterObject = ParameterObjectType::New();
   parameterObject->SetParameterMap( parameterMapVector );
   parameterObject->Print( std::cout );
+  return *this;
 }
 
 bool
