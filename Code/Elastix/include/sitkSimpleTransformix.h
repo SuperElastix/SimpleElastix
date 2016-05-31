@@ -97,9 +97,9 @@ class SITKCommon_EXPORT SimpleTransformix
     std::map< std::string, std::vector< std::string > > ReadParameterFile( const std::string filename );
     Self& WriteParameterFile( const std::map< std::string, std::vector< std::string > > parameterMap, const std::string parameterFileName );
 
-    Self& PrettyPrint( void );
-    Self& PrettyPrint( const std::map< std::string, std::vector< std::string > > parameterMap );
-    Self& PrettyPrint( const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapVector );
+    Self& PrintParameterMap( void );
+    Self& PrintParameterMap( const std::map< std::string, std::vector< std::string > > parameterMap );
+    Self& PrintParameterMap( const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapVector );
 
     Image Execute( void );
 

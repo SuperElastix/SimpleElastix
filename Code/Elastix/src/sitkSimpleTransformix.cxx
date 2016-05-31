@@ -502,55 +502,29 @@ SimpleTransformix
 
 SimpleTransformix::Self&
 SimpleTransformix
-::PrettyPrint( void )
+::PrintParameterMap( void )
 {
-  this->PrettyPrint( this->GetTransformParameterMap() );
+  this->PrintParameterMap( this->GetTransformParameterMap() );
   return *this;
 }
 
 SimpleTransformix::Self& 
 SimpleTransformix
-::PrettyPrint( const ParameterMapType parameterMap )
+::PrintParameterMap( const ParameterMapType parameterMap )
 {
   ParameterMapVectorType parameterMapVector = ParameterMapVectorType( 1 );
   parameterMapVector[ 0 ] = parameterMap;
-  this->PrettyPrint( parameterMapVector );
+  this->PrintParameterMap( parameterMapVector );
   return *this;
 }
 
 SimpleTransformix::Self& 
 SimpleTransformix
-::PrettyPrint( const ParameterMapVectorType parameterMapList )
+::PrintParameterMap( const ParameterMapVectorType parameterMapVector )
 {
-  for( unsigned int i = 0; i < parameterMapList.size(); ++i )
-  {
-    std::cout << "ParameterMap " << i << ": " << std::endl;
-    ParameterMapConstIterator parameterMapIterator = parameterMapList[ i ].begin();
-    ParameterMapConstIterator parameterMapIteratorEnd = parameterMapList[ i ].end();
-    while( parameterMapIterator != parameterMapIteratorEnd )
-    {
-      std::cout << "  (" << parameterMapIterator->first;
-      ParameterValueVectorType parameterMapValueVector = parameterMapIterator->second;
-      
-      for(unsigned int j = 0; j < parameterMapValueVector.size(); ++j)
-      {
-        std::stringstream stream( parameterMapValueVector[ j ] );
-        float number;
-        stream >> number;
-        if( stream.fail() ) {
-           std::cout << " \"" << parameterMapValueVector[ j ] << "\"";
-        }
-        else
-        {
-          std::cout << " " << number;
-        }      
-      }
-      
-      std::cout << ")" << std::endl;
-      parameterMapIterator++;
-    }
-  }
-
+  ParameterObjectPointer parameterObject = ParameterObjectType::New();
+  parameterObject->SetParameterMap( parameterMapVector );
+  parameterObject->Print( std::cout );
   return *this;
 }
 
