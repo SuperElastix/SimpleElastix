@@ -68,7 +68,7 @@ We will study other parameter maps more closely in later examples. For now, we s
 
 ::
 
-    >>> sitk.PrettyPrint(sitk.GetDefaultParameterMap("translation"))
+    >>> sitk.PrintParametermap(sitk.GetDefaultParameterMap("translation"))
     ParameterMap 0: 
       (AutomaticParameterEstimation "true")
       (CheckNumberOfSamples "true")
