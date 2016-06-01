@@ -82,33 +82,6 @@ TEST( TransformixFilterTest, GetInputImageFromElastixFilter )
   EXPECT_NO_THROW( writer->Update() );
 }
 
-TEST( TransformixFilterTest, UpdateOnGetTransformParameterObject )
-{
-  typedef itk::Image< float, 2 > ImageType;
-  typedef itk::ImageFileReader< ImageType > ImageFileReaderType;
-  typedef itk::ImageFileWriter< ImageType > ImageFileWriterType;
-  typedef ElastixFilter< ImageType, ImageType > ElastixFilterType;
-  typedef TransformixFilter< ImageType > TransformixFilterType;
-
-  ImageFileReaderType::Pointer fixedImageReader = ImageFileReaderType::New();
-  fixedImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
-
-  ImageFileReaderType::Pointer movingImageReader = ImageFileReaderType::New();
-  movingImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceR10X13Y17.png" ) );
-
-  ElastixFilterType::Pointer elastixFilter;
-  EXPECT_NO_THROW( elastixFilter = ElastixFilterType::New() );
-  EXPECT_NO_THROW( elastixFilter->SetFixedImage( fixedImageReader->GetOutput() ) );
-  EXPECT_NO_THROW( elastixFilter->SetMovingImage( movingImageReader->GetOutput() ) );
-
-  TransformixFilterType::Pointer transformixFilter;
-  ParameterObject::Pointer transformParameters;
-  EXPECT_NO_THROW( transformixFilter = TransformixFilterType::New() );
-  EXPECT_NO_THROW( transformixFilter->SetInput( movingImageReader->GetOutput() ) );
-  EXPECT_NO_THROW( transformixFilter->SetOutputDirectory( dataFinder.GetOutputDirectory() ) );
-  EXPECT_THROW( transformixFilter->SetTransformParameterObject( elastixFilter->GetTransformParameterObject() ), itk::ExceptionObject );
-}
-
 TEST( TransformixFilterTest, ComputeSpatialJacobian )
 {
   typedef itk::Image< float, 2 > ImageType;

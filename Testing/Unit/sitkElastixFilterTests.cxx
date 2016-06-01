@@ -70,33 +70,6 @@ TEST( ElastixFilterTest, UpdateOnDownstreamUpdate )
   EXPECT_NO_THROW( writer->Update() );
 }
 
-TEST( ElastixFilterTest, UpdateOnGetTransformParametersEuler2D )
-{
-  ParameterObject::Pointer parameterObject;
-  EXPECT_NO_THROW( parameterObject = ParameterObject::New() );
-  EXPECT_NO_THROW( parameterObject->SetParameterMap( ParameterObject::GetDefaultParameterMap( "rigid" ) ) );
-
-  typedef itk::Image< float, 2 > ImageType;
-  typedef itk::ImageFileReader< ImageType > ImageFileReaderType;
-  typedef itk::ImageFileWriter< ImageType > ImageFileWriterType;
-  typedef ElastixFilter< ImageType, ImageType > ElastixFilterType;
-
-  ImageFileReaderType::Pointer fixedImageReader = ImageFileReaderType::New();
-  fixedImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
-
-  ImageFileReaderType::Pointer movingImageReader = ImageFileReaderType::New();
-  movingImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceR10X13Y17.png" ) );
-
-  ElastixFilterType::Pointer elastixFilter;
-  ParameterObject::Pointer transformParameters;
-
-  EXPECT_NO_THROW( elastixFilter = ElastixFilterType::New() );
-  EXPECT_NO_THROW( elastixFilter->SetFixedImage( fixedImageReader->GetOutput() ) );
-  EXPECT_NO_THROW( elastixFilter->SetMovingImage( movingImageReader->GetOutput() ) );
-  EXPECT_NO_THROW( elastixFilter->SetParameterObject( parameterObject ) );
-  EXPECT_THROW( transformParameters = elastixFilter->GetTransformParameterObject(), itk::ExceptionObject );
-}
-
 TEST( ElastixFilterTest, TranslationWithPointSets2D )
 {
   typedef itk::Image< float, 2 > ImageType;
