@@ -41,7 +41,7 @@ TEST( ElastixFilterTest, DefaultParameterObject2D )
   EXPECT_NO_THROW( elastixFilter->Update() );
 }
 
-TEST( ElastixFilterTest, UpdateOnDownstreamUpdate )
+TEST( ElastixFilterTest, UpdateOnOutputImageDownstreamUpdate )
 {
   ParameterObject::Pointer parameterObject;
   EXPECT_NO_THROW( parameterObject = ParameterObject::New() );
@@ -69,6 +69,44 @@ TEST( ElastixFilterTest, UpdateOnDownstreamUpdate )
   EXPECT_NO_THROW( writer->SetInput( elastixFilter->GetOutput() ) );
   EXPECT_NO_THROW( writer->Update() );
 }
+
+/*
+TEST( ElastixFilterTest, UpdateOnTransformParametersDownstreamUpdate )
+{
+  ParameterObject::Pointer parameterObject;
+  EXPECT_NO_THROW( parameterObject = ParameterObject::New() );
+  EXPECT_NO_THROW( parameterObject->SetParameterMap( ParameterObject::GetDefaultParameterMap( "rigid" ) ) );
+
+  typedef itk::Image< float, 2 > ImageType;
+  typedef itk::ImageFileReader< ImageType > ImageFileReaderType;
+  typedef itk::ImageFileWriter< ImageType > ImageFileWriterType;
+  typedef ElastixFilter< ImageType, ImageType > ElastixFilterType;
+  typedef TransformixFilter< ImageType > TransformixFilterType;
+
+  ImageFileReaderType::Pointer fixedImageReader = ImageFileReaderType::New();
+  fixedImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
+
+  ImageFileReaderType::Pointer movingImageReader1 = ImageFileReaderType::New();
+  movingImageReader1->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceR10X13Y17.png" ) );
+
+  ImageFileReaderType::Pointer movingImageReader2 = ImageFileReaderType::New();
+  movingImageReader2->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceR10X13Y17.png" ) );
+
+  ElastixFilterType::Pointer elastixFilter;
+  TransformixFilterType::Pointer transformixFilter;
+  ParameterObject::Pointer transformParameterObject;
+
+  EXPECT_NO_THROW( elastixFilter = ElastixFilterType::New() );
+  EXPECT_NO_THROW( elastixFilter->SetFixedImage( fixedImageReader->GetOutput() ) );
+  EXPECT_NO_THROW( elastixFilter->SetMovingImage( movingImageReader1->GetOutput() ) );
+  EXPECT_NO_THROW( elastixFilter->SetParameterObject( parameterObject ) );
+
+  // TODO: Fix getting transform parameter object resulting in "Illegal instruction: 4"
+  EXPECT_NO_THROW( transformixFilter->SetTransformParameterObject( elastixFilter->GetTransformParameterObject() ) );
+  EXPECT_NO_THROW( transformixFilter->SetInput( movingImageReader2->GetOutput() ));
+  EXPECT_NO_THROW( transformixFilter->Update() );
+}
+*/
 
 TEST( ElastixFilterTest, TranslationWithPointSets2D )
 {
