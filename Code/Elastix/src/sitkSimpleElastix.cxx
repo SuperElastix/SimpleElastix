@@ -869,9 +869,9 @@ SimpleElastix
   {
     if( this->GetMovingImage( i ).GetPixelID() != MovingImagePixelID )
     {
-      sitkExceptionMacro( "Fixed images must be of same pixel type (fixed image at index 0 is of type " 
+      sitkExceptionMacro( "Moving images must be of same pixel type (moving image at index 0 is of type "
                        << GetPixelIDValueAsElastixParameter( this->GetMovingImage( 0 ).GetPixelID() ) << ", "
-                       << "fixed image at index " << i << " is of type \""
+                       << "moving image at index " << i << " is of type \""
                        << GetPixelIDValueAsElastixParameter( this->GetMovingImage( i ).GetPixelID() ) 
                        << "\")." );
     }
