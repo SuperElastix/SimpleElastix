@@ -8,34 +8,67 @@
 # Additionally it give the option to wrap LUA.
 #
 
+include(sitkTargetLinkLibrariesWithDynamicLookup)
 
-# for wrapping to wrok correctly fPIC is needed on certain system.
-macro(check_PIC_flag Language)
-  string( TOUPPER ${Language} LANGUAGE )
-  if ( UNIX AND NOT APPLE AND WRAP_${LANGUAGE} )
-    if ( NOT ${CMAKE_CXX_FLAGS} MATCHES "-fPIC")
-      message ( FATAL_ERROR "${Language} wrapping requires CMAKE_CXX_FLAGS (or equivalent) to include -fPIC and ITK built with this flag." )
-    endif()
+#
+# Macro to set "_QUIET" and "_QUIET_LIBRARY" based on the first
+# argument being defined and true, to either REQUIRED or QUIET.
+#
+macro(set_QUIET var)
+  if ( DEFINED  ${var} AND ${var} )
+    set( _QUIET "REQUIRED" )
+  else()
+    set( _QUIET "QUIET" )
+  endif()
+  if ( SITK_UNDEFINED_SYMBOLS_ALLOWED )
+    set( _QUIET_LIBRARY "QUIET" )
+  else()
+    set( _QUIET_LIBRARY ${_QUIET} )
   endif()
 endmacro()
-
 
 #
 # Setup the option for each language
 #
-option ( WRAP_LUA "Wrap Lua" ON )
+set_QUIET( WRAP_LUA )
+if (CMAKE_VERSION VERSION_LESS "3")
+  find_package ( Lua51 ${_QUIET} )
+  if ( NOT LUA_FOUND )
+    find_package ( Lua50 ${_QUIET} )
+  endif()
+else()
+  find_package ( Lua ${_QUIET} )
+endif()
+if ( LUA_FOUND )
+  set( WRAP_LUA_DEFAULT ON )
+else()
+  set( WRAP_LUA_DEFAULT OFF )
+endif()
+
+set( LUA_ADDITIONAL_LIBRARIES "" CACHE STRING "Additional libraries which may be needed for lua such as readline.")
+mark_as_advanced( LUA_ADDITIONAL_LIBRARIES )
+
+option ( WRAP_LUA "Wrap Lua" ${WRAP_LUA_DEFAULT} )
+
+if ( WRAP_LUA )
+  find_package( LuaInterp REQUIRED )
+  list( APPEND SITK_LANGUAGES_VARS
+    LUA_EXECUTABLE
+    LUA_LIBRARIES
+    LUA_INCLUDE_DIR
+    LUA_VERSION_STRING
+    LUA_MATH_LIBRARY
+    LUA_ADDITIONAL_LIBRARIES
+    )
+endif()
+
 
 
 # If you're not using python or it's the first time, be quiet
-if (DEFINED  WRAP_PYTHON AND WRAP_PYTHON)
-  set(_QUIET "REQUIRED")
-else()
-  set(_QUIET "QUIET")
-endif()
 
+set_QUIET( WRAP_PYTHON )
 find_package ( PythonInterp ${_QUIET})
-
-find_package ( PythonLibs ${PYTHON_VERSION_STRING} EXACT ${_QUIET} )
+find_package ( PythonLibs ${PYTHON_VERSION_STRING} EXACT ${_QUIET_LIBRARY} )
 
 if (PYTHON_VERSION_STRING VERSION_LESS 2.6)
   message( WARNING "Python version less that 2.6: \"${PYTHON_VERSION_STRING}\"." )
@@ -66,15 +99,10 @@ if ( WRAP_PYTHON )
       )
   endif()
 endif ()
-check_PIC_flag ( Python )
 
 
-if (DEFINED  WRAP_JAVA AND WRAP_JAVA)
-  set(_QUIET "REQUIRED")
-else()
-  set(_QUIET "QUIET")
-endif()
 
+set_QUIET( WRAP_JAVA )
 find_package ( Java COMPONENTS Development Runtime ${_QUIET} )
 find_package ( JNI ${_QUIET} )
 if ( ${JAVA_FOUND} AND ${JNI_FOUND} )
@@ -84,7 +112,6 @@ else ( ${JAVA_FOUND} AND ${JNI_FOUND} )
 endif ( ${JAVA_FOUND} AND ${JNI_FOUND} )
 
 option ( WRAP_JAVA "Wrap Java" ${WRAP_JAVA_DEFAULT} )
-check_PIC_flag ( Java )
 
 if ( WRAP_JAVA )
   list( APPEND SITK_LANGUAGES_VARS
@@ -112,13 +139,10 @@ if ( WRAP_JAVA )
 endif()
 
 
-if (DEFINED  WRAP_TCL AND WRAP_TCL)
-  set(_QUIET "REQUIRED")
-else()
-  set(_QUIET "QUIET")
-endif()
+set_QUIET(WRAP_TCL)
 
 find_package ( TCL ${_QUIET} )
+
 if ( ${TCL_FOUND} )
   set ( WRAP_TCL_DEFAULT ON )
 else ( ${TCL_FOUND} )
@@ -139,7 +163,9 @@ if ( WRAP_TCL )
 endif()
 
 
-find_package ( Ruby QUIET )
+set_QUIET( WRAP_RUBY )
+
+find_package ( Ruby ${_QUIET} )
 if ( ${RUBY_FOUND} )
   set ( WRAP_RUBY_DEFAULT ON )
 else ( ${RUBY_FOUND} )
@@ -147,7 +173,6 @@ else ( ${RUBY_FOUND} )
 endif ( ${RUBY_FOUND} )
 
 option ( WRAP_RUBY "Wrap Ruby" ${WRAP_RUBY_DEFAULT} )
-check_PIC_flag ( Ruby )
 
 if ( WRAP_RUBY )
   list( APPEND SITK_LANGUAGES_VARS
@@ -185,11 +210,7 @@ if ( WRAP_CSHARP )
 endif()
 
 
-if (DEFINED  WRAP_R AND WRAP_R)
-  set(_QUIET "REQUIRED")
-else()
-  set(_QUIET "QUIET")
-endif()
+set_QUIET( WRAP_R )
 
 find_package(R ${_QUIET})
 if ( ${R_FOUND} AND NOT WIN32 )

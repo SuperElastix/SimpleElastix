@@ -20,7 +20,7 @@
 
 # Run this script to set up the git hooks for committing changes to SimpleITK.
 # For more information, see:
-#   http://www.itk.org/Wiki/Git/Hooks
+#   https://www.itk.org/Wiki/Git/Hooks
 
 egrep-q() {
   egrep "$@" >/dev/null 2>/dev/null
@@ -64,5 +64,11 @@ git config hooks.submodule false
 # Set up KWStyle hook.
 git config hooks.KWStyle.conf "Utilities/KWStyle/SITK.kws.xml.in"
 git config hooks.KWStyle.overwriteRulesConf "Utilities/KWStyle/SITKOverwrite.txt"
+
+
+echo "Setting up JSON validation with python..."
+PYTHON_EXECUTABLE=$(which python) || die "No python found for hooks."
+git config hooks.python ${PYTHON_EXECUTABLE}
+git config hooks.ValidateJSON true
 
 echo "Done."

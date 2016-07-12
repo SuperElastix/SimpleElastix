@@ -29,15 +29,16 @@ set ( SimpleITKCommonSource
   )
 
 set ( ITK_NO_IO_FACTORY_REGISTER_MANAGER 1 )
+find_package(ITK COMPONENTS ITKCommon ITKImageCompose
+  ITKImageIntensity ITKLabelMap ITKTransform ITKIOTransformBase ITKDisplacementField REQUIRED)
 include(${ITK_USE_FILE})
 
 add_library ( SimpleITKCommon ${SimpleITKCommonSource} ${SimpleITKAncillarySource} )
-target_link_libraries ( SimpleITKCommon ${ITK_LIBRARIES} )
+target_link_libraries ( SimpleITKCommon
+  PRIVATE ${ITK_LIBRARIES} )
 if (SITK_EXPLICIT_INSTANTIATION)
-  target_link_libraries ( SimpleITKCommon SimpleITKExplicit )
+  target_link_libraries ( SimpleITKCommon PRIVATE SimpleITKExplicit )
 endif()
-set_target_properties( SimpleITKCommon PROPERTIES SKIP_BUILD_RPATH TRUE )
-
 sitk_install_exported_target( SimpleITKCommon )
 
 # Add custom command that will delete java files which need to be rebuilt when changes

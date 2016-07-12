@@ -16,6 +16,7 @@
 *
 *=========================================================================*/
 
+#include <cstdlib>
 #include <SimpleITKTestHarness.h>
 #include <SimpleITK.h>
 
@@ -45,10 +46,12 @@ int main (int argc, char *argv[])
       catch (std::exception &e)
         {
         std::cout << "Exception: " << e.what() << std::endl;
+        return EXIT_FAILURE;
         }
       catch (...)
         {
         std::cout << "Default exception\n";
+        return EXIT_FAILURE;
         }
       }
     }
@@ -65,10 +68,12 @@ int main (int argc, char *argv[])
     catch (std::exception &e)
       {
       std::cout << "Exception: " << e.what() << std::endl;
+      return EXIT_FAILURE;
       }
     catch (...)
       {
       std::cout << "Default exception\n";
+      return EXIT_FAILURE;
       }
 
 
@@ -82,10 +87,12 @@ int main (int argc, char *argv[])
     catch (std::exception &e)
       {
       std::cout << "Exception: " << e.what() << std::endl;
+      return EXIT_FAILURE;
       }
     catch (...)
       {
       std::cout << "Default exception\n";
+      return EXIT_FAILURE;
       }
 
     try
@@ -93,15 +100,19 @@ int main (int argc, char *argv[])
       std::cout << "Read 3\n";
       img = sitk::ReadImage( dataFinder.GetFile ( "Input/cthead1-Float.mha" ) );
       std::cout << "Show 3\n";
-      sitk::Show(img, "Dave was here");
+      sitk::Show(img, "Dave was here", true);
       }
     catch (std::exception &e)
       {
       std::cout << "Exception: " << e.what() << std::endl;
+      return EXIT_FAILURE;
       }
     catch (...)
       {
       std::cout << "Default exception\n";
+      return EXIT_FAILURE;
       }
     }
+
+  return EXIT_SUCCESS;
 }

@@ -11,11 +11,24 @@ set( SimpleITKIOSource
 
 include_directories( ${CMAKE_CURRENT_SOURCE_DIR} )
 
+set(REQUIRED_ITK_MODULES  ITKCommon ITKLabelMap ITKImageCompose
+  ITKImageIntensity ITKIOImageBase ITKIOTransformBase ITKIOGDCM )
+foreach( mod IN LISTS ITK_MODULES_ENABLED)
+  if( ${mod} MATCHES "IO")
+    list(APPEND REQUIRED_ITK_MODULES ${mod})
+  endif()
+endforeach()
+
+find_package(ITK COMPONENTS REQUIRED)
 include(${ITK_USE_FILE})
 
 add_library ( SimpleITKIO ${SimpleITKIOSource} )
-target_link_libraries ( SimpleITKIO ${ITK_LIBRARIES} SimpleITKCommon )
-set_target_properties( SimpleITKIO PROPERTIES SKIP_BUILD_RPATH TRUE )
+target_link_libraries ( SimpleITKIO
+  PUBLIC  SimpleITKCommon
+  PRIVATE ${ITK_LIBRARIES} )
+if (SITK_EXPLICIT_INSTANTIATION)
+  target_link_libraries ( SimpleITKIO PRIVATE SimpleITKExplicit )
+endif()
 
 sitk_install_exported_target( SimpleITKIO )
 

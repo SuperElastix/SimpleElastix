@@ -32,6 +32,19 @@ TEST(IO,ImageFileReader) {
 
   EXPECT_EQ( reader.GetOutputPixelType(), sitk::sitkUnknown );
 
+  EXPECT_EQ( reader.GetLoadPrivateTags(), false );
+  reader.LoadPrivateTagsOn();
+  EXPECT_EQ( reader.GetLoadPrivateTags(), true );
+  reader.LoadPrivateTagsOff();
+  EXPECT_EQ( reader.GetLoadPrivateTags(), false );
+
+  reader.SetLoadPrivateTags(true);
+  EXPECT_EQ( reader.GetLoadPrivateTags(), true );
+
+  reader.SetLoadPrivateTags(false);
+  EXPECT_EQ( reader.GetLoadPrivateTags(), false );
+
+
   typedef std::map<std::string,std::string> MapType;
   MapType mapping;
 
@@ -329,11 +342,18 @@ TEST(IO, DicomSeriesReader) {
 
   fileNames = reader.GetGDCMSeriesFileNames( dicomDir );
 
-  sitk::Image image = reader.SetFileNames( fileNames ).Execute();
+  reader.SetFileNames( fileNames );
+  sitk::Image image = reader.Execute();
   EXPECT_EQ( "f5ad2854d68fc87a141e112e529d47424b58acfb", sitk::Hash( image ) );
 
   fileNames = reader.GetGDCMSeriesFileNames( dicomDir, "1.2.840.113619.2.133.1762890640.1886.1055165015.999" );
   EXPECT_EQ( 3u, fileNames.size() );
+
+  // When reading a series each slice has its own meta-data dictionary
+  // so the user has to decide on how to combine them, our image will
+  // return an empty dictionary.
+  std::vector< std::string > metaDataKeys = image.GetMetaDataKeys();
+  EXPECT_EQ( 0u, metaDataKeys.size() );
 }
 
 

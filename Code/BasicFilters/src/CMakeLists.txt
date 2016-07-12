@@ -17,8 +17,13 @@ set ( SimpleITKBasicFilters0Source
 )
 
 add_library ( SimpleITKBasicFilters0 ${SimpleITKBasicFilters0Source} )
-target_link_libraries ( SimpleITKBasicFilters0 SimpleITKCommon ${ITK_LIBRARIES} )
-set_target_properties( SimpleITKBasicFilters0  PROPERTIES SKIP_BUILD_RPATH TRUE )
+target_link_libraries ( SimpleITKBasicFilters0
+  PUBLIC SimpleITKCommon
+  PRIVATE ${ITK_LIBRARIES} )
+if (SITK_EXPLICIT_INSTANTIATION)
+  target_link_libraries ( SimpleITKBasicFilters0 PRIVATE SimpleITKExplicit )
+endif()
+
 sitk_install_exported_target( SimpleITKBasicFilters0 )
 
 # append this new library to the globally cached list
@@ -47,11 +52,16 @@ set ( SimpleITKBasicFilters1Source
   sitkBSplineTransformInitializerFilter.cxx
   sitkCenteredTransformInitializerFilter.cxx
   sitkCenteredVersorTransformInitializerFilter.cxx
+  sitkLandmarkBasedTransformInitializerFilter.cxx
 )
 
 add_library ( SimpleITKBasicFilters1 ${SimpleITKBasicFilters1Source} )
-target_link_libraries ( SimpleITKBasicFilters1 SimpleITKCommon SimpleITKBasicFilters0 ${ITK_LIBRARIES} )
-set_target_properties( SimpleITKBasicFilters1  PROPERTIES SKIP_BUILD_RPATH TRUE )
+target_link_libraries ( SimpleITKBasicFilters1
+  PUBLIC SimpleITKCommon SimpleITKBasicFilters0
+  PRIVATE ${ITK_LIBRARIES} )
+if (SITK_EXPLICIT_INSTANTIATION)
+  target_link_libraries ( SimpleITKBasicFilters1 PRIVATE SimpleITKExplicit )
+endif()
 add_dependencies ( SimpleITKBasicFilters1 BasicFiltersSourceCode )
 sitk_install_exported_target( SimpleITKBasicFilters1 )
 list ( APPEND SimpleITK_LIBRARIES SimpleITKBasicFilters1 )
@@ -103,13 +113,18 @@ foreach ( _start RANGE 0 ${_end_range} ${_stride} )
   endforeach()
 
   add_library ( SimpleITKBasicFilters${_library_i} ${SRC} )
-  target_link_libraries ( SimpleITKBasicFilters${_library_i} SimpleITKCommon SimpleITKBasicFilters0 ${ITK_LIBRARIES} )
+  target_link_libraries ( SimpleITKBasicFilters${_library_i}
+    PUBLIC SimpleITKCommon SimpleITKBasicFilters0
+    PRIVATE ${ITK_LIBRARIES} )
+  if (SITK_EXPLICIT_INSTANTIATION)
+    target_link_libraries ( SimpleITKBasicFilters${_library_i} PRIVATE SimpleITKExplicit )
+  endif()
   if(_last)
     # the last library include additional cxx files which may depend on
     # other filter libraries
-    target_link_libraries ( SimpleITKBasicFilters${_library_i} ${SimpleITK_LIBRARIES} )
+    target_link_libraries ( SimpleITKBasicFilters${_library_i}
+      PRIVATE ${SimpleITK_LIBRARIES} )
   endif()
-  set_target_properties( SimpleITKBasicFilters${_library_i}  PROPERTIES SKIP_BUILD_RPATH TRUE )
   add_dependencies ( SimpleITKBasicFilters${_library_i} BasicFiltersSourceCode )
 
   # append this new library to the globaly cached list
@@ -119,8 +134,3 @@ foreach ( _start RANGE 0 ${_end_range} ${_stride} )
   sitk_install_exported_target( SimpleITKBasicFilters${_library_i} )
 
 endforeach ()
-
-
-install( FILES ${CMAKE_CURRENT_BINARY_DIR}/../include/SimpleITKBasicFiltersGeneratedHeaders.h
-  DESTINATION ${SimpleITK_INSTALL_INCLUDE_DIR}
-  COMPONENT Development )

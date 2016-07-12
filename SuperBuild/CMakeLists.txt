@@ -1,25 +1,23 @@
-cmake_minimum_required ( VERSION 2.8.4 )
+
+#-----------------------------------------------------------------------------
+# Override defaults set in initial "project" call, allow user to
+# override from command line
+#-----------------------------------------------------------------------------
+
+
+# SimpleITK Addition: install to the common library
+# directory, so that all libs/include etc ends up
+# in one common tree
+if( NOT DEFINED CMAKE_INSTALL_PREFIX )
+  set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR} CACHE PATH "Where all the prerequisite libraries go")
+endif()
+
+cmake_minimum_required ( VERSION 3.0 )
 project ( SuperBuildSimpleITK )
 
 #-----------------------------------------------------------------------------
 # Superbuild script
 #-----------------------------------------------------------------------------
-
-#
-# Global configuration
-#
-
-# Add needed flag for gnu on linux like enviroments
-if(NOT APPLE AND "x${CMAKE_CXX_COMPILER_ID}x" MATCHES "xGNUx")
-  if(NOT "${CMAKE_CXX_FLAGS}" MATCHES "-fPIC")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-  endif()
-  if(NOT "${CMAKE_C_FLAGS}" MATCHES "-fPIC")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
-  endif()
-endif()
-
-
 
 # Actually run the super build script
 set(${CMAKE_PROJECT_NAME}_DEPENDENCIES "") #Dependancies will be determined during superbuild stage.

@@ -47,7 +47,7 @@ namespace itk {
       /** return user readable name fo the filter */
       virtual std::string GetName() const { return std::string("ImageFileReader"); }
 
-      Self& SetFileName ( std::string fn );
+      SITK_RETURN_SELF_TYPE_HEADER SetFileName ( std::string fn );
       std::string GetFileName() const;
 
       Image Execute();
@@ -56,12 +56,12 @@ namespace itk {
 
     protected:
 
-      template <class TImageType> Image ExecuteInternal ( void );
+      template <class TImageType> Image ExecuteInternal ( itk::ImageIOBase * );
 
     private:
 
       // function pointer type
-      typedef Image (Self::*MemberFunctionType)( void );
+      typedef Image (Self::*MemberFunctionType)( itk::ImageIOBase * );
 
       // friend to get access to executeInternal member
       friend struct detail::MemberFunctionAddressor<MemberFunctionType>;

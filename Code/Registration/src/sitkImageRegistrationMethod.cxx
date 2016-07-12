@@ -274,7 +274,7 @@ ImageRegistrationMethod::SetOptimizerAsGradientDescentLineSearch( double learnin
 
 ImageRegistrationMethod::Self&
 ImageRegistrationMethod::SetOptimizerAsLBFGSB( double gradientConvergenceTolerance,
-                                               unsigned int maximumNumberOfIterations,
+                                               unsigned int numberOfIterations,
                                                unsigned int maximumNumberOfCorrections,
                                                unsigned int maximumNumberOfFunctionEvaluations,
                                                double costFunctionConvergenceFactor,
@@ -284,7 +284,7 @@ ImageRegistrationMethod::SetOptimizerAsLBFGSB( double gradientConvergenceToleran
 {
   m_OptimizerType = LBFGSB;
   m_OptimizerGradientConvergenceTolerance = gradientConvergenceTolerance;
-  m_OptimizerNumberOfIterations = maximumNumberOfIterations;
+  m_OptimizerNumberOfIterations = numberOfIterations;
   m_OptimizerMaximumNumberOfCorrections = maximumNumberOfCorrections;
   m_OptimizerMaximumNumberOfFunctionEvaluations = maximumNumberOfFunctionEvaluations;
   m_OptimizerCostFunctionConvergenceFactor = costFunctionConvergenceFactor;
@@ -331,6 +331,22 @@ ImageRegistrationMethod::SetOptimizerAsAmoeba( double simplexDelta,
   m_OptimizerParametersConvergenceTolerance = parametersConvergenceTolerance;
   m_OptimizerFunctionConvergenceTolerance = functionConvergenceTolerance;
   m_OptimizerWithRestarts = withRestarts;
+  return *this;
+}
+
+ImageRegistrationMethod::Self&
+ImageRegistrationMethod::SetOptimizerAsPowell(unsigned int numberOfIterations,
+                                              unsigned int maximumLineIterations,
+                                              double stepLength,
+                                              double stepTolerance,
+                                              double valueTolerance )
+{
+  m_OptimizerType = Powell;
+  m_OptimizerNumberOfIterations = numberOfIterations;
+  m_OptimizerMaximumLineIterations = maximumLineIterations;
+  m_OptimizerStepLength = stepLength;
+  m_OptimizerStepTolerance = stepTolerance;
+  m_OptimizerValueTolerance = valueTolerance;
   return *this;
 }
 
@@ -631,7 +647,7 @@ Transform ImageRegistrationMethod::ExecuteInternal ( const Image &inFixed, const
   typedef TImageType     FixedImageType;
   typedef TImageType     MovingImageType;
   const unsigned int ImageDimension = FixedImageType::ImageDimension;
-  typedef itk::SpatialObject<ImageDimension> SpatialObjectMaskType;
+  //typedef itk::SpatialObject<ImageDimension> SpatialObjectMaskType;
 
 
   typedef itk::ImageRegistrationMethodv4<FixedImageType, MovingImageType>  RegistrationType;
@@ -871,7 +887,7 @@ double ImageRegistrationMethod::EvaluateInternal ( const Image &inFixed, const I
   typedef TImageType     FixedImageType;
   typedef TImageType     MovingImageType;
   const unsigned int ImageDimension = FixedImageType::ImageDimension;
-  typedef itk::SpatialObject<ImageDimension> SpatialObjectMaskType;
+  //typedef itk::SpatialObject<ImageDimension> SpatialObjectMaskType;
 
  typedef itk::ImageRegistrationMethodv4<FixedImageType, MovingImageType>  RegistrationType;
 

@@ -63,8 +63,19 @@ public:
   std::string GetName() const { return std::string ("DisplacementFieldTransform"); }
 
   /** parameters */
-  // set displacement methods take ownership for the image and remove it
-  Self &SetDisplacementField(Image &);
+
+  /** \brief Consume an image, and set the displacement field
+   *
+   * \warning The ownership of the input displacement image is
+   * transferred to the constructed transform object. The input image
+   * is modified to be a default constructed Image object.
+   *
+   * Image must be of sitkVectorFloat64 pixel type with the number of
+   * components equal to the image dimension.
+   *
+   */
+  SITK_RETURN_SELF_TYPE_HEADER SetDisplacementField(Image &);
+
   /** \todo The returned image should not directly modify the
    * internal displacement field.
    */
@@ -73,18 +84,19 @@ public:
   /** fixed parameter */
 
   /* additional methods */
-  Self &SetInverseDisplacementField(Image &);
+  SITK_RETURN_SELF_TYPE_HEADER SetInverseDisplacementField(Image &);
+
   /** \todo The returned image is should not directly modify the
    * internal displacement field.
    */
   Image GetInverseDisplacementField() const;
 
-  Self &SetInterpolator(InterpolatorEnum interp);
+  SITK_RETURN_SELF_TYPE_HEADER SetInterpolator(InterpolatorEnum interp);
   // InterpolatorEnum GetInterpolator() const; How to do this?
 
-  Self &SetSmoothingOff();
-  Self &SetSmoothingGaussianOnUpdate( double varianceForUpdateField=1.75, double varianceForTotalField=0.5 );
-  Self &SetSmoothingBSplineOnUpdate( const std::vector<unsigned int> &numberOfControlPointsForUpdateField = std::vector<unsigned int>(3,4),
+  SITK_RETURN_SELF_TYPE_HEADER SetSmoothingOff();
+  SITK_RETURN_SELF_TYPE_HEADER SetSmoothingGaussianOnUpdate( double varianceForUpdateField=1.75, double varianceForTotalField=0.5 );
+  SITK_RETURN_SELF_TYPE_HEADER SetSmoothingBSplineOnUpdate( const std::vector<unsigned int> &numberOfControlPointsForUpdateField = std::vector<unsigned int>(3,4),
                                      const std::vector<unsigned int> &numberOfControlPointsForTotalField = std::vector<unsigned int>(3,4),
                                      bool enforceStationaryBoundary=true,
                                      unsigned int order=3 );
