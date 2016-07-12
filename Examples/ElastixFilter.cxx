@@ -15,19 +15,19 @@ int main( int argc, char* argv[] ) {
   typedef itk::Image< float, 2u > ImageType;
 
   typedef elastix::ElastixFilter< ImageType, ImageType > ElastixFilterType;
-  typedef typename ElastixFilterType::Pointer ElastixPointer;
+  typedef ElastixFilterType::Pointer ElastixPointer;
 
   typedef elastix::ParameterObject ParameterObjectType;
-  typedef typename ParameterObjectType::Pointer ParameterObjectPointer;
+  typedef ParameterObjectType::Pointer ParameterObjectPointer;
 
   typedef itk::ImageFileReader< ImageType > FixedImageReaderType;
-  typedef typename FixedImageReaderType::Pointer FixedImageReaderPointer;
+  typedef FixedImageReaderType::Pointer FixedImageReaderPointer;
 
   typedef itk::ImageFileReader< ImageType > MovingImageReaderType;
-  typedef typename MovingImageReaderType::Pointer MovingImageReaderPointer;
+  typedef MovingImageReaderType::Pointer MovingImageReaderPointer;
 
   typedef itk::ImageFileWriter< ImageType > ResultImageWriterType;
-  typedef typename ResultImageWriterType::Pointer ResultImageWriterPointer;
+  typedef ResultImageWriterType::Pointer ResultImageWriterPointer;
 
   try 
   {
