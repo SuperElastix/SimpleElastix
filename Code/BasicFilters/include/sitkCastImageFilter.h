@@ -172,7 +172,7 @@ private:
   /** @} */
 
   typedef Image (Self::*MemberFunctionType)( const Image& );
-  std::auto_ptr<detail::DualMemberFunctionFactory<MemberFunctionType> > m_DualMemberFactory;
+  nsstd::auto_ptr<detail::DualMemberFunctionFactory<MemberFunctionType> > m_DualMemberFactory;
 
 };
 

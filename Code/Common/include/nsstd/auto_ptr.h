@@ -15,21 +15,12 @@
 *  limitations under the License.
 *
 *=========================================================================*/
-#ifndef __sitk_nsstd_type_traits_h
-#define __sitk_nsstd_type_traits_h
+#ifndef __sitk_nsstd_auto_ptr_h
+#define __sitk_nsstd_auto_ptr_h
 
 #include "sitkConfigure.h"
 
-#if !defined SITK_HAS_TR1_TYPE_TRAITS && !defined SITK_HAS_CXX11_TYPE_TRAITS
-#error "No system (tr1/c++11) type_traits header available!"
-#endif
-
-#if defined SITK_HAS_CXX11_TYPE_TRAITS || !defined SITK_HAS_TR1_SUB_INCLUDE
-#include <type_traits>
-#else
-#include <tr1/type_traits>
-#endif
-
+#include <memory>
 
 namespace itk
 {
@@ -37,19 +28,14 @@ namespace simple
 {
 namespace nsstd
 {
-#if defined SITK_HAS_TR1_TYPE_TRAITS && !defined SITK_HAS_CXX11_TYPE_TRAITS
-using std::tr1::is_same;
-using std::tr1::true_type;
-using std::tr1::false_type;
-using std::tr1::integral_constant;
+#if defined SITK_HAS_CXX11_UNIQUE_PTR && defined SITK_HAS_CXX11_ALIAS_TEMPLATE
+template <typename T>
+using auto_ptr = std::unique_ptr<T>;
 #else
-using std::is_same;
-using std::true_type;
-using std::false_type;
-using std::integral_constant;
+using std::auto_ptr;
 #endif
 }
 }
 }
 
-#endif //__sitk_nsstd_type_traits_h
+#endif //__sitk_nsstd_auto_ptr_h
