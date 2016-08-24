@@ -1,3 +1,7 @@
+# Include ITK needed by elastix
+set( ITK_NO_IO_FACTORY_REGISTER_MANAGER 1 )
+include( ${ITK_USE_FILE} )
+
 # A general packaging target, not built by default, to build packages for each
 # language.  This should depend on all language specific targets.
 
