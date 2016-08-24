@@ -18,7 +18,7 @@ SimpleTransformix::ExecuteInternal( void )
     TransforimxFilterPointer transformixFilter = TransformixFilterType::New();
 
     if( !this->IsEmpty( this->m_MovingImage ) ) {
-      transformixFilter->SetInput( static_cast< TMovingImage* >( this->GetMovingImage().GetITKBase() ) );
+      transformixFilter->SetMovingImage( static_cast< TMovingImage* >( this->GetMovingImage().GetITKBase() ) );
     }
 
     transformixFilter->SetFixedPointSetFileName( this->GetFixedPointSetFileName() );
