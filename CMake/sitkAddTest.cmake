@@ -67,7 +67,7 @@ function(sitk_add_python_test name)
       )
   if (NOT SITK_PYTHON_USE_VIRTUALENV)
     set_property(TEST Python.${name}
-      PROPERTY ENVIRONMENT PYTHONPATH=${SimpleITK_BINARY_DIR}/Wrapping
+      APPEND PROPERTY ENVIRONMENT PYTHONPATH=${SimpleITK_BINARY_DIR}/Wrapping/Python
       )
   endif()
 
@@ -98,6 +98,9 @@ function(sitk_add_lua_test name)
     )
   set_property(TEST Lua.${name}
     PROPERTY ENVIRONMENT LUA_CPATH=$<TARGET_FILE:SimpleITKLuaModule_LUA>
+    )
+  set_property(TEST Lua.${name}
+    APPEND PROPERTY ENVIRONMENT SITK_NOSHOW=YES
     )
 endfunction()
 
