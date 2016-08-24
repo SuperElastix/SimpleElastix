@@ -40,9 +40,9 @@ class SITKCommon_EXPORT SimpleTransformix
     Image& GetMovingImage( void );
     Self& RemoveMovingImage( void );
 
-    Self& SetMovingPointSetFileName( const std::string movingPointSetFileName );
-    std::string GetMovingPointSetFileName( void );
-    Self& RemoveMovingPointSetFileName( void );
+    Self& SetFixedPointSetFileName( const std::string movingPointSetFileName );
+    std::string GetFixedPointSetFileName( void );
+    Self& RemoveFixedPointSetFileName( void );
 
     Self& SetComputeSpatialJacobian( const bool );
     bool GetComputeSpatialJacobian( void );
@@ -111,8 +111,8 @@ class SITKCommon_EXPORT SimpleTransformix
     bool IsEmpty( const Image& image );
 
     // Definitions for SimpleITK member factory
-    typedef Image (Self::*MemberFunctionType)( void );
-    template< class TMovingImage > Image ExecuteInternal ( void );
+    typedef Image ( Self::*MemberFunctionType )( void );
+    template< class TMovingImage > Image ExecuteInternal( void );
     friend struct detail::MemberFunctionAddressor< MemberFunctionType >;
     std::auto_ptr< detail::MemberFunctionFactory< MemberFunctionType > > m_MemberFactory;
 

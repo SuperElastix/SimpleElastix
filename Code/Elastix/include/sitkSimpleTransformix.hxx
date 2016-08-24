@@ -21,7 +21,7 @@ SimpleTransformix::ExecuteInternal( void )
       transformixFilter->SetInput( static_cast< TMovingImage* >( this->GetMovingImage().GetITKBase() ) );
     }
 
-    transformixFilter->SetInputPointSetFileName( this->GetMovingPointSetFileName() );
+    transformixFilter->SetInputPointSetFileName( this->GetFixedPointSetFileName() );
     transformixFilter->SetComputeSpatialJacobian( this->GetComputeSpatialJacobian() );
     transformixFilter->SetComputeDeterminantOfSpatialJacobian( this->GetComputeDeterminantOfSpatialJacobian() );
     transformixFilter->SetComputeDeformationField( this->GetComputeDeformationField() );
