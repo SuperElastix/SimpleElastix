@@ -1,12 +1,21 @@
 set( proj elastix )
 
+get_cmake_property( _varNames VARIABLES )#
+
+if( ${ITK_WRAPPING} OR ${BUILD_SHARED_LIBS} )
+  set( ELASTIX_BUILD_SHARED_LIBS ON )
+else()
+  set( ELASTIX_BUILD_SHARED_LIBS OFF )
+endif()
+
 file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/${proj}-build/CMakeCacheInit.txt" "${ep_common_cache}" )
-set( ELASTIX_REPOSITORY http://github.com/kaspermarstal/elastix )
-set( ELASTIX_TAG 3c7deef6d4f44203207bc198cc27f011ac1222c7 )
+
+set( ELASTIX_GIT_REPOSITORY ${git_protocol}://github.com/kaspermarstal/elastix )
+set( ELASTIX_GIT_TAG 098f973472f3a51bbffbe2967440fae970518001 )
 
 ExternalProject_Add( ${proj} 
-  GIT_REPOSITORY ${ELASTIX_REPOSITORY}
-  GIT_TAG ${ELASTIX_TAG}
+  GIT_REPOSITORY ${ELASTIX_GIT_REPOSITORY}
+  GIT_TAG ${ELASTIX_GIT_TAG}
   UPDATE_COMMAND ""
   SOURCE_DIR ${proj}
   BINARY_DIR ${proj}-build
@@ -14,9 +23,11 @@ ExternalProject_Add( ${proj}
   CMAKE_ARGS
   --no-warn-unused-cli
   -C "${CMAKE_CURRENT_BINARY_DIR}/${proj}-build/CMakeCacheInit.txt"
+  ${ep_common_args}
+  -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON
   -DELASTIX_BUILD_TESTING:BOOL=OFF
   -DELASTIX_BUILD_EXECUTABLE:BOOL=OFF
-  -DELASTIX_BUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
+  -DELASTIX_BUILD_SHARED_LIBS:BOOL=${ELASTIX_BUILD_SHARED_LIBS}
   -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
   -DITK_DIR:PATH=${ITK_DIR}
   -DUSE_ALL_PIXELTYPES:BOOL=ON
@@ -85,7 +96,7 @@ ExternalProject_Add( ${proj}
   -DUSE_RayCastInterpolator:BOOL=ON                                           
   -DUSE_RayCastResampleInterpolator:BOOL=ON                                           
   -DUSE_ReducedDimensionBSplineInterpolator:BOOL=ON                                           
-  -DUSE_ReducedDimensionBSplineResampleInterpolator:BOOL=ON                                           
+  -DUSE_ReducedDimensionBSplineResampleInterpolator:BOOL=ON
   -DUSE_RegularStepGradientDescent:BOOL=ON                                           
   -DUSE_SimilarityTransformElastix:BOOL=ON                                           
   -DUSE_Simplex:BOOL=ON                                           
