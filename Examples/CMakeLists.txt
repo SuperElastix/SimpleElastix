@@ -22,14 +22,36 @@ if(NOT CMAKE_PROJECT_NAME STREQUAL "SimpleITK")
   set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
 endif()
 
-add_executable( ElastixFilter ElastixFilter.cxx )
-target_link_libraries( ElastixFilter ${SimpleITK_LIBRARIES} )
+# Add individual cxx executables
+add_executable ( SimpleElastix1 SimpleElastix.cxx )
+target_link_libraries ( SimpleElastix1 ${SimpleITK_LIBRARIES} )
 
-add_executable( SimpleElastixCxx SimpleElastix.cxx )
-target_link_libraries( SimpleElastixCxx ${SimpleITK_LIBRARIES} )
+add_executable ( SimpleTransformix1 SimpleTransformix.cxx )
+target_link_libraries ( SimpleTransformix1 ${SimpleITK_LIBRARIES} )
 
-add_executable( SimpleTransformixCxx SimpleTransformix.cxx )
-target_link_libraries( SimpleTransformixCxx ${SimpleITK_LIBRARIES} )
+add_executable ( SimpleGaussian SimpleGaussian.cxx )
+target_link_libraries ( SimpleGaussian ${SimpleITK_LIBRARIES} )
+
+add_executable ( SimpleGaussianFunctional SimpleGaussianFunctional.cxx )
+target_link_libraries ( SimpleGaussianFunctional ${SimpleITK_LIBRARIES} )
+
+add_executable ( BufferImportExport BufferImportExport.cxx )
+target_link_libraries ( BufferImportExport ${SimpleITK_LIBRARIES} )
+
+add_executable ( FilterProgressReporting FilterProgressReporting.cxx )
+target_link_libraries ( FilterProgressReporting ${SimpleITK_LIBRARIES} )
+
+add_executable ( DicomSeriesReader DicomSeriesReader.cxx )
+target_link_libraries ( DicomSeriesReader ${SimpleITK_LIBRARIES} )
+
+add_executable ( ImageRegistrationMethod1 ImageRegistrationMethod1.cxx )
+target_link_libraries ( ImageRegistrationMethod1 ${SimpleITK_LIBRARIES} )
+
+add_executable ( ImageRegistrationMethod2 ImageRegistrationMethod2.cxx )
+target_link_libraries ( ImageRegistrationMethod2 ${SimpleITK_LIBRARIES} )
+
+add_executable ( ImageRegistrationMethodBSpline1 ImageRegistrationMethodBSpline1.cxx )
+target_link_libraries ( ImageRegistrationMethodBSpline1 ${SimpleITK_LIBRARIES} )
 
 add_executable ( ImageRegistrationMethodDisplacement1 ImageRegistrationMethodDisplacement1.cxx )
 target_link_libraries ( ImageRegistrationMethodDisplacement1  ${SimpleITK_LIBRARIES} )
@@ -42,6 +64,7 @@ target_link_libraries ( DemonsRegistration2 ${SimpleITK_LIBRARIES} )
 
 # Add subdirectories
 add_subdirectory(Segmentation)
+add_subdirectory(ITKIntegration)
 
 # Test data directory
 set(TEST_HARNESS_TEMP_DIRECTORY ${SimpleITK_BINARY_DIR}/Testing/Temporary)
