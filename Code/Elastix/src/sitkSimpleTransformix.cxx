@@ -76,7 +76,7 @@ SimpleTransformix
 
 SimpleTransformix::Self& 
 SimpleTransformix
-::SetMovingPointSetFileName( const std::string movingPointSetFileName )
+::SetFixedPointSetFileName( const std::string movingPointSetFileName )
 {
   this->m_MovingPointSetFileName = movingPointSetFileName;
   return *this;
@@ -84,14 +84,14 @@ SimpleTransformix
 
 std::string 
 SimpleTransformix
-::GetMovingPointSetFileName( void )
+::GetFixedPointSetFileName( void )
 {
   return this->m_MovingPointSetFileName;
 }
 
 SimpleTransformix::Self&
 SimpleTransformix
-::RemoveMovingPointSetFileName( void )
+::RemoveFixedPointSetFileName( void )
 {
   this->m_MovingPointSetFileName = std::string();
   return *this;

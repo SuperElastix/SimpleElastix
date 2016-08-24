@@ -181,9 +181,9 @@ TEST( TransformixFilterTest, TransformPointSet )
   ImageFileReaderType::Pointer movingImageReader = ImageFileReaderType::New();
   movingImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceR10X13Y17.png" ) );
   
-  const std::string inputPointSetFileName = dataFinder.GetOutputFile( "InputPoints.pts" );
+  const std::string fixedPointSetFileName = dataFinder.GetOutputFile( "InputPoints.pts" );
   std::ofstream fixedMeshFile;
-  fixedMeshFile.open( inputPointSetFileName.c_str() );
+  fixedMeshFile.open( fixedPointSetFileName.c_str() );
   fixedMeshFile << "point\n";
   fixedMeshFile << "1\n";
   fixedMeshFile << "128.0 128.0\n";
@@ -199,7 +199,7 @@ TEST( TransformixFilterTest, TransformPointSet )
   EXPECT_NO_THROW( transformixFilter = TransformixFilterType::New() );
   EXPECT_NO_THROW( transformixFilter->SetOutputDirectory( dataFinder.GetOutputDirectory() ) );
   EXPECT_NO_THROW( transformixFilter->SetTransformParameterObject( elastixFilter->GetTransformParameterObject() ) );
-  EXPECT_NO_THROW( transformixFilter->SetInputPointSetFileName( dataFinder.GetOutputFile( "InputPoints.pts" ) ) );
+  EXPECT_NO_THROW( transformixFilter->SetFixedPointSetFileName( dataFinder.GetOutputFile( "InputPoints.pts" ) ) );
   EXPECT_NO_THROW( transformixFilter->Update() );
 }
 
