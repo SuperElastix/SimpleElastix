@@ -1,8 +1,8 @@
 #ifndef __sitksimpletransformix_hxx_
 #define __sitksimpletransformix_hxx_
 
-#include "sitkSimpleTransformix.h"
- 
+#include "sitkCastImageFilter.h"
+
 namespace itk {
   namespace simple {
 
@@ -18,7 +18,7 @@ SimpleTransformix::ExecuteInternal( void )
     TransforimxFilterPointer transformixFilter = TransformixFilterType::New();
 
     if( !this->IsEmpty( this->m_MovingImage ) ) {
-      transformixFilter->SetMovingImage( static_cast< TMovingImage* >( this->GetMovingImage().GetITKBase() ) );
+      transformixFilter->SetMovingImage( itkDynamicCastInDebugMode< TMovingImage* >( Cast( this->GetMovingImage(), static_cast< PixelIDValueEnum >( GetPixelIDValueFromElastixString( "float" ) ) ).GetITKBase() ) );
     }
 
     transformixFilter->SetFixedPointSetFileName( this->GetFixedPointSetFileName() );
@@ -31,15 +31,23 @@ SimpleTransformix::ExecuteInternal( void )
     transformixFilter->SetLogToFile( this->GetLogToFile() );
     transformixFilter->SetLogToConsole( this->GetLogToConsole() );
 
+    ParameterMapVectorType transformParameterMapVector = this->m_TransformParameterMapVector;
+    for( unsigned int i = 0; i < transformParameterMapVector.size(); i++ )
+    {
+      transformParameterMapVector[ i ][ "FixedInternalImagePixelType" ] = ParameterValueVectorType( 1, "float" );
+      transformParameterMapVector[ i ][ "MovingInternalImagePixelType" ] = ParameterValueVectorType( 1, "float" );
+      transformParameterMapVector[ i ][ "ResultImagePixelType" ] = ParameterValueVectorType( 1, "float" );
+    }
+
     ParameterObjectPointer parameterObject = ParameterObjectType::New();
-    parameterObject->SetParameterMap( this->m_TransformParameterMapVector );
+    parameterObject->SetParameterMap( transformParameterMapVector );
     transformixFilter->SetTransformParameterObject( parameterObject );
-    
     transformixFilter->Update();
 
     if( !this->IsEmpty( this->GetMovingImage() ) )
     {
-      this->m_ResultImage = Image( transformixFilter->GetOutput() );
+      // Cast DataObject -> itk::Image< ResultImagePixelType, ImageDimension -> sitk::Image
+      this->m_ResultImage = Cast( Image( itkDynamicCastInDebugMode< TMovingImage* >( transformixFilter->GetOutput() ) ), this->GetMovingImage().GetPixelID() );
       this->m_ResultImage.MakeUnique();
     }
   }

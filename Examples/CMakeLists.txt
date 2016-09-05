@@ -14,6 +14,11 @@ if(NOT CMAKE_PROJECT_NAME STREQUAL "SimpleITK")
   find_package(SimpleITK REQUIRED)
   include(${SimpleITK_USE_FILE})
 
+  # SimpleElastix further requires ITK
+  find_package(ITK)
+  set(ITK_NO_IO_FACTORY_REGISTER_MANAGER 1)
+  include(${ITK_USE_FILE})
+
   # Add compiler flags needed to use SimpleITK.
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${SimpleITK_REQUIRED_C_FLAGS}")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SimpleITK_REQUIRED_CXX_FLAGS}")
@@ -23,10 +28,10 @@ if(NOT CMAKE_PROJECT_NAME STREQUAL "SimpleITK")
 endif()
 
 # Add individual cxx executables
-add_executable ( SimpleElastix1 SimpleElastix.cxx )
+add_executable ( SimpleElastix1 SimpleElastix1.cxx )
 target_link_libraries ( SimpleElastix1 ${SimpleITK_LIBRARIES} )
 
-add_executable ( SimpleTransformix1 SimpleTransformix.cxx )
+add_executable ( SimpleTransformix1 SimpleTransformix1.cxx )
 target_link_libraries ( SimpleTransformix1 ${SimpleITK_LIBRARIES} )
 
 add_executable ( SimpleGaussian SimpleGaussian.cxx )

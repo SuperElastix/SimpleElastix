@@ -130,6 +130,7 @@ const std::string SITKCommon_EXPORT GetPixelIDValueAsElastixParameter( PixelIDVa
  * changes to PixelIDValueEnum - i.e. if a new pixel type is added.
  */
 PixelIDValueType SITKCommon_EXPORT GetPixelIDValueFromString(const std::string &enumString );
+PixelIDValueType SITKCommon_EXPORT GetPixelIDValueFromElastixString(const std::string &enumString );
 
 #ifndef SWIG
 SITKCommon_EXPORT std::ostream& operator<<(std::ostream& os, const PixelIDValueEnum id);

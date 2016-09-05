@@ -149,9 +149,9 @@ class SITKCommon_EXPORT SimpleElastix
 
     // Definitions for SimpleITK member factory
     typedef Image ( Self::*MemberFunctionType )( void );
+    template< class TFixedImage, class TMovingImage > Image DualExecuteInternal( void );
     friend struct detail::DualExecuteInternalAddressor< MemberFunctionType >;
-    template< class TFixedImage, class TMovingImage > Image DualExecuteInternal ( void );
-    std::auto_ptr< detail::DualMemberFunctionFactory< MemberFunctionType > > m_DualMemberFactory;
+    nsstd::auto_ptr< detail::DualMemberFunctionFactory< MemberFunctionType > > m_DualMemberFactory;
 
     VectorOfImage           m_FixedImages;
     VectorOfImage           m_MovingImages;

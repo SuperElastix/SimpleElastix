@@ -114,7 +114,7 @@ class SITKCommon_EXPORT SimpleTransformix
     typedef Image ( Self::*MemberFunctionType )( void );
     template< class TMovingImage > Image ExecuteInternal( void );
     friend struct detail::MemberFunctionAddressor< MemberFunctionType >;
-    std::auto_ptr< detail::MemberFunctionFactory< MemberFunctionType > > m_MemberFactory;
+    nsstd::auto_ptr< detail::MemberFunctionFactory< MemberFunctionType > > m_MemberFactory;
 
     Image                   m_MovingImage;
     Image                   m_ResultImage;

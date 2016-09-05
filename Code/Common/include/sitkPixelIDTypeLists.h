@@ -217,6 +217,12 @@ typedef AllPixelIDTypeList InstantiatedPixelIDTypeList;
 
 #endif
 
+/** SimpleElastix and SimpleTransformix is compiled with float pixel type only for
+ * saving compile time and reducing binary size. Images are automacially casted to 
+ * and from float before and after registration.
+ */
+typedef typelist::MakeTypeList< BasicPixelID< float > >::Type FloatPixelIDTypeList;
+
 
 }
 }

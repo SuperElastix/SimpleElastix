@@ -1,7 +1,8 @@
 #ifndef __sitksimpleelastix_hxx_
 #define __sitksimpleelastix_hxx_
 
-#include "sitkSimpleElastix.h"
+#include "sitkPixelIDValues.h"
+#include "sitkCastImageFilter.h"
 
 namespace itk {
   namespace simple {
@@ -21,12 +22,12 @@ SimpleElastix::DualExecuteInternal( void )
 
     for( unsigned int i = 0; i < this->GetNumberOfFixedImages(); ++i )
     {
-      elastixFilter->AddFixedImage( itkDynamicCastInDebugMode< TFixedImage* >( this->GetFixedImage( i ).GetITKBase() ) );
+      elastixFilter->AddFixedImage( itkDynamicCastInDebugMode< TFixedImage* >( Cast( this->GetFixedImage( i ), static_cast< PixelIDValueEnum >( GetPixelIDValueFromElastixString( "float" ) ) ).GetITKBase() ) );
     }
 
     for( unsigned int i = 0; i < this->GetNumberOfMovingImages(); ++i )
     {
-      elastixFilter->AddMovingImage( itkDynamicCastInDebugMode< TMovingImage* >( this->GetMovingImage( i ).GetITKBase() ) );
+      elastixFilter->AddMovingImage( itkDynamicCastInDebugMode< TMovingImage* >( Cast( this->GetMovingImage( i ), static_cast< PixelIDValueEnum >( GetPixelIDValueFromElastixString( "float" ) ) ).GetITKBase() ) );
     }
 
     for( unsigned int i = 0; i < this->GetNumberOfFixedMasks(); ++i )
@@ -48,13 +49,25 @@ SimpleElastix::DualExecuteInternal( void )
     elastixFilter->SetLogToFile( this->GetLogToFile() );
     elastixFilter->SetLogToConsole( this->GetLogToConsole() );
 
+    ParameterMapVectorType parameterMapVector = this->m_ParameterMapVector;
+    for( unsigned int i = 0; i < parameterMapVector.size(); i++ )
+    {
+      parameterMapVector[ i ][ "FixedInternalImagePixelType" ] 
+        = ParameterValueVectorType( 1, "float" );
+      parameterMapVector[ i ][ "MovingInternalImagePixelType" ]
+        = ParameterValueVectorType( 1, "float" );
+      parameterMapVector[ i ][ "ResultImagePixelType" ]
+        = ParameterValueVectorType( 1, "float" );
+    }
+
     ParameterObjectPointer parameterObject = ParameterObjectType::New();
-    parameterObject->SetParameterMap( this->m_ParameterMapVector );
+    parameterObject->SetParameterMap( parameterMapVector );
     elastixFilter->SetParameterObject( parameterObject );
     
     elastixFilter->Update();
 
-    this->m_ResultImage = Image( elastixFilter->GetOutput() );
+    // Cast DataObject -> itk::Image< ResultImagePixelType, ImageDimension > -> sitk::Image
+    this->m_ResultImage = Cast( Image( itkDynamicCastInDebugMode< TFixedImage * >( elastixFilter->GetOutput() ) ), this->GetFixedImage( 0 ).GetPixelID() );
     this->m_ResultImage.MakeUnique();
     this->m_TransformParameterMapVector = elastixFilter->GetTransformParameterObject()->GetParameterMap();
   }
@@ -65,7 +78,6 @@ SimpleElastix::DualExecuteInternal( void )
 
   return this->m_ResultImage;
 }
-
 
 } // end namespace simple
 } // end namespace itk

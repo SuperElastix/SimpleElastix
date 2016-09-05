@@ -27,7 +27,7 @@ int main( int argc, char* argv[] ) {
   typedef MovingImageReaderType::Pointer MovingImageReaderPointer;
 
   typedef itk::ImageFileWriter< ImageType > ResultImageWriterType;
-  typedef ResultImageWriterType::Pointer ResultImageWriterPointer;
+  typedef ResultImageWriterType::Pointer ResultImageWriterPointer; 
 
   try 
   {

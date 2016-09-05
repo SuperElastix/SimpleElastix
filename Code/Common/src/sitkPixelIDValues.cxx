@@ -326,6 +326,54 @@ PixelIDValueType GetPixelIDValueFromString(const std::string &enumString )
 }
 
 
+PixelIDValueType GetPixelIDValueFromElastixString(const std::string &enumString )
+{
+
+  if ( enumString == "sitkUnknown" )
+    {
+    // Unknow must be first because other enums may be -1 if they are
+    // not instantiated
+      return sitkUnknown;
+    }
+  else if ( enumString == "unsigned char" )
+    {
+      return sitkUInt8;
+    }
+  else if ( enumString == "char" )
+    {
+      return sitkInt8;
+    }
+  else if ( enumString ==  "unsigned short" )
+    {
+      return sitkUInt16;
+    }
+  else if ( enumString == "short" )
+    {
+      return sitkInt16;
+    }
+  else if ( enumString == "unsigned int" )
+    {
+      return sitkUInt32;
+    }
+  else if ( enumString == "int" )
+    {
+      return sitkInt32;
+    }
+  else if ( enumString == "float" )
+    {
+      return sitkFloat32;
+    }
+  else if ( enumString == "double" )
+    {
+      return sitkFloat64;
+    }
+  else
+    {
+    return -99;
+    }
+}
+
+
 std::ostream& operator<<(std::ostream& os, const PixelIDValueEnum id)
 {
   return (os << GetPixelIDValueAsString(id));

@@ -9,29 +9,38 @@ namespace sitk = itk::simple;
 int main ( int argc, char* argv[] ) {
 
   if ( argc < 4 ) {
-    std::cerr << "Usage: " << argv[0] << " <fixedImage> <movingImage> <parameterFile> <outputImage>\n";
+    std::cerr << "Usage: " << argv[0] << " <fixedImage> <movingImage> <inputImage> <parameterFile> <outputImage>\n";
     return 1;
   }
 
-  // Instantiate SimpleElastix
+  // Make transform
   sitk::SimpleElastix elastix;
-
-  // Read input
   sitk::ImageFileReader reader;
   reader.SetFileName( std::string( argv[1] ) );
   elastix.SetFixedImage( reader.Execute() );
   reader.SetFileName( std::string( argv[2] ) );
   elastix.SetMovingImage( reader.Execute() );
   elastix.SetParameterMap( sitk::ReadParameterFile( std::string( argv[3] ) ) );
-
-  // Perform registration
   elastix.LogToConsoleOn();
   elastix.Execute();
 
+  // Instantiate transformix
+  sitk::SimpleTransformix transformix;
+  transformix.LogToConsoleOn();
+
+  // Read input
+  reader.SetFileName( std::string( argv[4] ) );
+  transformix.SetMovingImage( reader.Execute() );
+  transformix.SetTransformParameterMap( elastix.GetTransformParameterMap() );
+
+  // Run warp
+  transformix.Execute();
+
   // Write result image
   sitk::ImageFileWriter writer;
-  writer.SetFileName( std::string( argv[4] ) );
-  writer.Execute( elastix.GetResultImage() );
+  writer.SetFileName( std::string( argv[5] ) );
+  writer.Execute( transformix.GetResultImage() );
 
   return 0;
 }
+

@@ -13,6 +13,13 @@ file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/${proj}-build/CMakeCacheInit.txt" "${ep
 set( ELASTIX_GIT_REPOSITORY ${git_protocol}://github.com/kaspermarstal/elastix )
 set( ELASTIX_GIT_TAG 54e5a7c4513bb36374c18d05951de7354f5837ca )
 
+if( ${ITK_WRAPPING} OR ${BUILD_SHARED_LIBS} )
+  set( ELASTIX_BUILD_SHARED_LIBS ON )
+else()
+  set( ELASTIX_BUILD_SHARED_LIBS OFF )
+  list( APPEND ep_itk_args"-DCMAKE_C_VISIBILITY_PRESET:BOOL=hidden" "-DCMAKE_CXX_VISIBILITY_PRESET:BOOL=hidden" )
+endif()
+
 ExternalProject_Add( ${proj} 
   GIT_REPOSITORY ${ELASTIX_GIT_REPOSITORY}
   GIT_TAG ${ELASTIX_GIT_TAG}
@@ -30,7 +37,9 @@ ExternalProject_Add( ${proj}
   -DELASTIX_BUILD_SHARED_LIBS:BOOL=${ELASTIX_BUILD_SHARED_LIBS}
   -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
   -DITK_DIR:PATH=${ITK_DIR}
-  -DUSE_ALL_PIXELTYPES:BOOL=ON
+  -DELASTIX_IMAGE_2D_PIXELTYPES:STRING=float
+  -DELASTIX_IMAGE_3D_PIXELTYPES:STRING=float
+  -DELASTIX_IMAGE_4D_PIXELTYPES:STRING=float
   -DUSE_AdaptiveStochasticGradientDescent:BOOL=ON                                           
   -DUSE_AdvancedAffineTransformElastix:BOOL=ON
   -DUSE_AdvancedBSplineTransform:BOOL=ON                                           

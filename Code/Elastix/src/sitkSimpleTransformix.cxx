@@ -14,11 +14,11 @@ SimpleTransformix
 {
   // Register this class with SimpleITK
   this->m_MemberFactory.reset( new detail::MemberFunctionFactory< MemberFunctionType >( this ) );
-  this->m_MemberFactory->RegisterMemberFunctions< BasicPixelIDTypeList, 2 >();
-  this->m_MemberFactory->RegisterMemberFunctions< BasicPixelIDTypeList, 3 >();
+  this->m_MemberFactory->RegisterMemberFunctions< FloatPixelIDTypeList, 2 >();
+  this->m_MemberFactory->RegisterMemberFunctions< FloatPixelIDTypeList, 3 >();
 
 #ifdef SITK_4D_IMAGES
-  m_MemberFactory->RegisterMemberFunctions< BasicPixelIDTypeList, 4 >();
+  m_MemberFactory->RegisterMemberFunctions< FloatPixelIDTypeList, 4 >();
 #endif
 
   this->m_MovingImage = Image();
