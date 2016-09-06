@@ -40,7 +40,7 @@ TEST( TransformixFilterTest, UpdateOnDownstreamUpdate )
   
   TransformixFilterType::Pointer transformixFilter;
   EXPECT_NO_THROW( transformixFilter = TransformixFilterType::New() );
-  EXPECT_NO_THROW( transformixFilter->SetInput( movingImageReader->GetOutput() ) );
+  EXPECT_NO_THROW( transformixFilter->SetMovingImage( movingImageReader->GetOutput() ) );
   EXPECT_NO_THROW( transformixFilter->SetOutputDirectory( dataFinder.GetOutputDirectory() ) );
   EXPECT_NO_THROW( transformixFilter->SetTransformParameterObject( elastixFilter->GetTransformParameterObject() ) );
 
@@ -72,7 +72,7 @@ TEST( TransformixFilterTest, GetInputImageFromElastixFilter )
 
   TransformixFilterType::Pointer transformixFilter;
   EXPECT_NO_THROW( transformixFilter = TransformixFilterType::New() );
-  EXPECT_NO_THROW( transformixFilter->SetInput( elastixFilter->GetOutput() ) );
+  EXPECT_NO_THROW( transformixFilter->SetMovingImage( elastixFilter->GetOutput() ) );
   EXPECT_NO_THROW( transformixFilter->SetTransformParameterObject( elastixFilter->GetTransformParameterObject() ) );
   EXPECT_NO_THROW( transformixFilter->SetOutputDirectory( dataFinder.GetOutputDirectory() ) );
 
@@ -229,9 +229,9 @@ TEST( TransformixFilterTest, SameTransformParameterMapForMultipleTransformations
   EXPECT_NO_THROW( transformixFilter = TransformixFilterType::New() );
   EXPECT_NO_THROW( transformixFilter->SetOutputDirectory( dataFinder.GetOutputDirectory() ) );
   EXPECT_NO_THROW( transformixFilter->SetTransformParameterObject( elastixFilter->GetTransformParameterObject() ) );
-  EXPECT_NO_THROW( transformixFilter->SetInput( movingImageReader1->GetOutput() ) );
+  EXPECT_NO_THROW( transformixFilter->SetMovingImage( movingImageReader1->GetOutput() ) );
   EXPECT_NO_THROW( transformixFilter->Update() );
-  EXPECT_NO_THROW( transformixFilter->SetInput( movingImageReader2->GetOutput() ) );
+  EXPECT_NO_THROW( transformixFilter->SetMovingImage( movingImageReader2->GetOutput() ) );
   EXPECT_NO_THROW( transformixFilter->Update() );
 }
 
@@ -260,7 +260,7 @@ TEST( TransformixFilterTest, BSpline4D )
 
   TransformixFilterType::Pointer transformixFilter;
   EXPECT_NO_THROW( transformixFilter = TransformixFilterType::New() );
-  EXPECT_NO_THROW( transformixFilter->SetInput( imageReader->GetOutput() ) );
+  EXPECT_NO_THROW( transformixFilter->SetMovingImage( imageReader->GetOutput() ) );
   EXPECT_NO_THROW( transformixFilter->SetTransformParameterObject( elastixFilter->GetTransformParameterObject() ) );
 
   ImageFileWriterType::Pointer writer = ImageFileWriterType::New();

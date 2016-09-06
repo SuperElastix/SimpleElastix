@@ -298,7 +298,7 @@ TEST( ElastixFilterTest, InverseTransformTestEuler2D )
 
   // Warp fixed image to moving image with the inverse transform
   TransformixFilterType::Pointer transformixFilter = TransformixFilterType::New();
-  EXPECT_NO_THROW( transformixFilter->SetInput( inputImageReader->GetOutput() ) );
+  EXPECT_NO_THROW( transformixFilter->SetMovingImage( inputImageReader->GetOutput() ) );
   EXPECT_NO_THROW( transformixFilter->SetTransformParameterObject( inverseTransformParameterObject ) );
 
   ImageFileWriterType::Pointer writer = ImageFileWriterType::New();

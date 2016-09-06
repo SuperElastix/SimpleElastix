@@ -49,11 +49,10 @@ const double adir[] = { 0.0,  0.0,  0.0, 1.0,
                         0.0,  0.0, -1.0, 0.0 };
 
 using  itk::simple::InstantiatedPixelIDTypeList;
-namespace sitk = itk::simple;
 
 class Image4D : public ::testing::Test {
 public:
-  typedef nsstd::auto_ptr<itk::simple::Image> sitkAutoImagePointer;
+  typedef itk::simple::nsstd::auto_ptr<itk::simple::Image> sitkAutoImagePointer;
 
   virtual void SetUp() {
     itk::ImageBase<4>::IndexType index;
@@ -400,6 +399,8 @@ TEST_F( Image4D,Properties ) {
   ASSERT_ANY_THROW( shortImage->SetDirection( std::vector<double>( adir, adir + 4 ) ) );
   ASSERT_ANY_THROW( shortImage->SetDirection( std::vector<double>( adir, adir + 8 ) ) );
 }
+
+namespace sitk = itk::simple;
 
 TEST_F( Image4D, CopyInformation )
 {
