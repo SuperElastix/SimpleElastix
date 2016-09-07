@@ -535,14 +535,15 @@ SimpleTransformix
   const PixelIDValueEnum MovingImagePixelEnum = this->m_MovingImage.GetPixelID();
   const unsigned int MovingImageDimension = this->m_MovingImage.GetDimension();
 
-  if( this->m_MemberFactory->HasMemberFunction( MovingImagePixelEnum, MovingImageDimension ) )
+  if( this->m_MemberFactory->HasMemberFunction( sitkFloat32, MovingImageDimension ) )
   {
-    return this->m_MemberFactory->GetMemberFunction( MovingImagePixelEnum, MovingImageDimension )();
+    return this->m_MemberFactory->GetMemberFunction( sitkFloat32, MovingImageDimension )();
   }
 
   sitkExceptionMacro( << "SimpleTransformix does not support the combination of image type "
                       << GetPixelIDValueAsElastixParameter( MovingImagePixelEnum ) << " and dimension "
-                      << MovingImageDimension << "." );
+                      << MovingImageDimension << ". This a serious error. "
+                      << "Contact developers at https://github.com/kaspermarstal/SimpleElastix/issues." );
 }
 
 Image

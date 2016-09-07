@@ -855,25 +855,41 @@ SimpleElastix
 
   for( unsigned int i = 1; i < this->GetNumberOfFixedImages(); ++i )
   {
-    if( this->GetFixedImage( i ).GetPixelID() != FixedImagePixelID )
+    if( this->GetFixedImage( i ).GetDimension() != FixedImageDimension )
     {
-      sitkExceptionMacro( "Fixed images must be of same pixel type (fixed image at index 0 is of type " 
-                       << GetPixelIDValueAsElastixParameter( this->GetFixedImage( 0 ).GetPixelID() ) << ", "
-                       << "fixed image at index " << i << " is of type \""
-                       << GetPixelIDValueAsElastixParameter( this->GetFixedImage( i ).GetPixelID() ) 
-                       << "\")." );
+      sitkExceptionMacro( "Fixed images must be of same dimension (fixed image at index 0 is of dimension " 
+                       << this->GetFixedImage( 0 ).GetDimension() << ", fixed image at index " << i
+                       << " is of dimension \"" << this->GetFixedImage( i ).GetDimension() << "\")." );
     }
   }
 
   for( unsigned int i = 1; i < this->GetNumberOfMovingImages(); ++i )
   {
-    if( this->GetMovingImage( i ).GetPixelID() != MovingImagePixelID )
+    if( this->GetMovingImage( i ).GetDimension() != FixedImageDimension )
     {
-      sitkExceptionMacro( "Moving images must be of same pixel type (moving image at index 0 is of type "
-                       << GetPixelIDValueAsElastixParameter( this->GetMovingImage( 0 ).GetPixelID() ) << ", "
-                       << "moving image at index " << i << " is of type \""
-                       << GetPixelIDValueAsElastixParameter( this->GetMovingImage( i ).GetPixelID() ) 
-                       << "\")." );
+      sitkExceptionMacro( "Moving images must be of same dimension as fixed images (fixed image at index 0 is of dimension " 
+                       << this->GetFixedImage( 0 ).GetDimension() << ", moving image at index " << i
+                       << " is of dimension \"" << this->GetMovingImage( i ).GetDimension() << "\")." );
+    }
+  }
+
+  for( unsigned int i = 1; i < this->GetNumberOfFixedMasks(); ++i )
+  {
+    if( this->GetFixedMask( i ).GetDimension() != FixedImageDimension )
+    {
+      sitkExceptionMacro( "Fixed masks must be of same dimension as fixed images (fixed images are of dimension " 
+                       << this->GetFixedImage( 0 ).GetDimension() << ", fixed mask at index " << i
+                       << " is of dimension \"" << this->GetFixedMask( i ).GetDimension() << "\")." );
+    }
+  }
+
+  for( unsigned int i = 1; i < this->GetNumberOfMovingMasks(); ++i )
+  {
+    if( this->GetMovingMask( i ).GetDimension() != FixedImageDimension )
+    {
+      sitkExceptionMacro( "Moving masks must be of same dimension as moving images (moving images are of dimension " 
+                       << this->GetMovingImage( 0 ).GetDimension() << ", moving mask at index " << i
+                       << " is of dimension \"" << this->GetMovingMask( i ).GetDimension() << "\")." );
     }
   }
 
@@ -895,16 +911,17 @@ SimpleElastix
     }
   }
 
-  if( this->m_DualMemberFactory->HasMemberFunction( FixedImagePixelID, MovingImagePixelID, FixedImageDimension ) )
+  if( this->m_DualMemberFactory->HasMemberFunction( sitkFloat32, sitkFloat32, FixedImageDimension ) )
   {
-    return this->m_DualMemberFactory->GetMemberFunction( FixedImagePixelID, MovingImagePixelID, FixedImageDimension )();
+    return this->m_DualMemberFactory->GetMemberFunction( sitkFloat32, sitkFloat32, FixedImageDimension )();
   }
 
   sitkExceptionMacro( << "SimpleElastix does not support the combination of "
                       << FixedImageDimension << "-dimensional "
                       << GetPixelIDValueAsElastixParameter( FixedImagePixelID ) << " fixed image and a "
                       << MovingImageDimension << "-dimensional " 
-                      << GetPixelIDValueAsElastixParameter( FixedImagePixelID ) << " moving image." )
+                      << GetPixelIDValueAsElastixParameter( MovingImagePixelID ) << " moving image. "
+                      << "This a serious error. Contact developers at https://github.com/kaspermarstal/SimpleElastix/issues." )
 }
 
 SimpleElastix::ParameterMapVectorType 
