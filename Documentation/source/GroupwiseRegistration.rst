@@ -34,11 +34,11 @@ Elastix takes a single N+1 dimensional image for groupwise registration. Therefo
     image = sitk.JoinSeries(vectorOfImages)
 
     # Register
-    elastix = sitk.SimpleElastix()
-    elastix.SetFixedImage(image) 
-    elastix.SetMovingImage(image)
-    elastix.SetParameterMap(selx.GetDefaultParameterMap('groupwise'))
-    elastix.Execute()
+    SimpleElastix = sitk.SimpleElastix()
+    SimpleElastix.SetFixedImage(image) 
+    SimpleElastix.SetMovingImage(image)
+    SimpleElastix.SetParameterMap(sitk.GetDefaultParameterMap('groupwise'))
+    SimpleElastix.Execute()
 
 While the groupwise transform works only on the moving image we need to pass a dummy fixed image is to prevent elastix from throwing errors. This does not consume extra memory as only pointers are passed internally. 
 

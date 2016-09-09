@@ -17,7 +17,7 @@ A significant amount of research has focused on developing the registration algo
 SimpleElastix
 -------------
 
-Elastix \cite{Klein2010} is an open source, command-line program for intensity-based registration of medical images that allows the user to quickly configure, test, and compare different registration methods. SimpleElastix is an extension of SimpleITK \cite{Lowekamp2013} that allows you to configure and run Elastix entirely in Python, Java, R, Octave, Ruby, Lua, Tcl and C\# on Linux, Mac and Windows. The goal is to bring robust registration algorithms to a wider audience and make it easier to use elastix for e.g. Java-based enterprise applications or rapid Python prototyping. 
+Elastix \cite{Klein2010} is an open source, command-line program for intensity-based registration of medical images that allows the user to quickly configure, test, and compare different registration methods. SimpleElastix is an extension of SimpleITK \cite{Lowekamp2013} that allows you to configure and run Elastix entirely in Python, Java, R, Octave, Ruby, Lua, Tcl and C\# on Linux, Mac and Windows. The goal is to bring robust registration algorithms to a wider audience and make it easier to use elastix, e.g. for Java-based enterprise applications or rapid Python prototyping. 
 
 A lot of research has focused on making SimpleElastix computationally efficient and easy to use. Stochastic sampling (Klein et al. 2007), multi-threading and code optimizations (Shamonin et al 2014) makes registration run fast without sacrificing robustness. A simple parameter interface and modular architecture allows you to configure registration components at runtime and easily try out different registration methods. 
 

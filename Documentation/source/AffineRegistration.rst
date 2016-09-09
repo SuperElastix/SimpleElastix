@@ -24,12 +24,12 @@ The image on the right has been sheared, scaled 1.2x, rotated 10 degrees and tra
 
     import SimpleITK as sitk
 
-    elastix = sitk.SimpleElastix()
-    elastix.SetFixedImage(sitk.ReadImage("fixedImage.nii")
-    elastix.SetMovingImage(sitk.ReadImage(movingImage.nii")
-    elastix.SetParameterMap(sitk.GetDefaultParameterMap("affine"))
-    elastix.Execute()
-    sitk.WriteImage(elastix.GetResultImage())
+    SimpleElastix = sitk.SimpleElastix()
+    SimpleElastix.SetFixedImage(sitk.ReadImage("fixedImage.nii")
+    SimpleElastix.SetMovingImage(sitk.ReadImage(movingImage.nii")
+    SimpleElastix.SetParameterMap(sitk.GetDefaultParameterMap("affine"))
+    SimpleElastix.Execute()
+    sitk.WriteImage(SimpleElastix.GetResultImage())
 
 It is clear from the result mean image on right in Fig. 11 that registration was successful.
 
@@ -52,13 +52,13 @@ Notice that the only difference from the previous example is the requested param
 
     import SimpleITK as sitk
 
-    elastix = sitk.SimpleElastix()
-    elastix.SetFixedImage(sitk.ReadImage("fixedImage.nii")
-    elastix.SetMovingImage(sitk.ReadImage(movingImage.nii")
+    SimpleElastix = sitk.SimpleElastix()
+    SimpleElastix.SetFixedImage(sitk.ReadImage("fixedImage.nii")
+    SimpleElastix.SetMovingImage(sitk.ReadImage(movingImage.nii")
     parameterMap = sitk.GetDefaultParameterMap("rigid")
     parameterMap["Transform"] = ["AffineTransform"]
-    elastix.SetParameterMap()
-    elastix.Execute()
-    sitk.WriteImage(elastix.GetResultImage())
+    SimpleElastix.SetParameterMap()
+    SimpleElastix.Execute()
+    sitk.WriteImage(SimpleElastix.GetResultImage())
 
 This demonstrates how easy it is to try out different registration components with SimpleElastix. In the next example we will introduce non-rigid registration and initialize the moving image with an affine transform.
