@@ -1,7 +1,6 @@
 #ifndef __sitksimpleelastix_hxx_
 #define __sitksimpleelastix_hxx_
 
-#include "sitkPixelIDValues.h"
 #include "sitkCastImageFilter.h"
 
 namespace itk {
@@ -22,12 +21,12 @@ SimpleElastix::DualExecuteInternal( void )
 
     for( unsigned int i = 0; i < this->GetNumberOfFixedImages(); ++i )
     {
-      elastixFilter->AddFixedImage( itkDynamicCastInDebugMode< TFixedImage* >( Cast( this->GetFixedImage( i ), static_cast< PixelIDValueEnum >( GetPixelIDValueFromElastixString( "float" ) ) ).GetITKBase() ) );
+      elastixFilter->AddFixedImage( itkDynamicCastInDebugMode< TFixedImage* >( Cast( this->GetFixedImage( i ), sitkFloat32 ).GetITKBase() ) );
     }
 
     for( unsigned int i = 0; i < this->GetNumberOfMovingImages(); ++i )
     {
-      elastixFilter->AddMovingImage( itkDynamicCastInDebugMode< TMovingImage* >( Cast( this->GetMovingImage( i ), static_cast< PixelIDValueEnum >( GetPixelIDValueFromElastixString( "float" ) ) ).GetITKBase() ) );
+      elastixFilter->AddMovingImage( itkDynamicCastInDebugMode< TMovingImage* >( Cast( this->GetMovingImage( i ), sitkFloat32 ).GetITKBase() ) );
     }
 
     for( unsigned int i = 0; i < this->GetNumberOfFixedMasks(); ++i )
