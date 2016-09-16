@@ -132,6 +132,7 @@ class SITKCommon_EXPORT SimpleElastix
     
     Image Execute( void );
     std::vector< std::map< std::string, std::vector< std::string > > > GetTransformParameterMap( void );
+    std::map< std::string, std::vector< std::string > > GetTransformParameterMap( const unsigned int index );
     Image GetResultImage( void );
 
     std::vector< std::map< std::string, std::vector< std::string > > > ExecuteInverse( void );

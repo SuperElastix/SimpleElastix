@@ -936,6 +936,24 @@ SimpleElastix
   return this->m_TransformParameterMapVector;
 }
 
+SimpleElastix::ParameterMapType 
+SimpleElastix
+::GetTransformParameterMap( const unsigned int index )
+{
+  if( this->GetNumberOfParameterMaps() == 0 )
+  {
+    sitkExceptionMacro( "Number of transform parameter maps: 0. Run registration with Execute()." );
+  }
+
+  if( this->GetNumberOfParameterMaps() <= index )
+  {
+    sitkExceptionMacro( "Index exceeds number of transform parameter maps (index: " << index
+                     << ", number of parameter maps: " << this->GetNumberOfParameterMaps() << ")." );
+  }
+
+  return this->m_TransformParameterMapVector[ index ];
+}
+
 Image
 SimpleElastix
 ::GetResultImage( void )
