@@ -95,7 +95,13 @@ SimpleElastix can be compiled with the SuperBuild. The SuperBuild is a script th
 
     - Press generate.
 
-3. Open Visual Studio, select File -> Open Project/Solution -> Open and choose :code:`SuperBuildSimpleITK` solution.
+3. If you are comfortable with the commandline, this is by far the easiest and least error-prone way of compiling the project. Otherwise skip to steps 4 and 5 that uses Visual Studio . 
+    - Open x64 native tools command prompt. On Windows 10, open the stat menu and click on "All Apps". Find the Visual Studio folder (e.g. "Microsoft Visual Studio 2012"), open it, and click on "Open VS2012 x64 Native Tools Command Prompt."
+    - Navigate to the build folder specified in CMake. 
+    - Run :code:`msbuild ALL_BUILD.vcxproj /p:Configuration=Release`.
+    - Done. Ignore steps 4 and 5.
+
+4. Open Visual Studio, select File -> Open Project/Solution -> Open and choose :code:`SuperBuildSimpleITK` solution.
 
     .. figure:: _static/WindowsInstallationOpenSolution.png
         :align: center
@@ -104,7 +110,7 @@ SimpleElastix can be compiled with the SuperBuild. The SuperBuild is a script th
         Figure 5: Open the solution in Visual Studio.
 
 
-4. Make sure "Release" build type is selected and build the :code:`ALL_BUILD` project. If the "Debug" build type is used instead of "Release" mode, we will experience a significant performance penalty and may not be able to build language packages that are distributed without development binaries, e.g. Python.
+5. Make sure "Release" build type is selected and build the :code:`ALL_BUILD` project. If the "Debug" build type is used instead of "Release" mode, we will experience a significant performance penalty and may not be able to build language packages that are distributed without development binaries.
 
     .. figure:: _static/WindowsInstallationBuildSolution.png
         :align: center
@@ -115,7 +121,7 @@ SimpleElastix can be compiled with the SuperBuild. The SuperBuild is a script th
 
 Manually Building On Linux
 --------------------------
-The following approach allows us to a locally installed version of ITK and/or elastix. 
+The following approach allows us to use a locally installed version of ITK and/or elastix. 
 
 1. Setup the prerequisites
     - `sudo apt-get install cmake swig monodevelop r-base r-base-dev ruby python python-dev tcl tcl-dev tk tk-dev`.
@@ -149,7 +155,9 @@ The language package may be configured incorrectly or the necessary folders may 
     - Solution 2: Set the paths manually in CMake (quick and dirty fix). For example, specify :code:`PYTHON_EXECUTABLE`, :code:`PYTHON_INCLUDE_DIR` and :code:`PYTHON_LIBRARY` if you wish to build the python package. 
         - Linux and Mac OS X: Run :code:`$ ccmake .` in the build directory and press :code:`t` on your keyboard to see these options.
         - Windows: Tick "Advanced" in the CMake GUI to see these options.
-        - You will have to repeat this procedure every time you setup a new build of SimpleElastix so it is worth considering configuring your :code:`PATH` variable instead (we recommend you configure your :code:`$PATH` environment variable correctly in any case). If you still experience problems at this point, re-install the language package or consult Google or Stackoverflow.
+        - You will have to repeat this procedure every time you setup a new build of SimpleElastix, so we recommend that you configure your :code:`$PATH` environment variable as described in solution 1 above. 
+
+If you are still experiencing problems at this point, re-install the language package or consult Google or Stack Overflow.
 
 Visual Studio throws :code:`LNK1102 out of memory` error even though I selected the 64-bit compiler
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
