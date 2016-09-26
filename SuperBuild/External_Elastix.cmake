@@ -99,7 +99,7 @@ ExternalProject_Add( ${proj}
   -DUSE_PolydataDummyPenalty:BOOL=OFF                                           
   -DUSE_Powell:BOOL=OFF
   -DUSE_QuasiNewtonLBFGS:BOOL=ON                                           
-  -DUSE_RSGDEachParameterApart:BOOL=ON                                           
+  -DUSE_RSGDEachParameterApart:BOOL=OFF                                           
   -DUSE_RandomCoordinateSampler:BOOL=ON                                           
   -DUSE_RandomSampler:BOOL=ON                                           
   -DUSE_RandomSamplerSparseMask:BOOL=ON                                           
