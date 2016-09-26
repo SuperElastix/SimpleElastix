@@ -46,8 +46,7 @@ SimpleTransformix::ExecuteInternal( void )
 
     if( !this->IsEmpty( this->GetMovingImage() ) )
     {
-      // Cast DataObject -> itk::Image< ResultImagePixelType, ImageDimension -> sitk::Image
-      this->m_ResultImage = Cast( Image( itkDynamicCastInDebugMode< TMovingImage* >( transformixFilter->GetOutput() ) ), this->GetMovingImage().GetPixelID() );
+      this->m_ResultImage = Image( itkDynamicCastInDebugMode< TMovingImage * >( transformixFilter->GetOutput() ) );
       this->m_ResultImage.MakeUnique();
     }
   }

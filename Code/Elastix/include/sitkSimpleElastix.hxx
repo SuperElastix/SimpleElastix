@@ -65,8 +65,7 @@ SimpleElastix::DualExecuteInternal( void )
     
     elastixFilter->Update();
 
-    // Cast DataObject -> itk::Image< ResultImagePixelType, ImageDimension > -> sitk::Image
-    this->m_ResultImage = Cast( Image( itkDynamicCastInDebugMode< TFixedImage * >( elastixFilter->GetOutput() ) ), this->GetFixedImage( 0 ).GetPixelID() );
+    this->m_ResultImage = Image( itkDynamicCastInDebugMode< TFixedImage * >( elastixFilter->GetOutput() ) );
     this->m_ResultImage.MakeUnique();
     this->m_TransformParameterMapVector = elastixFilter->GetTransformParameterObject()->GetParameterMap();
   }
