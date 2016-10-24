@@ -865,7 +865,7 @@ SimpleElastix
 
   for( unsigned int i = 1; i < this->GetNumberOfMovingImages(); ++i )
   {
-    if( this->GetMovingImage( i ).GetDimension() != FixedImageDimension )
+    if( this->GetMovingImage( i ).GetDimension() != MovingImageDimension )
     {
       sitkExceptionMacro( "Moving images must be of same dimension as fixed images (fixed image at index 0 is of dimension " 
                        << this->GetFixedImage( 0 ).GetDimension() << ", moving image at index " << i
@@ -885,7 +885,7 @@ SimpleElastix
 
   for( unsigned int i = 1; i < this->GetNumberOfMovingMasks(); ++i )
   {
-    if( this->GetMovingMask( i ).GetDimension() != FixedImageDimension )
+    if( this->GetMovingMask( i ).GetDimension() != MovingImageDimension )
     {
       sitkExceptionMacro( "Moving masks must be of same dimension as moving images (moving images are of dimension " 
                        << this->GetMovingImage( 0 ).GetDimension() << ", moving mask at index " << i
