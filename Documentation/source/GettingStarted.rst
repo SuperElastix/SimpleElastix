@@ -128,7 +128,7 @@ The following approach allows us to use a locally installed version of ITK and/o
 2. Install SWIG >= 3.0.5
 3. Install ITK. Configure CMake using the same approach as above.
     - Clone ITK from `github.com/InsightSoftwareConsortium/ITK <https://github.com/InsightSoftwareConsortium/ITK>`_.
-    - Configure CMake. Set the following CMake variables: BUILD_SHARED_LIBS=OFF, ITK_USE_REVIEW=ON, ITK_WRAP_*=OFF.
+    - Configure CMake. Set the following CMake variables: BUILD_SHARED_LIBS=OFF, Module_ITKReview=ON, ITK_WRAP_*=OFF.
     - Compile ITK. Make sure to note the build settings, e.g. Release x64.
 4. Build elastix. 
     - Clone elastix from `github.com/kaspermarstal/elastix <https://github.com/kaspermarstal/elastix>`_.
