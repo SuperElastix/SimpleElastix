@@ -14,17 +14,19 @@ if(NOT CMAKE_PROJECT_NAME STREQUAL "SimpleITK")
   find_package(SimpleITK REQUIRED)
   include(${SimpleITK_USE_FILE})
 
-  # SimpleElastix further requires ITK
-  find_package(ITK)
-  set(ITK_NO_IO_FACTORY_REGISTER_MANAGER 1)
-  include(${ITK_USE_FILE})
-
   # Add compiler flags needed to use SimpleITK.
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${SimpleITK_REQUIRED_C_FLAGS}")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SimpleITK_REQUIRED_CXX_FLAGS}")
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
   set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
+endif()
+
+if(CMAKE_PROJECT_NAME STREQUAL "SimpleITK")
+  # SimpleElastix further requires ITK
+  find_package(ITK REQUIRED)
+  set(ITK_NO_IO_FACTORY_REGISTER_MANAGER 1)
+  include(${ITK_USE_FILE})
 endif()
 
 # Add individual cxx executables
