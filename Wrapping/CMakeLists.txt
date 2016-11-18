@@ -71,6 +71,14 @@ if ( WRAP_LUA )
   target_link_libraries ( SimpleITKLua ${SimpleITK_LIBRARIES} ${LUA_LIB} )
   sitk_strip_target( SimpleITKLua )
 
+  # Create a SimpleITK Lua module that can be loaded into any Lua executable.
+  SWIG_add_module( SimpleITKLuaModule lua SimpleITK.i )
+  target_link_libraries( ${SWIG_MODULE_SimpleITKLuaModule_TARGET_NAME} ${SimpleITK_LIBRARIES} )
+  set_target_properties( ${SWIG_MODULE_SimpleITKLuaModule_TARGET_NAME} PROPERTIES PREFIX "" OUTPUT_NAME  "SimpleITK" )
+  target_link_libraries ( ${SWIG_MODULE_SimpleITKLuaModule_TARGET_NAME} ${SimpleITK_LIBRARIES} ${LUA_LIB} )
+  set_source_files_properties( ${swig_generated_file_fullname} PROPERTIES COMPILE_FLAGS "-w")
+  sitk_strip_target( ${SWIG_MODULE_SimpleITKLuaModule_TARGET_NAME} )
+
 endif()
 
 #
