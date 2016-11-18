@@ -2,7 +2,7 @@ add_executable ( ITKIntegration ITKIntegration.cxx )
 target_link_libraries ( ITKIntegration ${SimpleITK_LIBRARIES} )
 
 add_executable( ElastixFilter ElastixFilter.cxx )
-target_link_libraries( ElastixFilter ${SimpleITK_LIBRARIES} )
+target_link_libraries( ElastixFilter ${SimpleITK_LIBRARIES} elastix ${ITK_LIBRARIES} )
 
 add_executable( TransformixFilter TransformixFilter.cxx )
-target_link_libraries( TransformixFilter ${SimpleITK_LIBRARIES} )
+target_link_libraries( TransformixFilter ${SimpleITK_LIBRARIES} transformix ${ITK_LIBRARIES} )

@@ -22,12 +22,10 @@ if(NOT CMAKE_PROJECT_NAME STREQUAL "SimpleITK")
   set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
 endif()
 
-if(CMAKE_PROJECT_NAME STREQUAL "SimpleITK")
-  # SimpleElastix further requires ITK
-  find_package(ITK REQUIRED)
-  set(ITK_NO_IO_FACTORY_REGISTER_MANAGER 1)
-  include(${ITK_USE_FILE})
-endif()
+# ITK and Elastix is required to build SimpleElastix examples 
+set(ITK_NO_IO_FACTORY_REGISTER_MANAGER 1)
+include(${ITK_USE_FILE})
+include(${ELASTIX_USE_FILE})
 
 # Add individual cxx executables
 add_executable ( SimpleElastix1 SimpleElastix1.cxx )
