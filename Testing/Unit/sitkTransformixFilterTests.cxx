@@ -86,7 +86,6 @@ TEST( TransformixFilterTest, ComputeSpatialJacobian )
 {
   typedef itk::Image< float, 2 > ImageType;
   typedef itk::ImageFileReader< ImageType > ImageFileReaderType;
-  typedef itk::ImageFileWriter< ImageType > ImageFileWriterType;
   typedef ElastixFilter< ImageType, ImageType > ElastixFilterType;
   typedef TransformixFilter< ImageType > TransformixFilterType;
 
@@ -115,7 +114,6 @@ TEST( TransformixFilterTest, ComputeDeterminantOfSpatialJacobian )
 {
   typedef itk::Image< float, 2 > ImageType;
   typedef itk::ImageFileReader< ImageType > ImageFileReaderType;
-  typedef itk::ImageFileWriter< ImageType > ImageFileWriterType;
   typedef ElastixFilter< ImageType, ImageType > ElastixFilterType;
   typedef TransformixFilter< ImageType > TransformixFilterType;
 
@@ -143,7 +141,6 @@ TEST( TransformixFilterTest, ComputeDeformationField )
 {
   typedef itk::Image< float, 2 > ImageType;
   typedef itk::ImageFileReader< ImageType > ImageFileReaderType;
-  typedef itk::ImageFileWriter< ImageType > ImageFileWriterType;
   typedef ElastixFilter< ImageType, ImageType > ElastixFilterType;
   typedef TransformixFilter< ImageType > TransformixFilterType;
 
@@ -171,7 +168,6 @@ TEST( TransformixFilterTest, TransformPointSet )
 {
   typedef itk::Image< float, 2 > ImageType;
   typedef itk::ImageFileReader< ImageType > ImageFileReaderType;
-  typedef itk::ImageFileWriter< ImageType > ImageFileWriterType;
   typedef ElastixFilter< ImageType, ImageType > ElastixFilterType;
   typedef TransformixFilter< ImageType > TransformixFilterType;
 

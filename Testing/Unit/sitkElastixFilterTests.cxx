@@ -25,7 +25,6 @@ TEST( ElastixFilterTest, DefaultParameterObject2D )
 {
   typedef itk::Image< float, 2 > ImageType;
   typedef itk::ImageFileReader< ImageType > ImageFileReaderType;
-  typedef itk::ImageFileWriter< ImageType > ImageFileWriterType;
   typedef ElastixFilter< ImageType, ImageType > ElastixFilterType;
 
   ImageFileReaderType::Pointer fixedImageReader = ImageFileReaderType::New();
@@ -244,74 +243,10 @@ TEST( ElastixFilterTest, InitialTransformTestEuler2D )
   EXPECT_NO_THROW( writer->Update() );
 }
 
-TEST( ElastixFilterTest, InverseTransformTestEuler2D )
-{
-  ParameterObject::Pointer parameterObject;
-  EXPECT_NO_THROW( parameterObject = ParameterObject::New() );
-  EXPECT_NO_THROW( parameterObject->SetParameterMap( ParameterObject::GetDefaultParameterMap( "rigid" ) ) );
-
-  typedef itk::Image< float, 2 > ImageType;
-  typedef itk::ImageFileReader< ImageType > ImageFileReaderType;
-  typedef itk::ImageFileWriter< ImageType > ImageFileWriterType;
-  typedef ElastixFilter< ImageType, ImageType > ElastixFilterType;
-  typedef TransformixFilter< ImageType > TransformixFilterType;
-
-  ImageFileReaderType::Pointer fixedImageReader = ImageFileReaderType::New();
-  fixedImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
-
-  ImageFileReaderType::Pointer inputImageReader = ImageFileReaderType::New();
-  inputImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
-
-  ImageFileReaderType::Pointer movingImageReader = ImageFileReaderType::New();
-  movingImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceR10X13Y17.png" ) );
-
-  // Forward registration
-  ElastixFilterType::Pointer forwardElastixFilter;
-  EXPECT_NO_THROW( forwardElastixFilter = ElastixFilterType::New() );
-  EXPECT_NO_THROW( forwardElastixFilter->SetFixedImage( fixedImageReader->GetOutput() ) );
-  EXPECT_NO_THROW( forwardElastixFilter->SetMovingImage( movingImageReader->GetOutput() ) );
-  EXPECT_NO_THROW( forwardElastixFilter->SetParameterObject( parameterObject ) );
-  EXPECT_NO_THROW( forwardElastixFilter->Update() );
-  EXPECT_NO_THROW( forwardElastixFilter->GetTransformParameterObject()->WriteParameterFile( dataFinder.GetOutputFile( "inverseTransformTestEuler2D.txt" ) ) );
-
-  // Inverse registration
-  ElastixFilterType::ParameterMapType parameterMap = ParameterObject::GetDefaultParameterMap( "rigid" );
-  parameterMap[ "Metric" ] = ElastixFilterType::ParameterValueVectorType( 1, "DisplacementMagnitudePenalty" );
-  ParameterObject::Pointer inverseParameterObject;
-  EXPECT_NO_THROW( inverseParameterObject = ParameterObject::New() );
-  EXPECT_NO_THROW( inverseParameterObject->SetParameterMap( parameterMap ) );
-
-  ElastixFilterType::Pointer inverseElastixFilter;
-  EXPECT_NO_THROW( inverseElastixFilter = ElastixFilterType::New() );
-  EXPECT_NO_THROW( inverseElastixFilter->SetFixedImage( fixedImageReader->GetOutput() ) );
-  EXPECT_NO_THROW( inverseElastixFilter->SetMovingImage( fixedImageReader->GetOutput() ) );
-  EXPECT_NO_THROW( inverseElastixFilter->SetParameterObject( inverseParameterObject ) );
-  EXPECT_NO_THROW( inverseElastixFilter->SetInitialTransformParameterFileName( dataFinder.GetOutputFile( "inverseTransformTestEuler2D.txt" ) ) );
-  EXPECT_NO_THROW( inverseElastixFilter->Update() );
-
-  ElastixFilterType::ParameterMapVectorType inverseParameterMap;
-  EXPECT_NO_THROW( inverseParameterMap = inverseElastixFilter->GetTransformParameterObject()->GetParameterMap() );
-  EXPECT_NO_THROW( inverseParameterMap[ 0 ][ "InitialTransformParametersFileName" ] = ElastixFilterType::ParameterValueVectorType( 1, "NoInitialTransform" ) );
-
-  ParameterObject::Pointer inverseTransformParameterObject = ParameterObject::New();
-  inverseTransformParameterObject->SetParameterMap( inverseParameterMap );
-
-  // Warp fixed image to moving image with the inverse transform
-  TransformixFilterType::Pointer transformixFilter = TransformixFilterType::New();
-  EXPECT_NO_THROW( transformixFilter->SetMovingImage( inputImageReader->GetOutput() ) );
-  EXPECT_NO_THROW( transformixFilter->SetTransformParameterObject( inverseTransformParameterObject ) );
-
-  ImageFileWriterType::Pointer writer = ImageFileWriterType::New();
-  EXPECT_NO_THROW( writer->SetFileName( dataFinder.GetOutputFile( "InverseTransformTestEuler2DResultImage.nii" ) ) );
-  EXPECT_NO_THROW( writer->SetInput( transformixFilter->GetOutput() ) );
-  EXPECT_NO_THROW( writer->Update() );
-}
-
 TEST( ElastixFilterTest, SameFixedImageForMultipleRegistrations )
 { 
   typedef itk::Image< float, 2 > ImageType;
   typedef itk::ImageFileReader< ImageType > ImageFileReaderType;
-  typedef itk::ImageFileWriter< ImageType > ImageFileWriterType;
   typedef ElastixFilter< ImageType, ImageType > ElastixFilterType;
 
   ImageFileReaderType::Pointer fixedImageReader = ImageFileReaderType::New();

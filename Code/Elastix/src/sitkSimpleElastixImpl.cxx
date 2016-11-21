@@ -191,8 +191,6 @@ SimpleElastix::SimpleElastixImpl
         = ParameterValueVectorType( 1, "float" );
       parameterMapVector[ i ][ "MovingInternalImagePixelType" ]
         = ParameterValueVectorType( 1, "float" );
-      parameterMapVector[ i ][ "ResultImagePixelType" ]
-        = ParameterValueVectorType( 1, "float" );
     }
 
     ParameterObjectPointer parameterObject = ParameterObjectType::New();

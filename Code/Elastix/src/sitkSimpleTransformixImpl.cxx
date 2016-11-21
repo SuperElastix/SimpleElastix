@@ -91,7 +91,6 @@ SimpleTransformix::SimpleTransformixImpl
     {
       transformParameterMapVector[ i ][ "FixedInternalImagePixelType" ] = ParameterValueVectorType( 1, "float" );
       transformParameterMapVector[ i ][ "MovingInternalImagePixelType" ] = ParameterValueVectorType( 1, "float" );
-      transformParameterMapVector[ i ][ "ResultImagePixelType" ] = ParameterValueVectorType( 1, "float" );
     }
 
     ParameterObjectPointer parameterObject = ParameterObjectType::New();
