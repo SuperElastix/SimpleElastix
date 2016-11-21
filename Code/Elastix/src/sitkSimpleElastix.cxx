@@ -2,46 +2,14 @@
 #define __sitksimpleelastix_cxx_
 
 #include "sitkSimpleElastix.h"
-#include "sitkSimpleElastix.hxx"
+#include "sitkSimpleElastixImpl.h"
 
 namespace itk {
   namespace simple {
 
 SimpleElastix
-::SimpleElastix( void )
+::SimpleElastix( void ) : m_Pimple( new SimpleElastixImpl )
 {
-  // Register this class with SimpleITK
-  this->m_DualMemberFactory.reset( new detail::DualMemberFunctionFactory< MemberFunctionType >( this ) );
-  this->m_DualMemberFactory->RegisterMemberFunctions< FloatPixelIDTypeList, FloatPixelIDTypeList, 2 >();
-  this->m_DualMemberFactory->RegisterMemberFunctions< FloatPixelIDTypeList, FloatPixelIDTypeList, 3 >();
-
-#ifdef SITK_4D_IMAGES
-  this->m_DualMemberFactory->RegisterMemberFunctions< FloatPixelIDTypeList, FloatPixelIDTypeList, 4 >();
-#endif
- 
-  m_FixedImages                 = VectorOfImage();
-  m_MovingImages                = VectorOfImage();
-  m_FixedMasks                  = VectorOfImage();
-  m_MovingMasks                 = VectorOfImage();
-  m_ResultImage                 = Image();
-
-  m_ParameterMapVector          = ParameterMapVectorType();
-  m_TransformParameterMapVector = ParameterMapVectorType();
-
-  m_FixedPointSetFileName       = "";
-  m_MovingPointSetFileName      = "";
-
-  m_OutputDirectory             = ".";
-  m_LogFileName                 = "";
-
-  this->m_LogToFile = false;
-  this->m_LogToConsole = false;
-
-  ParameterMapVectorType defaultParameterMap;
-  defaultParameterMap.push_back( ParameterObjectType::GetDefaultParameterMap( "translation" ) );
-  defaultParameterMap.push_back( ParameterObjectType::GetDefaultParameterMap( "affine" ) );
-  defaultParameterMap.push_back( ParameterObjectType::GetDefaultParameterMap( "bspline" ) );
-  this->SetParameterMap( defaultParameterMap );
 }
 
 SimpleElastix
@@ -53,21 +21,14 @@ const std::string
 SimpleElastix
 ::GetName( void )
 { 
-  const std::string name = "SimpleElastix";
-  return name;
+  return this->m_Pimple->GetName();
 }
 
 SimpleElastix::Self& 
 SimpleElastix
 ::SetFixedImage( const Image& fixedImage )
 {
-  if( this->IsEmpty( fixedImage ) )
-  {
-    sitkExceptionMacro( "Image is empty." )
-  }
-
-  this->RemoveFixedImage();
-  this->m_FixedImages.push_back( fixedImage );
+  this->m_Pimple->SetFixedImage( fixedImage );
   return *this;
 }
 
@@ -75,14 +36,7 @@ SimpleElastix::Self&
 SimpleElastix
 ::SetFixedImage( const VectorOfImage& fixedImages )
 {
-  if( fixedImages.size() == 0u )
-  {
-    sitkExceptionMacro( "Cannot set fixed images from empty vector" );
-  }
-
-  this->RemoveFixedImage();
-  this->m_FixedImages = fixedImages;
-
+  this->m_Pimple->SetFixedImage( fixedImages );
   return *this;
 }
 
@@ -90,12 +44,7 @@ SimpleElastix::Self&
 SimpleElastix
 ::AddFixedImage( const Image& fixedImage )
 {
-  if( this->IsEmpty( fixedImage ) )
-  {
-    sitkExceptionMacro( "Image is empty." )
-  }
-
-  this->m_FixedImages.push_back( fixedImage );
+  this->m_Pimple->AddFixedImage( fixedImage );
   return *this;
 }
 
@@ -103,39 +52,29 @@ Image&
 SimpleElastix
 ::GetFixedImage( const unsigned long index )
 {
-  if( index < this->m_FixedImages.size() )
-  {
-    return this->m_FixedImages[ index ];
-  }
-
-  sitkExceptionMacro( "Index out of range (index: " << index << ", number of fixed images: " << this->m_FixedImages.size() << ")" );
+  return this->m_Pimple->GetFixedImage( index );
 }
 
 SimpleElastix::VectorOfImage&
 SimpleElastix
 ::GetFixedImage( void )
 {
-  return this->m_FixedImages;
+  return this->m_Pimple->GetFixedImage();
 }
 
 SimpleElastix::Self& 
 SimpleElastix
 ::RemoveFixedImage( const unsigned long index )
 {
-  if( index < this->m_FixedImages.size() )
-  {
-    this->m_FixedImages.erase( this->m_FixedImages.begin() + index );
-    return *this;
-  }
-
-  sitkExceptionMacro( "Index out of range (index: " << index << ", number of fixed images: " << this->m_FixedImages.size() << ")" );
+  this->m_Pimple->RemoveFixedImage( index );
+  return *this;
 }
 
 SimpleElastix::Self& 
 SimpleElastix
 ::RemoveFixedImage( void )
 {
-  this->m_FixedImages.clear();
+  this->m_Pimple->RemoveFixedImage();
   return *this;
 }
 
@@ -143,20 +82,14 @@ unsigned int
 SimpleElastix
 ::GetNumberOfFixedImages( void )
 {
-  return this->m_FixedImages.size();
+  return this->m_Pimple->GetNumberOfFixedImages();
 }
 
 SimpleElastix::Self& 
 SimpleElastix
 ::SetMovingImage( const Image& movingImage )
 {
-  if( this->IsEmpty( movingImage ) )
-  {
-    sitkExceptionMacro( "Image is empty." )
-  }
-
-  this->RemoveMovingImage();
-  this->m_MovingImages.push_back( movingImage );
+  this->m_Pimple->SetMovingImage( movingImage );
   return *this;
 }
 
@@ -164,14 +97,7 @@ SimpleElastix::Self&
 SimpleElastix
 ::SetMovingImage( const VectorOfImage& movingImages )
 {
-  if( movingImages.size() == 0u )
-  {
-    sitkExceptionMacro( "Cannot set moving images from empty vector" );
-  }
-
-  this->RemoveMovingImage();
-  this->m_MovingImages = movingImages;
-
+  this->m_Pimple->SetMovingImage( movingImages );
   return *this;
 }
 
@@ -179,12 +105,7 @@ SimpleElastix::Self&
 SimpleElastix
 ::AddMovingImage( const Image& movingImage )
 {
-  if( this->IsEmpty( movingImage ) )
-  {
-    sitkExceptionMacro( "Image is empty." )
-  }
-
-  this->m_MovingImages.push_back( movingImage );
+  this->m_Pimple->AddMovingImage( movingImage );
   return *this;
 }
 
@@ -192,39 +113,29 @@ Image&
 SimpleElastix
 ::GetMovingImage( const unsigned long index )
 {
-  if( index < this->m_MovingImages.size() )
-  {
-    return this->m_MovingImages[ index ];
-  }
-  
-  sitkExceptionMacro( "Index out of range (index: " << index << ", number of moving images: " << this->m_MovingImages.size() << ")" );
+  return this->m_Pimple->GetMovingImage( index );
 }
 
 SimpleElastix::VectorOfImage&
 SimpleElastix
 ::GetMovingImage( void )
 {
-  return this->m_MovingImages;
+  return this->m_Pimple->GetMovingImage();
 }
 
 SimpleElastix::Self& 
 SimpleElastix
 ::RemoveMovingImage( const unsigned long index )
 {
-  if( index < this->m_MovingImages.size() )
-  {
-    this->m_MovingImages.erase( this->m_MovingImages.begin() + index );
-    return *this;
-  }
-
-  sitkExceptionMacro( "Index out of range (index: " << index << ", number of moving images: " << this->m_MovingImages.size() << ")" );
+  this->m_Pimple->RemoveMovingImage( index );
+  return *this;
 }
 
 SimpleElastix::Self& 
 SimpleElastix
 ::RemoveMovingImage( void )
 {
-  this->m_MovingImages.clear();
+  this->m_Pimple->RemoveMovingImage();
   return *this;
 }
 
@@ -232,20 +143,14 @@ unsigned int
 SimpleElastix
 ::GetNumberOfMovingImages( void )
 {
-  return this->m_MovingImages.size();
+  return this->m_Pimple->GetNumberOfMovingImages();
 }
 
 SimpleElastix::Self& 
 SimpleElastix
 ::SetFixedMask( const Image& fixedMask )
 {
-  if( this->IsEmpty( fixedMask ) )
-  {
-    sitkExceptionMacro( "Image is empty." )
-  }
-
-  this->RemoveFixedMask();
-  this->m_FixedMasks.push_back( fixedMask );
+  this->m_Pimple->SetFixedMask( fixedMask );
   return *this;
 }
 
@@ -253,14 +158,7 @@ SimpleElastix::Self&
 SimpleElastix
 ::SetFixedMask( const VectorOfImage& fixedMasks )
 {
-  if( fixedMasks.size() == 0u )
-  {
-    sitkExceptionMacro( "Cannot set fixed images from empty vector" );
-  }
-
-  this->RemoveFixedMask();
-  this->m_FixedMasks = fixedMasks;
-
+  this->m_Pimple->SetFixedMask( fixedMasks );
   return *this;
 }
 
@@ -268,12 +166,7 @@ SimpleElastix::Self&
 SimpleElastix
 ::AddFixedMask( const Image& fixedMask )
 {
-  if( this->IsEmpty( fixedMask ) )
-  {
-    sitkExceptionMacro( "Image is empty." )
-  }
-
-  this->m_FixedMasks.push_back( fixedMask );
+  this->m_Pimple->AddFixedMask( fixedMask );
   return *this;
 }
 
@@ -281,39 +174,29 @@ Image&
 SimpleElastix
 ::GetFixedMask( const unsigned long index )
 {
-  if( index < this->m_FixedMasks.size() )
-  {
-    return this->m_FixedMasks[ index ];
-  }
-
-  sitkExceptionMacro( "Index out of range (index: " << index << ", number of fixed masks: " << this->m_FixedMasks.size() << ")" );
+  return this->m_Pimple->GetFixedMask( index );
 }
 
 SimpleElastix::VectorOfImage&
 SimpleElastix
 ::GetFixedMask( void )
 {
-  return this->m_FixedMasks;
+  return this->m_Pimple->GetFixedMask();
 }
 
 SimpleElastix::Self& 
 SimpleElastix
 ::RemoveFixedMask( const unsigned long index )
 {
-  if( index < this->m_FixedMasks.size()  )
-  {
-    this->m_FixedMasks.erase( this->m_FixedMasks.begin() + index );
-    return *this;
-  }
-
-  sitkExceptionMacro( "Index out of range (index: " << index << ", number of fixed masks: " << this->m_FixedMasks.size() << ")" );
+  this->m_Pimple->RemoveFixedMask( index );
+  return *this;
 }
 
 SimpleElastix::Self& 
 SimpleElastix
 ::RemoveFixedMask( void )
 {
-  this->m_FixedMasks.clear();
+  this->m_Pimple->RemoveFixedMask();
   return *this;
 }
 
@@ -321,20 +204,14 @@ unsigned int
 SimpleElastix
 ::GetNumberOfFixedMasks( void )
 {
-  return this->m_FixedMasks.size();
+  return this->m_Pimple->GetNumberOfFixedMasks();
 }
 
 SimpleElastix::Self& 
 SimpleElastix
 ::SetMovingMask( const Image& movingMask )
 {
-  if( this->IsEmpty( movingMask ) )
-  {
-    sitkExceptionMacro( "Image is empty." )
-  }
-
-  this->RemoveMovingMask();
-  this->m_MovingMasks.push_back( movingMask );
+  this->m_Pimple->SetMovingMask( movingMask );
   return *this;
 }
 
@@ -342,14 +219,7 @@ SimpleElastix::Self&
 SimpleElastix
 ::SetMovingMask( const VectorOfImage& movingMasks )
 {
-  if( movingMasks.size() == 0u )
-  {
-    sitkExceptionMacro( "Cannot set moving masks from empty vector" );
-  }
-
-  this->RemoveMovingMask();
-  this->m_MovingMasks = movingMasks;
-
+  this->m_Pimple->SetMovingMask( movingMasks );
   return *this;
 }
 
@@ -357,12 +227,7 @@ SimpleElastix::Self&
 SimpleElastix
 ::AddMovingMask( const Image& movingMask )
 {
-  if( this->IsEmpty( movingMask ) )
-  {
-    sitkExceptionMacro( "Image is empty." )
-  }
-
-  this->m_MovingMasks.push_back( movingMask );
+  this->m_Pimple->AddMovingMask( movingMask );
   return *this;
 }
 
@@ -370,39 +235,29 @@ Image&
 SimpleElastix
 ::GetMovingMask( const unsigned long index )
 {
-  if( index < this->m_MovingMasks.size()  )
-  {
-    return this->m_MovingMasks[ index ];
-  }
-
-  sitkExceptionMacro( "Index out of range (index: " << index << ", number of moving masks: " << this->m_MovingMasks.size() << ")" );
+  return this->m_Pimple->GetMovingMask( index );
 }
 
 SimpleElastix::VectorOfImage&
 SimpleElastix
 ::GetMovingMask( void )
 {
-  return this->m_MovingMasks;
+  return this->m_Pimple->GetMovingMask();
 }
 
 SimpleElastix::Self& 
 SimpleElastix
 ::RemoveMovingMask( const unsigned long index )
 {
-  if( index < this->m_MovingMasks.size()  )
-  {
-    this->m_MovingMasks.erase( this->m_MovingMasks.begin() + index );
-    return *this;
-  }
-
-  sitkExceptionMacro( "Index out of range (index: " << index << ", number of moving masks: " << this->m_MovingMasks.size() << ")" );
+  this->m_Pimple->RemoveMovingMask( index );
+  return *this;
 }
 
 SimpleElastix::Self& 
 SimpleElastix
 ::RemoveMovingMask( void )
 {
-  this->m_MovingMasks.clear();
+  this->m_Pimple->RemoveMovingMask();
   return *this;
 }
 
@@ -410,14 +265,14 @@ unsigned int
 SimpleElastix
 ::GetNumberOfMovingMasks( void )
 {
-  return this->m_MovingMasks.size();
+  return this->m_Pimple->GetNumberOfMovingMasks();
 }
 
 SimpleElastix::Self& 
 SimpleElastix
 ::SetFixedPointSetFileName( const std::string fixedPointSetFileName )
 {
-  this->m_FixedPointSetFileName = fixedPointSetFileName;
+  this->m_Pimple->SetFixedPointSetFileName( fixedPointSetFileName );
   return *this;
 }
 
@@ -425,14 +280,14 @@ std::string
 SimpleElastix
 ::GetFixedPointSetFileName( void )
 {
-  return this->m_FixedPointSetFileName;
+  return this->m_Pimple->GetFixedPointSetFileName();
 }
 
 SimpleElastix::Self& 
 SimpleElastix
 ::RemoveFixedPointSetFileName( void )
 {
-  this->m_FixedPointSetFileName = "";
+  this->m_Pimple->RemoveFixedPointSetFileName();
   return *this;
 }
 
@@ -440,7 +295,7 @@ SimpleElastix::Self&
 SimpleElastix
 ::SetMovingPointSetFileName( const std::string movingPointSetFileName )
 {
-  this->m_MovingPointSetFileName = movingPointSetFileName;
+  this->m_Pimple->SetMovingPointSetFileName( movingPointSetFileName );
   return *this;
 }
 
@@ -448,14 +303,14 @@ std::string
 SimpleElastix
 ::GetMovingPointSetFileName( void )
 {
-  return this->m_MovingPointSetFileName;
+  return this->m_Pimple->GetMovingPointSetFileName();
 }
 
 SimpleElastix::Self& 
 SimpleElastix
 ::RemoveMovingPointSetFileName( void )
 {
-  this->m_MovingPointSetFileName = "";
+  this->m_Pimple->RemoveMovingImage();
   return *this;
 }
 
@@ -463,7 +318,7 @@ SimpleElastix::Self&
 SimpleElastix
 ::SetOutputDirectory( const std::string outputDirectory )
 {
-  this->m_OutputDirectory = outputDirectory;
+  this->m_Pimple->SetOutputDirectory( outputDirectory );
   return *this;
 }
 
@@ -471,14 +326,14 @@ std::string
 SimpleElastix
 ::GetOutputDirectory( void )
 {
-  return this->m_OutputDirectory;
+  return this->m_Pimple->GetOutputDirectory();
 }
 
 SimpleElastix::Self& 
 SimpleElastix
 ::RemoveOutputDirectory( void )
 {
-  this->m_OutputDirectory = "";
+  this->m_Pimple->RemoveOutputDirectory();
   return *this;
 }
 
@@ -486,7 +341,7 @@ SimpleElastix::Self&
 SimpleElastix
 ::SetLogFileName( std::string logFileName )
 {
-  this->m_LogFileName = logFileName;
+  this->m_Pimple->SetLogFileName( logFileName );
   return *this;
 }
 
@@ -494,14 +349,14 @@ std::string
 SimpleElastix
 ::GetLogFileName( void )
 {
-  return this->m_LogFileName;
+  return this->m_Pimple->GetLogFileName();
 }
 
 SimpleElastix::Self& 
 SimpleElastix
 ::RemoveLogFileName( void )
 {
-  this->m_LogFileName = "";
+  this->m_Pimple->RemoveLogFileName();
   return *this;
 }
 
@@ -509,7 +364,7 @@ SimpleElastix::Self&
 SimpleElastix
 ::SetLogToFile( bool logToFile )
 {
-  this->m_LogToFile = logToFile;
+  this->m_Pimple->SetLogToFile( logToFile );
   return *this;
 }
 
@@ -517,14 +372,14 @@ bool
 SimpleElastix
 ::GetLogToFile( void )
 {
-  return this->m_LogToFile;
+  return this->m_Pimple->GetLogToFile();
 }
 
 SimpleElastix::Self& 
 SimpleElastix
 ::LogToFileOn()
 {
-  this->SetLogToFile( true );
+  this->m_Pimple->LogToFileOn();
   return *this;
 }
 
@@ -532,7 +387,7 @@ SimpleElastix::Self&
 SimpleElastix
 ::LogToFileOff()
 {
-  this->SetLogToFile( false );
+  this->m_Pimple->LogToFileOff();
   return *this;
 }
 
@@ -540,7 +395,7 @@ SimpleElastix::Self&
 SimpleElastix
 ::SetLogToConsole( bool logToConsole )
 {
-  this->m_LogToConsole = logToConsole;
+  this->m_Pimple->SetLogToConsole( logToConsole );
   return *this;
 }
 
@@ -548,14 +403,14 @@ bool
 SimpleElastix
 ::GetLogToConsole( void )
 {
-  return this->m_LogToConsole;
+  return this->m_Pimple->GetLogToConsole();
 }
 
 SimpleElastix::Self& 
 SimpleElastix
 ::LogToConsoleOn()
 {
-  this->SetLogToConsole( true );
+  this->m_Pimple->LogToConsoleOn();
   return *this;
 }
 
@@ -563,7 +418,7 @@ SimpleElastix::Self&
 SimpleElastix
 ::LogToConsoleOff()
 {
-  this->SetLogToConsole( false );
+  this->m_Pimple->LogToConsoleOff();
   return *this;
 }
 
@@ -571,8 +426,7 @@ SimpleElastix::Self&
 SimpleElastix
 ::SetParameterMap( const std::string transformName, const unsigned int numberOfResolutions, const double finalGridSpacingInPhysicalUnits )
 {
-  ParameterMapType parameterMap = ParameterObjectType::GetDefaultParameterMap( transformName, numberOfResolutions, finalGridSpacingInPhysicalUnits );
-  this->SetParameterMap( parameterMap );
+  this->m_Pimple->SetParameterMap( transformName, numberOfResolutions, finalGridSpacingInPhysicalUnits );
   return *this;
 }
 
@@ -580,8 +434,7 @@ SimpleElastix::Self&
 SimpleElastix
 ::SetParameterMap( const ParameterMapType parameterMap )
 {
-  ParameterMapVectorType parameterMapVector = ParameterMapVectorType( 1, parameterMap );
-  this->SetParameterMap( parameterMapVector );
+  this->m_Pimple->SetParameterMap( parameterMap );
   return *this;
 }
 
@@ -589,7 +442,7 @@ SimpleElastix::Self&
 SimpleElastix
 ::SetParameterMap( const ParameterMapVectorType parameterMapVector )
 {
-  this->m_ParameterMapVector = parameterMapVector;
+  this->m_Pimple->SetParameterMap( parameterMapVector );
   return *this;
 }
 
@@ -597,7 +450,7 @@ SimpleElastix::Self&
 SimpleElastix
 ::AddParameterMap( const ParameterMapType parameterMap )
 {
-  this->m_ParameterMapVector.push_back( parameterMap );
+  this->m_Pimple->AddParameterMap( parameterMap );
   return *this;
 }
 
@@ -605,21 +458,21 @@ SimpleElastix::ParameterMapVectorType
 SimpleElastix
 ::GetParameterMap( void )
 {
-  return this->m_ParameterMapVector;
+  return this->m_Pimple->GetParameterMap();
 }
 
 unsigned int 
 SimpleElastix
 ::GetNumberOfParameterMaps( void )
 {
-  return this->m_ParameterMapVector.size();
+  return this->m_Pimple->GetNumberOfParameterMaps();
 }
 
 SimpleElastix::Self&
 SimpleElastix
 ::SetInitialTransformParameterFileName( const std::string initialTransformParameterFileName )
 {
-  this->m_InitialTransformParameterMapFileName = initialTransformParameterFileName;
+  this->m_Pimple->SetInitialTransformParameterFileName( initialTransformParameterFileName );
   return *this;
 }
 
@@ -627,14 +480,14 @@ std::string
 SimpleElastix
 ::GetInitialTransformParameterFileName( void )
 {
-  return m_InitialTransformParameterMapFileName ;
+  return this->m_Pimple->GetInitialTransformParameterFileName();
 }
 
 SimpleElastix::Self&
 SimpleElastix
 ::RemoveInitialTransformParameterFileName( void )
 {
-  this->m_InitialTransformParameterMapFileName = "";
+  this->m_Pimple->RemoveInitialTransformParameterFileName();
   return *this;
 }
 
@@ -642,11 +495,7 @@ SimpleElastix::Self&
 SimpleElastix
 ::SetParameter( const ParameterKeyType key, const ParameterValueType value )
 {
-  for( unsigned int i = 0; i < this->m_ParameterMapVector.size(); i++ )
-  {
-    this->SetParameter( i, key, value );
-  }
-
+  this->m_Pimple->SetParameter( key, value );
   return *this;
 }
 
@@ -654,11 +503,7 @@ SimpleElastix::Self&
 SimpleElastix
 ::SetParameter( const ParameterKeyType key, const ParameterValueVectorType value )
 {
-  for( unsigned int i = 0; i < this->m_ParameterMapVector.size(); i++ )
-  {
-    this->SetParameter( i, key, value );
-  }
-
+  this->m_Pimple->SetParameter( key, value );
   return *this;
 }
 
@@ -666,13 +511,7 @@ SimpleElastix::Self&
 SimpleElastix
 ::SetParameter( const unsigned int index, const ParameterKeyType key, const ParameterValueType value )
 {
-  if( index >= this->m_ParameterMapVector.size() )
-  {
-    sitkExceptionMacro( "Parameter map index is out of range (index: " << index << "; number of parameters maps: " << this->m_ParameterMapVector.size() << "). Note that indexes are zero-based." );
-  }
-
-  this->m_ParameterMapVector[ index ][ key ] = ParameterValueVectorType( 1, value );
-
+  this->m_Pimple->SetParameter( index, key, value );
   return *this;
 }
 
@@ -680,13 +519,7 @@ SimpleElastix::Self&
 SimpleElastix
 ::SetParameter( const unsigned int index, const ParameterKeyType key, const ParameterValueVectorType value )
 {
-  if( index >= this->m_ParameterMapVector.size() )
-  {
-    sitkExceptionMacro( "Parameter map index is out of range (index: " << index << ", number of parameters maps: " << this->m_ParameterMapVector.size() << "). Note that indexes are zero-based." );
-  }
-
-  this->m_ParameterMapVector[ index ][ key ] = value;
-
+  this->m_Pimple->SetParameter( index, key, value );
   return *this;
 }
 
@@ -694,11 +527,7 @@ SimpleElastix::Self&
 SimpleElastix
 ::AddParameter( const ParameterKeyType key, const ParameterValueType value )
 {
-  for( unsigned int i = 0; i < this->m_ParameterMapVector.size(); i++ )
-  {
-    this->AddParameter( i, key, value );
-  }
-
+  this->m_Pimple->AddParameter( key, value );
   return *this;
 }
 
@@ -706,11 +535,7 @@ SimpleElastix::Self&
 SimpleElastix
 ::AddParameter( const ParameterKeyType key, const ParameterValueVectorType value )
 {
-  for( unsigned int i = 0; i < this->m_ParameterMapVector.size(); i++ )
-  {
-    this->AddParameter( i, key, value );
-  }
-
+  this->m_Pimple->AddParameter( key, value );
   return *this;
 }
 
@@ -718,20 +543,7 @@ SimpleElastix::Self&
 SimpleElastix
 ::AddParameter( const unsigned int index, const ParameterKeyType key, const ParameterValueType value )
 {
-  if( index >= this->m_ParameterMapVector.size() )
-  {
-    sitkExceptionMacro( "Parameter map index is out of range (index: " << index << ", number of parameters maps: " << this->m_ParameterMapVector.size() << "). Note that indexes are zero-based." );
-  }
-
-  if( this->m_ParameterMapVector[ index ].find( key ) == this->m_ParameterMapVector[ index ].end() )
-  {
-    this->SetParameter( index, key, value );
-  }
-  else
-  {
-    this->m_ParameterMapVector[ index ][ key ].push_back( value );
-  }
-
+  this->m_Pimple->AddParameter( index, key, value );
   return *this;
 }
 
@@ -739,23 +551,7 @@ SimpleElastix::Self&
 SimpleElastix
 ::AddParameter( const unsigned int index, const ParameterKeyType key, const ParameterValueVectorType value )
 {
-  if( index >= this->m_ParameterMapVector.size() )
-  {
-    sitkExceptionMacro( "Parameter map index is out of range (index: " << index << ", number of parameters maps: " << this->m_ParameterMapVector.size() << "). Note that indexes are zero-based." );
-  }
-
-  if( this->m_ParameterMapVector[ index ].find( key ) == this->m_ParameterMapVector[ index ].end() )
-  {
-    this->SetParameter( index, key, value );
-  }
-  else
-  {
-    for( unsigned int i = 0; i < value.size(); i++ )
-    {
-      this->m_ParameterMapVector[ index ][ key ].push_back( value[ i ] );
-    }
-  }
-
+  this->m_Pimple->AddParameter( index, key, value );
   return *this;
 }
 
@@ -763,35 +559,21 @@ SimpleElastix::ParameterValueVectorType
 SimpleElastix
 ::GetParameter( const ParameterKeyType key )
 {
-  if( this->m_ParameterMapVector.size() > 0 )
-  {
-    sitkExceptionMacro( "An index is needed when more than one parameter map is present. Please specify the parameter map number as the first argument." );
-  }
-
-  return this->GetParameter( 0, key );
+  return this->m_Pimple->GetParameter( key );
 }
 
 SimpleElastix::ParameterValueVectorType
 SimpleElastix
 ::GetParameter( const unsigned int index, const ParameterKeyType key )
 {
-  if( index >= this->m_ParameterMapVector.size() )
-  {
-    sitkExceptionMacro( "Parameter map index is out of range (index: " << index << ", number of parameters maps: " << this->m_ParameterMapVector.size() << "). Note that indexes are zero-based." );
-  }
-
-  return this->m_ParameterMapVector[ index ][ key ];
+  return this->m_Pimple->GetParameter( index, key );
 }
 
 SimpleElastix::Self&
 SimpleElastix
 ::RemoveParameter( const ParameterKeyType key )
 {
-  for( unsigned int i = 0; i < this->m_ParameterMapVector.size(); i++ )
-  {
-    this->RemoveParameter( i, key );
-  }
-
+  this->m_Pimple->RemoveParameter( key );
   return *this;
 }
 
@@ -799,13 +581,7 @@ SimpleElastix::Self&
 SimpleElastix
 ::RemoveParameter( const unsigned int index, const ParameterKeyType key )
 {
-  if( index >= this->m_ParameterMapVector.size() )
-  {
-    sitkExceptionMacro( "Parameter map index is out of range (index: " << index << ", number of parameters maps: " << this->m_ParameterMapVector.size() << "). Note that indexes are zero-based." );
-  }
-
-  this->m_ParameterMapVector[ index ].erase( key );
-
+  this->m_Pimple->RemoveParameter( index, key );
   return *this;
 }
 
@@ -813,17 +589,14 @@ SimpleElastix::ParameterMapType
 SimpleElastix
 ::ReadParameterFile( const std::string fileName )
 {
-  ParameterObjectPointer parameterObject = ParameterObjectType::New();
-  parameterObject->ReadParameterFile( fileName );
-  return parameterObject->GetParameterMap( 0 );
+  return this->m_Pimple->ReadParameterFile( fileName );
 }
 
 SimpleElastix::Self&
 SimpleElastix
 ::WriteParameterFile( ParameterMapType const parameterMap, const std::string parameterFileName )
 {
-  ParameterObjectPointer parameterObject = ParameterObjectType::New();
-  parameterObject->WriteParameterFile( parameterMap, parameterFileName );
+  this->m_Pimple->WriteParameterFile( parameterMap, parameterFileName);
   return *this;
 }
 
@@ -831,261 +604,70 @@ SimpleElastix::ParameterMapType
 SimpleElastix
 ::GetDefaultParameterMap( const std::string transformName, const unsigned int numberOfResolutions, const double finalGridSpacingInPhysicalUnits )
 { 
-  return ParameterObjectType::GetDefaultParameterMap( transformName, numberOfResolutions, finalGridSpacingInPhysicalUnits );
+  return this->m_Pimple->GetDefaultParameterMap( transformName, numberOfResolutions, finalGridSpacingInPhysicalUnits );
 }
 
 Image
 SimpleElastix
 ::Execute( void )
 {
-  if( this->GetNumberOfFixedImages() == 0 )
-  {
-    sitkExceptionMacro( "Fixed image not set." );
-  }
-
-  if( this->GetNumberOfMovingImages() == 0 )
-  {
-    sitkExceptionMacro( "Moving image not set." );
-  }
-
-  const PixelIDValueEnum FixedImagePixelID = this->GetFixedImage( 0 ).GetPixelID();
-  const unsigned int FixedImageDimension = this->GetFixedImage( 0 ).GetDimension();
-  const PixelIDValueEnum MovingImagePixelID = this->GetMovingImage( 0 ).GetPixelID();
-  const unsigned int MovingImageDimension = this->GetMovingImage( 0 ).GetDimension();
-
-  for( unsigned int i = 1; i < this->GetNumberOfFixedImages(); ++i )
-  {
-    if( this->GetFixedImage( i ).GetDimension() != FixedImageDimension )
-    {
-      sitkExceptionMacro( "Fixed images must be of same dimension (fixed image at index 0 is of dimension " 
-                       << this->GetFixedImage( 0 ).GetDimension() << ", fixed image at index " << i
-                       << " is of dimension \"" << this->GetFixedImage( i ).GetDimension() << "\")." );
-    }
-  }
-
-  for( unsigned int i = 1; i < this->GetNumberOfMovingImages(); ++i )
-  {
-    if( this->GetMovingImage( i ).GetDimension() != MovingImageDimension )
-    {
-      sitkExceptionMacro( "Moving images must be of same dimension as fixed images (fixed image at index 0 is of dimension " 
-                       << this->GetFixedImage( 0 ).GetDimension() << ", moving image at index " << i
-                       << " is of dimension \"" << this->GetMovingImage( i ).GetDimension() << "\")." );
-    }
-  }
-
-  for( unsigned int i = 1; i < this->GetNumberOfFixedMasks(); ++i )
-  {
-    if( this->GetFixedMask( i ).GetDimension() != FixedImageDimension )
-    {
-      sitkExceptionMacro( "Fixed masks must be of same dimension as fixed images (fixed images are of dimension " 
-                       << this->GetFixedImage( 0 ).GetDimension() << ", fixed mask at index " << i
-                       << " is of dimension \"" << this->GetFixedMask( i ).GetDimension() << "\")." );
-    }
-  }
-
-  for( unsigned int i = 1; i < this->GetNumberOfMovingMasks(); ++i )
-  {
-    if( this->GetMovingMask( i ).GetDimension() != MovingImageDimension )
-    {
-      sitkExceptionMacro( "Moving masks must be of same dimension as moving images (moving images are of dimension " 
-                       << this->GetMovingImage( 0 ).GetDimension() << ", moving mask at index " << i
-                       << " is of dimension \"" << this->GetMovingMask( i ).GetDimension() << "\")." );
-    }
-  }
-
-  for( unsigned int i = 0; i < this->GetNumberOfFixedMasks(); ++i )
-  {
-    if( this->GetFixedMask( i ).GetPixelID() != sitkUInt8 )
-    {
-      sitkExceptionMacro( "Fixed mask must be of pixel type unsigned char (fixed mask at index " 
-                       << i << " is of type \"" << GetPixelIDValueAsElastixParameter( this->GetFixedMask( i ).GetPixelID() ) << "\")." );
-    }
-  }
-
-  for( unsigned int i = 0; i < this->GetNumberOfMovingMasks(); ++i )
-  {
-    if( this->GetMovingMask( i ).GetPixelID() != sitkUInt8 )
-    {
-      sitkExceptionMacro( "Moving mask must be of pixel type unsigned char (moving mask at index " 
-                       << i << " is of type \"" << GetPixelIDValueAsElastixParameter( this->GetMovingMask( i ).GetPixelID() ) << "\")." );
-    }
-  }
-
-  if( this->m_DualMemberFactory->HasMemberFunction( sitkFloat32, sitkFloat32, FixedImageDimension ) )
-  {
-    return this->m_DualMemberFactory->GetMemberFunction( sitkFloat32, sitkFloat32, FixedImageDimension )();
-  }
-
-  sitkExceptionMacro( << "SimpleElastix does not support the combination of "
-                      << FixedImageDimension << "-dimensional "
-                      << GetPixelIDValueAsElastixParameter( FixedImagePixelID ) << " fixed image and a "
-                      << MovingImageDimension << "-dimensional " 
-                      << GetPixelIDValueAsElastixParameter( MovingImagePixelID ) << " moving image. "
-                      << "This a serious error. Contact developers at https://github.com/kaspermarstal/SimpleElastix/issues." )
+  return this->m_Pimple->Execute();
 }
 
 SimpleElastix::ParameterMapVectorType 
 SimpleElastix
 ::GetTransformParameterMap( void )
 {
-  if( this->m_TransformParameterMapVector.size() == 0 )
-  {
-    sitkExceptionMacro( "Number of transform parameter maps: 0. Run registration with Execute()." );
-  }
-
-  return this->m_TransformParameterMapVector;
+  return this->m_Pimple->GetTransformParameterMap();
 }
 
 SimpleElastix::ParameterMapType 
 SimpleElastix
 ::GetTransformParameterMap( const unsigned int index )
 {
-  if( this->GetNumberOfParameterMaps() == 0 )
-  {
-    sitkExceptionMacro( "Number of transform parameter maps: 0. Run registration with Execute()." );
-  }
-
-  if( this->GetNumberOfParameterMaps() <= index )
-  {
-    sitkExceptionMacro( "Index exceeds number of transform parameter maps (index: " << index
-                     << ", number of parameter maps: " << this->GetNumberOfParameterMaps() << ")." );
-  }
-
-  return this->m_TransformParameterMapVector[ index ];
+  return this->m_Pimple->GetTransformParameterMap( index );
 }
 
 Image
 SimpleElastix
 ::GetResultImage( void )
 {
-  if( this->IsEmpty( this->m_ResultImage ) )
-  {
-    sitkExceptionMacro( "No result image found. Run registration with Execute()." )
-  }
-
-  return this->m_ResultImage;
+  return this->m_Pimple->GetResultImage();
 }
 
 SimpleElastix::ParameterMapVectorType
 SimpleElastix
 ::ExecuteInverse( void )
 {
-  return this->ExecuteInverse( this->GetParameterMap() );
+  return this->m_Pimple->ExecuteInverse();
 }
 
 SimpleElastix::ParameterMapVectorType
 SimpleElastix
 ::ExecuteInverse( std::map< std::string, std::vector< std::string > > inverseParameterMap )
 {
-  return this->ExecuteInverse( ParameterMapVectorType( 1, inverseParameterMap ) );
+  return this->m_Pimple->ExecuteInverse( ParameterMapVectorType( 1, inverseParameterMap ) );
 }
 
 SimpleElastix::ParameterMapVectorType
 SimpleElastix
 ::ExecuteInverse( std::vector< std::map< std::string, std::vector< std::string > > > inverseParameterMapVector )
 {
-  if( this->m_FixedImages.size() == 0 )
-  {
-    sitkExceptionMacro( "No fixed images found. Elastix needs the fixed image of the forward transformation to compute the inverse transform.")
-  }
-
-  if( this->m_MovingImages.size() == 0 )
-  {
-    sitkExceptionMacro( "No moving images found. Elastix needs the moving image of the forward transformation to compute the inverse transform.")
-  }
-
-  if( this->m_TransformParameterMapVector.size() == 0 )
-  {
-    sitkExceptionMacro( "No forward transform parameter map found. Run forward registration before computing the inverse.")
-  }
-
-  // Write forward transform parameter file to disk
-  // Head of chain
-  std::vector< std::string > forwardTransformParameterFileNames;
-  forwardTransformParameterFileNames.push_back( this->GetOutputDirectory() + "/forwardTransformParameterFile.0.txt" );
-  ParameterMapVectorType forwardTransformParameterMaps = this->m_TransformParameterMapVector;
-  forwardTransformParameterMaps[ 0 ][ "InitialTransformParametersFileName" ] = ParameterValueVectorType( 1, "NoInitialTransform" );
-  for( unsigned int i = 1; i < forwardTransformParameterMaps.size(); i++ )
-  {
-      // Chain transform parameter file
-      forwardTransformParameterFileNames.push_back( this->GetOutputDirectory() + "/forwardTransformParameterFile." + ParameterObjectType::ToString( i ) + ".txt" );
-      forwardTransformParameterMaps[ i ][ "InitialTransformParametersFileName" ] = ParameterValueVectorType( 1, forwardTransformParameterFileNames[ forwardTransformParameterFileNames.size()-1 ] );
-  }
-  ParameterObjectPointer forwardTransformParameterMapObject = ParameterObjectType::New();
-  forwardTransformParameterMapObject->SetParameterMap( forwardTransformParameterMaps );
-  forwardTransformParameterMapObject->WriteParameterFile( forwardTransformParameterFileNames );
-
-  // Setup inverse transform parameter map
-  for( unsigned int i = 0; i < inverseParameterMapVector.size(); i++ )
-  {
-    inverseParameterMapVector[ i ][ "Registration" ] = ParameterValueVectorType( 1, "MultiResolutionRegistration" );
-    inverseParameterMapVector[ i ][ "Metric" ] = ParameterValueVectorType( 1, "DisplacementMagnitudePenalty" );
-
-    // RandomSparseMask will throw an error if no mask is supplied
-    if( inverseParameterMapVector[ i ][ "ImageSampler" ].size() > 0 && inverseParameterMapVector[ i ][ "ImageSampler" ][ 0 ] == "RandomSparseMask" )
-    {
-      inverseParameterMapVector[ i ][ "ImageSampler" ] = ParameterValueVectorType( 1, "RandomCoordinate" );
-    }
-  }
-
-  // Setup inverse registration
-  SimpleElastix selx;
-  selx.SetInitialTransformParameterFileName( forwardTransformParameterFileNames[ 0 ] );
-  selx.SetParameterMap( inverseParameterMapVector );  
-
-  // Pass options from this SimpleElastix
-  selx.SetFixedImage( this->GetFixedImage( 0 ) ); 
-  selx.SetMovingImage( this->GetFixedImage( 0 ) ); // <-- The fixed image is also used as the moving image. This is not a bug.
-  selx.SetOutputDirectory( this->GetOutputDirectory() );
-  selx.SetLogFileName( this->GetLogFileName() );
-  selx.SetLogToFile( this->GetLogToFile() );
-  selx.SetLogToConsole( this->GetLogToConsole() );
-
-  selx.Execute();
-
-  for( unsigned int i = 0; i < forwardTransformParameterFileNames.size(); i++ )
-  {
-    try
-    {
-      std::remove( forwardTransformParameterFileNames[ i ].c_str() );
-    }
-    catch( ... )
-    {
-      std::cout << "Error removing file " << forwardTransformParameterFileNames[ i ] << ". Continuing ... " << std::endl;
-    }
-  }
-
-  // TODO: Change direction/origin/spacing to match moving image
-
-  // Unlink the first transform parameter map
-  ParameterMapVectorType inverseTransformParameterMap = selx.GetTransformParameterMap();
-  inverseTransformParameterMap[ 0 ][ "InitialTransformParametersFileName" ] = ParameterValueVectorType( 1, "NoInitialTransform" );
-  this->m_InverseTransformParameterMapVector = inverseTransformParameterMap;
-  return this->m_InverseTransformParameterMapVector;
+  return this->m_Pimple->ExecuteInverse( inverseParameterMapVector );
 }
 
 SimpleElastix::ParameterMapVectorType 
 SimpleElastix
 ::GetInverseTransformParameterMap( void )
 {
-  if( this->m_InverseTransformParameterMapVector.size() == 0 )
-  {
-    sitkExceptionMacro( "Number of inverse transform parameter maps: 0. Run inverse registration with ExecuteInverse()." );
-  }
-
-  return this->m_InverseTransformParameterMapVector;
+  return this->m_Pimple->GetInverseTransformParameterMap();
 }
 
 SimpleElastix::Self&
 SimpleElastix
 ::PrintParameterMap( void )
 {
-  if( this->GetNumberOfParameterMaps() == 0 )
-  {
-    sitkExceptionMacro( "Cannot print parameter maps: Number of parameter maps is 0." )
-  }
-
-  this->PrintParameterMap( this->GetParameterMap() );
+  this->m_Pimple->PrintParameterMap();
   return *this;
 }
 
@@ -1093,7 +675,7 @@ SimpleElastix::Self&
 SimpleElastix
 ::PrintParameterMap( const ParameterMapType parameterMap )
 {
-  this->PrintParameterMap( ParameterMapVectorType( 1, parameterMap ) );
+  this->m_Pimple->PrintParameterMap( parameterMap );
   return *this;
 }
 
@@ -1101,18 +683,8 @@ SimpleElastix::Self&
 SimpleElastix
 ::PrintParameterMap( const ParameterMapVectorType parameterMapVector )
 {
-  ParameterObjectPointer parameterObject = ParameterObjectType::New();
-  parameterObject->SetParameterMap( parameterMapVector );
-  parameterObject->Print( std::cout );
+  this->m_Pimple->PrintParameterMap( parameterMapVector );
   return *this;
-}
-
-bool
-SimpleElastix
-::IsEmpty( const Image& image )
-{
-  const bool isEmpty = image.GetWidth() == 0 && image.GetHeight() == 0;
-  return isEmpty;
 }
 
 /**
@@ -1152,9 +724,8 @@ PrintParameterMap( const SimpleElastix::ParameterMapType parameterMap )
 void
 PrintParameterMap( const SimpleElastix::ParameterMapVectorType parameterMapVector )
 {
-  SimpleElastix::ParameterObjectPointer parameterObject = SimpleElastix::ParameterObjectType::New();
-  parameterObject->SetParameterMap( parameterMapVector );
-  parameterObject->Print( std::cout );
+  SimpleElastix selx;
+  selx.SetParameterMap( parameterMapVector );
 }
 
 Image

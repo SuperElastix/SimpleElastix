@@ -80,8 +80,15 @@ if(ITK_FOUND)
 endif()
 
 #----------------------------------------------------------
-# Configure elastix
+# Set flags and directories
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${SimpleITK_REQUIRED_C_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CXX_ADDITIONAL_WARNING_FLAGS} ${CMAKE_CXX_FLAGS} ${SimpleITK_REQUIRED_CXX_FLAGS}")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
+set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
 
+#-----------------------------------------------------------
+# Configure Elastix
 find_package( OpenMP )
 if( OPENMP_FOUND )
   set( SimpleITK_REQUIRED_C_FLAGS "${SimpleITK_REQUIRED_C_FLAGS} ${OpenMP_C_FLAGS} " )
@@ -105,14 +112,6 @@ include( ${ELASTIX_USE_FILE} )
 if( ELASTIX_BUILD_EXECUTABLE )
   message(FATAL_ERROR "SimpleElastix requires elastix libraries, please set ELASTIX_BUILD_EXECUTABLE=OFF and rebuild elastix")
 endif()
-
-#----------------------------------------------------------
-# Set flags and directories
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${SimpleITK_REQUIRED_C_FLAGS}")
-set(CMAKE_CXX_FLAGS "${CXX_ADDITIONAL_WARNING_FLAGS} ${CMAKE_CXX_FLAGS} ${SimpleITK_REQUIRED_CXX_FLAGS}")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
-set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
 
 #----------------------------------------------------------
 # Place all options to go into sitkConfigure.h here
@@ -370,7 +369,6 @@ endif()
 # we enter the sub-directories
 include(CTest)
 
-
 #------------------------------------------------------------------------------
 # Go to subdirectories
 add_subdirectory ( Utilities )
@@ -504,16 +502,10 @@ install(
 
 install(FILES ${SimpleITK_DOC_FILES} DESTINATION "${SimpleITK_INSTALL_DOC_DIR}" COMPONENT Runtime)
 
-# Additional files needed by SimpleElastix
-install(
-  DIRECTORY 
-    ${ITK_INCLUDE_DIRS}
-    ${ELASTIX_INCLUDE_DIRECTORIES}
-  DESTINATION 
-    ${SimpleITK_INSTALL_INCLUDE_DIR}/
-  COMPONENT Development
-  FILES_MATCHING PATTERN "*.h"
-)
+install( DIRECTORY "${ELASTIX_LINK_DIRECTORIES}"
+         DESTINATION ${SimpleITK_INSTALL_INCLUDE_DIR} 
+         COMPONENT Development 
+         FILES_MATCHING PATTERN "*ix*" )
 
 #------------------------------------------------------------------------------
 # CPack

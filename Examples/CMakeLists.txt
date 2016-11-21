@@ -14,6 +14,12 @@ if(NOT CMAKE_PROJECT_NAME STREQUAL "SimpleITK")
   find_package(SimpleITK REQUIRED)
   include(${SimpleITK_USE_FILE})
 
+  if( NOT EXISTS ${ELASTIX_USE_FILE} )
+    set( ELASTIX_USE_FILE "" CACHE PATH "Path to UseElastix.cmake" )
+    message(FATAL_ERROR "Could not find UseElastix.cmake. The CMake variable ELASTIX_USE_FILE must point to UseElastix.cmake when using SimpleElastix as an external project.")
+  endif()
+  include(${ELASTIX_USE_FILE})
+
   # Add compiler flags needed to use SimpleITK.
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${SimpleITK_REQUIRED_C_FLAGS}")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SimpleITK_REQUIRED_CXX_FLAGS}")
@@ -21,11 +27,6 @@ if(NOT CMAKE_PROJECT_NAME STREQUAL "SimpleITK")
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
   set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
 endif()
-
-# ITK and Elastix is required to build SimpleElastix examples 
-set(ITK_NO_IO_FACTORY_REGISTER_MANAGER 1)
-include(${ITK_USE_FILE})
-include(${ELASTIX_USE_FILE})
 
 # Add individual cxx executables
 add_executable ( SimpleElastix1 SimpleElastix1.cxx )

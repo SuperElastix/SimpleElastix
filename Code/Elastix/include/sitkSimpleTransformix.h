@@ -1,14 +1,9 @@
 #ifndef __sitksimpletransformix_h_
 #define __sitksimpletransformix_h_
 
-// SimpleITK
+#include "nsstd/auto_ptr.h"
 #include "sitkCommon.h"
-#include "sitkMemberFunctionFactory.h"
 #include "sitkImage.h"
-
-// Transformix
-#include "elxTransformixFilter.h"
-#include "elxParameterObject.h"
 
 namespace itk { 
   namespace simple {
@@ -22,17 +17,14 @@ class SITKCommon_EXPORT SimpleTransformix
 
     typedef SimpleTransformix Self;                                
 
-    typedef elastix::ParameterObject                       ParameterObjectType;
-    typedef ParameterObjectType::Pointer                   ParameterObjectPointer;
-    typedef ParameterObjectType::ParameterMapType          ParameterMapType;
-    typedef ParameterObjectType::ParameterMapVectorType    ParameterMapVectorType;
-    typedef ParameterMapType::iterator                     ParameterMapIterator;
-    typedef ParameterMapType::const_iterator               ParameterMapConstIterator;
-    typedef itk::ParameterFileParser                       ParameterFileParserType;
-    typedef ParameterFileParserType::Pointer               ParameterFileParserPointer;
-    typedef ParameterObjectType::ParameterKeyType          ParameterKeyType;
-    typedef ParameterObjectType::ParameterValueType        ParameterValueType;
-    typedef ParameterObjectType::ParameterValueVectorType  ParameterValueVectorType;
+    typedef std::string                                             ParameterKeyType;
+    typedef std::string                                             ParameterValueType;
+    typedef std::vector< ParameterValueType >                       ParameterValueVectorType;
+    typedef ParameterValueVectorType::iterator                      ParameterValueVectorIterator;
+    typedef std::map< ParameterKeyType, ParameterValueVectorType >  ParameterMapType;
+    typedef std::vector< ParameterMapType >                         ParameterMapVectorType;
+    typedef ParameterMapType::iterator                              ParameterMapIterator;
+    typedef ParameterMapType::const_iterator                        ParameterMapConstIterator;
 
     const std::string GetName( void );
 
@@ -94,7 +86,7 @@ class SITKCommon_EXPORT SimpleTransformix
     Self& RemoveTransformParameter( const std::string key );
     Self& RemoveTransformParameter( const unsigned int index, const std::string key );
 
-    std::map< std::string, std::vector< std::string > > ReadParameterFile( const std::string filename );
+    std::map< std::string, std::vector< std::string > > ReadParameterFile( const std::string parameterFileName );
     Self& WriteParameterFile( const std::map< std::string, std::vector< std::string > > parameterMap, const std::string parameterFileName );
 
     Self& PrintParameterMap( void );
@@ -104,36 +96,10 @@ class SITKCommon_EXPORT SimpleTransformix
     Image Execute( void );
 
     Image GetResultImage( void );
+
+    struct SimpleTransformixImpl;
+    nsstd::auto_ptr< SimpleTransformixImpl > m_Pimple;
     
-
-  private:
-
-    bool IsEmpty( const Image& image );
-
-    // Definitions for SimpleITK member factory
-    typedef Image ( Self::*MemberFunctionType )( void );
-    template< class TMovingImage > Image ExecuteInternal( void );
-    friend struct detail::MemberFunctionAddressor< MemberFunctionType >;
-    nsstd::auto_ptr< detail::MemberFunctionFactory< MemberFunctionType > > m_MemberFactory;
-
-    Image                   m_MovingImage;
-    Image                   m_ResultImage;
-
-    ParameterMapVectorType  m_TransformParameterMapVector;
-
-    bool                    m_ComputeSpatialJacobian;
-    bool                    m_ComputeDeterminantOfSpatialJacobian;
-    bool                    m_ComputeDeformationField;
-    std::string             m_MovingPointSetFileName;
-
-    std::string             m_OutputDirectory;
-    std::string             m_LogFileName;
-
-    bool                    m_LogToConsole;
-    bool                    m_LogToFile;
-
-    
-
 };
 
 // Procedural Interface 
