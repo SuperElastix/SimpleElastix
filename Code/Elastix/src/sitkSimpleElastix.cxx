@@ -15,6 +15,8 @@ SimpleElastix
 SimpleElastix
 ::~SimpleElastix( void )
 {
+  delete m_Pimple;
+  m_Pimple = NULL;
 }
 
 const std::string 

@@ -1,7 +1,6 @@
 #ifndef __sitksimpleelastix_h_
 #define __sitksimpleelastix_h_
 
-#include "nsstd/auto_ptr.h"
 #include "sitkCommon.h"
 #include "sitkImage.h"
 
@@ -137,7 +136,7 @@ class SITKCommon_EXPORT SimpleElastix
   private:
 
     struct SimpleElastixImpl;
-    nsstd::auto_ptr< SimpleElastixImpl > m_Pimple;
+    SimpleElastixImpl* m_Pimple;
     
 };
 

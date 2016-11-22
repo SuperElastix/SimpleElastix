@@ -15,6 +15,8 @@ SimpleTransformix
 SimpleTransformix
 ::~SimpleTransformix( void )
 {
+  delete m_Pimple;
+  m_Pimple = NULL;
 }
 
 const std::string 

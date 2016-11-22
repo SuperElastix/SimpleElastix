@@ -1,7 +1,6 @@
 #ifndef __sitksimpletransformix_h_
 #define __sitksimpletransformix_h_
 
-#include "nsstd/auto_ptr.h"
 #include "sitkCommon.h"
 #include "sitkImage.h"
 
@@ -97,8 +96,10 @@ class SITKCommon_EXPORT SimpleTransformix
 
     Image GetResultImage( void );
 
+  private:
+
     struct SimpleTransformixImpl;
-    nsstd::auto_ptr< SimpleTransformixImpl > m_Pimple;
+    SimpleTransformixImpl* m_Pimple;
     
 };
 
