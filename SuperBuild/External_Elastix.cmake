@@ -11,7 +11,7 @@ endif()
 file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/${proj}-build/CMakeCacheInit.txt" "${ep_common_cache}" )
 
 set( ELASTIX_GIT_REPOSITORY ${git_protocol}://github.com/kaspermarstal/elastix )
-set( ELASTIX_GIT_TAG e29be08c65ee4b204e89ddc144b1f6d931c41fe1 )
+set( ELASTIX_GIT_TAG 99251130b1d04841a1b94f7023be74124d9d9c43 )
 
 if( ${ITK_WRAPPING} OR ${BUILD_SHARED_LIBS} )
   set( ELASTIX_BUILD_SHARED_LIBS ON )
