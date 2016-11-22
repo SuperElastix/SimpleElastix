@@ -14,7 +14,7 @@ if(NOT CMAKE_PROJECT_NAME STREQUAL "SimpleITK")
   find_package(SimpleITK REQUIRED)
   include(${SimpleITK_USE_FILE})
 
-  if( NOT EXISTS ${ELASTIX_USE_FILE} )
+  if(NOT EXISTS ${ELASTIX_USE_FILE})
     set( ELASTIX_USE_FILE "" CACHE PATH "Path to UseElastix.cmake" )
     message(FATAL_ERROR "Could not find UseElastix.cmake. The CMake variable ELASTIX_USE_FILE must point to UseElastix.cmake when using SimpleElastix as an external project.")
   endif()

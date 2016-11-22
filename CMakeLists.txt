@@ -79,20 +79,12 @@ if(ITK_FOUND)
   link_directories( "${ITK_LIBRARY_DIRS}")
 endif()
 
-#----------------------------------------------------------
-# Set flags and directories
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${SimpleITK_REQUIRED_C_FLAGS}")
-set(CMAKE_CXX_FLAGS "${CXX_ADDITIONAL_WARNING_FLAGS} ${CMAKE_CXX_FLAGS} ${SimpleITK_REQUIRED_CXX_FLAGS}")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
-set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
-
 #-----------------------------------------------------------
 # Configure Elastix
 find_package( OpenMP )
 if( OPENMP_FOUND )
-  set( SimpleITK_REQUIRED_C_FLAGS "${SimpleITK_REQUIRED_C_FLAGS} ${OpenMP_C_FLAGS} " )
-  set( SimpleITK_REQUIRED_CXX_FLAGS "${SimpleITK_REQUIRED_CXX_FLAGS} ${OpenMP_CXX_FLAGS} " )
+  set(SimpleITK_REQUIRED_C_FLAGS "${SimpleITK_REQUIRED_C_FLAGS} ${OpenMP_C_FLAGS}")
+  set(SimpleITK_REQUIRED_CXX_FLAGS "${SimpleITK_REQUIRED_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
 # Find UseElastix.cmake 
@@ -112,6 +104,14 @@ include( ${ELASTIX_USE_FILE} )
 if( ELASTIX_BUILD_EXECUTABLE )
   message(FATAL_ERROR "SimpleElastix requires elastix libraries, please set ELASTIX_BUILD_EXECUTABLE=OFF and rebuild elastix")
 endif()
+
+#----------------------------------------------------------
+# Set flags and directories
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${SimpleITK_REQUIRED_C_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CXX_ADDITIONAL_WARNING_FLAGS} ${SimpleITK_REQUIRED_CXX_FLAGS}")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
+set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
 
 #----------------------------------------------------------
 # Place all options to go into sitkConfigure.h here
