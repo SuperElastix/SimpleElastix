@@ -51,7 +51,7 @@ namespace itk
   {
     // note: If img and this are this same, the following statement
     // will still be safe. It is also exception safe.
-    std::auto_ptr<PimpleImageBase> temp( img.m_PimpleImage->ShallowCopy() );
+    nsstd::auto_ptr<PimpleImageBase> temp( img.m_PimpleImage->ShallowCopy() );
     delete this->m_PimpleImage;
     this->m_PimpleImage = temp.release();
     return *this;
@@ -256,6 +256,21 @@ namespace itk
       return ss.str();
     }
 
+    void Image::SetMetaData( const std::string &key, const std::string &value)
+    {
+      assert( m_PimpleImage );
+      this->MakeUnique();
+      itk::MetaDataDictionary &mdd = this->m_PimpleImage->GetDataBase()->GetMetaDataDictionary();
+      itk::EncapsulateMetaData<std::string>(mdd, key, value);
+    }
+
+    bool Image::EraseMetaData( const std::string &key )
+    {
+      assert( m_PimpleImage );
+      itk::MetaDataDictionary &mdd = this->m_PimpleImage->GetDataBase()->GetMetaDataDictionary();
+      this->MakeUnique();
+      return mdd.Erase(key);
+    }
 
     // Physical Point to Continuous Index
     std::vector< int64_t > Image::TransformPhysicalPointToIndex( const std::vector< double > &pt ) const
@@ -706,7 +721,7 @@ namespace itk
       if ( this->m_PimpleImage->GetReferenceCountOfImage() > 1 )
         {
         // note: care is take here to be exception safe with memory allocation
-        std::auto_ptr<PimpleImageBase> temp( this->m_PimpleImage->DeepCopy() );
+        nsstd::auto_ptr<PimpleImageBase> temp( this->m_PimpleImage->DeepCopy() );
         delete this->m_PimpleImage;
         this->m_PimpleImage = temp.release();
         }

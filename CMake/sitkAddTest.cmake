@@ -49,7 +49,7 @@ function(sitk_add_python_test name)
     return()
   endif()
 
-  set(command "${VIRTUAL_PYTHON_EXECUTABLE}")
+  set(command "${TEST_PYTHON_EXECUTABLE}")
 
   # add extra command which may be needed on some systems
   if(CMAKE_OSX_ARCHITECTURES)
@@ -59,10 +59,18 @@ function(sitk_add_python_test name)
 
   sitk_add_test(NAME Python.${name}
     COMMAND "${ITK_TEST_DRIVER}"
-    --add-before-env SITK_NOSHOW "YES"
     ${command}
     ${ARGN}
     )
+  set_property(TEST Python.${name}
+      PROPERTY ENVIRONMENT SITK_NOSHOW=YES
+      )
+  if (NOT SITK_PYTHON_USE_VIRTUALENV)
+    set_property(TEST Python.${name}
+      APPEND PROPERTY ENVIRONMENT PYTHONPATH=${SimpleITK_BINARY_DIR}/Wrapping/Python
+      )
+  endif()
+
 endfunction()
 
 
@@ -75,7 +83,7 @@ function(sitk_add_lua_test name)
     return()
   endif()
 
-  set(command "$<TARGET_FILE:SimpleITKLua>")
+  set(command "${LUA_EXECUTABLE}")
 
   # add extra command which may be needed on some systems
   if(CMAKE_OSX_ARCHITECTURES)
@@ -87,6 +95,12 @@ function(sitk_add_lua_test name)
     COMMAND "${ITK_TEST_DRIVER}"
     ${command}
     ${ARGN}
+    )
+  set_property(TEST Lua.${name}
+    PROPERTY ENVIRONMENT LUA_CPATH=$<TARGET_FILE:SimpleITKLuaModule_LUA>
+    )
+  set_property(TEST Lua.${name}
+    APPEND PROPERTY ENVIRONMENT SITK_NOSHOW=YES
     )
 endfunction()
 
@@ -110,10 +124,12 @@ function(sitk_add_ruby_test name)
 
   sitk_add_test(NAME Ruby.${name}
     COMMAND "${ITK_TEST_DRIVER}"
-    --add-before-env RUBYLIB "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/$<CONFIGURATION>"
-    --add-before-env RUBYLIB "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}"
     ${command}
     ${ARGN}
+    )
+
+  set_property(TEST Ruby.${name}
+    PROPERTY ENVIRONMENT RUBYLIB=$<TARGET_FILE_DIR:simpleitk_RUBY>
     )
 endfunction()
 
@@ -155,28 +171,35 @@ function(sitk_add_java_test name java_file)
   # the root is with out extension or path, it is also assumed to the the name of the main class
   get_filename_component( _java_class ${java_file} NAME_WE )
   set( _java_file_class "${_java_class}.class" )
+  set( _class_path "${CMAKE_CURRENT_BINARY_DIR}" )
+  set(JAR_FILE "simpleitk-${SimpleITK_VERSION}.jar")  # from target?
 
+  set( _JAVA_LIBRARY_PATH  "$<TARGET_FILE_DIR:SimpleITKJava_JAVA>")
   if(WIN32)
-    set( _JAVA_LIBRARY_PATH "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/$<CONFIGURATION>" )
-    # Note: on windows this is a semi-colon separated list
-    set( _JAVA_CLASSPATH "${SimpleITK_BINARY_DIR}/Wrapping/${JAR_FILE};${CMAKE_CURRENT_BINARY_DIR}" )
-  else(WIN32)
-    set( _JAVA_LIBRARY_PATH "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}" )
-    set( _JAVA_CLASSPATH "${SimpleITK_BINARY_DIR}/Wrapping/${JAR_FILE}:${CMAKE_CURRENT_BINARY_DIR}" )
-  endif(WIN32)
+    set( _JAVA_CLASSPATH "${SimpleITK_BINARY_DIR}/Wrapping/Java/${JAR_FILE}$<SEMICOLON>${_class_path}" )
+  else()
+    set( _JAVA_CLASSPATH "${SimpleITK_BINARY_DIR}/Wrapping/Java/${JAR_FILE}:${_class_path}" )
+  endif()
 
-  add_custom_command(
-    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${_java_file_class}"
-    COMMAND "${Java_JAVAC_EXECUTABLE}"
-    ARGS -classpath "${_JAVA_CLASSPATH}"
-    -d "${CMAKE_CURRENT_BINARY_DIR}"
-    "${java_file}"
-    DEPENDS ${java_file} ${SWIG_MODULE_SimpleITKJava_TARGET_NAME} org_itk_simple_jar
-    COMMENT "Building ${CMAKE_CURRENT_BINARY_DIR}/${_java_file_class}"
-    )
-  add_custom_target( ${_java_class}Java ALL
-    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/${_java_file_class}"
-    SOURCES ${java_file})
+  if (NOT TARGET ${_java_class}Java)
+
+    add_custom_command(
+      OUTPUT "${_class_path}/${_java_file_class}"
+      COMMAND "${CMAKE_COMMAND}"
+        ARGS -E remove -f "${_class_path}/${_java_file_class}"
+      COMMAND "${Java_JAVAC_EXECUTABLE}"
+        ARGS -classpath "${_JAVA_CLASSPATH}"
+          -d "${_class_path}"
+          "${java_file}"
+      DEPENDS ${java_file} ${SWIG_MODULE_SimpleITKJava_TARGET_NAME} org_itk_simple_jar
+      COMMENT "Building ${_class_path}/${_java_file_class}"
+      )
+    add_custom_target( ${_java_class}Java ALL
+      DEPENDS "${_class_path}/${_java_file_class}"
+      SOURCES ${java_file}
+      )
+  endif()
+
 
   sitk_add_test(NAME Java.${name}
     COMMAND "${ITK_TEST_DRIVER}"
@@ -213,7 +236,7 @@ function(sitk_add_r_test name)
     )
 
   set_property(TEST R.${name}
-    PROPERTY ENVIRONMENT R_LIBS=${SimpleITK_BINARY_DIR}/Wrapping/RLib/
+    PROPERTY ENVIRONMENT R_LIBS=${SimpleITK_BINARY_DIR}/Wrapping/R/R_libs/
     )
 endfunction()
 
@@ -236,12 +259,16 @@ function(sitk_add_csharp_test name csharp_file)
     set( CSHARP_EXECUTABLE "CSharp${CSHARP_EXECUTABLE}" )
   endif()
 
-  # add the target to compile the test
-  csharp_add_executable(
-    "${CSHARP_EXECUTABLE}"
-    SimpleITKCSharpManaged.dll
-    ${csharp_file}
-    )
+
+  if (NOT TARGET "${CSHARP_EXECUTABLE}")
+
+    # add the target to compile the test
+    csharp_add_executable(
+      "${CSHARP_EXECUTABLE}"
+      SimpleITKCSharpManaged.dll
+      ${csharp_file}
+      )
+  endif()
 
   # because each executable is it's own target we actually don't
   # need to make a target depend on this list

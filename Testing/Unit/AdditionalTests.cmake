@@ -47,12 +47,26 @@ sitk_add_python_test( Test.ProcessObject
 sitk_add_java_test( ProcessObjectTest
   "${SimpleITK_SOURCE_DIR}/Testing/Unit/sitkProcessObjectTest.java" )
 
+sitk_add_java_test( ImageTests
+  "${SimpleITK_SOURCE_DIR}/Testing/Unit/sitkImageTests.java" )
 
 #
 # R Tests
 #
 sitk_add_r_test( Arithmetic
   "--file=${SimpleITK_SOURCE_DIR}/Testing/Unit/RArithmeticTest.R"
+  )
+sitk_add_r_test( PixelIndexing
+  "--file=${SimpleITK_SOURCE_DIR}/Testing/Unit/RPixelAccess.R"
+  )
+sitk_add_r_test( ImageListArguments
+  "--file=${SimpleITK_SOURCE_DIR}/Testing/Unit/RImageListArguments.R"
+  )
+sitk_add_r_test( SwigVectorConversion
+  "--file=${SimpleITK_SOURCE_DIR}/Testing/Unit/RSwigVectorConversionTests.R"
+  )
+sitk_add_r_test( ImageSlicing
+  "--file=${SimpleITK_SOURCE_DIR}/Testing/Unit/RImageSlicingTests.R"
   )
 
 

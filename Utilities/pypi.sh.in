@@ -1,0 +1,1 @@
+sudo python @CMAKE_BINARY_DIR@/Wrapping/Python/Packaging/setup.py bdist upload -r pypi

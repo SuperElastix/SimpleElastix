@@ -51,6 +51,28 @@
   #endif
 #endif
 
+
+#if __cplusplus >= 201103L
+// In c++11 the override keyword allows you to explicity define that a function
+// is intended to override the base-class version.  This makes the code more
+// managable and fixes a set of common hard-to-find bugs.
+#define SITK_OVERRIDE override
+// In C++11 the throw-list specification has been deprecated,
+// replaced with the noexcept specifier. Using this function
+// specification adds the run-time check that the method does not
+// throw. If it does throw then std::terminate will be called.
+// Use cautiously.
+#define SITK_NOEXCEPT noexcept
+#else
+#define SITK_OVERRIDE
+#define SITK_NOEXCEPT throw()
+#endif
+
+
+#if  !defined(SITK_RETURN_SELF_TYPE_HEADER)
+#define SITK_RETURN_SELF_TYPE_HEADER Self &
+#endif
+
 namespace itk {
 
 namespace simple {
@@ -71,6 +93,10 @@ class GenericException;
 #endif
 
 
+#define sitkMacroJoin( X, Y ) sitkDoMacroJoin( X, Y )
+#define sitkDoMacroJoin( X, Y ) sitkDoMacroJoin2(X,Y)
+#define sitkDoMacroJoin2( X, Y ) X##Y
+
 #ifdef SITK_HAS_CXX11_STATIC_ASSERT
 // utilize the c++11 static_assert if available
 #define sitkStaticAssert( expr, str) static_assert( expr, str )
@@ -79,17 +105,26 @@ class GenericException;
 template<bool> struct StaticAssertFailure;
 template<> struct StaticAssertFailure<true>{ enum { Value = 1 }; };
 
-#define BOOST_JOIN( X, Y ) BOOST_DO_JOIN( X, Y )
-#define BOOST_DO_JOIN( X, Y ) BOOST_DO_JOIN2(X,Y)
-#define BOOST_DO_JOIN2( X, Y ) X##Y
-
-#define sitkStaticAssert( expr, str ) enum { BOOST_JOIN( static_assert_typedef, __LINE__) = sizeof( itk::simple::StaticAssertFailure<((expr) == 0 ? false : true )> ) };
+#define sitkStaticAssert( expr, str ) enum { sitkMacroJoin( static_assert_typedef, __LINE__) = sizeof( itk::simple::StaticAssertFailure<((expr) == 0 ? false : true )> ) };
 
 
 #endif
-
-
 }
 }
+
+#define sitkPragma(x) _Pragma (#x)
+
+#if defined(__clang__) && defined(__has_warning)
+#define sitkClangDiagnosticPush()       sitkPragma( clang diagnostic push )
+#define sitkClangDiagnosticPop()        sitkPragma( clang diagnostic pop )
+#define sitkClangWarningIgnore_0(x)
+#define sitkClangWarningIgnore_1(x)  sitkPragma( clang diagnostic ignored x)
+#define sitkClangWarningIgnore(x)    sitkMacroJoin( sitkClangWarningIgnore_, __has_warning(x) )(x)
+#else
+#define sitkClangDiagnosticPush()
+#define sitkClangDiagnosticPop()
+#define sitkClangWarningIgnore(x)
+#endif
+
 
 #endif

@@ -1,0 +1,82 @@
+import sys
+
+if "setuptools" in sys.modules.keys():
+    from setuptools import setup, Distribution
+else:
+    from distutils.core import setup
+    from distutils.dist import Distribution
+
+import re
+
+doc_files = @SimpleITK_DOC_FILES_AS_LIST@
+
+def get_pep386version():
+    """This method examines the SimpleITK's CMake version variables to make a pep 386 compliant version string when building a version indented for distribution."""
+    sitkMAJOR = "@SimpleITK_VERSION_MAJOR@"
+    sitkMINOR = "@SimpleITK_VERSION_MINOR@"
+    sitkPATCH = "@SimpleITK_VERSION_PATCH@"
+    sitkTWEAK = "@SimpleITK_VERSION_TWEAK@"
+    sitkRC    = "@SimpleITK_VERSION_RC@"
+    sitkPOST   = "@SimpleITK_VERSION_POST@"
+    sitkDEV    = "@SimpleITK_VERSION_DEV@"
+    sitkHASH   = "@SimpleITK_VERSION_HASH@"
+
+
+    version = sitkMAJOR+"."+sitkMINOR
+
+    if sitkPATCH:
+        version += "."+sitkPATCH
+        if sitkTWEAK:
+            version += "."+sitkTWEAK
+
+    if  sitkRC:
+        version += sitkRC
+
+    if sitkPOST:
+        version += ".post"+sitkPOST
+    elif sitkDEV:
+        version += ".dev"+sitkDEV
+
+    # Local Version Identifier
+    if sitkHASH and not "@SimpleITK_BUILD_DISTRIBUTE@" in ['1', 'ON']:
+        version += "+g"+sitkHASH
+
+    return version
+
+
+# HACK
+# We are using the "data_files" parameter to package up the SimpleITK
+# libraries. However distribute does not detect this as an extension
+# and does not build a egg with the platform name in the egg file
+# name. So we forcable overload a method so that distutils, always
+# reports that we are always an extension.
+def always_has_ext_modules (self):
+    """Always returns true, to force extensimon behavior in packaging."""
+    return True
+Distribution.has_ext_modules =  always_has_ext_modules
+
+
+
+setup(
+    name = 'SimpleElastix',
+    version = get_pep386version(),
+    author = 'Kasper Marstal',
+    author_email = 'kaspermarstal@gmail.com',
+    packages= ['SimpleITK'],
+    package_dir = {'SimpleITK':r'@SIMPLEITK_PYTHON_PACKAGE_DIR@'},
+    package_data = {'SimpleITK':[r'@SIMPLEITK_RELATIVE_BINARY_MODULE@']},
+    download_url = r'https://simpleelastix.github.io',
+    platforms = [],
+    description = r'User-friendly multi-lingual library for medical image registration',
+    long_description  = 'Native elastix interface for Python, Java, R, Lua, Tcl, Ruby and C#.',
+    classifiers=[
+        "License :: OSI Approved :: Apache Software License",
+        "Programming Language :: Python",
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: Developers",
+        "Topic :: Scientific/Engineering"
+        ],
+    license='Apache',
+    keywords = 'elastix medical image registration',
+    url = r'https://simpleelastix.github.io'
+    )

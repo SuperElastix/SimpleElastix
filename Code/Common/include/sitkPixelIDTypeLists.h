@@ -165,7 +165,7 @@ typedef typelist::MakeTypeList<LabelPixelID<uint8_t>,
 #endif
                                >::Type LabelPixelIDTypeList;
 
-typedef UnsignedIntegerPixelIDTypeList IntergerLabelPixelIDTypeList;
+typedef UnsignedIntegerPixelIDTypeList IntegerLabelPixelIDTypeList;
 
 /** List of all pixel ids available, but itk::LabelMap this include image of itk::Image,
  * itk::VectorImage
@@ -216,6 +216,12 @@ typedef typelist::MakeTypeList< BasicPixelID<int16_t>, BasicPixelID<float>, Basi
 typedef AllPixelIDTypeList InstantiatedPixelIDTypeList;
 
 #endif
+
+/** SimpleElastix and SimpleTransformix is compiled with float pixel type only. This
+ * saves compile time and reduces binary size. Images are automacially casted to and
+ * from float before and after registration.
+ */
+typedef typelist::MakeTypeList< BasicPixelID< float > >::Type FloatPixelIDTypeList;
 
 
 }

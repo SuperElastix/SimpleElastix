@@ -22,7 +22,7 @@ if (BUILD_DOXYGEN)
       -P "${PROJECT_SOURCE_DIR}/Utilities/Doxygen/ITKDoxygenTags.cmake"
       DEPENDS "${PROJECT_SOURCE_DIR}/Utilities/Doxygen/ITKDoxygenTags.cmake"
       )
-    set(DOXYGEN_TAGFILES_PARAMETER "${PROJECT_BINARY_DIR}/Documentation/Doxygen/InsightDoxygen.tag=http://www.itk.org/Doxygen/html/")
+    set(DOXYGEN_TAGFILES_PARAMETER "${PROJECT_BINARY_DIR}/Documentation/Doxygen/InsightDoxygen.tag=https://www.itk.org/Doxygen/html/")
   endif()
 
   #
@@ -50,9 +50,13 @@ if (BUILD_DOXYGEN)
     MAIN_DEPENDENCY ${PROJECT_BINARY_DIR}/Utilities/Doxygen/doxygen.config
     DEPENDS "${PROJECT_BINARY_DIR}/Documentation/Doxygen/Examples.dox"
     DEPENDS "${PROJECT_BINARY_DIR}/Documentation/Doxygen/FilterCoverage.dox"
-    DEPENDS "${PROJECT_BINARY_DIR}/Documentation/Doxygen/InsightDoxygen.tag"
     WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/Utilities/Doxygen
     )
+
+  if (USE_ITK_DOXYGEN_TAGS)
+    add_dependencies( Documentation
+    "${PROJECT_BINARY_DIR}/Documentation/Doxygen/InsightDoxygen.tag" )
+  endif ()
 
   message( STATUS
     "To generate Doxygen's documentation, you need to build the Documentation target"

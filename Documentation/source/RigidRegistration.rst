@@ -24,12 +24,12 @@ The image on right has been rotated 10 degrees and translated 13 pixels in the x
 
     import SimpleITK as sitk
 
-    elastix = sitk.SimpleElastix()
-    elastix.SetFixedImage(sitk.SetFixedImage("fixedImage.nii"))
-    elastix.SetMovingImage(sitk.SetFixedImage("movingImage.nii"))
-    elastix.SetParameterMap(sitk.GetDefaultParameterMap("rigid"))
-    elastix.Execute()
-    sitk.WriteImage(elastix.GetResultImage())
+    SimpleElastix = sitk.SimpleElastix()
+    SimpleElastix.SetFixedImage(sitk.SetFixedImage("fixedImage.nii"))
+    SimpleElastix.SetMovingImage(sitk.SetFixedImage("movingImage.nii"))
+    SimpleElastix.SetParameterMap(sitk.GetDefaultParameterMap("rigid"))
+    SimpleElastix.Execute()
+    sitk.WriteImage(SimpleElastix.GetResultImage())
 
 It is clear from the result mean image on right in Fig. 9 that registration was successful.
 

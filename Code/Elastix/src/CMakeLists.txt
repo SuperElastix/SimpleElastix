@@ -1,20 +1,14 @@
-set ( ITK_NO_IO_FACTORY_REGISTER_MANAGER 1 )
+set( ITK_NO_IO_FACTORY_REGISTER_MANAGER 1 )
 include( ${ITK_USE_FILE} )
 
-set( SimpleElastixSource
-  sitkSimpleElastix.cxx
-)
-
-add_library( SimpleElastix ${SimpleElastixSource} )
+add_library( SimpleElastix sitkSimpleElastix.cxx sitkSimpleElastixImpl.h sitkSimpleElastixImpl.cxx )
 set_target_properties( SimpleElastix PROPERTIES SKIP_BUILD_RPATH TRUE )
-target_link_libraries( SimpleElastix elastix SimpleITKCommon )
+target_link_libraries( SimpleElastix INTERFACE elastix )
 sitk_install_exported_target( SimpleElastix )
 
-set( SimpleTransformixSource
-  sitkSimpleTransformix.cxx
-)
-
-add_library( SimpleTransformix ${SimpleTransformixSource} )
+add_library( SimpleTransformix sitkSimpleTransformix.cxx sitkSimpleTransformixImpl.h  sitkSimpleTransformixImpl.cxx )
 set_target_properties( SimpleTransformix PROPERTIES SKIP_BUILD_RPATH TRUE )
-target_link_libraries( SimpleTransformix transformix SimpleITKCommon )
-sitk_install_exported_target( SimpleTransformix )
+target_link_libraries( SimpleTransformix INTERFACE transformix )
+sitk_install_exported_target( SimpleTransformix ) 
+
+

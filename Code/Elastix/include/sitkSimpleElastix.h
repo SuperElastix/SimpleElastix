@@ -1,15 +1,8 @@
 #ifndef __sitksimpleelastix_h_
 #define __sitksimpleelastix_h_
 
-// SimpleITK
 #include "sitkCommon.h"
-#include "sitkMemberFunctionFactory.h"
-#include "sitkDualMemberFunctionFactory.h"
 #include "sitkImage.h"
-
-// Elastix
-#include "elxElastixFilter.h"
-#include "elxParameterObject.h"
 
 namespace itk { 
   namespace simple {
@@ -23,20 +16,16 @@ class SITKCommon_EXPORT SimpleElastix
 
     typedef SimpleElastix Self;                                
 
-    typedef std::vector< Image >                                VectorOfImage;
+    typedef std::vector< Image >                                    VectorOfImage;
 
-    typedef elastix::ParameterObject                            ParameterObjectType;
-    typedef ParameterObjectType::Pointer                        ParameterObjectPointer;
-    typedef ParameterObjectType::ParameterMapType               ParameterMapType;
-    typedef ParameterObjectType::ParameterMapVectorType         ParameterMapVectorType;
-    typedef ParameterMapType::iterator                          ParameterMapIterator;
-    typedef ParameterMapType::const_iterator                    ParameterMapConstIterator;
-    typedef itk::ParameterFileParser                            ParameterFileParserType;
-    typedef ParameterFileParserType::Pointer                    ParameterFileParserPointer;
-    typedef ParameterObjectType::ParameterKeyType               ParameterKeyType;
-    typedef ParameterObjectType::ParameterValueType             ParameterValueType;
-    typedef ParameterObjectType::ParameterValueVectorType       ParameterValueVectorType;
-    typedef ParameterObjectType::ParameterValueVectorIterator   ParameterValueVectorIterator;
+    typedef std::string                                             ParameterKeyType;
+    typedef std::string                                             ParameterValueType;
+    typedef std::vector< ParameterValueType >                       ParameterValueVectorType;
+    typedef ParameterValueVectorType::iterator                      ParameterValueVectorIterator;
+    typedef std::map< ParameterKeyType, ParameterValueVectorType >  ParameterMapType;
+    typedef std::vector< ParameterMapType >                         ParameterMapVectorType;
+    typedef ParameterMapType::iterator                              ParameterMapIterator;
+    typedef ParameterMapType::const_iterator                        ParameterMapConstIterator;
 
     const std::string GetName( void );
 
@@ -132,6 +121,7 @@ class SITKCommon_EXPORT SimpleElastix
     
     Image Execute( void );
     std::vector< std::map< std::string, std::vector< std::string > > > GetTransformParameterMap( void );
+    std::map< std::string, std::vector< std::string > > GetTransformParameterMap( const unsigned int index );
     Image GetResultImage( void );
 
     std::vector< std::map< std::string, std::vector< std::string > > > ExecuteInverse( void );
@@ -145,34 +135,8 @@ class SITKCommon_EXPORT SimpleElastix
 
   private:
 
-    bool IsEmpty( const Image& image );
-
-    // Definitions for SimpleITK member factory
-    typedef Image ( Self::*MemberFunctionType )( void );
-    friend struct detail::DualExecuteInternalAddressor< MemberFunctionType >;
-    template< class TFixedImage, class TMovingImage > Image DualExecuteInternal ( void );
-    std::auto_ptr< detail::DualMemberFunctionFactory< MemberFunctionType > > m_DualMemberFactory;
-
-    VectorOfImage           m_FixedImages;
-    VectorOfImage           m_MovingImages;
-    VectorOfImage           m_FixedMasks;
-    VectorOfImage           m_MovingMasks;
-    Image                   m_ResultImage;
-    
-    std::string             m_InitialTransformParameterMapFileName;
-    std::string             m_FixedPointSetFileName;
-    std::string             m_MovingPointSetFileName;
-
-    ParameterMapVectorType  m_ParameterMapVector;
-    ParameterMapVectorType  m_TransformParameterMapVector;
-    ParameterMapVectorType  m_InverseTransformParameterMapVector;
-
-    std::string             m_OutputDirectory;
-    std::string             m_LogFileName;
-
-    bool                    m_LogToFile;
-    bool                    m_LogToConsole;
-    
+    struct SimpleElastixImpl;
+    SimpleElastixImpl* m_Pimple;
     
 };
 

@@ -49,11 +49,10 @@ const double adir[] = { 0.0,  0.0,  0.0, 1.0,
                         0.0,  0.0, -1.0, 0.0 };
 
 using  itk::simple::InstantiatedPixelIDTypeList;
-namespace sitk = itk::simple;
 
 class Image4D : public ::testing::Test {
 public:
-  typedef std::auto_ptr<itk::simple::Image> sitkAutoImagePointer;
+  typedef itk::simple::nsstd::auto_ptr<itk::simple::Image> sitkAutoImagePointer;
 
   virtual void SetUp() {
     itk::ImageBase<4>::IndexType index;
@@ -401,6 +400,8 @@ TEST_F( Image4D,Properties ) {
   ASSERT_ANY_THROW( shortImage->SetDirection( std::vector<double>( adir, adir + 8 ) ) );
 }
 
+namespace sitk = itk::simple;
+
 TEST_F( Image4D, CopyInformation )
 {
   std::vector<unsigned int> s4d(4,10);
@@ -540,7 +541,7 @@ TEST_F( Image4D, IO )
 }
 
 
-TEST_F( Image4D, JoinSeriesImageFilter )
+TEST_F(Image4D, JoinSeriesImageFilter)
 {
   std::vector<unsigned int> size(3);
   size[0] = 10;
@@ -555,7 +556,7 @@ TEST_F( Image4D, JoinSeriesImageFilter )
   EXPECT_EQ ( out.GetSize()[3], 3 );
 }
 
-TEST_F( Image4D, ExtractImageFilter )
+TEST_F(Image4D, ExtractImageFilter)
 {
   std::vector<unsigned int> size(4);
   size[0] = 10;
@@ -574,5 +575,5 @@ TEST_F( Image4D, ExtractImageFilter )
   sitk::Image out = sitk::Extract(img, extractSize);
 
   ASSERT_EQ ( out.GetDimension(), 3 );
-  EXPECT_EQ ( out.GetSize()[2], 13 );
+  EXPECT_EQ ( out.GetSize()[3], 13 );
 }

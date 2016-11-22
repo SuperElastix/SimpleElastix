@@ -45,11 +45,13 @@ const double adir[] = {0.0, 0.0, 1.0,
                        0.0, -1.0, 0.0};
 
 using  itk::simple::InstantiatedPixelIDTypeList;
+namespace nsstd = itk::simple::nsstd;
+
 
 
 class Image : public ::testing::Test {
 public:
-  typedef std::auto_ptr<itk::simple::Image> sitkAutoImagePointer;
+  typedef nsstd::auto_ptr<itk::simple::Image> sitkAutoImagePointer;
 
   virtual void SetUp() {
     itk::ImageBase<3>::IndexType index;
@@ -1599,6 +1601,23 @@ TEST_F(Image,MetaDataDictionary)
     EXPECT_NO_THROW( value = img.GetMetaData( keys[i]) );
     std::cout << "Key = \"" << keys[i] << "\" Value = \"" << value << "\"" << std::endl;
     }
+
+  img = sitk::Image( 10,10, 10, sitk::sitkFloat32 );
+  img.SetMetaData( "k1", "somevalue");
+
+  EXPECT_EQ( 1u, img.GetMetaDataKeys().size() );
+  EXPECT_TRUE( img.HasMetaDataKey("k1") );
+  EXPECT_EQ( "somevalue", img.GetMetaData("k1") );
+
+  EXPECT_FALSE( img.EraseMetaData("wrong") );
+  EXPECT_EQ( 1u, img.GetMetaDataKeys().size() );
+  EXPECT_TRUE( img.HasMetaDataKey("k1") );
+
+  EXPECT_TRUE( img.EraseMetaData("k1") );
+  EXPECT_FALSE( img.HasMetaDataKey("k1") );
+  EXPECT_EQ( 0u, img.GetMetaDataKeys().size() );
+
+  EXPECT_TRUE( img.EraseMetaData("k1") );
 
 }
 

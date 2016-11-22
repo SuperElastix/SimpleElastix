@@ -32,15 +32,21 @@ VariableListToArgs( ITK_VARS  ep_itk_args )
 
 
 set(proj ITK)  ## Use ITK convention of calling it ITK
-set(ITK_REPOSITORY http://itk.org/ITK.git)
+set(ITK_REPOSITORY "${git_protocol}://itk.org/ITK.git")
+
+set(ITK_USE_GIT_PROTOCOL 0)
+if("${git_protocol}" STREQUAL "git")
+  set(ITK_USE_GIT_PROTOCOL 1)
+endif()
 
 # NOTE: it is very important to update the ITK_DIR path with the ITK version
-set(ITK_TAG_COMMAND GIT_TAG v4.8.2)
+set(ITK_TAG_COMMAND GIT_TAG 80178ae516db87aa50d2883c4e090da92c4a502d ) # just before 4.10.1 release
 
 if( ${ITK_WRAPPING} OR ${BUILD_SHARED_LIBS} )
   set( ITK_BUILD_SHARED_LIBS ON )
 else()
   set( ITK_BUILD_SHARED_LIBS OFF )
+  list( APPEND ep_itk_args"-DCMAKE_C_VISIBILITY_PRESET:BOOL=hidden" "-DCMAKE_CXX_VISIBILITY_PRESET:BOOL=hidden" )
 endif()
 
 
@@ -58,6 +64,8 @@ ExternalProject_Add(${proj}
   -C "${CMAKE_CURRENT_BINARY_DIR}/${proj}-build/CMakeCacheInit.txt"
   ${ep_itk_args}
   ${ep_common_args}
+  -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON
+  -DCMAKE_VISIBILITY_INLINES_HIDDEN:BOOL=ON
   -DBUILD_EXAMPLES:BOOL=OFF
   -DBUILD_TESTING:BOOL=OFF
   -DBUILD_SHARED_LIBS:BOOL=${ITK_BUILD_SHARED_LIBS}
@@ -66,6 +74,7 @@ ExternalProject_Add(${proj}
   -DITK_LEGACY_REMOVE:BOOL=ON
   -DITK_BUILD_DEFAULT_MODULES:BOOL=ON
   -DModule_ITKReview:BOOL=ON
+  -DITK_USE_GIT_PROTOCOL:BOOL=${ITK_USE_GIT_PROTOCOL}
   -DITK_WRAP_float:BOOL=ON
   -DITK_WRAP_unsigned_char:BOOL=ON
   -DITK_WRAP_signed_short:BOOL=ON
@@ -89,5 +98,5 @@ ExternalProject_Add(${proj}
 
 
 ExternalProject_Get_Property(ITK install_dir)
-set(ITK_DIR "${install_dir}/lib/cmake/ITK-4.8" )
-set(WrapITK_DIR "${install_dir}/lib/cmake/ITK-4.8/WrapITK")
+set(ITK_DIR "${install_dir}/lib/cmake/ITK-4.10" )
+set(WrapITK_DIR "${ITK_DIR}/WrapITK")

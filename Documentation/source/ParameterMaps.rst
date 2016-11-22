@@ -30,11 +30,11 @@ SimpleElastix can read these types of files as well but further introduces nativ
       import SimpleITK as sitk
 
       p = sitk.ParameterMap()
-      p["Registration"] = ["MultiResolutionRegistration"]
-      p["Transform"] = ["TranslationTransform"]
+      p['Registration'] = ['MultiResolutionRegistration']
+      p['Transform'] = ['TranslationTransform']
       ...
 
-We can also load one of the default parameter maps and tweak its settings to get started more quickly, however, as shown in the following section.
+and so on. Elastix has default settings for most parameters, but still, there are quite a lot of parameters to be set. While we can specify a parameter map scratch as above, we can also load one of the default parameter maps and tweak its settings to get started more quickly, as shown in the following section.
 
 The Default Parameter Maps
 --------------------------
@@ -42,26 +42,39 @@ In the Hello World example we obtained a registered image by running
 
 ::
 
-  resultImage = sitk.Elastix(sitk.ReadImage("fixedImage.nii"),  \
-                             sitk.ReadImage("movingImage.nii"), \
-                             "translation")
+  resultImage = sitk.Elastix(sitk.ReadImage('fixedImage.nii'),  \
+                             sitk.ReadImage('movingImage.nii'), \
+                             'translation')
 
-Internally, SimpleElastix passes images along with a parameter map to elastix and invokes registration. The parameter map is returned by a call to :code:`sitk.GetDefaultParameterFile('translation')`. This function provides parameter maps for rigid, affine, non-rigid and groupwise registration methods (in order of increasing complexity). The returned parameter object can be reconfigured and passed back to SimpleElastix allowing you to quickly optimize the registration method to your particular problem:
+Internally, SimpleElastix passes images along with a parameter map to elastix and invokes registration. The parameter map is returned by an internal call to :code:`sitk.GetDefaultParameterFile('translation')`. This function provides parameter maps for rigid, affine, non-rigid and groupwise registration methods (in order of increasing complexity). 
+
+.. tip::
+  
+  You can also leave out the parameter map parameter entirely, and SimpleElastix with register your images with a :code:`translation -> affine -> b-spline` multi-resolution approach. Similarly, for the object-oriented interface, simply leave out the call to :code:`SetParameterMap` to achieve this functionality. You can view these default parameter maps like this:
+
+  ::
+
+    import SimpleITK as sitk
+    SimpleElastix = sitk.SimpleElastix()
+    parameterMaps = SimpleElastaix.GetParameterMaps()
+    sitk.PrintParameterMaps(parameterMaps)
+
+You can also retrieve this parameter map yourself and reconfigure it before passing it back to SimpleElastix, allowing you to quickly optimize a registration method to your particular problem:
 
 ::
 
   parameterMap = sitk.GetDefaultParameterMap('translation')
 
   # Use a non-rigid transform instead of a translation transform
-  parameterMap["Transform"] = ["BSplineTransform"]
+  parameterMap['Transform'] = ['BSplineTransform']
 
-  # Because of the increased complexity of the b-sbpline transform,
+  # Because of the increased complexity of the b-spline transform,
   # it is a good idea to run the registration a little longer to 
   # ensure convergence  
-  parameterMap["MaximumNumberOfIterations"] = ["512"]
+  parameterMap['MaximumNumberOfIterations'] = ['512']
 
-  resultImage = sitk.Elastix(sitk.ReadImage("fixedImage.nii"),  \
-                             sitk.ReadImage("movingImage.nii"), \
+  resultImage = sitk.Elastix(sitk.ReadImage('fixedImage.nii'),  \
+                             sitk.ReadImage('movingImage.nii'), \
                              parameterMap)
 
 We will study other parameter maps more closely in later examples. For now, we simply print the translation parameter map to console.

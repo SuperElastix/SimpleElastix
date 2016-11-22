@@ -2,60 +2,35 @@
 #define __sitksimpletransformix_cxx_
 
 #include "sitkSimpleTransformix.h"
-#include "sitkSimpleTransformix.hxx"
+#include "sitkSimpleTransformixImpl.h"
 
 namespace itk {
   namespace simple {
 
-
-
 SimpleTransformix
-::SimpleTransformix( void )
+::SimpleTransformix( void ) : m_Pimple( new SimpleTransformixImpl )
 {
-  // Register this class with SimpleITK
-  this->m_MemberFactory.reset( new detail::MemberFunctionFactory< MemberFunctionType >( this ) );
-  this->m_MemberFactory->RegisterMemberFunctions< BasicPixelIDTypeList, 2 >();
-  this->m_MemberFactory->RegisterMemberFunctions< BasicPixelIDTypeList, 3 >();
-
-#ifdef SITK_4D_IMAGES
-  m_MemberFactory->RegisterMemberFunctions< BasicPixelIDTypeList, 4 >();
-#endif
-
-  this->m_MovingImage = Image();
-  this->m_ResultImage = Image();
-
-  this->m_TransformParameterMapVector = ParameterMapVectorType();
-
-  this->m_ComputeSpatialJacobian = false;
-  this->m_ComputeDeterminantOfSpatialJacobian = false;
-  this->m_ComputeDeformationField = false;
-  this->m_MovingPointSetFileName = "";
-
-  this->m_OutputDirectory = "";
-  this->m_LogFileName = "";
-  
-  this->m_LogToFile = "";
-  this->m_LogToConsole = "";
 }
 
 SimpleTransformix
 ::~SimpleTransformix( void )
 {
+  delete m_Pimple;
+  m_Pimple = NULL;
 }
 
 const std::string 
 SimpleTransformix
 ::GetName( void )
 { 
-  const std::string name = std::string( "SimpleTransformix" );
-  return name;
+  return this->m_Pimple->GetName();
 }
 
 SimpleTransformix::Self&
 SimpleTransformix
 ::SetMovingImage( const Image& movingImage )
 {
-  this->m_MovingImage = movingImage;
+  this->m_Pimple->SetMovingImage( movingImage );
   return *this;
 }
 
@@ -63,37 +38,37 @@ Image&
 SimpleTransformix
 ::GetMovingImage( void )
 {
-  return this->m_MovingImage;
+  return this->m_Pimple->GetMovingImage();
 }
 
 SimpleTransformix::Self&
 SimpleTransformix
 ::RemoveMovingImage( void )
 {
-  this->SetMovingImage( Image() );
+  this->m_Pimple->RemoveMovingImage();
   return *this;
 }
 
 SimpleTransformix::Self& 
 SimpleTransformix
-::SetMovingPointSetFileName( const std::string movingPointSetFileName )
+::SetFixedPointSetFileName( const std::string movingPointSetFileName )
 {
-  this->m_MovingPointSetFileName = movingPointSetFileName;
+  this->m_Pimple->SetFixedPointSetFileName( movingPointSetFileName );
   return *this;
 }
 
 std::string 
 SimpleTransformix
-::GetMovingPointSetFileName( void )
+::GetFixedPointSetFileName( void )
 {
-  return this->m_MovingPointSetFileName;
+  return this->m_Pimple->GetFixedPointSetFileName();
 }
 
 SimpleTransformix::Self&
 SimpleTransformix
-::RemoveMovingPointSetFileName( void )
+::RemoveFixedPointSetFileName( void )
 {
-  this->m_MovingPointSetFileName = std::string();
+  this->m_Pimple->RemoveFixedPointSetFileName();
   return *this;
 }
 
@@ -101,7 +76,7 @@ SimpleTransformix::Self&
 SimpleTransformix
 ::SetComputeSpatialJacobian( const bool computeSpatialJacobian )
 {
-  this->m_ComputeSpatialJacobian = computeSpatialJacobian;
+  this->m_Pimple->SetComputeSpatialJacobian( computeSpatialJacobian );
   return *this;
 }
 
@@ -109,14 +84,14 @@ bool
 SimpleTransformix
 ::GetComputeSpatialJacobian( void )
 {
-  return this->m_ComputeSpatialJacobian;
+  return this->m_Pimple->GetComputeSpatialJacobian();
 }
 
 SimpleTransformix::Self&
 SimpleTransformix
 ::ComputeSpatialJacobianOn( void )
 {
-  this->SetComputeSpatialJacobian( true );
+  this->m_Pimple->SetComputeSpatialJacobian( true );
   return *this;
 }
 
@@ -124,7 +99,7 @@ SimpleTransformix::Self&
 SimpleTransformix
 ::ComputeSpatialJacobianOff( void )
 {
-  this->SetComputeSpatialJacobian( false );
+  this->m_Pimple->SetComputeSpatialJacobian( false );
   return *this;
 }
 
@@ -132,7 +107,7 @@ SimpleTransformix::Self&
 SimpleTransformix
 ::SetComputeDeterminantOfSpatialJacobian( const bool computeDeterminantOfSpatialJacobian )
 {
-  this->m_ComputeDeterminantOfSpatialJacobian = computeDeterminantOfSpatialJacobian;
+  this->m_Pimple->SetComputeDeterminantOfSpatialJacobian( computeDeterminantOfSpatialJacobian );
   return *this;
 }
 
@@ -140,14 +115,14 @@ bool
 SimpleTransformix
 ::GetComputeDeterminantOfSpatialJacobian( void )
 {
-  return this->m_ComputeDeterminantOfSpatialJacobian;
+  return this->m_Pimple->GetComputeDeterminantOfSpatialJacobian();
 }
 
 SimpleTransformix::Self&
 SimpleTransformix
 ::ComputeDeterminantOfSpatialJacobianOn( void )
 {
-  this->SetComputeDeterminantOfSpatialJacobian( true );
+  this->m_Pimple->SetComputeDeterminantOfSpatialJacobian( true );
   return *this;
 }
 
@@ -155,7 +130,7 @@ SimpleTransformix::Self&
 SimpleTransformix
 ::ComputeDeterminantOfSpatialJacobianOff( void )
 {
-  this->SetComputeDeterminantOfSpatialJacobian( false );
+  this->m_Pimple->SetComputeDeterminantOfSpatialJacobian( false );
   return *this;
 }
 
@@ -163,7 +138,7 @@ SimpleTransformix::Self&
 SimpleTransformix
 ::SetComputeDeformationField( const bool computeDeformationField )
 {
-  this->m_ComputeDeformationField = computeDeformationField;
+  this->m_Pimple->SetComputeDeformationField( computeDeformationField );
   return *this;
 }
 
@@ -171,14 +146,14 @@ bool
 SimpleTransformix
 ::GetComputeDeformationField( void )
 {
-  return this->m_ComputeDeformationField;
+  return this->m_Pimple->GetComputeDeformationField();
 }
 
 SimpleTransformix::Self&
 SimpleTransformix
 ::ComputeDeformationFieldOn( void )
 {
-  this->SetComputeDeformationField( true );
+  this->m_Pimple->SetComputeDeformationField( true );
   return *this;
 }
 
@@ -186,7 +161,7 @@ SimpleTransformix::Self&
 SimpleTransformix
 ::ComputeDeformationFieldOff( void )
 {
-  this->SetComputeDeformationField( false );
+  this->m_Pimple->SetComputeDeformationField( false );
   return *this;
 }
 
@@ -194,7 +169,7 @@ SimpleTransformix::Self&
 SimpleTransformix
 ::SetOutputDirectory( const std::string outputDirectory )
 {
-  this->m_OutputDirectory = outputDirectory;
+  this->m_Pimple->SetOutputDirectory( outputDirectory );
   return *this;
 }
 
@@ -202,14 +177,14 @@ std::string
 SimpleTransformix
 ::GetOutputDirectory( void )
 {
-  return this->m_OutputDirectory;
+  return this->m_Pimple->GetOutputDirectory();
 }
 
 SimpleTransformix::Self& 
 SimpleTransformix
 ::RemoveOutputDirectory( void )
 {
-  this->m_OutputDirectory = std::string();
+  this->m_Pimple->RemoveOutputDirectory();
   return *this;
 }
 
@@ -217,7 +192,7 @@ SimpleTransformix::Self&
 SimpleTransformix
 ::SetLogFileName( std::string logFileName )
 {
-  this->m_LogFileName = logFileName;
+  this->m_Pimple->SetLogFileName( logFileName );
   return *this;
 }
 
@@ -225,14 +200,14 @@ std::string
 SimpleTransformix
 ::GetLogFileName( void )
 {
-  return this->m_LogFileName;
+  return this->m_Pimple->GetLogFileName();
 }
 
 SimpleTransformix::Self& 
 SimpleTransformix
 ::RemoveLogFileName( void )
 {
-  this->m_LogFileName = std::string();
+  this->m_Pimple->RemoveLogFileName();
   return *this;
 }
 
@@ -240,7 +215,7 @@ SimpleTransformix::Self&
 SimpleTransformix
 ::SetLogToFile( bool logToFile )
 {
-  this->m_LogToFile = logToFile;
+  this->m_Pimple->SetLogToFile( logToFile );
   return *this;
 }
 
@@ -248,14 +223,14 @@ bool
 SimpleTransformix
 ::GetLogToFile( void )
 {
-  return this->m_LogToFile;
+  return this->m_Pimple->GetLogToFile();
 }
 
 SimpleTransformix::Self& 
 SimpleTransformix
 ::LogToFileOn()
 {
-  this->SetLogToFile( true );
+  this->m_Pimple->SetLogToFile( true );
   return *this;
 }
 
@@ -263,7 +238,7 @@ SimpleTransformix::Self&
 SimpleTransformix
 ::LogToFileOff()
 {
-  this->SetLogToFile( false );
+  this->m_Pimple->SetLogToFile( false );
   return *this;
 }
 
@@ -271,7 +246,7 @@ SimpleTransformix::Self&
 SimpleTransformix
 ::SetLogToConsole( bool logToConsole )
 {
-  this->m_LogToConsole = logToConsole;
+  this->m_Pimple->SetLogToConsole( logToConsole );
   return *this;
 }
 
@@ -279,14 +254,14 @@ bool
 SimpleTransformix
 ::GetLogToConsole( void )
 {
-  return this->m_LogToConsole;
+  return this->m_Pimple->GetLogToConsole();
 }
 
 SimpleTransformix::Self& 
 SimpleTransformix
 ::LogToConsoleOn()
 {
-  this->SetLogToConsole( true );
+  this->m_Pimple->SetLogToConsole( true );
   return *this;
 }
 
@@ -294,33 +269,31 @@ SimpleTransformix::Self&
 SimpleTransformix
 ::LogToConsoleOff()
 {
-  this->SetLogToConsole( false );
+  this->m_Pimple->SetLogToConsole( false );
   return *this;
 }
 
 SimpleTransformix::Self&
 SimpleTransformix
-::SetTransformParameterMap( const ParameterMapVectorType parameterMapVector )
+::SetTransformParameterMap( const ParameterMapVectorType transformParameterMapVector )
 {
-  this->m_TransformParameterMapVector = parameterMapVector;
+  this->m_Pimple->SetTransformParameterMap( transformParameterMapVector );
   return *this;
 }
 
 SimpleTransformix::Self&
 SimpleTransformix
-::SetTransformParameterMap( const ParameterMapType parameterMap )
+::SetTransformParameterMap( const ParameterMapType transformParameterMap )
 {
-  ParameterMapVectorType parameterMapVector;
-  parameterMapVector.push_back( parameterMap );
-  this->SetTransformParameterMap( parameterMapVector );
+  this->m_Pimple->SetTransformParameterMap( transformParameterMap );
   return *this;
 }
 
 SimpleTransformix::Self&
 SimpleTransformix
-::AddTransformParameterMap( const ParameterMapType parameterMap )
+::AddTransformParameterMap( const ParameterMapType transformParameterMap )
 {
-  this->m_TransformParameterMapVector.push_back( parameterMap );
+  this->m_Pimple->AddTransformParameterMap( transformParameterMap );
   return *this;
 }
 
@@ -328,25 +301,21 @@ SimpleTransformix::ParameterMapVectorType
 SimpleTransformix
 ::GetTransformParameterMap( void )
 {
-  return this->m_TransformParameterMapVector;
+  return this->m_Pimple->GetTransformParameterMap();
 }
 
 unsigned int
 SimpleTransformix
 ::GetNumberOfTransformParameterMaps( void )
 {
-  return this->m_TransformParameterMapVector.size();
+  return this->m_Pimple->GetNumberOfTransformParameterMaps();
 }
 
 SimpleTransformix::Self&
 SimpleTransformix
 ::SetTransformParameter( const ParameterKeyType key, const ParameterValueType value )
 {
-  for( unsigned int i = 0; i < this->m_TransformParameterMapVector.size(); i++ )
-  {
-    this->SetTransformParameter( i, key, value );
-  }
-
+  this->m_Pimple->SetTransformParameter( key, value );
   return *this;
 }
 
@@ -354,11 +323,7 @@ SimpleTransformix::Self&
 SimpleTransformix
 ::SetTransformParameter( const ParameterKeyType key, const ParameterValueVectorType value )
 {
-  for( unsigned int i = 0; i < this->m_TransformParameterMapVector.size(); i++ )
-  {
-    this->SetTransformParameter( i, key, value );
-  }
-
+  this->m_Pimple->SetTransformParameter( key, value );
   return *this;
 }
 
@@ -366,13 +331,7 @@ SimpleTransformix::Self&
 SimpleTransformix
 ::SetTransformParameter( const unsigned int index, const ParameterKeyType key, const ParameterValueType value )
 {
-  if( index >= this->m_TransformParameterMapVector.size() )
-  {
-    sitkExceptionMacro( "Parameter map index is out of range (index: " << index << "; number of transform parameters maps: " << this->m_TransformParameterMapVector.size() << "). Note that indexes are zero-based." );
-  }
-
-  this->m_TransformParameterMapVector[ index ][ key ] = ParameterValueVectorType( 1, value );
-
+  this->m_Pimple->SetTransformParameter( index, key, value );
   return *this;
 }
 
@@ -380,13 +339,7 @@ SimpleTransformix::Self&
 SimpleTransformix
 ::SetTransformParameter( const unsigned int index, const ParameterKeyType key, const ParameterValueVectorType value )
 {
-  if( index >= this->m_TransformParameterMapVector.size() )
-  {
-    sitkExceptionMacro( "Parameter map index is out of range (index: " << index << ", number of transform parameters maps: " << this->m_TransformParameterMapVector.size() << "). Note that indexes are zero-based." );
-  }
-
-  this->m_TransformParameterMapVector[ index ][ key ] = value;
-
+  this->m_Pimple->SetTransformParameter( index, key, value );
   return *this;
 }
 
@@ -394,11 +347,7 @@ SimpleTransformix::Self&
 SimpleTransformix
 ::AddTransformParameter( const ParameterKeyType key, const ParameterValueType value )
 {
-  for( unsigned int i = 0; i < this->m_TransformParameterMapVector.size(); i++ )
-  {
-    this->AddTransformParameter( i, key, value );
-  }
-
+  this->m_Pimple->AddTransformParameter( key, value );
   return *this;
 }
 
@@ -406,20 +355,7 @@ SimpleTransformix::Self&
 SimpleTransformix
 ::AddTransformParameter( const unsigned int index, const ParameterKeyType key, const ParameterValueType value )
 {
-  if( index >= this->m_TransformParameterMapVector.size() )
-  {
-    sitkExceptionMacro( "Parameter map index is out of range (index: " << index << ", number of transform parameters maps: " << this->m_TransformParameterMapVector.size() << "). Note that indexes are zero-based." );
-  }
-
-  if( this->m_TransformParameterMapVector[ index ].find( key ) == this->m_TransformParameterMapVector[ index ].end() )
-  {
-    this->SetTransformParameter( index, key, value );
-  }
-  else
-  {
-    this->m_TransformParameterMapVector[ index ][ key ].push_back( value );
-  }
-
+  this->m_Pimple->AddTransformParameter( index, key, value );
   return *this;
 }
 
@@ -427,35 +363,21 @@ SimpleTransformix::ParameterValueVectorType
 SimpleTransformix
 ::GetTransformParameter( const ParameterKeyType key )
 {
-  if( this->m_TransformParameterMapVector.size() > 0 )
-  {
-    sitkExceptionMacro( "An index is needed when more than one transform parameter map is present. Please specify the parameter map number as the first argument." );
-  }
-
-  return this->GetTransformParameter( 0, key );
+  return this->m_Pimple->GetTransformParameter( key );
 }
 
 SimpleTransformix::ParameterValueVectorType
 SimpleTransformix
 ::GetTransformParameter( const unsigned int index, const ParameterKeyType key )
 {
-  if( index >= this->m_TransformParameterMapVector.size() )
-  {
-    sitkExceptionMacro( "Parameter map index is out of range (index: " << index << ", number of transform parameters maps: " << this->m_TransformParameterMapVector.size() << "). Note that indexes are zero-based." );
-  }
-
-  return this->m_TransformParameterMapVector[ index ][ key ];
+  return this->m_Pimple->GetTransformParameter( index, key );
 }
 
 SimpleTransformix::Self&
 SimpleTransformix
 ::RemoveTransformParameter( const ParameterKeyType key )
 {
-  for( unsigned int i = 0; i < this->m_TransformParameterMapVector.size(); i++ )
-  {
-    this->RemoveTransformParameter( i, key );
-  }
-
+  this->m_Pimple->RemoveTransformParameter( key );
   return *this;
 }
 
@@ -463,40 +385,22 @@ SimpleTransformix::Self&
 SimpleTransformix
 ::RemoveTransformParameter( const unsigned int index, const ParameterKeyType key )
 {
-  if( index >= this->m_TransformParameterMapVector.size() )
-  {
-    sitkExceptionMacro( "Parameter map index is out of range (index: " << index << ", number of transform parameters maps: " << this->m_TransformParameterMapVector.size() << "). Note that indexes are zero-based." );
-  }
-
-  this->m_TransformParameterMapVector[ index ].erase( key );
-
+  this->m_Pimple->RemoveTransformParameter( index, key );
   return *this;
 }
 
 SimpleTransformix::ParameterMapType 
 SimpleTransformix
-::ReadParameterFile( const std::string filename )
+::ReadParameterFile( const std::string parameterFileName )
 {
-  ParameterFileParserPointer parser = ParameterFileParserType::New();
-  parser->SetParameterFileName( filename );
-  try
-  {
-    parser->ReadParameterFile();
-  }
-  catch( itk::ExceptionObject &e )
-  {
-    std::cout << e.what() << std::endl;
-  }
-
-  return parser->GetParameterMap();
+  return this->m_Pimple->ReadParameterFile( parameterFileName );
 }
 
 SimpleTransformix::Self&
 SimpleTransformix
 ::WriteParameterFile( const ParameterMapType parameterMap, const std::string parameterFileName )
 {
-  ParameterObjectPointer parameterObject = ParameterObjectType::New();
-  parameterObject->WriteParameterFile( parameterMap, parameterFileName );
+  this->m_Pimple->WriteParameterFile( parameterMap, parameterFileName );
   return *this;
 }
 
@@ -504,7 +408,7 @@ SimpleTransformix::Self&
 SimpleTransformix
 ::PrintParameterMap( void )
 {
-  this->PrintParameterMap( this->GetTransformParameterMap() );
+  this->m_Pimple->PrintParameterMap();
   return *this;
 }
 
@@ -512,9 +416,7 @@ SimpleTransformix::Self&
 SimpleTransformix
 ::PrintParameterMap( const ParameterMapType parameterMap )
 {
-  ParameterMapVectorType parameterMapVector = ParameterMapVectorType( 1 );
-  parameterMapVector[ 0 ] = parameterMap;
-  this->PrintParameterMap( parameterMapVector );
+  this->m_Pimple->PrintParameterMap( parameterMap );
   return *this;
 }
 
@@ -522,9 +424,7 @@ SimpleTransformix::Self&
 SimpleTransformix
 ::PrintParameterMap( const ParameterMapVectorType parameterMapVector )
 {
-  ParameterObjectPointer parameterObject = ParameterObjectType::New();
-  parameterObject->SetParameterMap( parameterMapVector );
-  parameterObject->Print( std::cout );
+  this->m_Pimple->PrintParameterMap( parameterMapVector );
   return *this;
 }
 
@@ -532,38 +432,14 @@ Image
 SimpleTransformix
 ::Execute( void )
 {
-  const PixelIDValueEnum MovingImagePixelEnum = this->m_MovingImage.GetPixelID();
-  const unsigned int MovingImageDimension = this->m_MovingImage.GetDimension();
-
-  if( this->m_MemberFactory->HasMemberFunction( MovingImagePixelEnum, MovingImageDimension ) )
-  {
-    return this->m_MemberFactory->GetMemberFunction( MovingImagePixelEnum, MovingImageDimension )();
-  }
-
-  sitkExceptionMacro( << "SimpleTransformix does not support the combination of image type "
-                      << GetPixelIDValueAsElastixParameter( MovingImagePixelEnum ) << " and dimension "
-                      << MovingImageDimension << "." );
+  return this->m_Pimple->Execute();
 }
 
 Image
 SimpleTransformix
 ::GetResultImage( void )
 {
-  if( this->IsEmpty( this->m_ResultImage ) )
-  {
-    sitkExceptionMacro( "No result image was found. Has transformix run yet?" )
-  }
-
-  return this->m_ResultImage;
-}
-
-
-bool
-SimpleTransformix
-::IsEmpty( const Image& image )
-{
-  bool isEmpty = image.GetWidth() == 0 && image.GetHeight() == 0;
-  return isEmpty;
+  return this->m_Pimple->GetResultImage();
 }
 
 /**

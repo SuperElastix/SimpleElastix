@@ -1,15 +1,24 @@
 cmake_minimum_required(VERSION 2.8)
-project( SimpleElastixExamples )
+project(SimpleITKExamples)
 
-if( NOT SimpleITK_SOURCE_DIR )
-  find_package( SimpleITK REQUIRED )
-  include( ${SimpleITK_USE_FILE} )
+foreach(p
+    CMP0042 # CMake 3.0
+    CMP0063 # CMake 3.3.2
+    )
+  if(POLICY ${p})
+    cmake_policy(SET ${p} NEW)
+  endif()
+endforeach()
 
-  # TODO: CMake refuses to properly configure the ITK_USE_FILE when 
-  # called in the SimpleITK_USE_FILE. Here we import ITK manually, but
-  # really all dependencies should be resolved by the SimpleITK_USE_FILE.
-  find_package( ITK REQUIRED )
-  include( ${ITK_USE_FILE} )
+if(NOT CMAKE_PROJECT_NAME STREQUAL "SimpleITK")
+  find_package(SimpleITK REQUIRED)
+  include(${SimpleITK_USE_FILE})
+
+  if(NOT EXISTS ${ELASTIX_USE_FILE})
+    set( ELASTIX_USE_FILE "" CACHE PATH "Path to UseElastix.cmake" )
+    message(FATAL_ERROR "Could not find UseElastix.cmake. The CMake variable ELASTIX_USE_FILE must point to UseElastix.cmake when using SimpleElastix as an external project.")
+  endif()
+  include(${ELASTIX_USE_FILE})
 
   # Add compiler flags needed to use SimpleITK.
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${SimpleITK_REQUIRED_C_FLAGS}")
@@ -17,16 +26,74 @@ if( NOT SimpleITK_SOURCE_DIR )
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
   set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
-else()
-  set( ITK_NO_IO_FACTORY_REGISTER_MANAGER 1 )
-  include( ${ITK_USE_FILE} )
 endif()
 
-add_executable( SimpleElastixCxx SimpleElastix.cxx )
-target_link_libraries( SimpleElastixCxx ${SimpleITK_LIBRARIES} )
+# Add individual cxx executables
+add_executable ( SimpleElastix1 SimpleElastix1.cxx )
+target_link_libraries ( SimpleElastix1 ${SimpleITK_LIBRARIES} )
 
-add_executable( SimpleTransformixCxx SimpleTransformix.cxx )
-target_link_libraries( SimpleTransformixCxx ${SimpleITK_LIBRARIES} )
+add_executable ( SimpleTransformix1 SimpleTransformix1.cxx )
+target_link_libraries ( SimpleTransformix1 ${SimpleITK_LIBRARIES} )
 
-add_executable( ElastixFilter ElastixFilter.cxx )
-target_link_libraries( ElastixFilter ${SimpleITK_LIBRARIES} )
+add_executable ( SimpleGaussian SimpleGaussian.cxx )
+target_link_libraries ( SimpleGaussian ${SimpleITK_LIBRARIES} )
+
+add_executable ( SimpleGaussianFunctional SimpleGaussianFunctional.cxx )
+target_link_libraries ( SimpleGaussianFunctional ${SimpleITK_LIBRARIES} )
+
+add_executable ( BufferImportExport BufferImportExport.cxx )
+target_link_libraries ( BufferImportExport ${SimpleITK_LIBRARIES} )
+
+add_executable ( FilterProgressReporting FilterProgressReporting.cxx )
+target_link_libraries ( FilterProgressReporting ${SimpleITK_LIBRARIES} )
+
+add_executable ( DicomSeriesReader DicomSeriesReader.cxx )
+target_link_libraries ( DicomSeriesReader ${SimpleITK_LIBRARIES} )
+
+add_executable ( ImageRegistrationMethod1 ImageRegistrationMethod1.cxx )
+target_link_libraries ( ImageRegistrationMethod1 ${SimpleITK_LIBRARIES} )
+
+add_executable ( ImageRegistrationMethod2 ImageRegistrationMethod2.cxx )
+target_link_libraries ( ImageRegistrationMethod2 ${SimpleITK_LIBRARIES} )
+
+add_executable ( ImageRegistrationMethodBSpline1 ImageRegistrationMethodBSpline1.cxx )
+target_link_libraries ( ImageRegistrationMethodBSpline1 ${SimpleITK_LIBRARIES} )
+
+add_executable ( ImageRegistrationMethodDisplacement1 ImageRegistrationMethodDisplacement1.cxx )
+target_link_libraries ( ImageRegistrationMethodDisplacement1  ${SimpleITK_LIBRARIES} )
+
+add_executable ( DemonsRegistration1 DemonsRegistration1.cxx )
+target_link_libraries ( DemonsRegistration1 ${SimpleITK_LIBRARIES} )
+
+add_executable ( DemonsRegistration2 DemonsRegistration2.cxx )
+target_link_libraries ( DemonsRegistration2 ${SimpleITK_LIBRARIES} )
+
+# Add subdirectories
+add_subdirectory(Segmentation)
+add_subdirectory(ITKIntegration)
+
+# Test data directory
+set(TEST_HARNESS_TEMP_DIRECTORY ${SimpleITK_BINARY_DIR}/Testing/Temporary)
+set(TEST_HARNESS_DATA_DIRECTORY ${SimpleITK_BINARY_DIR}/ExternalData/Testing/Data)
+set(ITK_TEST_DRIVER  "itkTestDriver")
+
+
+macro(add_language_subdirectory lang)
+  string(TOUPPER ${lang} LANG)
+  if ( WRAP_${LANG} )
+    add_subdirectory(${lang})
+  endif()
+endmacro()
+
+if ( BUILD_TESTING )
+  add_subdirectory( test )
+
+  add_language_subdirectory( CSharp )
+  add_language_subdirectory( Java )
+  add_language_subdirectory( Lua )
+  add_language_subdirectory( Python )
+  add_language_subdirectory( R )
+  add_language_subdirectory( Ruby )
+  add_language_subdirectory( Tcl )
+
+endif()

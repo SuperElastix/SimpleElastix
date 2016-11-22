@@ -3,6 +3,8 @@
 #include "sitkSimpleElastix.h"
 #include "sitkImageFileWriter.h"
 #include "sitkBinaryThresholdImageFilter.h"
+  
+#include <fstream>
 
 namespace itk {
   namespace simple {
@@ -302,16 +304,14 @@ TEST( SimpleElastix, RegistrationWithPointSets )
 {
   // We generate the point sets manually
   std::string fixedPointSetFileName = dataFinder.GetOutputFile( "FixedPointSet.pts" );
-  std::ofstream fixedPointSetFile;
-  fixedPointSetFile.open( fixedPointSetFileName.c_str() );
+  std::ofstream fixedPointSetFile( fixedPointSetFileName.c_str(), std::ofstream::out );
   fixedPointSetFile << "point\n";
   fixedPointSetFile << "1\n";
   fixedPointSetFile << "128.0 128.0\n";
   fixedPointSetFile.close();
 
   std::string movingPointSetFileName = dataFinder.GetOutputFile( "MovingPointSet.pts" );
-  std::ofstream movingPointSetFile;
-  movingPointSetFile.open( movingPointSetFileName.c_str() );
+  std::ofstream movingPointSetFile( movingPointSetFileName.c_str(), std::ofstream::out );
   movingPointSetFile << "point\n";
   movingPointSetFile << "1\n";
   movingPointSetFile << "115.0 111.0\n";

@@ -1,4 +1,4 @@
-cmake_minimum_required ( VERSION 2.8.1 FATAL_ERROR )
+cmake_minimum_required ( VERSION 3.0 FATAL_ERROR )
 
 # Explicitly add INCREMENTAL linking option to command lines.
 # http://www.cmake.org/pipermail/cmake/2010-February/035174.html
@@ -6,11 +6,19 @@ SET(MSVC_INCREMENTAL_DEFAULT ON)
 
 project ( SimpleITK )
 
-cmake_policy( VERSION 2.8.1 )
+cmake_policy( VERSION 3.0 )
 
+foreach(p
+    CMP0042 # CMake 3.0
+    CMP0063 # CMake 3.3.2
+    )
+  if(POLICY ${p})
+    cmake_policy(SET ${p} NEW)
+  endif()
+endforeach()
 
 # Include extra CMake files
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
+list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 
 #-----------------------------------------------------------------------------
 # Version information
@@ -47,11 +55,12 @@ message(STATUS "Building SimpleITK version \"${SimpleITK_VERSION}\"")
 # This must be done before any other try compiles based tests are
 # done.
 include(sitkCheckRequiredFlags)
+include(sitkCompilerWarningsSettings)
 
 
 find_package(ITK REQUIRED )
 #we require certain packages be turned on in ITK
-include("sitkCheckForITKModuleDependencies.cmake")
+include(sitkCheckForITKModuleDependencies)
 
 if(ITK_FOUND)
   # NOTE: We are purposely not calling UseITK yet. However, we must make
@@ -70,13 +79,12 @@ if(ITK_FOUND)
   link_directories( "${ITK_LIBRARY_DIRS}")
 endif()
 
-#----------------------------------------------------------
-# Configure elastix
-
+#-----------------------------------------------------------
+# Configure Elastix
 find_package( OpenMP )
 if( OPENMP_FOUND )
-  set( SimpleITK_REQUIRED_C_FLAGS "${SimpleITK_REQUIRED_C_FLAGS} ${OpenMP_C_FLAGS} " )
-  set( SimpleITK_REQUIRED_CXX_FLAGS "${SimpleITK_REQUIRED_CXX_FLAGS} ${OpenMP_CXX_FLAGS} " )
+  set(SimpleITK_REQUIRED_C_FLAGS "${SimpleITK_REQUIRED_C_FLAGS} ${OpenMP_C_FLAGS}")
+  set(SimpleITK_REQUIRED_CXX_FLAGS "${SimpleITK_REQUIRED_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
 # Find UseElastix.cmake 
@@ -100,16 +108,10 @@ endif()
 #----------------------------------------------------------
 # Set flags and directories
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${SimpleITK_REQUIRED_C_FLAGS}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SimpleITK_REQUIRED_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CXX_ADDITIONAL_WARNING_FLAGS} ${SimpleITK_REQUIRED_CXX_FLAGS}")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
 set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
-
-
-if( NOT ITK_USE_REVIEW )
-# TODO need to check ITK configuration to verify that it has the needed modules
-#  message(FATAL_ERROR "Please reconfigure ITK by turning ITK_USE_REVIEW ON")
-endif()
 
 #----------------------------------------------------------
 # Place all options to go into sitkConfigure.h here
@@ -144,6 +146,8 @@ option( SITK_4D_IMAGES "Add Image and I/O support for four spatial dimensions." 
 mark_as_advanced( SITK_4D_IMAGES )
 
 
+include( sitkForbidDownloadsOption )
+
 # Setup build locations.
 if(NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
@@ -169,7 +173,9 @@ set ( SimpleITK_LIBRARIES SimpleITKCommon SimpleITKIO SimpleITKRegistration Simp
 
 if (SITK_EXPLICIT_INSTANTIATION)
   list ( APPEND SimpleITK_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/Code/Explicit/include )
-  list ( APPEND SimpleITK_LIBRARIES  SimpleITKExplicit )
+  # This library is linked privately to SimpleITK libraries and is not
+  # part of the public link interface
+  #list ( APPEND SimpleITK_LIBRARIES  SimpleITKExplicit )
 endif()
 
 set( SimpleITK_LIBRARIES ${SimpleITK_LIBRARIES}  CACHE INTERNAL "" )
@@ -178,13 +184,6 @@ set( SimpleITK_LIBRARIES ${SimpleITK_LIBRARIES}  CACHE INTERNAL "" )
 set ( GENERATED_TEST_LIST "" CACHE INTERNAL "" )
 set ( GENERATED_FILTER_LIST "" CACHE INTERNAL "" )
 set ( GENERATED_TEST_SOURCE_LIST "" CACHE INTERNAL "" )
-
-
-
-set(JAR_FILE "simpleitk-${SimpleITK_VERSION}.jar")
-set(JAVADOC_FILE "simpleitk-javadoc-${SimpleITK_VERSION}.jar")
-set(JAVA_SOURCE_FILE "simpleitk-source-${SimpleITK_VERSION}.jar")
-
 
 # Create cached list of all template components
 file( GLOB template_components
@@ -241,80 +240,29 @@ function(sitk_install_exported_target tgt)
     )
 endfunction()
 
-#------------------------------------------------------------------------------
-# Strip Option
-
-# Add option to strip wrapping libraries.
-# Since the wrapping libraries don't get installed by the normal cmake
-# installation process, this option enables stripping of the libraries
-# as part of the build process. It should be used on the laguage
-# targets and the the SimpleITK iterface, as those can be installed
-# into the system.
-option(SimpleITK_BUILD_STRIP "Strip executables and libraries after building." OFF)
-mark_as_advanced(SimpleITK_BUILD_STRIP)
-set(CMAKE_STRIP_FLAGS "-x" CACHE STRING "Flags used by strip in the post_build.")
-mark_as_advanced(CMAKE_STRIP_FLAGS)
-separate_arguments(CMAKE_STRIP_FLAGS)
-
-function(sitk_strip_target tgt)
-  if(NOT SimpleITK_BUILD_STRIP)
-    return()
-  endif()
-  get_property(type TARGET ${tgt} PROPERTY TYPE)
-  if(NOT type STREQUAL STATIC_LIBRARY)
-    add_custom_command(
-      TARGET ${tgt}
-      POST_BUILD
-      COMMAND ${CMAKE_STRIP} ${CMAKE_STRIP_FLAGS} "$<TARGET_FILE:${tgt}>"
-      )
-  endif()
-
-endfunction()
+include(sitkStripOption)
 
 #------------------------------------------------------------------------------
 # These are some system specific compiler options needed to build SimpleITK
 
-if(MSVC)
-  # /bigobj is required for windows builds because of the size of
-  # some object files (CastImage for instance)
-  # Also supress the pesky warning about std::vector not being marked
-  # for export in the dll
-  set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj /wd4251" )
-  set ( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /bigobj" )
+include(CheckCXXCompilerFlag)
 
-  # Avoid some warnings
-  add_definitions ( -D_SCL_SECURE_NO_WARNINGS )
-
-
-  # force debug linking not to be incremental
-  foreach( _varName
-      CMAKE_EXE_LINKER_FLAGS_DEBUG
-      CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO
-      CMAKE_MODULE_LINKER_FLAGS_DEBUG
-      CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO
-      CMAKE_SHARED_LINKER_FLAGS_DEBUG
-      CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO )
-    STRING(REGEX REPLACE "INCREMENTAL(:[a-zA-Z]+)?" "INCREMENTAL:NO" ${_varName} ${${_varName}})
-  endforeach()
-
+if( NOT DEFINED CMAKE_POSITION_INDEPENDENT_CODE )
+  set( CMAKE_POSITION_INDEPENDENT_CODE 1 )
 endif()
 
 
-include(CheckCXXCompilerFlag)
+if( NOT DEFINED CMAKE_C_VISIBILITY_PRESET )
+  set(CMAKE_C_VISIBILITY_PRESET hidden)
+endif()
 
-# The fPIC flags is used to create position independent code. It is
-# required on some systems to produce shared libraries. On Apple
-# systems the flag has no effect as it is the default. On other
-# platforms, this flag may enable libraries to be better shared
-# between processes. Therefore, if the compiler supports it, we will
-# use it.
-check_cxx_compiler_flag( "-fPIC" CXX_HAS_fPIC )
-if( CXX_HAS_fPIC )
-  if(NOT "${CMAKE_CXX_FLAGS}" MATCHES "-fPIC")
-    set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC" )
-  endif()
-endif( )
+if( NOT DEFINED CMAKE_CXX_VISIBILITY_PRESET )
+  set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+endif()
 
+if( NOT DEFINED CMAKE_VISIBILITY_INLINES_HIDDEN )
+  set( CMAKE_VISIBILITY_INLINES_HIDDEN 1 )
+endif()
 
 
 #-----------------------------------------------------------
@@ -406,11 +354,20 @@ include(sitkLanguageOptions)
 # Ensure that development strips have been setup
 include(sitkCheckSourceTree)
 
+#-----------------------------------------------------------------------------
+if(NOT EXISTS "${SimpleITK_SOURCE_DIR}/.ExternalData/README.rst")
+  # This file is always present in version-controlled source trees
+  # so we must have been extracted from a source tarball with no
+  # data objects needed for testing.  Turn off tests by default
+  # since enabling them requires network access or manual data
+  # store configuration.
+  option(BUILD_TESTING "Build the testing tree." OFF)
+endif()
+
 #------------------------------------------------------------------------------
 # set things up for testing, this configuration needs to occour before
 # we enter the sub-directories
 include(CTest)
-
 
 #------------------------------------------------------------------------------
 # Go to subdirectories
@@ -529,10 +486,6 @@ file( GLOB __files
   ${CMAKE_SOURCE_DIR}/Code/Registration/include/*.hxx
   )
 
-set(__files ${__files}
-  ${SimpleITKBasicFiltersGeneratedHeader}
-  )
-
 install(FILES ${__files}
   DESTINATION ${SimpleITK_INSTALL_INCLUDE_DIR}
   COMPONENT Development)
@@ -549,28 +502,24 @@ install(
 
 install(FILES ${SimpleITK_DOC_FILES} DESTINATION "${SimpleITK_INSTALL_DOC_DIR}" COMPONENT Runtime)
 
-# Additional files needed by SimpleElastix
-install(
-  DIRECTORY 
-    ${ITK_INCLUDE_DIRS}
-    ${ELASTIX_INCLUDE_DIRECTORIES}
-  DESTINATION 
-    ${SimpleITK_INSTALL_INCLUDE_DIR}/
-  COMPONENT Development
-  FILES_MATCHING PATTERN "*.h"
-)
+install( DIRECTORY "${ELASTIX_LINK_DIRECTORIES}"
+         DESTINATION ${SimpleITK_INSTALL_INCLUDE_DIR} 
+         COMPONENT Development 
+         FILES_MATCHING PATTERN "*ix*" )
 
 #------------------------------------------------------------------------------
 # CPack
 
 set(CPACK_SOURCE_IGNORE_FILES  "${ITK_MODULES_DISABLED_CPACK};/\\\\.git")
-set(CPACK_PACKAGE_VERSION_MAJOR "${SimpleITK_Major}")
-set(CPACK_PACKAGE_VERSION_MINOR "${SimpleITK_Minor}")
-set(CPACK_PACKAGE_VERSION_PATCH "${SimpleITK_Patch}")
+set(CPACK_PACKAGE_VERSION_MAJOR "${SimpleITK_VERSION_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR "${SimpleITK_VERSION_MINOR}")
+set(CPACK_PACKAGE_VERSION_PATCH "${SimpleITK_VERSION_PATCH}")
 
 
 include( CPack )
 
-if(COMMAND ExternalData_Add_Target )
-  ExternalData_Add_Target( SimpleITKData )
+if(BUILD_TESTING)
+  if(COMMAND ExternalData_Add_Target )
+    ExternalData_Add_Target( SimpleITKData )
+  endif()
 endif()

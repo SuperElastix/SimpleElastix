@@ -20,5 +20,5 @@ before_script:
   - cd SimpleElastix-build
 
 script:
-  - cmake ../SimpleElastix/SuperBuild
+  - cmake ../SimpleElastix/SuperBuild -DBUILD_TESTING=OFF # Not enough time
   - make --jobs=2

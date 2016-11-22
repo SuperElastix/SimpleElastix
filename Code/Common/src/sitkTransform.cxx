@@ -178,8 +178,8 @@ public:
   ObjectType *Get() {return this->m_Object;}
   const ObjectType *Get() const {return this->m_Object;}
 
-  void Execute(itk::Object*, const itk::EventObject&) {}
-  void Execute(const itk::Object*, const itk::EventObject&) {}
+  void Execute(itk::Object*, const itk::EventObject&) SITK_OVERRIDE {}
+  void Execute(const itk::Object*, const itk::EventObject&) SITK_OVERRIDE {}
 
 protected:
   HolderCommand() : m_Object(NULL) {};
@@ -348,7 +348,6 @@ void Transform::InternalBSplineInitialization( Image & inImage )
   {
     typedef TDisplacementType VectorImageType;
 
-    typedef typename VectorImageType::PixelType PixelType;
     typedef typename VectorImageType::InternalPixelType ComponentType;
     const unsigned int ImageDimension = VectorImageType::ImageDimension;
 
@@ -588,7 +587,7 @@ void Transform::SetPimpleTransform( PimpleTransformBase *pimpleTransform )
   bool Transform::SetInverse()
   {
     assert( m_PimpleTransform );
-    std::auto_ptr<PimpleTransformBase> temp;
+    nsstd::auto_ptr<PimpleTransformBase> temp;
     {
     // See if a new pimple transform can be created
     PimpleTransformBase *p = NULL;

@@ -28,7 +28,74 @@
 #include <sitkImageFileWriter.h>
 #include <sitkHashImageFilter.h>
 #include <sitkCastImageFilter.h>
+#include <sitkConditional.h>
 #include <sitkVersion.h>
+
+namespace {
+void * GetBufferAsVoid( itk::simple::Image &sitkImage)
+{
+
+  namespace sitk = itk::simple;
+  void *sitkBufferPtr = NULL;
+
+  switch( sitkImage.GetPixelIDValue() )
+    {
+    case sitk::sitkUnknown:
+      break;
+    case sitk::ConditionalValue< sitk::sitkVectorUInt8 != sitk::sitkUnknown, sitk::sitkVectorUInt8, -14 >::Value:
+    case sitk::ConditionalValue< sitk::sitkUInt8 != sitk::sitkUnknown, sitk::sitkUInt8, -2 >::Value:
+      sitkBufferPtr = (void *)sitkImage.GetBufferAsUInt8();
+      break;
+    case sitk::ConditionalValue< sitk::sitkVectorInt8 != sitk::sitkUnknown, sitk::sitkVectorInt8, -15 >::Value:
+    case sitk::ConditionalValue< sitk::sitkInt8 != sitk::sitkUnknown, sitk::sitkInt8, -3 >::Value:
+      sitkBufferPtr = (void *)sitkImage.GetBufferAsInt8();
+      break;
+    case sitk::ConditionalValue< sitk::sitkVectorUInt16 != sitk::sitkUnknown, sitk::sitkVectorUInt16, -16 >::Value:
+    case sitk::ConditionalValue< sitk::sitkUInt16 != sitk::sitkUnknown, sitk::sitkUInt16, -4 >::Value:
+      sitkBufferPtr = (void *)sitkImage.GetBufferAsUInt16();
+      break;
+    case sitk::ConditionalValue< sitk::sitkVectorInt16 != sitk::sitkUnknown, sitk::sitkVectorInt16, -17 >::Value:
+    case sitk::ConditionalValue< sitk::sitkInt16 != sitk::sitkUnknown, sitk::sitkInt16, -5 >::Value:
+      sitkBufferPtr = (void *)sitkImage.GetBufferAsInt16();
+      break;
+    case sitk::ConditionalValue< sitk::sitkVectorUInt32 != sitk::sitkUnknown, sitk::sitkVectorUInt32, -18 >::Value:
+    case sitk::ConditionalValue< sitk::sitkUInt32 != sitk::sitkUnknown, sitk::sitkUInt32, -6 >::Value:
+      sitkBufferPtr = (void *)sitkImage.GetBufferAsUInt32();
+      break;
+    case sitk::ConditionalValue< sitk::sitkVectorInt32 != sitk::sitkUnknown, sitk::sitkVectorInt32, -19 >::Value:
+    case sitk::ConditionalValue< sitk::sitkInt32 != sitk::sitkUnknown, sitk::sitkInt32, -7 >::Value:
+      sitkBufferPtr = (void *)sitkImage.GetBufferAsInt32();
+      break;
+    case sitk::ConditionalValue< sitk::sitkVectorUInt64 != sitk::sitkUnknown, sitk::sitkVectorUInt64, -20 >::Value:
+    case sitk::ConditionalValue< sitk::sitkUInt64 != sitk::sitkUnknown, sitk::sitkUInt64, -8 >::Value:
+      sitkBufferPtr = (void *)sitkImage.GetBufferAsUInt64();
+      break;
+    case sitk::ConditionalValue< sitk::sitkVectorInt64 != sitk::sitkUnknown, sitk::sitkVectorInt64, -21 >::Value:
+    case sitk::ConditionalValue< sitk::sitkInt64 != sitk::sitkUnknown, sitk::sitkInt64, -9 >::Value:
+      sitkBufferPtr = (void *)sitkImage.GetBufferAsInt64();
+     break;
+    case sitk::ConditionalValue< sitk::sitkVectorFloat32 != sitk::sitkUnknown, sitk::sitkVectorFloat32, -22 >::Value:
+    case sitk::ConditionalValue< sitk::sitkFloat32 != sitk::sitkUnknown, sitk::sitkFloat32, -10 >::Value:
+      sitkBufferPtr = (void *)sitkImage.GetBufferAsFloat();
+      break;
+    case sitk::ConditionalValue< sitk::sitkVectorFloat64 != sitk::sitkUnknown, sitk::sitkVectorFloat64, -23 >::Value:
+    case sitk::ConditionalValue< sitk::sitkFloat64 != sitk::sitkUnknown, sitk::sitkFloat64, -11 >::Value:
+      sitkBufferPtr = (void *)sitkImage.GetBufferAsDouble();
+      break;
+    case sitk::ConditionalValue< sitk::sitkComplexFloat32 != sitk::sitkUnknown, sitk::sitkComplexFloat32, -12 >::Value:
+      //sitkBufferPtr = (void *)sitkImage.GetBufferAsComplexFloat32();
+      break;
+    case sitk::ConditionalValue< sitk::sitkComplexFloat64 != sitk::sitkUnknown, sitk::sitkComplexFloat64, -13 >::Value:
+      //sitkBufferPtr = (void *)sitkImage.GetBufferAsComplexFloat64();
+      break;
+      break;
+  default:
+    ;
+    }
+  return sitkBufferPtr;
+}
+
+}
 
 
 TEST(BasicFilters,${name}) {
@@ -118,7 +185,7 @@ OUT = OUT .. [[
   itk::simple::Image largeImage( 10,10,10,itk::simple::sitkUInt8 );
 ]]
     for inum=2,#inputs do
-      if  not inputs[inum].optional then
+      if  not inputs[inum].optional and not inputs[inum].no_size_check then
         OUT = OUT .. [[
   EXPECT_THROW ( filter.Execute ( largeImage]]
         for jnum=2,#inputs do
@@ -187,8 +254,8 @@ OUT=[=[
       // Do we get the same image back, if we use the functional interface?
       itk::simple::Image fromFunctional( 0, 0, itk::simple::sitkUInt8 );
       itk::simple::Image fromProcedural( 0, 0, itk::simple::sitkUInt8 );
-      ASSERT_NO_THROW ( fromProcedural = filter.Execute ( $(if #inputs > 0 then OUT=[[inputs[0] ]] end)$(for inum=1,#inputs-1 do OUT=OUT..", inputs["..inum.."]" end) ) ) << "Procedural interface to ${name}";
-      ASSERT_NO_THROW ( fromFunctional = itk::simple::${name:gsub("ImageFilter$", ""):gsub("Filter$", ""):gsub("ImageSource$", "Source")} ( $(if true then
+      EXPECT_NO_THROW ( fromProcedural = filter.Execute ( $(if #inputs > 0 then OUT=[[inputs[0] ]] end)$(for inum=1,#inputs-1 do OUT=OUT..", inputs["..inum.."]" end) ) ) << "Procedural interface to ${name}";
+      EXPECT_NO_THROW ( fromFunctional = itk::simple::${name:gsub("ImageFilter$", ""):gsub("Filter$", ""):gsub("ImageSource$", "Source")} ( $(if true then
 local count = 0
 if #inputs > 0 then
   OUT=[[inputs[0] ]]
@@ -285,6 +352,13 @@ end)
       // Check that the input is not modified
       // This will fail if the filter is being run in-place
       EXPECT_EQ ( inputSHA1hash,  itk::simple::Hash( inputs[0] ) ) << "Input was modified by filter.";
+
+      // Check that the input buffer is different that the output
+      // buffer, this does not check complex or label map pixel types.
+      if (GetBufferAsVoid(output) != SITK_NULLPTR && GetBufferAsVoid(inputs[0]) != SITK_NULLPTR)
+        {
+        EXPECT_NE(GetBufferAsVoid(output), GetBufferAsVoid(inputs[0]) ) << "Input buffer was copyied to output!";
+        }
       }
 
   $(if md5hash then
@@ -328,478 +402,3 @@ end))
 
 } // END FOR EACH TEST
 )
-
-
-#if defined(WRAP_LUA)
-
-TEST_F(Lua,${name}) {
-  $(if #tests == 0 then
-    OUT=[[
-  FAIL() << "Filter ${name} has no tests defined";
-        ]]
-    end)
-
-  std::string Script = dataFinder.GetBuildDirectory() + "/Testing/Unit/LuaTests/${name}Test.lua";
-  $(foreach tests
-    {
-    /* ${description} */
-    std::vector<std::string> CommandLine;
-    std::string outputFileName = dataFinder.GetOutputFile ( "Lua-${name}-${tag}.nrrd" );
-    // Make sure the output is deleted
-    if ( itksys::SystemTools::FileExists ( outputFileName.c_str() ) ) {
-      ASSERT_TRUE ( itksys::SystemTools::RemoveFile ( outputFileName.c_str() ) ) << "Deleting file " << outputFileName;
-    }
-    CommandLine = dataFinder.GetLuaExecutable();
-    CommandLine.push_back ( Script );
-    CommandLine.push_back ( "${tag}" );
-$(for inum=1,#inputs do
-    OUT=OUT..[[
-  CommandLine.push_back( dataFinder.GetFile ("]]..inputs[inum]..[[")  );
-]] end)
-    CommandLine.push_back ( outputFileName );
-    EXPECT_EQ( 0, RunExecutable ( CommandLine, true ) ) << "non-zero returned from process";
-
-  $(if not no_return_image then
-  OUT=[[
-    ASSERT_TRUE ( dataFinder.FileExists ( outputFileName ) );
-    itk::simple::ImageFileReader reader;
-    itk::simple::HashImageFilter hasher;
-    itk::simple::Image output( 0, 0, itk::simple::sitkUInt8 );
-
-    output = reader.SetFileName ( outputFileName ).Execute();
-    ASSERT_TRUE ( output.GetITKBase() != NULL ) << "Loaded output image";
-  ]]
-  end)
-
-    $(if md5hash then
-      OUT = [[
-  // Check the hash
-  IMAGECOMPAREWITHHASH("${md5hash}",MD5,output,"Output MD5 hash failed");
-               ]]
-      end)
-    $(if sha1hash then
-      OUT = [[
-  // Check the hash
-  IMAGECOMPAREWITHHASH("${sha1hash}",SHA1,output,"Output SHA1 hash failed");
-               ]]
-      end)
-    $(if tolerance then
-      OUT = [[
-              IMAGECOMPAREWITHTOLERANCE_WITH_TESTCASE ( output, "BasicFilters", "${tag}", ${tolerance} );
-               ]]
-      end)
-      }
-    )
-}
-#endif
-
-#if defined(WRAP_PYTHON)
-
-TEST_F(Python,${name}) {
-  $(if #tests == 0 then
-    OUT=[[
-  FAIL() << "Filter ${name} has no tests defined";
-        ]]
-    end)
-
-  std::string Script = dataFinder.GetBuildDirectory() + "/Testing/Unit/PythonTests/${name}Test.py";
-  $(foreach tests
-    {
-    /* ${description} */
-    std::vector<std::string> CommandLine;
-    std::string outputFileName = dataFinder.GetOutputFile ( "Python-${name}-${tag}.nrrd" );
-    // Make sure the output is deleted
-    if ( itksys::SystemTools::FileExists ( outputFileName.c_str() ) ) {
-      ASSERT_TRUE ( itksys::SystemTools::RemoveFile ( outputFileName.c_str() ) ) << "Deleting file " << outputFileName;
-    }
-    CommandLine = dataFinder.GetPythonExecutable();
-    CommandLine.push_back ( Script );
-    CommandLine.push_back ( "${tag}" );
-$(for inum=1,#inputs do
-    OUT=OUT..[[
-  CommandLine.push_back( dataFinder.GetFile ("]]..inputs[inum]..[[")  );
-]] end)
-    CommandLine.push_back ( outputFileName );
-    EXPECT_EQ( 0, RunExecutable ( CommandLine, true ) ) << "non-zero returned from process";
-
-  $(if not no_return_image then
-   OUT=[[
-    ASSERT_TRUE ( dataFinder.FileExists ( outputFileName ) );
-    itk::simple::ImageFileReader reader;
-    itk::simple::HashImageFilter hasher;
-    itk::simple::Image output( 0, 0, itk::simple::sitkUInt8 );
-
-    output = reader.SetFileName ( outputFileName ).Execute();
-    ASSERT_TRUE ( output.GetITKBase() != NULL ) << "Loaded output image";
-]]
-  end)
-
-    $(if md5hash then
-      OUT = [[
-  // Check the hash
-  IMAGECOMPAREWITHHASH("${md5hash}",MD5,output,"Output MD5 hash failed");
-               ]]
-      end)
-    $(if sha1hash then
-      OUT = [[
-  // Check the hash
-  IMAGECOMPAREWITHHASH("${sha1hash}",SHA1,output,"Output SHA1 hash failed");
-               ]]
-      end)
-    $(if tolerance then
-      OUT = [[
-              IMAGECOMPAREWITHTOLERANCE_WITH_TESTCASE ( output, "BasicFilters", "${tag}", ${tolerance} );
-               ]]
-      end)
-      }
-    )
-}
-#endif
-
-#if defined(WRAP_TCL)
-
-TEST_F(Tcl,${name}) {
-  $(if #tests == 0 then
-    OUT=[[
-  FAIL() << "Filter ${name} has no tests defined";
-        ]]
-    end)
-
-  std::string Script = dataFinder.GetBuildDirectory() + "/Testing/Unit/TclTests/${name}Test.tcl";
-  $(foreach tests
-    {
-    /* ${description} */
-    std::vector<std::string> CommandLine;
-    std::string outputFileName = dataFinder.GetOutputFile ( "Tcl-${name}-${tag}.nrrd" );
-    // Make sure the output is deleted
-    if ( itksys::SystemTools::FileExists ( outputFileName.c_str() ) ) {
-      ASSERT_TRUE ( itksys::SystemTools::RemoveFile ( outputFileName.c_str() ) ) << "Deleting file " << outputFileName;
-    }
-    CommandLine = dataFinder.GetTclExecutable ( );
-    CommandLine.push_back ( Script );
-    CommandLine.push_back ( "${tag}" );
-$(for inum=1,#inputs do
-    OUT=OUT..[[
-  CommandLine.push_back( dataFinder.GetFile ("]]..inputs[inum]..[[")  );
-]] end)
-    CommandLine.push_back ( outputFileName );
-    EXPECT_EQ( 0, RunExecutable ( CommandLine, true ) ) << "non-zero returned from process";
-
-  $(if not no_return_image then
-   OUT=[[
-    ASSERT_TRUE ( dataFinder.FileExists ( outputFileName ) );
-    itk::simple::ImageFileReader reader;
-    itk::simple::HashImageFilter hasher;
-    itk::simple::Image output( 0, 0, itk::simple::sitkUInt8 );
-
-    output = reader.SetFileName ( outputFileName ).Execute();
-    ASSERT_TRUE ( output.GetITKBase() != NULL ) << "Loaded output image";
-  ]]
-  end)
-
-    $(if md5hash then
-      OUT = [[
-  // Check the hash
-  IMAGECOMPAREWITHHASH("${md5hash}",MD5,output,"Output MD5 hash failed");
-               ]]
-      end)
-    $(if sha1hash then
-      OUT = [[
-  // Check the hash
-  IMAGECOMPAREWITHHASH("${sha1hash}",SHA1,output,"Output SHA1 hash failed");
-               ]]
-      end)
-    $(if tolerance then
-      OUT = [[
-              IMAGECOMPAREWITHTOLERANCE_WITH_TESTCASE ( output, "BasicFilters", "${tag}", ${tolerance} );
-               ]]
-      end)
-      }
-    )
-}
-#endif
-
-#if defined(WRAP_R)
-
-TEST_F(R,${name}) {
-  $(if #tests == 0 then
-    OUT=[[
-  FAIL() << "Filter ${name} has no tests defined";
-        ]]
-    end)
-
-  // Set-up the R enviroment to include the SimpleITK R library in the
-  // build directory.
-  SetEnvironment ( "R_LIBS", dataFinder.GetBuildDirectory()+"/Wrapping/RLib" );
-
-
-  std::string Script = dataFinder.GetBuildDirectory() + "/Testing/Unit/RTests/${name}Test.R";
-  $(foreach tests
-    {
-
-    /* ${description} */
-    std::vector<std::string> CommandLine;
-    std::string outputFileName = dataFinder.GetOutputFile ( "R-${name}-${tag}.nrrd" );
-    // Make sure the output is deleted
-    if ( itksys::SystemTools::FileExists ( outputFileName.c_str() ) ) {
-      ASSERT_TRUE ( itksys::SystemTools::RemoveFile ( outputFileName.c_str() ) ) << "Deleting file " << outputFileName;
-    }
-    CommandLine = dataFinder.GetRExecutable();
-    CommandLine.push_back ( "--slave" );
-    CommandLine.push_back ( "--vanilla" );
-    CommandLine.push_back ( std::string("--file=")+Script );
-    CommandLine.push_back ( "--args" );
-    CommandLine.push_back ( "${tag}" );
-$(for inum=1,#inputs do
-    OUT=OUT..[[
-  CommandLine.push_back( dataFinder.GetFile ("]]..inputs[inum]..[[")  );
-]] end)
-    CommandLine.push_back ( outputFileName );
-    EXPECT_EQ( 0, RunExecutable ( CommandLine, true ) ) << "non-zero returned from process";
-
-  $(if not no_return_image then
-   OUT=[[
-    ASSERT_TRUE ( dataFinder.FileExists ( outputFileName ) );
-    itk::simple::ImageFileReader reader;
-    itk::simple::HashImageFilter hasher;
-    itk::simple::Image output( 0, 0, itk::simple::sitkUInt8 );
-    output = reader.SetFileName ( outputFileName ).Execute();
-    ASSERT_TRUE ( output.GetITKBase() != NULL ) << "Loaded output image";
-]]
-  end)
-
-    $(if md5hash then
-      OUT = [[
-  // Check the hash
-  IMAGECOMPAREWITHHASH("${md5hash}",MD5,output,"Output MD5 hash failed");
-               ]]
-      end)
-    $(if sha1hash then
-      OUT = [[
-  // Check the hash
-  IMAGECOMPAREWITHHASH("${sha1hash}",SHA1,output,"Output SHA1 hash failed");
-               ]]
-      end)
-    $(if tolerance then
-      OUT = [[
-              IMAGECOMPAREWITHTOLERANCE_WITH_TESTCASE ( output, "BasicFilters", "${tag}", ${tolerance} );
-               ]]
-      end)
-      }
-
-    )
-}
-#endif
-
-
-
-#if defined(WRAP_JAVA)
-
-TEST_F(Java,${name}) {
-  $(if #tests == 0 then
-    OUT=[[
-  FAIL() << "Filter ${name} has no tests defined";
-        ]]
-    end)
-
-  std::string Classpath = dataFinder.GetBuildDirectory() + "/Testing/Unit/JavaTests"
-    + dataFinder.GetPathSeparator() + dataFinder.GetBuildDirectory() + "/Wrapping/simpleitk-" + itk::simple::Version::VersionString() + ".jar";
-  std::string JavaPath = dataFinder.GetLibraryDirectory();
-  std::string Script = "org.itk.simple.testing.${name}Test";
-  $(foreach tests
-    {
-    /* ${description} */
-    std::vector<std::string> CommandLine;
-    std::string outputFileName = dataFinder.GetOutputFile ( "Java-${name}-${tag}.nrrd" );
-    // Make sure the output is deleted
-    if ( itksys::SystemTools::FileExists ( outputFileName.c_str() ) ) {
-      ASSERT_TRUE ( itksys::SystemTools::RemoveFile ( outputFileName.c_str() ) ) << "Deleting file " << outputFileName;
-    }
-    CommandLine = dataFinder.GetJavaExecutable();
-    CommandLine.push_back ( "-classpath" );
-    CommandLine.push_back ( Classpath );
-    CommandLine.push_back ( "-Djava.library.path=" + JavaPath );
-    CommandLine.push_back ( Script );
-    CommandLine.push_back ( "${tag}" );
-$(for inum=1,#inputs do
-    OUT=OUT..[[
-  CommandLine.push_back( dataFinder.GetFile ("]]..inputs[inum]..[[")  );
-]] end)
-    CommandLine.push_back ( outputFileName );
-    EXPECT_EQ( 0, RunExecutable ( CommandLine, true ) ) << "non-zero returned from process";
-
-  $(if not no_return_image then
-   OUT=[[
-    ASSERT_TRUE ( dataFinder.FileExists ( outputFileName ) );
-    itk::simple::ImageFileReader reader;
-    itk::simple::HashImageFilter hasher;
-    itk::simple::Image output( 0, 0, itk::simple::sitkUInt8 );
-    output = reader.SetFileName ( outputFileName ).Execute();
-    ASSERT_TRUE ( output.GetITKBase() != NULL ) << "Loaded output image";
-]]
-  end)
-
-    $(if md5hash then
-      OUT = [[
-  // Check the hash
-  IMAGECOMPAREWITHHASH("${md5hash}",MD5,output,"Output MD5 hash failed");
-               ]]
-      end)
-    $(if sha1hash then
-      OUT = [[
-  // Check the hash
-  IMAGECOMPAREWITHHASH("${sha1hash}",SHA1,output,"Output SHA1 hash failed");
-               ]]
-      end)
-    $(if tolerance then
-      OUT = [[
-              IMAGECOMPAREWITHTOLERANCE_WITH_TESTCASE ( output, "BasicFilters", "${tag}", ${tolerance} );
-               ]]
-      end)
-      }
-    )
-}
-#endif
-
-#if defined(WRAP_RUBY)
-
-TEST_F(Ruby,${name}) {
-  $(if #tests == 0 then
-    OUT=[[
-  FAIL() << "Filter ${name} has no tests defined";
-        ]]
-    end)
-
-  // Set our Ruby path
-  SetEnvironment ( "RUBYLIB", dataFinder.GetLibraryDirectory() );
-
-  std::string Script = dataFinder.GetBuildDirectory() + "/Testing/Unit/RubyTests/${name}Test.rb";
-  $(foreach tests
-    {
-    /* ${description} */
-    std::vector<std::string> CommandLine;
-    std::string outputFileName = dataFinder.GetOutputFile ( "Ruby-${name}-${tag}.nrrd" );
-    // Make sure the output is deleted
-    if ( itksys::SystemTools::FileExists ( outputFileName.c_str() ) ) {
-      ASSERT_TRUE ( itksys::SystemTools::RemoveFile ( outputFileName.c_str() ) ) << "Deleting file " << outputFileName;
-    }
-    CommandLine = dataFinder.GetRubyExecutable();
-    CommandLine.push_back ( Script );
-    CommandLine.push_back ( "${tag}" );
-$(for inum=1,#inputs do
-    OUT=OUT..[[
-  CommandLine.push_back( dataFinder.GetFile ("]]..inputs[inum]..[[")  );
-]] end)
-    CommandLine.push_back ( outputFileName );
-    EXPECT_EQ( 0, RunExecutable ( CommandLine, true ) ) << "non-zero returned from process";
-
-  $(if not no_return_image then
-   OUT=[[
-    ASSERT_TRUE ( dataFinder.FileExists ( outputFileName ) );
-    itk::simple::ImageFileReader reader;
-    itk::simple::HashImageFilter hasher;
-    itk::simple::Image output( 0, 0, itk::simple::sitkUInt8 );
-    output = reader.SetFileName ( outputFileName ).Execute();
-    ASSERT_TRUE ( output.GetITKBase() != NULL ) << "Loaded output image";
-]]
-    end)
-
-    $(if md5hash then
-      OUT = [[
-  // Check the hash
-  IMAGECOMPAREWITHHASH("${md5hash}",MD5,output,"Output MD5 hash failed");
-               ]]
-      end)
-    $(if sha1hash then
-      OUT = [[
-  // Check the hash
-  IMAGECOMPAREWITHHASH("${sha1hash}",SHA1,output,"Output SHA1 hash failed");
-               ]]
-      end)
-    $(if tolerance then
-      OUT = [[
-              IMAGECOMPAREWITHTOLERANCE_WITH_TESTCASE ( output, "BasicFilters", "${tag}", ${tolerance} );
-               ]]
-      end)
-      }
-    )
-}
-#endif
-
-#if defined(WRAP_CSHARP)
-
-TEST_F(CSharp,${name}) {
-  $(if #tests == 0 then
-    OUT=[[
-  FAIL() << "Filter ${name} has no tests defined";
-        ]]
-    end)
-
-  std::string ExePath = dataFinder.GetCSharpBinaryDirectory();
-  std::string ExeName = "Test${name}.exe";
-  std::string ExePathAndName = ExePath + "/" + ExeName;
-
-  // On Linux, we need to specify where the shared library is found
-  std::string path = dataFinder.GetBuildDirectory() + "/Wrapping/CSharpBinaries";
-  SetEnvironment ( "LD_LIBRARY_PATH", path );
-
-
-  $(foreach tests
-    {
-    /* ${description} */
-    std::vector<std::string> CommandLine;
-    std::string outputFileName = dataFinder.GetOutputFile ( "CSharp-${name}-${tag}.nrrd" );
-
-    // Make sure the output is deleted
-    if ( itksys::SystemTools::FileExists ( outputFileName.c_str() ) ) {
-      ASSERT_TRUE ( itksys::SystemTools::RemoveFile ( outputFileName.c_str() ) ) << "Deleting file " << outputFileName;
-    }
-
-    std::vector<std::string> cs_interp = dataFinder.GetCSharpInterpreter();
-
-    if ( cs_interp.size() && cs_interp[0].size() )
-    {
-      CommandLine = dataFinder.GetCSharpInterpreter();
-    }
-    CommandLine.push_back ( ExePathAndName );
-    CommandLine.push_back ( dataFinder.GetFile ( "Input/RA-Short.nrrd" ).c_str() );
-    CommandLine.push_back ( "${tag}" );
-$(for inum=1,#inputs do
-    OUT=OUT..[[
-  CommandLine.push_back( dataFinder.GetFile ("]]..inputs[inum]..[[")  );
-]] end)
-    CommandLine.push_back ( outputFileName );
-    EXPECT_EQ( 0, RunExecutable ( CommandLine, true ) ) << "non-zero returned from process";
-
-  $(if not no_return_image then
-   OUT=[[
-    ASSERT_TRUE ( dataFinder.FileExists ( outputFileName ) );
-    itk::simple::ImageFileReader reader;
-    itk::simple::HashImageFilter hasher;
-    itk::simple::Image output( 0, 0, itk::simple::sitkUInt8 );
-    output = reader.SetFileName ( outputFileName ).Execute();
-    ASSERT_TRUE ( output.GetITKBase() != NULL ) << "Loaded output image";
-]]
-  end)
-
-    $(if md5hash then
-      OUT = [[
-  // Check the hash
-  IMAGECOMPAREWITHHASH("${md5hash}",MD5,output,"Output MD5 hash failed");
-               ]]
-      end)
-    $(if sha1hash then
-      OUT = [[
-  // Check the hash
-  IMAGECOMPAREWITHHASH("${sha1hash}",SHA1,output,"Output SHA1 hash failed");
-               ]]
-      end)
-    $(if tolerance then
-      OUT = [[
-              IMAGECOMPAREWITHTOLERANCE_WITH_TESTCASE ( output, "BasicFilters", "${tag}", ${tolerance} );
-               ]]
-      end)
-      }
-    )
-}
-#endif

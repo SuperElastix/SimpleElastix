@@ -1,5 +1,3 @@
-find_package(Git REQUIRED)
-
 #-----------------------------------------------------------------------------
 # CTest Related Settings
 #-----------------------------------------------------------------------------
@@ -53,8 +51,8 @@ set(CMAKE_MODULE_PATH
   ${CMAKE_MODULE_PATH}
   )
 
-include(PreventInSourceBuilds)
-include(PreventInBuildInstalls)
+include(sitkPreventInSourceBuilds)
+include(sitkPreventInBuildInstalls)
 include(VariableList)
 
 
@@ -62,10 +60,6 @@ include(VariableList)
 # Prerequisites
 #------------------------------------------------------------------------------
 #
-# SimpleITK Addition: install to the common library
-# directory, so that all libs/include etc ends up
-# in one common tree
-set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR} CACHE PATH "Where all the prerequisite libraries go" FORCE)
 
 # Compute -G arg for configuring external projects with the same CMake generator:
 if(CMAKE_EXTRA_GENERATOR)
@@ -73,6 +67,20 @@ if(CMAKE_EXTRA_GENERATOR)
 else()
   set(gen "${CMAKE_GENERATOR}")
 endif()
+
+#-----------------------------------------------------------------------------
+# Use GIT protocol
+#------------------------------------------------------------------------------
+find_package(Git)
+set(SITK_GIT_PROTOCOL_default "https")
+if (GIT_VERSION_STRING VERSION_LESS "1.7.10")
+  # minimum version for https support
+  set(SITK_GIT_PROTOCOL_default "git")
+endif()
+set(SITK_GIT_PROTOCOL  ${SITK_GIT_PROTOCOL_default} CACHE STRING "If behind a firewall turn set this to 'https' or 'http'." )
+mark_as_advanced(SITK_GIT_PROTOCOL)
+set_property(CACHE SITK_GIT_PROTOCOL PROPERTY STRINGS "https;http;git")
+set(git_protocol ${SITK_GIT_PROTOCOL})
 
 
 #-----------------------------------------------------------------------------
@@ -115,16 +123,8 @@ endif()
 #-------------------------------------------------------------------------
 # augment compiler flags
 #-------------------------------------------------------------------------
-include(CompilerFlagSettings)
-
-
-# the hidden visibility for inline methods should be consistent between ITK and SimpleITK
-if(NOT WIN32 AND CMAKE_COMPILER_IS_GNUCXX AND BUILD_SHARED_LIBS)
-  check_cxx_compiler_flag("-fvisibility-inlines-hidden" CXX_HAS-fvisibility-inlines-hidden)
-  if( CXX_HAS-fvisibility-inlines-hidden )
-    set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility-inlines-hidden" )
-  endif()
-endif()
+include(sitkCheckRequiredFlags)
+set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SimpleITK_REQUIRED_CXX_FLAGS}" )
 
 #------------------------------------------------------------------------------
 # BuildName used for dashboard reporting
@@ -148,16 +148,6 @@ endif()
 #------------------------------------------------------------------------------
 # Setup build locations.
 #------------------------------------------------------------------------------
-if(NOT SETIFEMPTY)
-  macro(SETIFEMPTY) # A macro to set empty variables to meaninful defaults
-    set(KEY ${ARGV0})
-    set(VALUE ${ARGV1})
-    if(NOT ${KEY})
-      set(${ARGV})
-    endif(NOT ${KEY})
-  endmacro(SETIFEMPTY KEY VALUE)
-endif(NOT SETIFEMPTY)
-
 
 #------------------------------------------------------------------------------
 # Common Build Options to pass to all subsequent tools
@@ -184,6 +174,8 @@ list( APPEND ep_common_list
   CMAKE_CXX_FLAGS_MINSIZEREL
   CMAKE_CXX_FLAGS_RELEASE
   CMAKE_CXX_FLAGS_RELWITHDEBINFO
+
+  CMAKE_LINKER
 
   CMAKE_EXE_LINKER_FLAGS
   CMAKE_EXE_LINKER_FLAGS_DEBUG
@@ -246,6 +238,24 @@ include(sitkLanguageOptions)
 
 #$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 include(ExternalProject)
+
+#------------------------------------------------------------------------------
+# Lua
+#------------------------------------------------------------------------------
+option ( USE_SYSTEM_LUA "Use a pre-compiled version of LUA 5.1 previously configured for your system" OFF )
+mark_as_advanced(USE_SYSTEM_LUA)
+if ( USE_SYSTEM_LUA )
+  find_package( LuaInterp REQUIRED 5.1 )
+  set( SITK_LUA_EXECUTABLE ${LUA_EXECUTABLE} CACHE PATH "Lua executable used for code generation." )
+  mark_as_advanced( SITK_LUA_EXECUTABLE )
+  unset( LUA_EXECUTABLE CACHE )
+else()
+  include(External_Lua)
+  list(APPEND ${CMAKE_PROJECT_NAME}_DEPENDENCIES Lua)
+  set( SITK_LUA_EXECUTABLE ${SITK_LUA_EXECUTABLE} CACHE PATH "Lua executable used for code generation." )
+  mark_as_advanced( SITK_LUA_EXECUTABLE )
+endif()
+
 #------------------------------------------------------------------------------
 # Swig
 #------------------------------------------------------------------------------
@@ -253,10 +263,43 @@ option ( USE_SYSTEM_SWIG "Use a pre-compiled version of SWIG 2.0 previously conf
 mark_as_advanced(USE_SYSTEM_SWIG)
 if(USE_SYSTEM_SWIG)
   find_package ( SWIG 2 REQUIRED )
-  include ( UseSWIGLocal )
 else()
   include(External_Swig)
   list(APPEND ${CMAKE_PROJECT_NAME}_DEPENDENCIES Swig)
+endif()
+
+#------------------------------------------------------------------------------
+# Google Test
+#------------------------------------------------------------------------------
+option( USE_SYSTEM_GTEST "Use a pre-compiled version of GoogleTest. " OFF )
+mark_as_advanced(USE_SYSTEM_GTEST)
+if ( BUILD_TESTING )
+  if (USE_SYSTEM_GTEST)
+    find_package( GTest REQUIRED )
+    list(APPEND SimpleITK_VARS GTEST_LIBRARIES GTEST_INCLUDE_DIRS GTEST_MAIN_LIBRARIES)
+  else()
+    include(External_GTest)
+    set( GTEST_ROOT ${GTEST_ROOT} )
+    list(APPEND SimpleITK_VARS GTEST_ROOT)
+    list(APPEND ${CMAKE_PROJECT_NAME}_DEPENDENCIES GTest)
+  endif()
+endif()
+
+#------------------------------------------------------------------------------
+# Python virtualenv
+#------------------------------------------------------------------------------
+option( USE_SYSTEM_VIRTUALENV "Use a system version of Python's virtualenv. " OFF )
+mark_as_advanced(USE_SYSTEM_VIRTUALENV)
+if( NOT DEFINED SITK_PYTHON_USE_VIRTUALENV OR SITK_PYTHON_USE_VIRTUALENV )
+  if ( USE_SYSTEM_VIRTUALENV )
+    find_package( PythonVirtualEnv REQUIRED)
+  else()
+    include(External_virtualenv)
+    if ( WRAP_PYTHON )
+      list(APPEND ${CMAKE_PROJECT_NAME}_DEPENDENCIES virtualenv)
+    endif()
+  endif()
+  list(APPEND SimpleITK_VARS PYTHON_VIRTUALENV_SCRIPT)
 endif()
 
 #------------------------------------------------------------------------------
@@ -273,7 +316,7 @@ mark_as_advanced(USE_SYSTEM_ITK)
 if(USE_SYSTEM_ITK)
   find_package(ITK REQUIRED)
   #we require certain packages be turned on in ITK
-  include("${CMAKE_CURRENT_SOURCE_DIR}/../sitkCheckForITKModuleDependencies.cmake")
+  include(sitkCheckForITKModuleDependencies)
 else()
   include(External_ITK)
   list(APPEND ${CMAKE_PROJECT_NAME}_DEPENDENCIES ITK)
@@ -306,15 +349,23 @@ endif()
 get_cmake_property( _varNames VARIABLES )
 
 foreach (_varName ${_varNames})
-  if(_varName MATCHES "^SimpleITK_" )
-    message( STATUS "Passing variable \"${_varName}=${${_varName}}\" to SimpleITK external project.")
-    list(APPEND SimpleITKITK_VARS ${_varName})
+  if(_varName MATCHES "^SimpleITK_" OR _varName MATCHES "^SITK_" )
+    if (NOT _varName MATCHES "^SITK_LANGUAGES_VARS"
+          AND
+        NOT _varName MATCHES "^SimpleITK_VARS"
+          AND
+        NOT _varName MATCHES "^SimpleITK_REQUIRED_"
+          AND
+        NOT _varName MATCHES "^SITK_UNDEFINED_SYMBOLS_ALLOWED")
+      message( STATUS "Passing variable \"${_varName}=${${_varName}}\" to SimpleITK external project.")
+      list(APPEND SimpleITK_VARS ${_varName})
+    endif()
   endif()
 endforeach()
 
 
 VariableListToCache( SimpleITK_VARS  ep_simpleitk_cache )
-VariableListToArgs( SimpleITKITK_VARS  ep_simpleitk_args )
+VariableListToArgs( SimpleITK_VARS  ep_simpleitk_args )
 VariableListToCache( SITK_LANGUAGES_VARS  ep_languages_cache )
 VariableListToArgs( SITK_LANGUAGES_VARS  ep_languages_args )
 
@@ -333,13 +384,12 @@ ExternalProject_Add(${proj}
     ${ep_simpleitk_args}
     ${ep_common_args}
     -DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
-    -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}\ ${CXX_ADDITIONAL_WARNING_FLAGS}
+    -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
     -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
     -DCMAKE_LIBRARY_OUTPUT_DIRECTORY:PATH=<BINARY_DIR>/lib
     -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY:PATH=<BINARY_DIR>/lib
     -DCMAKE_RUNTIME_OUTPUT_DIRECTORY:PATH=<BINARY_DIR>/bin
     -DCMAKE_BUNDLE_OUTPUT_DIRECTORY:PATH=<BINARY_DIR>/bin
-    -DSITK_4D_IMAGES:BOOL=${SITK_4D_IMAGES}
     ${ep_languages_args}
     # ITK
     -DITK_DIR:PATH=${ITK_DIR}
@@ -382,7 +432,7 @@ include(External_SimpleITKExamples)
 #------------------------------------------------------------------------------
 # List of external projects
 #------------------------------------------------------------------------------
-set(external_project_list ITK Swig elastix SimpleITKExamples PCRE ${CMAKE_PROJECT_NAME})
+set(external_project_list ITK Swig elastix SimpleITKExamples PCRE Lua GTest virtualenv ${CMAKE_PROJECT_NAME})
 
 #-----------------------------------------------------------------------------
 # Dump external project dependencies

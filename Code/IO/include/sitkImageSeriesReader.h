@@ -102,23 +102,23 @@ namespace itk {
        **/
       static std::vector<std::string> GetGDCMSeriesIDs( const std::string &directory );
 
-      Self& SetFileNames ( const std::vector<std::string> &fileNames );
+      SITK_RETURN_SELF_TYPE_HEADER SetFileNames ( const std::vector<std::string> &fileNames );
       const std::vector<std::string> &GetFileNames() const;
 
       Image Execute();
 
     protected:
 
-      template <class TImageType> Image ExecuteInternal ( void );
+      template <class TImageType> Image ExecuteInternal ( itk::ImageIOBase * );
 
     private:
 
       // function pointer type
-      typedef Image (Self::*MemberFunctionType)( void );
+      typedef Image (Self::*MemberFunctionType)( itk::ImageIOBase * );
 
       // friend to get access to executeInternal member
       friend struct detail::MemberFunctionAddressor<MemberFunctionType>;
-      std::auto_ptr<detail::MemberFunctionFactory<MemberFunctionType> > m_MemberFactory;
+      nsstd::auto_ptr<detail::MemberFunctionFactory<MemberFunctionType> > m_MemberFactory;
 
       std::vector<std::string> m_FileNames;
     };
