@@ -66,8 +66,8 @@ ExternalProject_Add( ${proj}
   -DUSE_DistancePreservingRigidityPenalty:BOOL=OFF                                           
   -DUSE_EulerTransformElastix:BOOL=ON                                           
   -DUSE_FiniteDifferenceGradientDescent:BOOL=OFF                                           
-  -DUSE_FixedGenericPyramid:BOOL=OFF                                           
-  -DUSE_FixedRecursivePyramid:BOOL=OFF                                           
+  -DUSE_FixedGenericPyramid:BOOL=ON                                          
+  -DUSE_FixedRecursivePyramid:BOOL=ON                                           
   -DUSE_FixedShrinkingPyramid:BOOL=ON                                           
   -DUSE_FixedSmoothingPyramid:BOOL=ON                                           
   -DUSE_FullSampler:BOOL=OFF                                           
@@ -78,8 +78,8 @@ ExternalProject_Add( ${proj}
   -DUSE_LinearInterpolator:BOOL=ON                                           
   -DUSE_LinearResampleInterpolator:BOOL=ON                                           
   -DUSE_MissingStructurePenalty:BOOL=OFF
-  -DUSE_MovingGenericPyramid:BOOL=OFF   
-  -DUSE_MovingRecursivePyramid:BOOL=OFF                                           
+  -DUSE_MovingGenericPyramid:BOOL=ON   
+  -DUSE_MovingRecursivePyramid:BOOL=ON                                           
   -DUSE_MovingShrinkingPyramid:BOOL=ON                                           
   -DUSE_MovingSmoothingPyramid:BOOL=ON                                           
   -DUSE_MultiBSplineTransformWithNormal:BOOL=OFF                                           
