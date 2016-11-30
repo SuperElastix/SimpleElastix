@@ -40,7 +40,7 @@
 cmake-build-*
 
 # Source
-build/
+Build/
 .ExternalData
 *~
 *.pyc

@@ -1,0 +1,15 @@
+/**
+\mainpage  SimpleElastix
+
+\section intro Introduction
+Image registration is the process of transforming images into a common coordinate system so corresponding pixels represent homologous biological points. SimpleElastix is an extension of SimpleITK that offers a user-friendly API to the popular image registration algorithms of the elastix C++ library. This makes state-of-the-art medical image registration really easy to do in languages like Python, Java, C# and R. This package provides
+
+- elastix and transformix bindings for C++, Python, Java, R, Ruby, Octave, Lua, Tcl and C# (see elastix manual for a list of supported registration algorithms).
+- Pre-configured registration methods that work well in many cases and serve as starting points for tuning elastix to domain-specific applications.
+- Installation guides, examples, and introductory material at simpleelastix.readthedocs.org.
+- A user-friendly API that aligns with the design philosophy of SimpleITK developed specifically for rapid prototyping. If you are interested, The Design of SimpleITK is a great read.
+- The complete set of SimpleITK image processing algorithms.
+
+This documentation describes the C++ API of \ref SimpleElastix "SimpleElastix", \ref SimpleTransformix "SimpleTransformix" and SimpleITK. A more friendly introduction to SimpleElastix and medical image registration in general is available at [simpleelastix.readthedocs.org](https://simpleelastix.readthedocs.io).
+ */
+

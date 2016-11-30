@@ -1,0 +1,40 @@
+namespace itk {
+namespace simple {
+/**
+\page GitPage Git philosophy
+This document records the standard operating procedure and philosopy
+of SimpleElastix's use of Git.
+
+\section TopicBranch The life of a topic branch
+
+In order to properly manage this workflow, we need to be very careful
+about always basing our branches off of master and tracking the
+dependencies of each branch.  The steps needed to do this are:
+
+-# base new topics off of the most up to date master
+-# merge to develop
+-# if there is a conflict when merging to next, abort the merge, find the branch that causes the conflict, and merge it into your branch, resolving conflicts here
+-# merge to next only when there are no conflicts left
+
+ Here are the details:
+\code
+ $ git checkout master
+ $ git pull (just to make sure master is up to date)
+ $ git checkout -b BRANCHNAME (we should also standardize our branch names)
+ ... do work and make commits on BRANCHNAME ...
+ $ git stage-push
+ $ git stage-merge
+\endcode
+Here's where the tricky part is.  If you get conflicts here, that
+means that there's some branch that's been merged to next which
+conflicts with your changes and isn't in master.  Instead of just
+resolving this conflict while merging BRANCH_NAME, you should
+introduce a dependency with the conflicting branch.  To do this you
+need to find the branch that conflicts and merge it with your own
+(resolving the conflict here instead).
+
+The stage should produce a message to aid in the process of resolving
+the failed merge.
+
+*/
+}}
