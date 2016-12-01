@@ -34,6 +34,7 @@ The :ref:`Getting Started <GettingStarted>` section explains how to clone the `G
     AffineRegistration
     NonRigidRegistration
     GroupwiseRegistration
+    PointBasedRegistration
     Acknowledgements
 
 The reader is refered to the `elastix manual <http://elastix.isi.uu.nl/download/elastix_manual_v4.7.pdf>`_ for a technical discussion of individual algorithms.
