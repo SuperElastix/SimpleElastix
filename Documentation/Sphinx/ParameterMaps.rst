@@ -50,16 +50,15 @@ Internally, SimpleElastix passes images along with a parameter map to elastix an
 
 .. tip::
   
-  You can also leave out the parameter map parameter entirely, and SimpleElastix with register your images with a :code:`translation -> affine -> b-spline` multi-resolution approach. Similarly, for the object-oriented interface, simply leave out the call to :code:`SetParameterMap` to achieve this functionality. You can view these default parameter maps like this:
+  We can also leave out the parameter map parameter entirely, and SimpleElastix with register our images with a :code:`translation -> affine -> b-spline` multi-resolution approach. For the object-oriented interface, we simply leave out the call to :code:`SetParameterMap` to achieve this functionality. We can view these default parameter maps like this:
 
   ::
 
     import SimpleITK as sitk
     SimpleElastix = sitk.SimpleElastix()
-    parameterMaps = SimpleElastaix.GetParameterMaps()
-    sitk.PrintParameterMaps(parameterMaps)
+    SimpleElastix.PrintParameterMap()
 
-You can also retrieve this parameter map yourself and reconfigure it before passing it back to SimpleElastix, allowing you to quickly optimize a registration method to your particular problem:
+We can also retrieve this parameter map ourselves and reconfigure it before passing it back to SimpleElastix, allowing us to quickly optimize a registration method to a particular problem:
 
 ::
 
@@ -77,7 +76,7 @@ You can also retrieve this parameter map yourself and reconfigure it before pass
                              sitk.ReadImage('movingImage.nii'), \
                              parameterMap)
 
-We will study other parameter maps more closely in later examples. For now, we simply print the translation parameter map to console.
+We will study other parameter maps more closely in later examples. For now, we simply print the translation parameter map to console and examine its contents.
 
 ::
 
@@ -107,14 +106,27 @@ We will study other parameter maps more closely in later examples. For now, we s
       (Transform "TranslationTransform")
       (WriteResultImage "true")
 
-The first thing to note is that the parameter map is enumerated. SimpleElastix can take a vector of parameter maps and apply the corresponding registrations sequentially. The resulting transform is called a composite transform since the final transformation is a composition of sequentially applied deformation fields. For example, a non-rigid registration is often initialized with an affine transformation (translation, scale, rotation, shearing) to bring the objects into rough alignment. This makes the registration less suscetible to local minima. You can also ask SimpleElastix to add the individual deformation fields and apply them in one go, but make sure you know what you are doing before opting for this apprach. 
+The first thing to note is that the parameter map is enumerated. SimpleElastix can take a vector of parameter maps and apply the corresponding registrations sequentially. The resulting transform is called a composite transform since the final transformation is a composition of sequentially applied deformation fields. For example, a non-rigid registration is often initialized with an affine transformation (translation, scale, rotation, shearing) to bring the objects into rough alignment. This makes the registration less suscetible to local minima. We can also ask SimpleElastix to add the individual deformation fields and apply them in one go (but make sure you know what you are doing before opting for this apprach). 
+
+.. tip::
+
+  We can add mulitple parameter maps to SimpleElastix like this:
+
+  ::
+
+    import SimpleITK as sitk
+    SimpleElastix = sitk.SimpleElastix()
+    SimpleElastix.SetParameterMap(sitk.GetDefaultParameterMap('translation'))
+    SimpleElastix.AddParameterMap(sitk.GetDefaultParameterMap('affine'))
+
+  Note that the first call is a :code:`Set` method. This deletes any prevously set parameter maps. We add our own custom parameter maps in the same way.
 
 Let's examine the parameters above in detail.
 
 Important Parameters
 --------------------
 
-:code:`Registration` is the top-level parameter which in this case has been set to :code:`MultiResolutionRegistration`. A multi-resolution pyramid strategy improves the capture range and robustness of the registration. You will almost always want to use multiple resolutions unless your problem is particularly simple. The basic idea is to first estimate :code:`T(x)` on a low resolution version of the images and then propagate the estimated deformation to higher resolutions. This makes the registration initially focus on larger structures (the skull and brain hemispheres etc), before focusing on high-frequency information (brain subregions etc) which contain more local minima. :code:`FixedImagePyramid`, :code:`FixedImagePyramidSchedule`, :code:`MovingImagePyramid`, :code:`MovingImagePyramidSchedule`, and :code:`NumberOfResolutions` controls the pyramid strategy.
+:code:`Registration` is the top-level parameter which in this case has been set to :code:`MultiResolutionRegistration`. A multi-resolution pyramid strategy improves the capture range and robustness of the registration. We will almost always want to use multiple resolutions unless your problem is particularly simple. The basic idea is to first estimate :code:`T(x)` on a low resolution version of the images and then propagate the estimated deformation to higher resolutions. This makes the registration initially focus on larger structures (the skull and brain hemispheres etc), before focusing on high-frequency information (brain subregions etc) which contain more local minima. :code:`FixedImagePyramid`, :code:`FixedImagePyramidSchedule`, :code:`MovingImagePyramid`, :code:`MovingImagePyramidSchedule`, and :code:`NumberOfResolutions` controls the pyramid strategy.
 
 The :code:`Transform` parameter is set to :code:`TranslationTransform` which it is optimized with an :code:`AdaptiveStochasticGradientDescent` optimizer (Klein et al. 2009). SimpleElastix will use this optimizer together with the :code:`AdvancedMattesMutualInformation` metric by default since this combination work well for a broad range of problems whether mono-modal or multi-modal. 
 
