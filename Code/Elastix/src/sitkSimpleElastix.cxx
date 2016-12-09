@@ -728,6 +728,7 @@ PrintParameterMap( const SimpleElastix::ParameterMapVectorType parameterMapVecto
 {
   SimpleElastix selx;
   selx.SetParameterMap( parameterMapVector );
+  selx.PrintParameterMap();
 }
 
 Image
