@@ -25,7 +25,10 @@ The metric can also be added to all metrics in the SimpleElastix object with a s
     SimpleElastix = sitk.SimpleElastix()
     SimpleElastix.AddParameter( "Metric", "CorrespondingPointsEuclideanDistanceMetric" )
 
-    # Or to a single parameter map (here we assume that SimpleElastix contains at least two parameter maps)
+Or to a single parameter map (here we assume that SimpleElastix contains at least two parameter maps)
+
+::
+
     SimpleElastix.AddParameter( 1, "Metric", "CorrespondingPointsEuclideanDistanceMetric" )
 
 
@@ -48,7 +51,7 @@ The point set are specified as text files. They can either be in `VTK pointdata 
 	178.1 -10.9 14.5
 	180.4 -18.1 78.9
 
-Apply Transformations Point Sets
+Transforming Point Sets
 --------------------------------
 
 We can apply a transformation computed with SimpleElastix to a point set with SimpleTransformix.

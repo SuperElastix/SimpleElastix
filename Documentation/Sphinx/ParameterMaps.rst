@@ -50,13 +50,20 @@ Internally, SimpleElastix passes images along with a parameter map to elastix an
 
 .. tip::
   
-  We can also leave out the parameter map parameter entirely, and SimpleElastix with register our images with a :code:`translation -> affine -> b-spline` multi-resolution approach. For the object-oriented interface, we simply leave out the call to :code:`SetParameterMap` to achieve this functionality. We can view these default parameter maps like this:
+  SimpleElastix will register our images with a :code:`translation -> affine -> b-spline` multi-resolution approach by default. We simply leave out the call to :code:`SetParameterMap` to achieve this functionality. 
 
   ::
-
+  
     import SimpleITK as sitk
+
+    # Functional interface
+    resultImage = sitk.Elastix(sitk.ReadImage('fixedImage.nii'), sitk.ReadImage('movingImage.nii')
+
+    # Object oritented interface
     SimpleElastix = sitk.SimpleElastix()
-    SimpleElastix.PrintParameterMap()
+    SimpleElastix.SetFixedImage(sitk.ReadImage('fixedImage.nii'))
+    SimpleElastix.SetMovingImage(sitk.ReadImage('movingImage.nii'))
+    resultImage = SimpleElastix.Execute()
 
 We can also retrieve this parameter map ourselves and reconfigure it before passing it back to SimpleElastix, allowing us to quickly optimize a registration method to a particular problem:
 
@@ -75,6 +82,16 @@ We can also retrieve this parameter map ourselves and reconfigure it before pass
   resultImage = sitk.Elastix(sitk.ReadImage('fixedImage.nii'),  \
                              sitk.ReadImage('movingImage.nii'), \
                              parameterMap)
+
+.. tip::
+
+  We can print parameter maps to console like this:
+
+  ::
+
+    import SimpleITK as sitk
+    SimpleElastix = sitk.SimpleElastix()
+    SimpleElastix.PrintParameterMap()
 
 We will study other parameter maps more closely in later examples. For now, we simply print the translation parameter map to console and examine its contents.
 
