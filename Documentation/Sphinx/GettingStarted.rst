@@ -10,7 +10,7 @@ This page explains how to install SimpleElastix. The process involves compiling 
 SuperBuild On Linux
 -------------------
 
-SimpleElastix can be compiled with the SuperBuild. The SuperBuild is a script that automatically downloads and install any dependencies so you can don't have to install elastix, ITK or SWIG on beforehand. The only thing you need is CMake, git and a compiler toolchain. To build SimpleElastix, use the following steps to download the code and start the build:
+SimpleElastix can be compiled with the SuperBuild. The SuperBuild is a script that automatically downloads and install any dependencies so you can don't have to install elastix, ITK or SWIG on beforehand. The only thing you need is CMake, git and a compiler toolchain. To build SimpleElastix, use the following commands to download the code and start the build:
 
 ::
 
@@ -60,11 +60,33 @@ It is assumed that a CMake, git and a compiler toolchain has already been instal
 SuperBuild On Windows
 ---------------------
 
-SimpleElastix can be compiled with the SuperBuild. The SuperBuild is a script that automatically downloads and install any dependencies so you can don't have to install elastix, ITK or SWIG on beforehand. The only thing you need is CMake, git and a compiler toolchain. In this guide we will use CMake to generate build files and the Visual Studio compiler to compile the project. 
+SimpleElastix can be compiled with the SuperBuild. The SuperBuild is a script that automatically downloads and install any dependencies so you can don't have to install elastix, ITK or SWIG on beforehand. The only thing you need is CMake, git and a compiler toolchain. 
+
+Using the command line
+~~~~~~~~~~~~~~~~~~~~~~
+
+We will use CMake to generate build files and the msbuild.exe program to compile the project (which is also what Visual Studio uses under the good). 
+
+1. Download CMake, git and code, and setup directories. 
+    - Download and install `CMake GUI <http://www.cmake.org/download/>`_. Be sure to select `Add CMake to the system PATH` option.
+    - :code:`git clone https://github.com/kaspermarstal/SimpleElastix` into a source folder of your choice. You can install `GitHub Desktop <https://desktop.github.com/>`_ and use the accompanying command line tool with git automatically added to its path.
+    - Make a new directory named `build` and cd into it by typing `cd build`. Here we will assume that the build directory and the source directory is in the same folder.
+2. Compile the project.
+    - Open "Developer Command Prompt for VS2015" (or equivalent depending on your version of Visual Studio)
+    - Run `cmake ../SimpleElastix/SuperBuild`.
+    - Run `msbuild /p:configuration=release ALL_BUILD.vcxproj`. 
+3. Enable x64 bit build (Optional).
+    - Prior to running the `cmake` command in step 2, navigate to `C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC>` (or equivalent depending on your version of Visual Studio) and `vcvarsall amd64`.
+
+
+Using Visual Studio
+~~~~~~~~~~~~~~~~~~~
+
+Will use CMake to generate build files and the Visual Studio compiler to compile the project. 
 
 1. Setup directories.
     - Download and install `CMake GUI <http://www.cmake.org/download/>`_.
-    - :code:`git clone https://github.com/kaspermarstal/SimpleElastix` into a source folder of your choice.
+    - :code:`git clone https://github.com/kaspermarstal/SimpleElastix` into a source folder of your choice. You can use `GitHub Desktop <https://desktop.github.com/>`_ if you prefer to not use the command line.
     - Point the CMake source directory to the :code:`SimpleElastix/SuperBuild` folder inside the source directory.
     - Point the CMake build directory to a clean directory. Note that Visual Studio may complain during the build if the path is longer than 50 characters. Make a build directory with a short name at the root of your harddrive to avoid any issues.
 
