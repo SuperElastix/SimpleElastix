@@ -24,7 +24,7 @@ When the project has been built, we can find language packages in the :code:`${B
 
 ::
 
-    ${BUILD_DIRECTORY}/SimpleITK-build/Wrapping/PythonPackage
+    ${BUILD_DIRECTORY}/SimpleITK-build/Wrapping/Python/Packaging
 
 and run the following command:
 
@@ -84,9 +84,9 @@ Using Visual Studio
 
 Will use CMake to generate build files and the Visual Studio compiler to compile the project. 
 
-1. Setup directories.
+1. Download CMake, git and code, and setup directories.
     - Download and install `CMake GUI <http://www.cmake.org/download/>`_.
-    - :code:`git clone https://github.com/kaspermarstal/SimpleElastix` into a source folder of your choice. You can use `GitHub Desktop <https://desktop.github.com/>`_ if you prefer to not use the command line.
+    - :code:`git clone https://github.com/kaspermarstal/SimpleElastix` into a source folder of your choice.
     - Point the CMake source directory to the :code:`SimpleElastix/SuperBuild` folder inside the source directory.
     - Point the CMake build directory to a clean directory. Note that Visual Studio may complain during the build if the path is longer than 50 characters. Make a build directory with a short name at the root of your harddrive to avoid any issues.
 
