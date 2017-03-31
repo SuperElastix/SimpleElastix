@@ -15,8 +15,8 @@
 *  limitations under the License.
 *
 *=========================================================================*/
-#ifndef __sitkPixelIDTypeLists_h
-#define __sitkPixelIDTypeLists_h
+#ifndef sitkPixelIDTypeLists_h
+#define sitkPixelIDTypeLists_h
 
 #include <stdint.h>
 
@@ -196,14 +196,6 @@ typedef typelist::Append<
   >::Type AllPixelIDTypeList;
 
 
-#ifdef SITK_EXPRESS_INSTANTIATEDPIXELS
-
-
-// this is a quick and dirty list to only be used for development purposes
-typedef typelist::MakeTypeList< BasicPixelID<int16_t>, BasicPixelID<float>, BasicPixelID<double>, VectorPixelID<float> >::Type InstantiatedPixelIDTypeList;
-
-#else
-
 /** List of pixel ids which are instantiated for use in SimpleITK
  *
  *  this include image of itk::Image,itk::VectorImage, and
@@ -215,14 +207,11 @@ typedef typelist::MakeTypeList< BasicPixelID<int16_t>, BasicPixelID<float>, Basi
  */
 typedef AllPixelIDTypeList InstantiatedPixelIDTypeList;
 
-#endif
-
 /** SimpleElastix and SimpleTransformix is compiled with float pixel type only. This
  * saves compile time and reduces binary size. Images are automacially casted to and
  * from float before and after registration.
  */
 typedef typelist::MakeTypeList< BasicPixelID< float > >::Type FloatPixelIDTypeList;
-
 
 }
 }

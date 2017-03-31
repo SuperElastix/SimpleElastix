@@ -20,19 +20,31 @@ set ( SimpleITKExplicitSource
   )
 
 
-# these files are the instantiated ITK filter, but they do not do IO,
-# so we don't need to register the IO factoried here.
-set ( ITK_NO_IO_FACTORY_REGISTER_MANAGER 1 )
-
-find_package(ITK COMPONENTS ITKCommon ITKImageCompose ITKImageIntensity ITKLabelMap REQUIRED)
+set(use_itk_modules ITKCommon ITKImageCompose ITKImageIntensity ITKLabelMap)
+find_package(ITK COMPONENTS ${use_itk_modules} REQUIRED)
 include(${ITK_USE_FILE})
 
 if ( MSVC AND SITK_BUILD_SHARED_LIBS )
   set( SimpleITKExplicit_FORCE_LIBRARY_TYPE "STATIC" )
 endif()
 add_library ( SimpleITKExplicit ${SimpleITKExplicit_FORCE_LIBRARY_TYPE} ${SimpleITKExplicitSource} )
-if( CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.9  AND SITK_BUILD_SHARED_LIBS )
+if( SITK_BUILD_SHARED_LIBS )
   set_target_properties(SimpleITKExplicit PROPERTIES CXX_VISIBILITY_PRESET default)
 endif()
-target_link_libraries ( SimpleITKExplicit PUBLIC ${ITK_LIBRARIES} )
+sitk_target_use_itk( SimpleITKExplicit PUBLIC ${use_itk_modules} )
+target_include_directories ( SimpleITKExplicit
+  PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/Code/Explicit/include>
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/Code/Common/include>
+    $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/Code/Common/include>
+    $<INSTALL_INTERFACE:include> )
+target_compile_definitions( SimpleITKExplicit
+  PUBLIC
+    SITK_USE_EXPLICITITK )
+target_compile_options( SimpleITKExplicit
+  PUBLIC
+    ${SimpleITK_PUBLIC_COMPILE_OPTIONS}
+  PRIVATE
+    ${SimpleITK_PRIVATE_COMPILE_OPTIONS} )
+
 sitk_install_exported_target( SimpleITKExplicit )

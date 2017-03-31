@@ -2,7 +2,7 @@
 set ( ITK_NO_IO_FACTORY_REGISTER_MANAGER 1 )
 include(${ITK_USE_FILE})
 
-find_package( GTest REQUIRED )
+include(sitkUseGTest)
 
 set ( SimpleITKUnitTestSourceBase
   SimpleITKTestHarness.cxx
@@ -11,10 +11,27 @@ set ( SimpleITKUnitTestSourceBase
 )
 add_library ( SimpleITKUnitTestBase STATIC ${SimpleITKUnitTestSourceBase} )
 add_dependencies( SimpleITKUnitTestBase BasicFiltersSourceCode  )
-target_link_libraries( SimpleITKUnitTestBase ${GTEST_LIBRARIES} ${SimpleITK_LIBRARIES} ${ITK_LIBRARIES} )
+target_link_libraries( SimpleITKUnitTestBase GTest::GTest ${SimpleITK_LIBRARIES} ${ITK_LIBRARIES} )
+target_include_directories( SimpleITKUnitTestBase
+  PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+)
+target_compile_options( SimpleITKUnitTestBase
+  PUBLIC
+    ${SimpleITK_PUBLIC_COMPILE_OPTIONS}
+  PRIVATE
+    ${SimpleITK_PRIVATE_COMPILE_OPTIONS} )
 
-add_executable( sitkTransformCompareDriver sitkTransformCompareDriver.cxx )
-target_link_libraries( sitkTransformCompareDriver ${GTEST_LIBRARIES} SimpleITKUnitTestBase ${SimpleITK_LIBRARIES} )
+
+add_executable( sitkCompareDriver sitkCompareDriver.cxx )
+target_link_libraries( sitkCompareDriver SimpleITKUnitTestBase ${SimpleITK_LIBRARIES} ${ITK_LIBRARIES})
+target_compile_options( sitkCompareDriver
+  PRIVATE
+    ${SimpleITK_PRIVATE_COMPILE_OPTIONS} )
+
+sitk_install_exported_target(sitkCompareDriver)
+
 # Find tests generated in the binary directory
 # To add a new file, just add it to this list.  Any GoogleTests inside will be automatically
 # added to ctest.
@@ -40,10 +57,8 @@ set ( SimpleITKUnitTestSource
   sitkTransformixFilterTests.cxx
   )
 
-if ( SITK_4D_IMAGES )
-  list ( APPEND SimpleITKUnitTestSource
-    sitkImage4DTests.cxx
-    )
+if ( SimpleITK_4D_IMAGES )
+  list(APPEND SimpleITKUnitTestSource sitkImage4DTests.cxx )
 endif()
 
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/CTest)
@@ -59,14 +74,18 @@ file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/CSharpTests)
 set(TEST_HARNESS_TEMP_DIRECTORY ${SimpleITK_BINARY_DIR}/Testing/Temporary)
 set(TEST_HARNESS_DATA_DIRECTORY ${SimpleITK_BINARY_DIR}/ExternalData/Testing/Data)
 
-set( ITK_TEST_DRIVER  "itkTestDriver" )
+set( ITK_TEST_DRIVER  "$<TARGET_FILE:itkTestDriver>" )
 
 # Adjust Python to run in the virtualenv
 set( PythonVirtualenvHome  ${SimpleITK_BINARY_DIR}/Testing/Installation/PythonVirtualenv )
 
 
 add_executable(SimpleITKUnitTestDriver0 SimpleITKUnitTestDriver.cxx ${SimpleITKUnitTestSource})
-target_link_libraries ( SimpleITKUnitTestDriver0 ${GTEST_LIBRARIES} SimpleITKUnitTestBase ${SimpleITK_LIBRARIES} ${ITK_LIBRARIES} )
+target_link_libraries ( SimpleITKUnitTestDriver0 GTest::GTest SimpleITKUnitTestBase ${SimpleITK_LIBRARIES} ${ITK_LIBRARIES} )
+target_compile_options( SimpleITKUnitTestDriver0
+  PRIVATE
+    ${SimpleITK_PRIVATE_COMPILE_OPTIONS} )
+
 
 #
 # Glob for necessary template files up front, before the foreach loop over
@@ -95,7 +114,11 @@ foreach ( FILTERNAME ${GENERATED_FILTER_LIST} )
 
   if ( NOT _i LESS _stride )
     add_executable(SimpleITKUnitTestDriver${_exec_i} SimpleITKUnitTestDriver.cxx ${GENERATED_TEST_SOURCE})
-    target_link_libraries ( SimpleITKUnitTestDriver${_exec_i} ${GTEST_LIBRARIES} SimpleITKUnitTestBase ${SimpleITK_LIBRARIES} )
+    target_link_libraries ( SimpleITKUnitTestDriver${_exec_i} GTest::GTest SimpleITKUnitTestBase ${SimpleITK_LIBRARIES} )
+    target_compile_options( SimpleITKUnitTestDriver${_exec_i}
+      PRIVATE
+        ${SimpleITK_PRIVATE_COMPILE_OPTIONS} )
+
     math(EXPR _exec_i "${_exec_i}+1")
     set(GENERATED_TEST_SOURCE "")
     set ( _i 0 )
@@ -103,9 +126,9 @@ foreach ( FILTERNAME ${GENERATED_FILTER_LIST} )
 
   # Set up some convenience variables
   set (filter_json_file ${SimpleITK_SOURCE_DIR}/Code/BasicFilters/json/${FILTERNAME}.json)
-  set (template_expansion_script ${SimpleITK_SOURCE_DIR}/Utilities/ExpandTemplate.lua)
+  set (template_expansion_script ${SimpleITK_SOURCE_DIR}/ExpandTemplateGenerator/ExpandTemplate.lua)
   set (template_include_dir
-  ${SimpleITK_SOURCE_DIR}/TemplateComponents)
+  ${SimpleITK_SOURCE_DIR}/ExpandTemplateGenerator/Components)
 
 
   ######
@@ -122,13 +145,15 @@ foreach ( FILTERNAME ${GENERATED_FILTER_LIST} )
   if (template_name)
     set(OUTPUT_TEST_FILENAME "${SimpleITK_BINARY_DIR}/Testing/Unit/CTest/${FILTERNAME}.cmake")
     file(REMOVE "${OUTPUT_TEST_FILENAME}")
+    set(cmd ${SimpleITK_LUA_EXECUTABLE} ${template_expansion_script} test ${filter_json_file} ${SimpleITK_SOURCE_DIR}/Testing/Unit/ ${template_include_dir} CTestTemplate.cmake.in "${OUTPUT_TEST_FILENAME}")
     execute_process(
-      COMMAND ${SITK_LUA_EXECUTABLE} ${template_expansion_script} test ${filter_json_file} ${SimpleITK_SOURCE_DIR}/Testing/Unit/ ${template_include_dir} CTestTemplate.cmake.in "${OUTPUT_TEST_FILENAME}"
+      COMMAND ${cmd}
       RESULT_VARIABLE failed
       ERROR_VARIABLE error
       )
     if ( failed )
-      message( FATAL_ERROR "Failed to generate ${OUTPUT_TEST_FILENAME}\n${error}" )
+      string (REPLACE ";" " " cmd "${cmd}")
+      message( FATAL_ERROR "Failed to generate \"${OUTPUT_TEST_FILENAME}\"\nCOMMAND: ${cmd} \n${error}" )
     endif()
     include("${OUTPUT_TEST_FILENAME}")
 
@@ -136,7 +161,7 @@ foreach ( FILTERNAME ${GENERATED_FILTER_LIST} )
     add_custom_command (
       OUTPUT  ${OUTPUT_TEST_FILENAME}
       COMMAND ${CMAKE_COMMAND} -E remove -f "${OUTPUT_TEST_FILENAME}"
-      COMMAND ${SITK_LUA_EXECUTABLE} ${template_expansion_script} test ${filter_json_file} ${SimpleITK_SOURCE_DIR}/Testing/Unit/sitk ${template_include_dir} TestTemplate.cxx.in "${OUTPUT_TEST_FILENAME}"
+      COMMAND ${SimpleITK_LUA_EXECUTABLE} ${template_expansion_script} test ${filter_json_file} ${SimpleITK_SOURCE_DIR}/Testing/Unit/sitk ${template_include_dir} TestTemplate.cxx.in "${OUTPUT_TEST_FILENAME}"
       DEPENDS ${filter_json_file} ${CXX_TEMPLATE_FILES}
       )
     add_test( NAME BasicFilters.${FILTERNAME} COMMAND SimpleITKUnitTestDriver${_exec_i} --gtest_filter=BasicFilters.${FILTERNAME}:BasicFilters.${FILTERNAME}_* )
@@ -147,7 +172,7 @@ foreach ( FILTERNAME ${GENERATED_FILTER_LIST} )
       add_custom_command (
         OUTPUT "${OUTPUT_TEST_FILENAME}"
         COMMAND ${CMAKE_COMMAND} -E remove -f "${OUTPUT_TEST_FILENAME}"
-        COMMAND ${SITK_LUA_EXECUTABLE} ${template_expansion_script} test ${filter_json_file} ${SimpleITK_SOURCE_DIR}/Testing/Unit/Lua ${template_include_dir} TestTemplate.lua.in "${OUTPUT_TEST_FILENAME}"
+        COMMAND ${SimpleITK_LUA_EXECUTABLE} ${template_expansion_script} test ${filter_json_file} ${SimpleITK_SOURCE_DIR}/Testing/Unit/Lua ${template_include_dir} TestTemplate.lua.in "${OUTPUT_TEST_FILENAME}"
         DEPENDS ${filter_json_file} ${LUA_TEMPLATE_FILES}
         )
       set ( WRAPPED_GENERATED_TEST_SOURCE ${WRAPPED_GENERATED_TEST_SOURCE} ${OUTPUT_TEST_FILENAME})
@@ -158,7 +183,7 @@ foreach ( FILTERNAME ${GENERATED_FILTER_LIST} )
       add_custom_command (
         OUTPUT  "${OUTPUT_TEST_FILENAME}"
         COMMAND ${CMAKE_COMMAND} -E remove -f "${OUTPUT_TEST_FILENAME}"
-        COMMAND ${SITK_LUA_EXECUTABLE} ${template_expansion_script} test ${filter_json_file} ${SimpleITK_SOURCE_DIR}/Testing/Unit/Python ${template_include_dir} TestTemplate.py.in "${OUTPUT_TEST_FILENAME}"
+        COMMAND ${SimpleITK_LUA_EXECUTABLE} ${template_expansion_script} test ${filter_json_file} ${SimpleITK_SOURCE_DIR}/Testing/Unit/Python ${template_include_dir} TestTemplate.py.in "${OUTPUT_TEST_FILENAME}"
         DEPENDS ${filter_json_file} ${PYTHON_TEMPLATE_FILES}
         )
       set ( WRAPPED_GENERATED_TEST_SOURCE ${WRAPPED_GENERATED_TEST_SOURCE} ${OUTPUT_TEST_FILENAME})
@@ -169,7 +194,7 @@ foreach ( FILTERNAME ${GENERATED_FILTER_LIST} )
       add_custom_command (
         OUTPUT  "${OUTPUT_TEST_FILENAME}"
         COMMAND ${CMAKE_COMMAND} -E remove -f "${OUTPUT_TEST_FILENAME}"
-        COMMAND ${SITK_LUA_EXECUTABLE} ${template_expansion_script} test ${filter_json_file} ${SimpleITK_SOURCE_DIR}/Testing/Unit/Tcl ${template_include_dir} TestTemplate.tcl.in "${OUTPUT_TEST_FILENAME}"
+        COMMAND ${SimpleITK_LUA_EXECUTABLE} ${template_expansion_script} test ${filter_json_file} ${SimpleITK_SOURCE_DIR}/Testing/Unit/Tcl ${template_include_dir} TestTemplate.tcl.in "${OUTPUT_TEST_FILENAME}"
         DEPENDS ${filter_json_file} ${TCL_TEMPLATE_FILES}
         )
       set ( WRAPPED_GENERATED_TEST_SOURCE ${WRAPPED_GENERATED_TEST_SOURCE} ${OUTPUT_TEST_FILENAME})
@@ -180,7 +205,7 @@ foreach ( FILTERNAME ${GENERATED_FILTER_LIST} )
       add_custom_command (
         OUTPUT  "${OUTPUT_TEST_FILENAME}"
         COMMAND ${CMAKE_COMMAND} -E remove -f "${OUTPUT_TEST_FILENAME}"
-        COMMAND ${SITK_LUA_EXECUTABLE} ${template_expansion_script} test ${filter_json_file} ${SimpleITK_SOURCE_DIR}/Testing/Unit/R ${template_include_dir} TestTemplate.R.in "${OUTPUT_TEST_FILENAME}"
+        COMMAND ${SimpleITK_LUA_EXECUTABLE} ${template_expansion_script} test ${filter_json_file} ${SimpleITK_SOURCE_DIR}/Testing/Unit/R ${template_include_dir} TestTemplate.R.in "${OUTPUT_TEST_FILENAME}"
         DEPENDS ${filter_json_file} ${R_TEMPLATE_FILES}
         )
       set ( WRAPPED_GENERATED_TEST_SOURCE ${WRAPPED_GENERATED_TEST_SOURCE} ${OUTPUT_TEST_FILENAME})
@@ -191,7 +216,7 @@ foreach ( FILTERNAME ${GENERATED_FILTER_LIST} )
       add_custom_command (
         OUTPUT  "${OUTPUT_TEST_FILENAME}"
         COMMAND ${CMAKE_COMMAND} -E remove -f "${OUTPUT_TEST_FILENAME}"
-        COMMAND ${SITK_LUA_EXECUTABLE} ${template_expansion_script} test ${filter_json_file} ${SimpleITK_SOURCE_DIR}/Testing/Unit/Ruby ${template_include_dir} TestTemplate.rb.in "${OUTPUT_TEST_FILENAME}"
+        COMMAND ${SimpleITK_LUA_EXECUTABLE} ${template_expansion_script} test ${filter_json_file} ${SimpleITK_SOURCE_DIR}/Testing/Unit/Ruby ${template_include_dir} TestTemplate.rb.in "${OUTPUT_TEST_FILENAME}"
         DEPENDS ${filter_json_file} ${RUBY_TEMPLATE_FILES}
         )
       set ( WRAPPED_GENERATED_TEST_SOURCE ${WRAPPED_GENERATED_TEST_SOURCE} ${OUTPUT_TEST_FILENAME})
@@ -203,7 +228,7 @@ foreach ( FILTERNAME ${GENERATED_FILTER_LIST} )
       add_custom_command (
         OUTPUT  "${OUTPUT_TEST_FILENAME}"
         COMMAND ${CMAKE_COMMAND} -E remove -f "${OUTPUT_TEST_FILENAME}"
-        COMMAND ${SITK_LUA_EXECUTABLE} ${template_expansion_script} test ${filter_json_file} ${SimpleITK_SOURCE_DIR}/Testing/Unit/Java ${template_include_dir} TestTemplate.java.in "${OUTPUT_TEST_FILENAME}"
+        COMMAND ${SimpleITK_LUA_EXECUTABLE} ${template_expansion_script} test ${filter_json_file} ${SimpleITK_SOURCE_DIR}/Testing/Unit/Java ${template_include_dir} TestTemplate.java.in "${OUTPUT_TEST_FILENAME}"
         DEPENDS ${filter_json_file} ${JAVA_TEMPLATE_FILES}  ${SWIG_MODULE_SimpleITKJava_TARGET_NAME}        )
       set ( WRAPPED_GENERATED_TEST_SOURCE ${WRAPPED_GENERATED_TEST_SOURCE} ${OUTPUT_TEST_FILENAME})
     endif()
@@ -214,7 +239,7 @@ foreach ( FILTERNAME ${GENERATED_FILTER_LIST} )
       add_custom_command (
         OUTPUT "${OUTPUT_TEST_FILENAME}"
         COMMAND ${CMAKE_COMMAND} -E remove -f "${OUTPUT_TEST_FILENAME}"
-        COMMAND ${SITK_LUA_EXECUTABLE} ${template_expansion_script} test ${filter_json_file} ${SimpleITK_SOURCE_DIR}/Testing/Unit/CSharp ${template_include_dir} TestTemplate.cs.in "${OUTPUT_TEST_FILENAME}"
+        COMMAND ${SimpleITK_LUA_EXECUTABLE} ${template_expansion_script} test ${filter_json_file} ${SimpleITK_SOURCE_DIR}/Testing/Unit/CSharp ${template_include_dir} TestTemplate.cs.in "${OUTPUT_TEST_FILENAME}"
         DEPENDS ${filter_json_file} ${CSHARP_TEMPLATE_FILES}
         )
       set ( WRAPPED_GENERATED_TEST_SOURCE ${WRAPPED_GENERATED_TEST_SOURCE} ${OUTPUT_TEST_FILENAME})
@@ -227,19 +252,14 @@ endforeach()
 message( STATUS "Generating tests...Done")
 
 add_executable(SimpleITKUnitTestDriver${_exec_i} SimpleITKUnitTestDriver.cxx ${GENERATED_TEST_SOURCE})
-target_link_libraries ( SimpleITKUnitTestDriver${_exec_i} ${GTEST_LIBRARIES} SimpleITKUnitTestBase ${SimpleITK_LIBRARIES} )
+target_link_libraries ( SimpleITKUnitTestDriver${_exec_i} GTest::GTest SimpleITKUnitTestBase ${SimpleITK_LIBRARIES} )
+target_compile_options( SimpleITKUnitTestDriver${_exec_i}
+  PRIVATE
+    ${SimpleITK_PRIVATE_COMPILE_OPTIONS} )
 
 # Set some variables
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/SimpleITKTestHarnessPaths.h.in
                ${CMAKE_CURRENT_BINARY_DIR}/SimpleITKTestHarnessPaths.h ESCAPE_QUOTES)
-
-
-include_directories (
-  ${SimpleITK_INCLUDE_DIRS}
-  ${GTEST_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_BINARY_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  )
 
 add_custom_target(WrappedGeneratedTests ALL
   DEPENDS ${WRAPPED_GENERATED_TEST_SOURCE}
@@ -255,14 +275,22 @@ if(MSVC_VERSION EQUAL 1700)
 endif()
 
 add_executable(sitkShowTest sitkShowTest.cxx )
-target_link_libraries ( sitkShowTest  ${GTEST_LIBRARIES} ${SimpleITK_LIBRARIES} SimpleITKUnitTestBase )
+target_link_libraries ( sitkShowTest  GTest::GTest ${SimpleITK_LIBRARIES} SimpleITKUnitTestBase )
+target_compile_options( sitkShowTest
+  PRIVATE
+    ${SimpleITK_PRIVATE_COMPILE_OPTIONS} )
+
 
 add_executable( sitkSystemInformationTest sitkSystemInformationTest.cxx )
 target_link_libraries( sitkSystemInformationTest ${SimpleITK_LIBRARIES} ${ITK_LIBRARIES})
 add_test( NAME sitkSystemInformaionTest COMMAND sitkSystemInformationTest ${CMAKE_BINARY_DIR} )
+target_compile_options( sitkSystemInformationTest
+  PRIVATE
+    ${SimpleITK_PRIVATE_COMPILE_OPTIONS} )
 
 
-gtest_add_tests(SimpleITKUnitTestDriver0 ${SimpleITKUnitTestSource})
+
+gtest_add_tests(SimpleITKUnitTestDriver0 "" ${SimpleITKUnitTestSource})
 
 
 #######################################################

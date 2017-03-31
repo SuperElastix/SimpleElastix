@@ -14,6 +14,9 @@ if( BUILD_TESTING AND CMAKE_VERSION VERSION_LESS 2.8.11 )
   message( FATAL_ERROR "BUILD_TESTING ON requires CMake 2.8.11 or newer." )
 endif()
 
+if(CMAKE_GENERATOR MATCHES "Ninja" AND CMAKE_VERSION VERSION_LESS 3.2 )
+  message( FATAL_ERROR "Using \"Ninja\" generator requires CMake 3.2.0 or newer." )
+endif()
 
 configure_file(../CMake/CTestCustom.cmake.in CTestCustom.cmake)
 
@@ -54,7 +57,48 @@ set(CMAKE_MODULE_PATH
 include(sitkPreventInSourceBuilds)
 include(sitkPreventInBuildInstalls)
 include(VariableList)
+include(sitkExternalData)
+include( sitkSITKLegacyNaming )
 
+
+
+add_custom_target( SuperBuildSimpleITKSource )
+
+#
+# sitkSourceDownload( <output variable> <filename> <md5 hash> )
+#
+# A function to get a filename for an ExternalData source file used in
+# a superbuild. Adds a target which downloads all source code
+# needed for superbuild projects. The source file is cached with in
+# the build tree, and can be locally cache with other ExternalData
+# controlled environment variables.
+#
+# The "SuperBuildSimpleITKSource" target needs to be manually added as
+# a dependencies to the ExternalProject.
+#
+#   add_dependencies( PROJ "SuperBuildSimpleITKSource" )
+#
+# Note: Hash files are created under the SOURCE directory in the
+# .ExternalSource sub-directory during configuration.
+#
+function(sitkSourceDownload outVar filename hash)
+  set(link_file "${CMAKE_CURRENT_SOURCE_DIR}/.ExternalSource/${filename}")
+  file(WRITE  "${link_file}.md5" ${hash} )
+  ExternalData_Expand_arguments(
+    SuperBuildSimpleITKSourceReal
+    link
+    DATA{${link_file}}
+    )
+  set(${outVar} "${link}" PARENT_SCOPE)
+endfunction()
+
+function(sitkSourceDownloadDependency proj)
+  if (CMAKE_VERSION VERSION_LESS 3.2)
+    add_dependencies(${proj}  "SuperBuildSimpleITKSource")
+  else()
+    ExternalProject_Add_StepDependencies(${proj} download "SuperBuildSimpleITKSource")
+  endif()
+endfunction()
 
 #-----------------------------------------------------------------------------
 # Prerequisites
@@ -72,15 +116,16 @@ endif()
 # Use GIT protocol
 #------------------------------------------------------------------------------
 find_package(Git)
-set(SITK_GIT_PROTOCOL_default "https")
+set(SimpleITK_GIT_PROTOCOL_default "https")
 if (GIT_VERSION_STRING VERSION_LESS "1.7.10")
   # minimum version for https support
-  set(SITK_GIT_PROTOCOL_default "git")
+  set(SimpleITK_GIT_PROTOCOL_default "git")
 endif()
-set(SITK_GIT_PROTOCOL  ${SITK_GIT_PROTOCOL_default} CACHE STRING "If behind a firewall turn set this to 'https' or 'http'." )
-mark_as_advanced(SITK_GIT_PROTOCOL)
-set_property(CACHE SITK_GIT_PROTOCOL PROPERTY STRINGS "https;http;git")
-set(git_protocol ${SITK_GIT_PROTOCOL})
+set(SimpleITK_GIT_PROTOCOL  ${SimpleITK_GIT_PROTOCOL_default} CACHE STRING "If behind a firewall turn set this to 'https' or 'http'." )
+mark_as_advanced(SimpleITK_GIT_PROTOCOL)
+set_property(CACHE SimpleITK_GIT_PROTOCOL PROPERTY STRINGS "https;http;git")
+set(git_protocol ${SimpleITK_GIT_PROTOCOL})
+sitk_legacy_naming(SimpleITK_GIT_PROTOCOL)
 
 
 #-----------------------------------------------------------------------------
@@ -103,8 +148,8 @@ option(BUILD_SHARED_LIBS "Build SimpleITK ITK with shared libraries. This does n
 # as this option does not robustly work across platforms it will be marked as advanced
 mark_as_advanced( FORCE BUILD_SHARED_LIBS )
 
-option( SITK_4D_IMAGES "Add Image and I/O support for four spatial dimensions." ON )
-mark_as_advanced( SITK_4D_IMAGES )
+option( SimpleITK_4D_IMAGES "Add Image and I/O support for four spatial dimensions." OFF )
+mark_as_advanced( SimpleITK_4D_IMAGES )
 
 #-----------------------------------------------------------------------------
 # Setup build type
@@ -124,7 +169,6 @@ endif()
 # augment compiler flags
 #-------------------------------------------------------------------------
 include(sitkCheckRequiredFlags)
-set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SimpleITK_REQUIRED_CXX_FLAGS}" )
 
 #------------------------------------------------------------------------------
 # BuildName used for dashboard reporting
@@ -132,22 +176,6 @@ set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SimpleITK_REQUIRED_CXX_FLAGS}" )
 if(NOT BUILDNAME)
   set(BUILDNAME "Unknown-build" CACHE STRING "Name of build to report to dashboard")
 endif()
-
-
-#------------------------------------------------------------------------------
-# WIN32 /bigobj is required for windows builds because of the size of
-#------------------------------------------------------------------------------
-if (MSVC)
-  # some object files (CastImage for instance)
-  set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj" )
-  set ( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /bigobj" )
-  # Avoid some warnings
-  add_definitions ( -D_SCL_SECURE_NO_WARNINGS )
-endif()
-
-#------------------------------------------------------------------------------
-# Setup build locations.
-#------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
 # Common Build Options to pass to all subsequent tools
@@ -158,7 +186,7 @@ list( APPEND ep_common_list
   CMAKE_MAKE_PROGRAM
 
   CMAKE_C_COMPILER
-  CMAKE_C_COMPILER_ARG1
+  CMAKE_C_COMPILER_LAUNCHER
 
   CMAKE_C_FLAGS
   CMAKE_C_FLAGS_DEBUG
@@ -167,7 +195,7 @@ list( APPEND ep_common_list
   CMAKE_C_FLAGS_RELWITHDEBINFO
 
   CMAKE_CXX_COMPILER
-  CMAKE_CXX_COMPILER_ARG1
+  CMAKE_CXX_COMPILER_LAUNCHER
 
   CMAKE_CXX_FLAGS
   CMAKE_CXX_FLAGS_DEBUG
@@ -197,6 +225,7 @@ list( APPEND ep_common_list
 
   CMAKE_PREFIX_PATH
   CMAKE_FRAMEWORK_PATH
+  CMAKE_DL_LIBS
   CMAKE_SYSTEM_PREFIX_PATH
   CMAKE_SYSTEM_INCLUDE_PATH
   CMAKE_SYSTEM_LIBRARY_PATH
@@ -210,7 +239,9 @@ list( APPEND ep_common_list
   MEMORYCHECK_SUPPRESSIONS_FILE
   MEMORYCHECK_COMMAND
   SITE
-  BUILDNAME )
+  BUILDNAME
+
+  SKBUILD )
 
 if( APPLE )
   list( APPEND ep_common_list
@@ -236,6 +267,14 @@ VariableListToCache( ep_common_list ep_common_cache )
 include(sitkLanguageOptions)
 
 
+if(NOT CMAKE_VERSION VERSION_LESS 3.4)
+  set(External_Project_USES_TERMINAL
+    USES_TERMINAL_DOWNLOAD 1
+    USES_TERMINAL_CONFIGURE 1
+    USES_TERMINAL_BUILD 1
+    USES_TERMINAL_INSTALL 1)
+endif()
+
 #$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 include(ExternalProject)
 
@@ -246,23 +285,23 @@ option ( USE_SYSTEM_LUA "Use a pre-compiled version of LUA 5.1 previously config
 mark_as_advanced(USE_SYSTEM_LUA)
 if ( USE_SYSTEM_LUA )
   find_package( LuaInterp REQUIRED 5.1 )
-  set( SITK_LUA_EXECUTABLE ${LUA_EXECUTABLE} CACHE PATH "Lua executable used for code generation." )
-  mark_as_advanced( SITK_LUA_EXECUTABLE )
+  set( SimpleITK_LUA_EXECUTABLE ${LUA_EXECUTABLE} CACHE PATH "Lua executable used for code generation." )
+  mark_as_advanced( SimpleITK_LUA_EXECUTABLE )
   unset( LUA_EXECUTABLE CACHE )
 else()
   include(External_Lua)
   list(APPEND ${CMAKE_PROJECT_NAME}_DEPENDENCIES Lua)
-  set( SITK_LUA_EXECUTABLE ${SITK_LUA_EXECUTABLE} CACHE PATH "Lua executable used for code generation." )
-  mark_as_advanced( SITK_LUA_EXECUTABLE )
+  set( SimpleITK_LUA_EXECUTABLE ${SimpleITK_LUA_EXECUTABLE} CACHE PATH "Lua executable used for code generation." )
+  mark_as_advanced( SimpleITK_LUA_EXECUTABLE )
 endif()
 
 #------------------------------------------------------------------------------
 # Swig
 #------------------------------------------------------------------------------
-option ( USE_SYSTEM_SWIG "Use a pre-compiled version of SWIG 2.0 previously configured for your system" OFF )
+option ( USE_SYSTEM_SWIG "Use a pre-compiled version of SWIG 3.0 previously configured for your system" OFF )
 mark_as_advanced(USE_SYSTEM_SWIG)
 if(USE_SYSTEM_SWIG)
-  find_package ( SWIG 2 REQUIRED )
+  find_package ( SWIG 3 REQUIRED )
 else()
   include(External_Swig)
   list(APPEND ${CMAKE_PROJECT_NAME}_DEPENDENCIES Swig)
@@ -271,15 +310,18 @@ endif()
 #------------------------------------------------------------------------------
 # Google Test
 #------------------------------------------------------------------------------
-option( USE_SYSTEM_GTEST "Use a pre-compiled version of GoogleTest. " OFF )
+option( USE_SYSTEM_GTEST "Use an external version of GoogleTest. " OFF )
 mark_as_advanced(USE_SYSTEM_GTEST)
 if ( BUILD_TESTING )
   if (USE_SYSTEM_GTEST)
-    find_package( GTest REQUIRED )
-    list(APPEND SimpleITK_VARS GTEST_LIBRARIES GTEST_INCLUDE_DIRS GTEST_MAIN_LIBRARIES)
+    if (DEFINED GTEST_ROOT AND EXISTS "${GTEST_ROOT}/CMakeLists.txt")
+      list(APPEND SimpleITK_VARS GTEST_ROOT)
+    else()
+      find_package( GTest REQUIRED )
+      list(APPEND SimpleITK_VARS GTEST_LIBRARIES GTEST_INCLUDE_DIRS GTEST_MAIN_LIBRARIES)
+    endif()
   else()
     include(External_GTest)
-    set( GTEST_ROOT ${GTEST_ROOT} )
     list(APPEND SimpleITK_VARS GTEST_ROOT)
     list(APPEND ${CMAKE_PROJECT_NAME}_DEPENDENCIES GTest)
   endif()
@@ -290,7 +332,7 @@ endif()
 #------------------------------------------------------------------------------
 option( USE_SYSTEM_VIRTUALENV "Use a system version of Python's virtualenv. " OFF )
 mark_as_advanced(USE_SYSTEM_VIRTUALENV)
-if( NOT DEFINED SITK_PYTHON_USE_VIRTUALENV OR SITK_PYTHON_USE_VIRTUALENV )
+if( NOT DEFINED SimpleITK_PYTHON_USE_VIRTUALENV OR SimpleITK_PYTHON_USE_VIRTUALENV )
   if ( USE_SYSTEM_VIRTUALENV )
     find_package( PythonVirtualEnv REQUIRED)
   else()
@@ -354,7 +396,7 @@ foreach (_varName ${_varNames})
           AND
         NOT _varName MATCHES "^SimpleITK_VARS"
           AND
-        NOT _varName MATCHES "^SimpleITK_REQUIRED_"
+        NOT _varName MATCHES "^SimpleITK_.*_COMPILE_OPTIONS"
           AND
         NOT _varName MATCHES "^SITK_UNDEFINED_SYMBOLS_ALLOWED")
       message( STATUS "Passing variable \"${_varName}=${${_varName}}\" to SimpleITK external project.")
@@ -363,6 +405,7 @@ foreach (_varName ${_varNames})
   endif()
 endforeach()
 
+list(APPEND SimpleITK_VARS ExternalData_OBJECT_STORES)
 
 VariableListToCache( SimpleITK_VARS  ep_simpleitk_cache )
 VariableListToArgs( SimpleITK_VARS  ep_simpleitk_args )
@@ -408,6 +451,7 @@ ExternalProject_Add(${proj}
     -DWRAP_R:BOOL=${WRAP_R}
     -DBUILD_EXAMPLES:BOOL=${BUILD_TESTING}
   DEPENDS ${${CMAKE_PROJECT_NAME}_DEPENDENCIES}
+  ${External_Project_USES_TERMINAL}
 )
 
 ExternalProject_Add_Step(${proj} forcebuild
@@ -442,3 +486,9 @@ foreach(ep ${external_project_list})
   set(ep_dependency_graph "${ep_dependency_graph}\n${ep}: ${${ep}_DEPENDENCIES}")
 endforeach()
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/ExternalProjectDependencies.txt "${ep_dependency_graph}\n")
+
+
+if(COMMAND ExternalData_Add_Target)
+  ExternalData_Add_Target(SuperBuildSimpleITKSourceReal)
+  add_dependencies(SuperBuildSimpleITKSource SuperBuildSimpleITKSourceReal)
+endif()

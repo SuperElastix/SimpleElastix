@@ -16,6 +16,7 @@
 *
 *=========================================================================*/
 #include <sitkImportImageFilter.h>
+#include <sitkHashImageFilter.h>
 #include <SimpleITKTestHarness.h>
 
 // Common fixture for Import tests
@@ -71,7 +72,7 @@ TEST_F(Import,Required) {
   typedef itk::simple::ImportImageFilter::Self ImportFilterType;
 
   // default constructable
-   itk::simple::ImportImageFilter importer;
+  ImportFilterType  importer;
 
   // has ToString method
   std::cout << importer.ToString() << std::endl;

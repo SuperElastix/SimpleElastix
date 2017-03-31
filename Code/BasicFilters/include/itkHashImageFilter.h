@@ -15,8 +15,8 @@
 *  limitations under the License.
 *
 *=========================================================================*/
-#ifndef __itkHashImageFilter_h
-#define __itkHashImageFilter_h
+#ifndef itkHashImageFilter_h
+#define itkHashImageFilter_h
 
 
 #include "itkSimpleDataObjectDecorator.h"
@@ -30,14 +30,13 @@
 
 namespace itk {
 
-/** \class CastImageFilter
+/** \class HashImageFilter
  * \brief Generates a hash string from an image.
  *
  * \note This class utlizes low level buffer pointer access, to work
  * with itk::Image and itk::VectorImage. It is modeled after the access
  * an ImageFileWriter provides to an ImageIO.
  *
- * \todo complete documentation
  * \todo Update in-place on to default after fixing bug in InPlaceImageFilter
  */
 template < class TImageType >
@@ -118,4 +117,4 @@ private:
 
 #include "itkHashImageFilter.hxx"
 
-#endif // __itkHashImageFilter_h
+#endif // itkHashImageFilter_h

@@ -57,6 +57,9 @@ message(STATUS "Building SimpleITK version \"${SimpleITK_VERSION}\"")
 include(sitkCheckRequiredFlags)
 include(sitkCompilerWarningsSettings)
 
+include( sitkSITKLegacyNaming )
+include( sitkForbidDownloadsOption )
+include( sitkTargetUseITK )
 
 find_package(ITK REQUIRED )
 #we require certain packages be turned on in ITK
@@ -105,25 +108,22 @@ if( ELASTIX_BUILD_EXECUTABLE )
   message(FATAL_ERROR "SimpleElastix requires elastix libraries, please set ELASTIX_BUILD_EXECUTABLE=OFF and rebuild elastix")
 endif()
 
-#----------------------------------------------------------
-# Set flags and directories
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${SimpleITK_REQUIRED_C_FLAGS}")
-set(CMAKE_CXX_FLAGS "${CXX_ADDITIONAL_WARNING_FLAGS} ${SimpleITK_REQUIRED_CXX_FLAGS}")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
-set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${SimpleITK_REQUIRED_LINK_FLAGS}")
+list(APPEND SimpleITK_PRIVATE_COMPILE_OPTIONS ${CXX_ADDITIONAL_WARNING_FLAGS})
 
 #----------------------------------------------------------
 # Place all options to go into sitkConfigure.h here
 option(BUILD_SHARED_LIBS "Build SimpleITK ITK with shared libraries. This does not effect wrapped languages." OFF)
 set(SITK_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
 
-option(SITK_EXPLICIT_INSTANTIATION "Enable an ITK static library of explicitly instantiated templates." ON)
+
+option(SimpleITK_EXPLICIT_INSTANTIATION "Enable an ITK static library of explicitly instantiated templates." ON)
+sitk_legacy_naming(SimpleITK_EXPLICIT_INSTANTIATION)
+
 if ( MSVC AND SITK_BUILD_SHARED_LIBS )
   set( SITK_SimpleITKExplit_STATIC 1 )
 endif()
 
-set( SITK_INT64_PIXELIDS_DEFAULT ON )
+set( SimpleITK_INT64_PIXELIDS_DEFAULT ON )
 if( MSVC )
   # See http://www.cmake.org/cmake/help/v2.8.10/cmake.html#variable:MSVC_VERSION
   # and https://en.wikipedia.org/wiki/Microsoft_Visual_Studio#Version_history
@@ -132,21 +132,18 @@ if( MSVC )
   #   1700 = VS 11.0 (Visual Studio 2012)
   if(MSVC_VERSION VERSION_LESS 1600)
     # with this option on the linker runs out of memory
-    set( SITK_INT64_PIXELIDS_DEFAULT OFF )
+    set( SimpleITK_INT64_PIXELIDS_DEFAULT OFF )
   endif()
 endif()
-option( SITK_INT64_PIXELIDS "Instantiate 64-bit integer pixels, including unsigned, vector and label maps." ${SITK_INT64_PIXELIDS_DEFAULT} )
-# Setting this option will shorten compile times by reducing the
-# amount of pixel types and generated code.
-# NB: this option should _NOT_ be used for releases!
-option ( SITK_EXPRESS_INSTANTIATEDPIXELS "Instantiate very few pixel types ( for use for development only )" OFF )
-mark_as_advanced ( SITK_EXPRESS_INSTANTIATEDPIXELS )
-
-option( SITK_4D_IMAGES "Add Image and I/O support for four spatial dimensions." OFF )
-mark_as_advanced( SITK_4D_IMAGES )
+option( SimpleITK_INT64_PIXELIDS "Instantiate 64-bit integer pixels, including unsigned, vector and label maps."
+  ${SimpleITK_INT64_PIXELIDS_DEFAULT} )
+sitk_legacy_naming(SimpleITK_INT64_PIXELIDS)
 
 
-include( sitkForbidDownloadsOption )
+option( SimpleITK_4D_IMAGES "Add Image and I/O support for four spatial dimensions." OFF )
+mark_as_advanced( SimpleITK_4D_IMAGES )
+sitk_legacy_naming(SimpleITK_4D_IMAGES)
+
 
 # Setup build locations.
 if(NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
@@ -171,7 +168,7 @@ set ( SimpleITK_INCLUDE_DIRS
 
 set ( SimpleITK_LIBRARIES SimpleITKCommon SimpleITKIO SimpleITKRegistration SimpleElastix SimpleTransformix )
 
-if (SITK_EXPLICIT_INSTANTIATION)
+if (SimpleITK_EXPLICIT_INSTANTIATION)
   list ( APPEND SimpleITK_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/Code/Explicit/include )
   # This library is linked privately to SimpleITK libraries and is not
   # part of the public link interface
@@ -187,8 +184,8 @@ set ( GENERATED_TEST_SOURCE_LIST "" CACHE INTERNAL "" )
 
 # Create cached list of all template components
 file( GLOB template_components
-      ${SimpleITK_SOURCE_DIR}/TemplateComponents/*.h.in
-      ${SimpleITK_SOURCE_DIR}/TemplateComponents/*.cxx.in
+      ${SimpleITK_SOURCE_DIR}/ExpandTemplateGenerator/Components/*.h.in
+      ${SimpleITK_SOURCE_DIR}/ExpandTemplateGenerator/Components/*.cxx.in
     )
 set ( template_components ${template_components} CACHE INTERNAL "" )
 
@@ -212,7 +209,7 @@ if(NOT SimpleITK_INSTALL_DOC_DIR)
   set(SimpleITK_INSTALL_DOC_DIR share/doc/SimpleITK-${SimpleITK_VERSION_MAJOR}.${SimpleITK_VERSION_MINOR})
 endif()
 if(NOT SimpleITK_INSTALL_PACKAGE_DIR)
-  set(SimpleITK_INSTALL_PACKAGE_DIR "lib/cmake/SimpleITK-${SimpleITK_VERSION_MAJOR}.${SimpleITK_VERSION_MINOR}")
+  set(SimpleITK_INSTALL_PACKAGE_DIR "${SimpleITK_INSTALL_LIBRARY_DIR}/cmake/SimpleITK-${SimpleITK_VERSION_MAJOR}.${SimpleITK_VERSION_MINOR}")
 endif()
 
 function(sitk_install_exported_target tgt)
@@ -277,19 +274,13 @@ include(CheckIncludeFileCXX)
 # check for stdint
 # This generates a configuration error if the compiler is not supported
 check_include_file_cxx( stdint.h SITK_HAS_STDINT_H )
-
-if(NOT STDINT_HAVE_STDINT_H)
-  if( WIN32 )
+if(NOT SITK_HAS_STDINT_H)
     if(MSVC)
-      list(APPEND SimpleITK_INCLUDE_DIRS
-        "${SimpleITK_SOURCE_DIR}/Utilities/C99")
       add_subdirectory("${SimpleITK_SOURCE_DIR}/Utilities/C99")
+    else()
+      message(FATAL_ERROR "Unable to find require \"stdint.h\" header file.")
     endif()
-  endif()
 endif()
-
-include_directories( ${SimpleITK_INCLUDE_DIRS} )
-
 
 #------------------------------------------------------------------------------
 # assemble a list of important documentation from Simple ITK and ITK

@@ -14,7 +14,10 @@ endif()
 get_cmake_property( _varNames VARIABLES )
 
 foreach (_varName ${_varNames})
-  if(_varName MATCHES "^ITK_" OR _varName MATCHES "FFTW")
+  if(_varName MATCHES "^ITK_"
+      OR _varName MATCHES "^ITKV3"
+      OR _varName MATCHES "FFTW"
+      OR _varName MATCHES "^Module_ITK")
     message( STATUS "Passing variable \"${_varName}=${${_varName}}\" to ITK external project.")
     list(APPEND ITK_VARS ${_varName})
   endif()
@@ -32,7 +35,9 @@ VariableListToArgs( ITK_VARS  ep_itk_args )
 
 
 set(proj ITK)  ## Use ITK convention of calling it ITK
-set(ITK_REPOSITORY "${git_protocol}://itk.org/ITK.git")
+if(NOT DEFINED ITK_REPOSITORY)
+  set(ITK_REPOSITORY "${git_protocol}://itk.org/ITK.git")
+endif()
 
 set(ITK_USE_GIT_PROTOCOL 0)
 if("${git_protocol}" STREQUAL "git")
@@ -40,15 +45,17 @@ if("${git_protocol}" STREQUAL "git")
 endif()
 
 # NOTE: it is very important to update the ITK_DIR path with the ITK version
-set(ITK_TAG_COMMAND GIT_TAG 80178ae516db87aa50d2883c4e090da92c4a502d ) # just before 4.10.1 release
+set(ITK_TAG_COMMAND GIT_TAG 046ede12fe47b90c13b4fcae98b61d8b775dc4ca ) # v4.11.0+ on release branch
 
-if( ${ITK_WRAPPING} OR ${BUILD_SHARED_LIBS} )
+if( ${BUILD_SHARED_LIBS} )
   set( ITK_BUILD_SHARED_LIBS ON )
 else()
   set( ITK_BUILD_SHARED_LIBS OFF )
-  list( APPEND ep_itk_args"-DCMAKE_C_VISIBILITY_PRESET:BOOL=hidden" "-DCMAKE_CXX_VISIBILITY_PRESET:BOOL=hidden" )
+  list( APPEND ep_itk_args
+    "-DCMAKE_C_VISIBILITY_PRESET:STRING=hidden"
+    "-DCMAKE_CXX_VISIBILITY_PRESET:STRING=hidden"
+    "-DITK_TEMPLATE_VISIBILITY_DEFAULT:BOOL=OFF" )
 endif()
-
 
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${proj}-build/CMakeCacheInit.txt" "${ep_itk_cache}\n${ep_common_cache}" )
 
@@ -72,31 +79,16 @@ ExternalProject_Add(${proj}
   -DCMAKE_SKIP_RPATH:BOOL=ON
   -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
   -DITK_LEGACY_REMOVE:BOOL=ON
+  -DITK_USE_KWSTYLE:BOOL=OFF
   -DITK_BUILD_DEFAULT_MODULES:BOOL=ON
   -DModule_ITKReview:BOOL=ON
   -DITK_USE_GIT_PROTOCOL:BOOL=${ITK_USE_GIT_PROTOCOL}
-  -DITK_WRAP_float:BOOL=ON
-  -DITK_WRAP_unsigned_char:BOOL=ON
-  -DITK_WRAP_signed_short:BOOL=ON
-  -DITK_WRAP_unsigned_short:BOOL=ON
-  -DITK_WRAP_complex_float:BOOL=ON
-  -DITK_WRAP_vector_float:BOOL=ON
-  -DITK_WRAP_covariant_vector_float:BOOL=ON
-  -DITK_WRAP_rgb_signed_short:BOOL=ON
-  -DITK_WRAP_rgb_unsigned_char:BOOL=ON
-  -DITK_WRAP_rgb_unsigned_short:BOOL=ON
-  -DITK_WRAP_PYTHON:BOOL=${ITK_WRAPPING}
-  # Required as to not install into system
-  -DINSTALL_WRAP_ITK_COMPATIBILITY:BOOL=OFF
-  # Swig
-  -DSWIG_DIR:PATH=${SWIG_DIR}
-  -DSWIG_EXECUTABLE:PATH=${SWIG_EXECUTABLE}
   BUILD_COMMAND ${BUILD_COMMAND_STRING}
   DEPENDS
-  ${ITK_DEPENDENCIES}
+    ${ITK_DEPENDENCIES}
+  ${External_Project_USES_TERMINAL}
   )
 
 
 ExternalProject_Get_Property(ITK install_dir)
-set(ITK_DIR "${install_dir}/lib/cmake/ITK-4.10" )
-set(WrapITK_DIR "${ITK_DIR}/WrapITK")
+set(ITK_DIR "${install_dir}/lib/cmake/ITK-4.11" )

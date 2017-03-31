@@ -45,3 +45,8 @@ build/
 *~
 *.pyc
 *.orig
+.ExternalData
+SuperBuild/.ExternalSource/
+Documentation/docs/build
+#ignore CLion temporary files.
+.idea/

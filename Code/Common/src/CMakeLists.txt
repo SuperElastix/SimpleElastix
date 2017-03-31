@@ -28,17 +28,33 @@ set ( SimpleITKCommonSource
   ../include/Ancillary/hl_sha1.cxx
   )
 
-set ( ITK_NO_IO_FACTORY_REGISTER_MANAGER 1 )
-find_package(ITK COMPONENTS ITKCommon ITKImageCompose
-  ITKImageIntensity ITKLabelMap ITKTransform ITKIOTransformBase ITKDisplacementField REQUIRED)
-include(${ITK_USE_FILE})
+set(use_itk_modules ITKCommon ITKImageCompose ITKImageIntensity
+  ITKLabelMap ITKTransform ITKIOTransformBase ITKDisplacementField )
+find_package(ITK COMPONENTS ${use_itk_modules}  REQUIRED)
 
 add_library ( SimpleITKCommon ${SimpleITKCommonSource} ${SimpleITKAncillarySource} )
-target_link_libraries ( SimpleITKCommon
-  PRIVATE ${ITK_LIBRARIES} )
-if (SITK_EXPLICIT_INSTANTIATION)
+sitk_target_use_itk (SimpleITKCommon PRIVATE ${use_itk_modules} )
+if (SimpleITK_EXPLICIT_INSTANTIATION)
   target_link_libraries ( SimpleITKCommon PRIVATE SimpleITKExplicit )
 endif()
+target_include_directories ( SimpleITKCommon
+  PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/Code/Common/include>
+    $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/Code/Common/include>
+    $<INSTALL_INTERFACE:include> )
+if(NOT SITK_HAS_STDINT_H AND MSVC)
+  target_include_directories ( SimpleITKCommon
+    PUBLIC
+      $<BUILD_INTERFACE:${SimpleITK_SOURCE_DIR}/Utilities/C99> )
+endif()
+target_compile_options( SimpleITKCommon
+  PUBLIC
+    ${SimpleITK_PUBLIC_COMPILE_OPTIONS}
+  PRIVATE
+    ${SimpleITK_PRIVATE_COMPILE_OPTIONS} )
+
+
+
 sitk_install_exported_target( SimpleITKCommon )
 
 # Add custom command that will delete java files which need to be rebuilt when changes

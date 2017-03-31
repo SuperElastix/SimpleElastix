@@ -79,6 +79,28 @@
 #include <sitkImageOperators.h>
 %}
 
+
+// Help SWIG handle std vectors
+namespace std
+{
+  %template(VectorBool) vector<bool>;
+  %template(VectorUInt8) vector<uint8_t>;
+  %template(VectorInt8) vector<int8_t>;
+  %template(VectorUInt16) vector<uint16_t>;
+  %template(VectorInt16) vector<int16_t>;
+  %template(VectorUInt32) vector<uint32_t>;
+  %template(VectorInt32) vector<int32_t>;
+  %template(VectorUInt64) vector<uint64_t>;
+  %template(VectorInt64) vector<int64_t>;
+  %template(VectorFloat) vector<float>;
+  %template(VectorDouble) vector<double>;
+  %template(VectorOfImage) vector< itk::simple::Image >;
+  %template(VectorUIntList) vector< vector<unsigned int> >;
+  %template(VectorString) vector< std::string >;
+
+  %template(DoubleDoubleMap) map<double, double>;
+}
+
 // Language Specific Sections
 #if SWIGCSHARP
 %include CSharp.i
@@ -108,28 +130,6 @@
 #endif
 
 
-// Help SWIG handle std vectors
-namespace std
-{
-  %template(VectorBool) vector<bool>;
-  %template(VectorUInt8) vector<uint8_t>;
-  %template(VectorInt8) vector<int8_t>;
-  %template(VectorUInt16) vector<uint16_t>;
-  %template(VectorInt16) vector<int16_t>;
-  %template(VectorUInt32) vector<uint32_t>;
-  %template(VectorInt32) vector<int32_t>;
-  %template(VectorUInt64) vector<uint64_t>;
-  %template(VectorInt64) vector<int64_t>;
-  %template(VectorFloat) vector<float>;
-  %template(VectorDouble) vector<double>;
-  %template(VectorOfImage) vector< itk::simple::Image >;
-  %template(VectorUIntList) vector< vector<unsigned int> >;
-  %template(VectorString) vector< std::string >;
-
-  %template(DoubleDoubleMap) map<double, double>;
-}
-
-
 
 // define these preprocessor directives to nothing for the swig interface
 #define SITKCommon_EXPORT
@@ -155,6 +155,7 @@ namespace std
 %include "sitkInterpolator.h"
 %include "sitkKernel.h"
 %include "sitkEvent.h"
+%include "sitkRandomSeed.h"
 
 // Transforms
 %include "sitkTransform.h"

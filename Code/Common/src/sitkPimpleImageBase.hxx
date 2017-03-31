@@ -15,8 +15,8 @@
 *  limitations under the License.
 *
 *=========================================================================*/
-#ifndef __sitkPimpleImageBase_hxx
-#define __sitkPimpleImageBase_hxx
+#ifndef sitkPimpleImageBase_hxx
+#define sitkPimpleImageBase_hxx
 
 #include "sitkPimpleImageBase.h"
 #include "sitkMemberFunctionFactory.h"
@@ -271,6 +271,11 @@ namespace itk
         std::vector<unsigned int> size( ImageType::ImageDimension );
 
         return sitkITKVectorToSTL<unsigned int>( largestRegion.GetSize() );
+      }
+
+    virtual uint64_t GetNumberOfPixels( void ) const
+      {
+        return this->m_Image->GetLargestPossibleRegion().GetNumberOfPixels();
       }
 
     std::string ToString( void ) const
@@ -804,4 +809,4 @@ namespace itk
   } // end namespace simple
 } // end namespace itk
 
-#endif // __sitkPimpleImageBase_hxx
+#endif // sitkPimpleImageBase_hxx

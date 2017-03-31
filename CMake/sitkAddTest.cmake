@@ -15,28 +15,22 @@ set(SimpleITK_DATA_ROOT ${SimpleITK_SOURCE_DIR}/Testing/Data)
 # TRANSFORM_COMPARE <test transform> <baseline displacement> [tolerance]
 function(sitk_add_test)
   set(options "")
-  set(oneValueArgs "")
-  set(multiValueArgs TRANSFORM_COMPARE)
+  set(oneValueArgs "NAME")
+  set(multiValueArgs COMMAND TRANSFORM_COMPARE)
   cmake_parse_arguments("_" "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
-  # Add test with data in the SimpleITKData group.
-  ExternalData_add_test(SimpleITKData ${__UNPARSED_ARGUMENTS})
-
-  if("NAME" STREQUAL "${ARGV0}")
-    set(_iat_testname ${ARGV1})
-  else()
-    set(_iat_testname ${ARGV0})
-  endif()
-
   if ( NOT "${__TRANSFORM_COMPARE}" STREQUAL "" )
-    ExternalData_add_test(SimpleITKData NAME "${_iat_testname}Compare"
-      COMMAND
-        $<TARGET_FILE:sitkTransformCompareDriver>
-        ${__TRANSFORM_COMPARE}
-      )
-
-    set_property(TEST "${_iat_testname}Compare" APPEND PROPERTY DEPENDS ${_iat_testname})
+    set(COMPARE_ARGS ${COMPARE_ARGS} --compareTransform ${__TRANSFORM_COMPARE})
   endif()
+
+  if (COMPARE_ARGS)
+    set(__COMMAND $<TARGET_FILE:sitkCompareDriver> ${COMPARE_ARGS} -- ${__COMMAND})
+  endif()
+
+   # Add test with data in the SimpleITKData group.
+  ExternalData_add_test(SimpleITKData NAME ${__NAME} COMMAND ${__COMMAND} ${__UNPARSED_ARGUMENTS})
+
+
 endfunction()
 
 
@@ -49,7 +43,7 @@ function(sitk_add_python_test name)
     return()
   endif()
 
-  set(command "${TEST_PYTHON_EXECUTABLE}")
+  set(command "${SimpleITK_PYTHON_TEST_EXECUTABLE}")
 
   # add extra command which may be needed on some systems
   if(CMAKE_OSX_ARCHITECTURES)
@@ -65,7 +59,7 @@ function(sitk_add_python_test name)
   set_property(TEST Python.${name}
       PROPERTY ENVIRONMENT SITK_NOSHOW=YES
       )
-  if (NOT SITK_PYTHON_USE_VIRTUALENV)
+  if (NOT SimpleITK_PYTHON_USE_VIRTUALENV)
     set_property(TEST Python.${name}
       APPEND PROPERTY ENVIRONMENT PYTHONPATH=${SimpleITK_BINARY_DIR}/Wrapping/Python
       )

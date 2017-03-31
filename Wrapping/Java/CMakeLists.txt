@@ -6,7 +6,7 @@ include(../../CMake/sitkProjectLanguageCommon.cmake NO_POLICY_SCOPE)
 
 find_package ( Java REQUIRED )
 find_package ( JNI REQUIRED )
-include_directories ( ${JAVA_INCLUDE_PATH} ${JNI_INCLUDE_DIRS} )
+include_directories ( ${SimpleITK_INCLUDE_DIRS} )
 
 set(JAR_FILE "simpleitk-${SimpleITK_VERSION}.jar")
 set(JAVADOC_FILE "simpleitk-javadoc-${SimpleITK_VERSION}.jar")
@@ -32,14 +32,21 @@ set(CMAKE_SWIG_FLAGS -I${CMAKE_CURRENT_SOURCE_DIR} -package "org.itk.simple" ${C
 set(SWIG_MODULE_SimpleITKJava_EXTRA_DEPS ${SWIG_EXTRA_DEPS} ${CMAKE_CURRENT_SOURCE_DIR}/Java.i ${CMAKE_CURRENT_SOURCE_DIR}/JavaDoc.i)
 SWIG_add_module ( SimpleITKJava java SimpleITK.i )
 target_link_libraries( ${SWIG_MODULE_SimpleITKJava_TARGET_NAME} ${SimpleITK_LIBRARIES})
+target_include_directories( ${SWIG_MODULE_SimpleITKJava_TARGET_NAME}
+  PRIVATE
+     ${JAVA_INCLUDE_PATH} ${JNI_INCLUDE_DIRS} )
 set_source_files_properties(${swig_generated_file_fullname} PROPERTIES COMPILE_FLAGS "-w")
 sitk_strip_target( ${SWIG_MODULE_SimpleITKJava_TARGET_NAME} )
 
 set(JAVA_SOURCE_CODE "${JAVA_SOURCE_DIRECTORY}/org/itk/simple/*.java")
 
-# Java 1.8 javadoc treats linting errors as build errors by default 
-# so linting should be opt-in for this version
-if( ${Java_VERSION_STRING} VERSION_EQUAL 1.8 OR ${Java_VERSION_STRING} VERSION_GREATER 1.8 )
+# Oracle Java 1.8 javadoc treats linting errors as build errors by default
+# so linting should be opt-in for this version. OpenJDK is not as
+# consistent with the 1.8.0 versions, so we execute at look for a
+# invalid flag error.
+execute_process(COMMAND "${Java_JAVADOC_EXECUTABLE}" "-Xdoclint:none" ERROR_VARIABLE err OUTPUT_VARIABLE err)
+string(REGEX MATCH "javadoc.*invalid flag" invalid_flag_match "${err}")
+if(invalid_flag_match STREQUAL "")
   mark_as_advanced( Java_JAVADOC_LINTING )
   option( Java_JAVADOC_LINTING "Enable javadoc linting for Java 1.8" OFF )
   if( Java_JAVADOC_LINTING )

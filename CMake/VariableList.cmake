@@ -7,7 +7,7 @@
 #
 function( VariableListToCache var_list cache )
   foreach( var IN LISTS ${var_list} )
-    if( DEFINED var )
+    if( DEFINED ${var} )
       set( value "${${var}}" )
       get_property( type CACHE ${var} PROPERTY TYPE )
       get_property( advanced CACHE ${var} PROPERTY ADVANCED )
@@ -45,9 +45,16 @@ endfunction( )
 #
 function( VariableListToArgs var_list args )
   foreach( var IN LISTS ${var_list} )
-    if( NOT ${var} STREQUAL "" ) # if variable has been set
+    if( DEFINED ${var} AND NOT ${var} STREQUAL "" ) # if variable has been set
       get_property( type CACHE ${var} PROPERTY TYPE )
-      list( APPEND _args "-D${var}:${type}=${${var}}" )
+      if (NOT "${type}" STREQUAL "")
+        set(type ":${type}")
+      else()
+        set(type ":UNINITIALIZED")
+      endif()
+      set(value ${${var}})
+      STRING( REPLACE ";" "$<SEMICOLON>" value "${value}" )
+      list( APPEND _args "-D${var}:${type}=${value}" )
     endif()
   endforeach()
   set( ${args} "${_args}" PARENT_SCOPE)

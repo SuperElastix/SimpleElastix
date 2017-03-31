@@ -15,8 +15,8 @@
 *  limitations under the License.
 *
 *=========================================================================*/
-#ifndef __sitkImageRegistrationMethod_h
-#define __sitkImageRegistrationMethod_h
+#ifndef sitkImageRegistrationMethod_h
+#define sitkImageRegistrationMethod_h
 
 #include "sitkRegistration.h"
 
@@ -26,6 +26,7 @@
 #include "sitkMemberFunctionFactory.h"
 #include "sitkProcessObject.h"
 
+#include "sitkRandomSeed.h"
 #include "sitkInterpolator.h"
 #include "sitkTransform.h"
 
@@ -177,6 +178,18 @@ namespace simple
     { return this->m_FixedInitialTransform; }
     /**@}*/
 
+
+    /** \brief Set the virtual domain used for sampling
+     *
+     * @{
+     */
+    SITK_RETURN_SELF_TYPE_HEADER SetVirtualDomain( const std::vector<uint32_t> &virtualSize,
+                            const std::vector<double> &virtualOrigin,
+                            const std::vector<double> &virtualSpacing,
+                            const std::vector<double> &virtualDirection );
+    SITK_RETURN_SELF_TYPE_HEADER SetVirtualDomainFromImage( const Image &virtualImage );
+    /**@}*/
+
     /** \brief Use normalized cross correlation using a small
      * neighborhood for each voxel between two images, with speed
      * optimizations for dense registration.
@@ -218,7 +231,10 @@ namespace simple
     SITK_RETURN_SELF_TYPE_HEADER SetMetricAsMattesMutualInformation( unsigned int numberOfHistogramBins = 50 );
 
 
-    enum EstimateLearningRateType { Never, Once, EachIteration };
+    enum EstimateLearningRateType { Never, ///< Never run estimation, use provided value.
+                                    Once,  ///< Estimate learning once each level, ignore provided values.
+                                    EachIteration ///< Estimate learning rate at each iteration.
+    };
 
     /** \brief Conjugate gradient descent optimizer with a golden section line search for nonlinear optimization.
      *
@@ -342,6 +358,22 @@ namespace simple
                                double stepTolerance = 1e-6,
                                double valueTolerance = 1e-6 );
 
+    /** \brief 1+1 evolutionary optimizer strategy.
+     *
+     * The seed parameter is used to seed the pseudo-random number
+     * generator. If the seed parameter is 0, then the wall clock is
+     * used to seed, otherwise the fixed seed is used for reproducible behavior.
+     *
+     * \sa itk::OnePlusOneEvolutionaryOptimizerv4
+     */
+    SITK_RETURN_SELF_TYPE_HEADER SetOptimizerAsOnePlusOneEvolutionary(unsigned int numberOfIterations = 100,
+                                                                      double epsilon = 1.5e-4,
+                                                                      double initialRadius = 1.01,
+                                                                      double growthFactor = -1.0,
+                                                                      double shrinkFactor = -1.0,
+                                                                      unsigned int seed = sitkWallClock);
+
+
 
     /** \brief Manually set per parameter weighting for the transform parameters. */
     SITK_RETURN_SELF_TYPE_HEADER SetOptimizerScales( const std::vector<double> &scales );
@@ -396,11 +428,16 @@ namespace simple
 
     /** \brief Set percentage of pixels sampled for metric evaluation.
      *
+     * The seed parameter is used to seed the pseudo-random number
+     * generator used in generating the sampling set of points. If the
+     * seed parameter is 0, then the wall clock is used, otherwise the
+     * fixed seed is used for reproducible behavior.
+     *
      * \sa itk::ImageRegistrationMethodv4::SetMetricSamplingPercentage
      * @{
      */
-    SITK_RETURN_SELF_TYPE_HEADER SetMetricSamplingPercentage(double percentage);
-    SITK_RETURN_SELF_TYPE_HEADER SetMetricSamplingPercentagePerLevel(const std::vector<double> &percentage);
+    SITK_RETURN_SELF_TYPE_HEADER SetMetricSamplingPercentage(double percentage, unsigned int seed = sitkWallClock);
+    SITK_RETURN_SELF_TYPE_HEADER SetMetricSamplingPercentagePerLevel(const std::vector<double> &percentage, unsigned int seed = sitkWallClock);
     /** @} */
 
     enum MetricSamplingStrategyType {
@@ -598,6 +635,11 @@ namespace simple
     Transform m_MovingInitialTransform;
     Transform m_FixedInitialTransform;
 
+    std::vector<uint32_t> m_VirtualDomainSize;
+    std::vector<double> m_VirtualDomainOrigin;
+    std::vector<double> m_VirtualDomainSpacing;
+    std::vector<double> m_VirtualDomainDirection;
+
     // optimizer
     enum OptimizerType { ConjugateGradientLineSearch,
                          RegularStepGradientDescent,
@@ -606,7 +648,8 @@ namespace simple
                          LBFGSB,
                          Exhaustive,
                          Amoeba,
-                         Powell
+                         Powell,
+                         OnePlusOneEvolutionary
     };
     OptimizerType m_OptimizerType;
     double m_OptimizerLearningRate;
@@ -638,6 +681,11 @@ namespace simple
     unsigned int m_OptimizerMaximumLineIterations;
     double m_OptimizerStepTolerance;
     double m_OptimizerValueTolerance;
+    double m_OptimizerEpsilon;
+    double m_OptimizerInitialRadius;
+    double m_OptimizerGrowthFactor;
+    double m_OptimizerShrinkFactor;
+    unsigned int m_OptimizerSeed;
 
     std::vector<double> m_OptimizerWeights;
 
@@ -671,6 +719,7 @@ namespace simple
 
     std::vector<double> m_MetricSamplingPercentage;
     MetricSamplingStrategyType m_MetricSamplingStrategy;
+    unsigned int m_MetricSamplingSeed;
 
     bool m_MetricUseFixedImageGradientFilter;
     bool m_MetricUseMovingImageGradientFilter;
@@ -689,4 +738,4 @@ namespace simple
 }
 }
 
-#endif // __sitkImageRegistrationMethod_h
+#endif // sitkImageRegistrationMethod_h

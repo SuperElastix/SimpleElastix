@@ -15,8 +15,8 @@
 *  limitations under the License.
 *
 *=========================================================================*/
-#ifndef __sitkImageFileReader_h
-#define __sitkImageFileReader_h
+#ifndef sitkImageFileReader_h
+#define sitkImageFileReader_h
 
 #include "sitkMacro.h"
 #include "sitkImage.h"
@@ -47,7 +47,7 @@ namespace itk {
       /** return user readable name fo the filter */
       virtual std::string GetName() const { return std::string("ImageFileReader"); }
 
-      SITK_RETURN_SELF_TYPE_HEADER SetFileName ( std::string fn );
+      SITK_RETURN_SELF_TYPE_HEADER SetFileName ( const std::string &fn );
       std::string GetFileName() const;
 
       Image Execute();
@@ -70,7 +70,16 @@ namespace itk {
       std::string m_FileName;
     };
 
-  SITKIO_EXPORT Image ReadImage ( std::string filename, PixelIDValueEnum outputPixelType = sitkUnknown );
+  /**
+   * \brief ReadImage is a procedural interface to the ImageFileReader
+   *     class which is convenient for most image reading tasks.
+   *
+   *     For more complicated use cases such as requiring loading of
+   *     all tags, including private ones, from a DICOM file the
+   *     object oriented interface should be used. The reader can be explicitly
+   *     set to load all tags (LoadPrivateTagsOn()).
+   */
+  SITKIO_EXPORT Image ReadImage ( const std::string &filename, PixelIDValueEnum outputPixelType = sitkUnknown );
   }
 }
 

@@ -43,6 +43,23 @@ namespace itk
 {
 namespace simple
 {
+namespace
+{
+
+struct CurrentLevelCustomCast
+{
+  template<typename TRegistrationType>
+  static unsigned int CustomCast(const TRegistrationType *reg)
+    {
+      itk::SizeValueType ret = reg->GetCurrentLevel();
+      if (ret > std::numeric_limits<unsigned int>::max())
+        {
+        return 0;
+        }
+      return static_cast<unsigned int>(ret);
+    }
+};
+}
 
 ImageRegistrationMethod::ImageRegistrationMethod()
   : m_Interpolator(sitkLinear),
@@ -50,6 +67,7 @@ ImageRegistrationMethod::ImageRegistrationMethod()
     m_OptimizerScalesType(Manual),
     m_MetricSamplingPercentage(1,1.0),
     m_MetricSamplingStrategy(NONE),
+    m_MetricSamplingSeed(0u),
     m_MetricUseFixedImageGradientFilter(true),
     m_MetricUseMovingImageGradientFilter(true),
     m_ShrinkFactorsPerLevel(1, 1),
@@ -128,6 +146,47 @@ ImageRegistrationMethod::SetInitialTransform ( Transform &transform, bool inPlac
 
   this->m_InitialTransform = transform;
   this->m_InitialTransformInPlace = inPlace;
+  return *this;
+}
+
+ImageRegistrationMethod::Self&
+ImageRegistrationMethod::SetVirtualDomain( const std::vector<uint32_t> &virtualSize,
+                            const std::vector<double> &virtualOrigin,
+                            const std::vector<double> &virtualSpacing,
+                            const std::vector<double> &virtualDirection )
+{
+  const size_t dim = virtualSize.size();
+
+  if ( virtualOrigin.size() != dim )
+    {
+    sitkExceptionMacro("Expected virtualOrigin to be of length " << dim << "!" );
+    }
+
+  if ( virtualSpacing.size() != dim )
+    {
+    sitkExceptionMacro("Expected virtualSpacing to be of length " << dim << "!" );
+    }
+
+  if ( virtualDirection.size() != dim*dim )
+    {
+    sitkExceptionMacro("Expected virtualDirection to be of length " << dim*dim << "!" );
+    }
+
+  this->m_VirtualDomainSize = virtualSize;
+  this->m_VirtualDomainOrigin = virtualOrigin;
+  this->m_VirtualDomainSpacing = virtualSpacing;
+  this->m_VirtualDomainDirection = virtualDirection;
+  return *this;
+}
+
+ImageRegistrationMethod::Self&
+ImageRegistrationMethod::SetVirtualDomainFromImage( const Image &virtualImage )
+{
+  this->m_VirtualDomainSize = virtualImage.GetSize();
+  this->m_VirtualDomainOrigin = virtualImage.GetOrigin();
+  this->m_VirtualDomainSpacing = virtualImage.GetSpacing();
+  this->m_VirtualDomainDirection = virtualImage.GetDirection();
+
   return *this;
 }
 
@@ -351,6 +410,25 @@ ImageRegistrationMethod::SetOptimizerAsPowell(unsigned int numberOfIterations,
 }
 
 ImageRegistrationMethod::Self&
+ImageRegistrationMethod::SetOptimizerAsOnePlusOneEvolutionary(unsigned int numberOfIterations,
+                                                              double epsilon,
+                                                              double initialRadius,
+                                                              double growthFactor,
+                                                              double shrinkFactor,
+                                                              unsigned int seed)
+{
+  m_OptimizerType = OnePlusOneEvolutionary;
+  m_OptimizerNumberOfIterations = numberOfIterations;
+  m_OptimizerEpsilon = epsilon;
+  m_OptimizerInitialRadius = initialRadius;
+  m_OptimizerGrowthFactor = growthFactor;
+  m_OptimizerShrinkFactor = shrinkFactor;
+  m_OptimizerSeed = seed;
+
+  return *this;
+}
+
+ImageRegistrationMethod::Self&
 ImageRegistrationMethod::SetOptimizerScales( const std::vector<double> &scales)
 {
   this->m_OptimizerScalesType = Manual;
@@ -408,17 +486,19 @@ ImageRegistrationMethod::SetOptimizerScalesFromPhysicalShift( unsigned int centr
 }
 
 ImageRegistrationMethod::Self&
-ImageRegistrationMethod::SetMetricSamplingPercentage(double percentage)
+ImageRegistrationMethod::SetMetricSamplingPercentage(double percentage, unsigned int seed)
 {
   m_MetricSamplingPercentage.resize(1);
   m_MetricSamplingPercentage[0] = percentage;
+  m_MetricSamplingSeed = seed;
   return *this;
 }
 
 ImageRegistrationMethod::Self&
-ImageRegistrationMethod::SetMetricSamplingPercentagePerLevel(const std::vector<double> &percentage)
+ImageRegistrationMethod::SetMetricSamplingPercentagePerLevel(const std::vector<double> &percentage, unsigned int seed)
 {
   m_MetricSamplingPercentage = percentage;
+  m_MetricSamplingSeed = seed;
   return *this;
 }
 
@@ -745,6 +825,15 @@ Transform ImageRegistrationMethod::ExecuteInternal ( const Image &inFixed, const
     registration->SetMetricSamplingPercentagePerLevel(param);
     }
 
+  if ( m_MetricSamplingSeed == sitkWallClock )
+    {
+    registration->MetricSamplingReinitializeSeed();
+    }
+  else
+    {
+    registration->MetricSamplingReinitializeSeed(m_MetricSamplingSeed);
+    }
+
   typename RegistrationType::ShrinkFactorsArrayType shrinkFactorsPerLevel( m_ShrinkFactorsPerLevel.size() );
   std::copy(m_ShrinkFactorsPerLevel.begin(), m_ShrinkFactorsPerLevel.end(), shrinkFactorsPerLevel.begin());
   registration->SetShrinkFactorsPerLevel( shrinkFactorsPerLevel );
@@ -798,7 +887,7 @@ Transform ImageRegistrationMethod::ExecuteInternal ( const Image &inFixed, const
 
   m_pfGetOptimizerStopConditionDescription =  nsstd::bind(&_OptimizerType::GetStopConditionDescription, optimizer.GetPointer());
 
-  m_pfGetCurrentLevel = nsstd::bind(&RegistrationType::GetCurrentLevel,registration.GetPointer());
+  m_pfGetCurrentLevel = nsstd::bind(&CurrentLevelCustomCast::CustomCast<RegistrationType>,registration.GetPointer());
 
 
   try
@@ -967,6 +1056,17 @@ ImageRegistrationMethod::SetupMetric(
   metric->SetUseFixedImageGradientFilter( m_MetricUseFixedImageGradientFilter );
   metric->SetUseMovingImageGradientFilter( m_MetricUseMovingImageGradientFilter );
 
+  if ( this->m_VirtualDomainSize.size() != 0 )
+    {
+    typename FixedImageType::SpacingType itkSpacing = sitkSTLVectorToITK<typename FixedImageType::SpacingType>(this->m_VirtualDomainSpacing);
+    typename FixedImageType::PointType itkOrigin = sitkSTLVectorToITK<typename FixedImageType::PointType>(this->m_VirtualDomainOrigin);
+    typename FixedImageType::DirectionType itkDirection = sitkSTLToITKDirection<typename FixedImageType::DirectionType>(this->m_VirtualDomainDirection);
+
+    typename FixedImageType::RegionType itkRegion;
+    itkRegion.SetSize( sitkSTLVectorToITK<typename FixedImageType::SizeType>( this->m_VirtualDomainSize ) );
+
+    metric->SetVirtualDomain( itkSpacing, itkOrigin, itkDirection, itkRegion );
+    }
 
   typedef itk::InterpolateImageFunction< FixedImageType, double > FixedInterpolatorType;
   typename FixedInterpolatorType::Pointer   fixedInterpolator  = CreateInterpolator(fixed, m_Interpolator);
