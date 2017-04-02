@@ -34,9 +34,6 @@ target_link_libraries ( SimpleElastix1 ${SimpleITK_LIBRARIES} )
 add_executable ( SimpleTransformix1 SimpleTransformix1.cxx )
 target_link_libraries ( SimpleTransformix1 ${SimpleITK_LIBRARIES} )
 
-add_executable ( SimpleGaussian SimpleGaussian.cxx )
-target_link_libraries ( SimpleGaussian ${SimpleITK_LIBRARIES} )
-
 add_executable ( SimpleGaussianFunctional SimpleGaussianFunctional.cxx )
 target_link_libraries ( SimpleGaussianFunctional ${SimpleITK_LIBRARIES} )
 

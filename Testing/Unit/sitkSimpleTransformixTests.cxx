@@ -1,4 +1,5 @@
 #include "SimpleITKTestHarness.h"
+#include "sitkImageFileReader.h"
 #include "sitkCastImageFilter.h"
 #include "sitkSimpleElastix.h"
 #include "sitkSimpleTransformix.h"
