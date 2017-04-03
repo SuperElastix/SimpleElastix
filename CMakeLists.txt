@@ -502,10 +502,6 @@ install(
 
 install(FILES ${SimpleITK_DOC_FILES} DESTINATION "${SimpleITK_INSTALL_DOC_DIR}" COMPONENT Runtime)
 
-install( FILES $<TARGET_FILE:elastix> $<TARGET_FILE:transformix>
-  DESTINATION ${SimpleITK_INSTALL_RUNTIME_DIR}
-)
-
 #------------------------------------------------------------------------------
 # CPack
 
