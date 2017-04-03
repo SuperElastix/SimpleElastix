@@ -2,13 +2,27 @@
   "name" : "LabelMapOverlayImageFilter",
   "template_code_filename" : "DualImageFilter",
   "template_test_filename" : "ImageFilter",
-  "number_of_inputs" : 2,
+  "include_files" : [
+    "sitkLabelFunctorUtils.hxx"
+  ],
+  "number_of_inputs" : 0,
   "doc" : "",
   "pixel_types" : "LabelPixelIDTypeList",
   "pixel_types2" : "BasicPixelIDTypeList",
   "output_image_type" : "itk::VectorImage< typename InputImageType2::PixelType, InputImageType::ImageDimension >",
   "filter_type" : "itk::LabelMapOverlayImageFilter<InputImageType, InputImageType2, OutputImageType>",
-  "custom_set_input" : "filter->SetInput1( image1 ); filter->SetInput2( image2 );",
+  "inputs" : [
+    {
+      "name" : "LabelMapImage",
+      "type" : "Image",
+      "custom_itk_cast" : "filter->SetInput1( this->CastImageToITK<typename FilterType::LabelMapType>(*inLabelMapImage) );"
+    },
+    {
+      "name" : "FeatureImage",
+      "type" : "Image",
+      "custom_itk_cast" : "filter->SetFeatureImage( this->CastImageToITK<typename FilterType::FeatureImageType>(*inFeatureImage) );"
+    }
+  ],
   "members" : [
     {
       "name" : "Opacity",
@@ -19,6 +33,12 @@
       "detaileddescriptionSet" : "Set/Get the opacity of the colored label image. The value must be between 0 and 1",
       "briefdescriptionGet" : "",
       "detaileddescriptionGet" : "Set/Get the opacity of the colored label image. The value must be between 0 and 1"
+    },
+    {
+      "name" : "Colormap",
+      "type" : "std::vector<unsigned char>",
+      "default" : "std::vector<unsigned char>()",
+      "custom_itk_cast" : "SetLabelFunctorFromColormap(filter->GetFunctor(),this->m_Colormap);"
     }
   ],
   "tests" : [
@@ -35,5 +55,7 @@
     }
   ],
   "briefdescription" : "Apply a colormap to a label map and superimpose it on an image.",
-  "detaileddescription" : "Apply a colormap to a label map and put it on top of the feature image. The feature image is typically the image from which the labeling was produced. Use the SetInput function to set the LabelMap , and the SetFeatureImage function to set the feature image.\n\nThe set of colors is a good selection of distinct colors. The opacity of the label map can be defined by the user. A background label produce a gray pixel with the same intensity than the input one.\n\n\\author Gaetan Lehmann. Biologie du Developpement et de la Reproduction, INRA de Jouy-en-Josas, France.\n\nThis implementation was taken from the Insight Journal paper: https://hdl.handle.net/1926/584 or http://www.insight-journal.org/browse/publication/176 \n\n\\see LabelMapToBinaryImageFilter , LabelMapToLabelImageFilter"
+  "detaileddescription" : "Apply a colormap to a label map and put it on top of the feature image. The feature image is typically the image from which the labeling was produced. Use the SetInput function to set the LabelMap , and the SetFeatureImage function to set the feature image.\n\nThe set of colors is a good selection of distinct colors. The opacity of the label map can be defined by the user. A background label produce a gray pixel with the same intensity than the input one.\n\n\\author Gaetan Lehmann. Biologie du Developpement et de la Reproduction, INRA de Jouy-en-Josas, France.\n\nThis implementation was taken from the Insight Journal paper: https://hdl.handle.net/1926/584 or http://www.insight-journal.org/browse/publication/176 \n\n\\see LabelOverlayImageFilter , LabelOverlayFunctor \n\n\\see LabelMapToRGBImageFilter , LabelMapToBinaryImageFilter , LabelMapToLabelImageFilter",
+  "itk_module" : "ITKImageFusion",
+  "itk_group" : "ImageFusion"
 }

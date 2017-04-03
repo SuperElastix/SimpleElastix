@@ -1,75 +1,5 @@
 
 
-%typemap(javaimports) itk::ComponentByComponentImageFilter "/**
-
-Apply a filter or a pipeline slice by slice on an image.
-
-C++ includes: itkComponentByComponentImageFilter.h
-*/"
-
-%javamethodmodifiers  itk::ComponentByComponentImageFilter::GetFilter "/**
-InputFilterType* itk::ComponentByComponentImageFilter< TInputImage, TOutputImage, TInputFilter, TOutputFilter, TInternalInputImage, TInternalOutputImage >::GetFilter()
-*/
-public ";
-
-%javamethodmodifiers  itk::ComponentByComponentImageFilter::GetFilter "/**
-const InputFilterType* itk::ComponentByComponentImageFilter< TInputImage, TOutputImage, TInputFilter, TOutputFilter, TInternalInputImage, TInternalOutputImage >::GetFilter() const
-*/
-public ";
-
-%javamethodmodifiers  itk::ComponentByComponentImageFilter::itkGetConstMacro "/**
-itk::ComponentByComponentImageFilter< TInputImage, TOutputImage, TInputFilter, TOutputFilter, TInternalInputImage, TInternalOutputImage >::itkGetConstMacro(ComponentIndex, unsigned int)
-
-The index of the slice currently processed by the filter. This is
-intended to be used with the IterationEvent sent before the processing
-of each object. It contains a relevant value only during the filter
-update.
-
-*/
-public ";
-
-%javamethodmodifiers  itk::ComponentByComponentImageFilter::itkGetModifiableObjectMacro "/**
-itk::ComponentByComponentImageFilter< TInputImage, TOutputImage, TInputFilter, TOutputFilter, TInternalInputImage, TInternalOutputImage >::itkGetModifiableObjectMacro(InputFilter, InputFilterType)
-*/
-public ";
-
-%javamethodmodifiers  itk::ComponentByComponentImageFilter::itkGetModifiableObjectMacro "/**
-itk::ComponentByComponentImageFilter< TInputImage, TOutputImage, TInputFilter, TOutputFilter, TInternalInputImage, TInternalOutputImage >::itkGetModifiableObjectMacro(OutputFilter, OutputFilterType)
-*/
-public ";
-
-%javamethodmodifiers  itk::ComponentByComponentImageFilter::itkNewMacro "/**
-itk::ComponentByComponentImageFilter< TInputImage, TOutputImage, TInputFilter, TOutputFilter, TInternalInputImage, TInternalOutputImage >::itkNewMacro(Self)
-
-Standard New method.
-
-*/
-public ";
-
-%javamethodmodifiers  itk::ComponentByComponentImageFilter::itkTypeMacro "/**
-itk::ComponentByComponentImageFilter< TInputImage, TOutputImage, TInputFilter, TOutputFilter, TInternalInputImage, TInternalOutputImage >::itkTypeMacro(ComponentByComponentImageFilter, ImageToImageFilter)
-
-Runtime information support.
-
-*/
-public ";
-
-%javamethodmodifiers  itk::ComponentByComponentImageFilter::SetFilter "/**
-void itk::ComponentByComponentImageFilter< TInputImage, TOutputImage, TInputFilter, TOutputFilter, TInternalInputImage, TInternalOutputImage >::SetFilter(InputFilterType *filter)
-*/
-public ";
-
-%javamethodmodifiers  itk::ComponentByComponentImageFilter::SetInputFilter "/**
-void itk::ComponentByComponentImageFilter< TInputImage, TOutputImage, TInputFilter, TOutputFilter, TInternalInputImage, TInternalOutputImage >::SetInputFilter(InputFilterType *filter)
-*/
-public ";
-
-%javamethodmodifiers  itk::ComponentByComponentImageFilter::SetOutputFilter "/**
-void itk::ComponentByComponentImageFilter< TInputImage, TOutputImage, TInputFilter, TOutputFilter, TInternalInputImage, TInternalOutputImage >::SetOutputFilter(OutputFilterType *filter)
-*/
-public ";
-
-
 %typemap(javaimports) itk::Functor::BitwiseNot "/**
 
 Performs the C++ unary bitwise NOT operator.
@@ -6026,11 +5956,6 @@ Set/Get the output pixel type
 */
 public ";
 
-%javamethodmodifiers  itk::simple::CastImageFilter::SetOutputPixelType "/**
-Self& itk::simple::CastImageFilter::SetOutputPixelType(PixelIDValueType pixelID)
-*/
-public ";
-
 %javamethodmodifiers  itk::simple::CastImageFilter::ToString "/**
 std::string itk::simple::CastImageFilter::ToString() const
 */
@@ -7784,12 +7709,6 @@ public ";
 %javamethodmodifiers  itk::simple::ConnectedComponentImageFilter::GetObjectCount "/**
 uint32_t itk::simple::ConnectedComponentImageFilter::GetObjectCount() const
 
-<<<<<<< HEAD:Wrapping/JavaDoc.i
-After the filter is executed, holds the number of connected
-components.
-
-=======
->>>>>>> v0.10rc1:Wrapping/Java/JavaDoc.i
 This is a measurement. Its value is updated in the Execute methods, so
 the value will only be valid after an execution.
 
@@ -10888,6 +10807,9 @@ public ";
 
 %javamethodmodifiers  itk::simple::DisplacementFieldTransform::SetInterpolator "/**
 Self& itk::simple::DisplacementFieldTransform::SetInterpolator(InterpolatorEnum interp)
+
+Set the interpolator used between the field voxels.
+
 */
 public ";
 
@@ -12817,11 +12739,7 @@ image.
 For images with an odd-sized dimension, applying this filter twice
 will not produce the same image as the original one without using
 SetInverse(true) on one (and only one) of the two filters.
-<<<<<<< HEAD:Wrapping/JavaDoc.i
-http://hdl.handle.net/1926/321
-=======
 https://hdl.handle.net/1926/321
->>>>>>> v0.10rc1:Wrapping/Java/JavaDoc.i
 
 
 Gaetan Lehmann. Biologie du Developpement et de la Reproduction, INRA
@@ -18257,7 +18175,7 @@ C++ includes: sitkHausdorffDistanceImageFilter.h
 */"
 
 %javamethodmodifiers  itk::simple::HausdorffDistanceImageFilter::Execute "/**
-Image itk::simple::HausdorffDistanceImageFilter::Execute(const Image &image1, const Image &image2)
+void itk::simple::HausdorffDistanceImageFilter::Execute(const Image &image1, const Image &image2)
 
 Execute the filter on the input images
 
@@ -18755,6 +18673,20 @@ Get the number of components for each pixel.
 
 For scalar images this methods returns 1. For vector images the number
 of components for each pixel is returned.
+
+*/
+public ";
+
+%javamethodmodifiers  itk::simple::Image::GetNumberOfPixels "/**
+uint64_t itk::simple::Image::GetNumberOfPixels(void) const
+
+Get the number of pixels in the image.
+
+
+To Calculate the total number of values stored continuously for the
+image's buffer, the NumberOfPixels should be multiplied by
+NumberOfComponentsPerPixel in order to account for multiple component
+images.
 
 */
 public ";
@@ -19418,6 +19350,26 @@ The default parameters utilize LBFGSB in unbounded mode.
 
 See:
  itk::LBFGSBOptimizerv4
+
+
+*/
+public ";
+
+%javamethodmodifiers  itk::simple::ImageRegistrationMethod::SetOptimizerAsOnePlusOneEvolutionary "/**
+Self& itk::simple::ImageRegistrationMethod::SetOptimizerAsOnePlusOneEvolutionary(unsigned int numberOfIterations=100, double epsilon=1.5e-4, double
+initialRadius=1.01, double growthFactor=-1.0, double
+shrinkFactor=-1.0, unsigned int seed=0)
+
+1+1 evolutionary optimizer strategy.
+
+
+The seed parameter is used to seed the pseudo-random number generator.
+If the seed parameter is 0, then the wall clock is used to seed,
+otherwise the fixed seed is used for reproducible behavior.
+
+
+See:
+ itk::OnePlusOneEvolutionaryOptimizerv4
 
 
 */
@@ -21898,11 +21850,7 @@ the same in the input and in the output image.
 The connectivity can be changed to minimum or maximum connectivity
 with SetFullyConnected() . Full connectivity produces thicker contours.
 
-<<<<<<< HEAD:Wrapping/JavaDoc.i
-http://hdl.handle.net/1926/1352
-=======
 https://hdl.handle.net/1926/1352
->>>>>>> v0.10rc1:Wrapping/Java/JavaDoc.i
 
 
 Gaetan Lehmann. Biologie du Developpement et de la Reproduction, INRA
@@ -22177,7 +22125,7 @@ Set the value of ComputePerimeter to true or false respectfully.
 public ";
 
 %javamethodmodifiers  itk::simple::LabelIntensityStatisticsImageFilter::Execute "/**
-Image itk::simple::LabelIntensityStatisticsImageFilter::Execute(const Image &image, const Image &featureImage)
+void itk::simple::LabelIntensityStatisticsImageFilter::Execute(const Image &image, const Image &featureImage)
 
 Execute the filter on the input image
 
@@ -22185,7 +22133,7 @@ Execute the filter on the input image
 public ";
 
 %javamethodmodifiers  itk::simple::LabelIntensityStatisticsImageFilter::Execute "/**
-Image itk::simple::LabelIntensityStatisticsImageFilter::Execute(const Image &image, const Image &featureImage, double
+void itk::simple::LabelIntensityStatisticsImageFilter::Execute(const Image &image, const Image &featureImage, double
 backgroundValue, bool computeFeretDiameter, bool computePerimeter,
 uint32_t numberOfBins)
 
@@ -22710,10 +22658,16 @@ Image itk::simple::LabelMapContourOverlayImageFilter::Execute(const Image &label
 opacity, const std::vector< unsigned int > &dilationRadius, const
 std::vector< unsigned int > &contourThickness, unsigned int
 sliceDimension, LabelMapContourOverlayImageFilter::ContourTypeType
-contourType, LabelMapContourOverlayImageFilter::PriorityType priority)
+contourType, LabelMapContourOverlayImageFilter::PriorityType priority,
+std::vector< uint8_t > colormap)
 
 Execute the filter on the input image with the given parameters
 
+*/
+public ";
+
+%javamethodmodifiers  itk::simple::LabelMapContourOverlayImageFilter::GetColormap "/**
+std::vector<uint8_t> itk::simple::LabelMapContourOverlayImageFilter::GetColormap() const
 */
 public ";
 
@@ -22780,6 +22734,11 @@ itk::simple::LabelMapContourOverlayImageFilter::LabelMapContourOverlayImageFilte
 Default Constructor that takes no arguments and initializes default
 parameters
 
+*/
+public ";
+
+%javamethodmodifiers  itk::simple::LabelMapContourOverlayImageFilter::SetColormap "/**
+Self& itk::simple::LabelMapContourOverlayImageFilter::SetColormap(std::vector< uint8_t > Colormap)
 */
 public ";
 
@@ -23089,18 +23048,24 @@ C++ includes: sitkLabelMapOverlayImageFilter.h
 */"
 
 %javamethodmodifiers  itk::simple::LabelMapOverlayImageFilter::Execute "/**
-Image itk::simple::LabelMapOverlayImageFilter::Execute(const Image &image1, const Image &image2)
+Image itk::simple::LabelMapOverlayImageFilter::Execute(const Image &labelMapImage, const Image &featureImage)
 
-Execute the filter on the input images
+Execute the filter on the input image
 
 */
 public ";
 
 %javamethodmodifiers  itk::simple::LabelMapOverlayImageFilter::Execute "/**
-Image itk::simple::LabelMapOverlayImageFilter::Execute(const Image &image1, const Image &image2, double opacity)
+Image itk::simple::LabelMapOverlayImageFilter::Execute(const Image &labelMapImage, const Image &featureImage, double
+opacity, std::vector< unsigned char > colormap)
 
-Execute the filter on the input images with the given parameters
+Execute the filter on the input image with the given parameters
 
+*/
+public ";
+
+%javamethodmodifiers  itk::simple::LabelMapOverlayImageFilter::GetColormap "/**
+std::vector<unsigned char> itk::simple::LabelMapOverlayImageFilter::GetColormap() const
 */
 public ";
 
@@ -23127,6 +23092,11 @@ itk::simple::LabelMapOverlayImageFilter::LabelMapOverlayImageFilter()
 Default Constructor that takes no arguments and initializes default
 parameters
 
+*/
+public ";
+
+%javamethodmodifiers  itk::simple::LabelMapOverlayImageFilter::SetColormap "/**
+Self& itk::simple::LabelMapOverlayImageFilter::SetColormap(std::vector< unsigned char > Colormap)
 */
 public ";
 
@@ -23371,6 +23341,19 @@ Execute the filter on the input image
 */
 public ";
 
+%javamethodmodifiers  itk::simple::LabelMapToRGBImageFilter::Execute "/**
+Image itk::simple::LabelMapToRGBImageFilter::Execute(const Image &image1, std::vector< uint8_t > colormap)
+
+Execute the filter on the input image with the given parameters
+
+*/
+public ";
+
+%javamethodmodifiers  itk::simple::LabelMapToRGBImageFilter::GetColormap "/**
+std::vector<uint8_t> itk::simple::LabelMapToRGBImageFilter::GetColormap() const
+*/
+public ";
+
 %javamethodmodifiers  itk::simple::LabelMapToRGBImageFilter::GetName "/**
 std::string itk::simple::LabelMapToRGBImageFilter::GetName() const
 
@@ -23385,6 +23368,11 @@ itk::simple::LabelMapToRGBImageFilter::LabelMapToRGBImageFilter()
 Default Constructor that takes no arguments and initializes default
 parameters
 
+*/
+public ";
+
+%javamethodmodifiers  itk::simple::LabelMapToRGBImageFilter::SetColormap "/**
+Self& itk::simple::LabelMapToRGBImageFilter::SetColormap(std::vector< uint8_t > Colormap)
 */
 public ";
 
@@ -23428,7 +23416,7 @@ C++ includes: sitkLabelOverlapMeasuresImageFilter.h
 */"
 
 %javamethodmodifiers  itk::simple::LabelOverlapMeasuresImageFilter::Execute "/**
-Image itk::simple::LabelOverlapMeasuresImageFilter::Execute(const Image &image1, const Image &image2)
+void itk::simple::LabelOverlapMeasuresImageFilter::Execute(const Image &image1, const Image &image2)
 
 Execute the filter on the input images
 
@@ -23582,7 +23570,7 @@ public ";
 
 %javamethodmodifiers  itk::simple::LabelOverlayImageFilter::Execute "/**
 Image itk::simple::LabelOverlayImageFilter::Execute(const Image &image, const Image &labelImage, double opacity, double
-backgroundValue)
+backgroundValue, std::vector< uint8_t > colormap)
 
 Execute the filter on the input image with the given parameters
 
@@ -23594,6 +23582,11 @@ double itk::simple::LabelOverlayImageFilter::GetBackgroundValue() const
 
 Set/Get the background value
 
+*/
+public ";
+
+%javamethodmodifiers  itk::simple::LabelOverlayImageFilter::GetColormap "/**
+std::vector<uint8_t> itk::simple::LabelOverlayImageFilter::GetColormap() const
 */
 public ";
 
@@ -23628,6 +23621,11 @@ Self& itk::simple::LabelOverlayImageFilter::SetBackgroundValue(double Background
 
 Set/Get the background value
 
+*/
+public ";
+
+%javamethodmodifiers  itk::simple::LabelOverlayImageFilter::SetColormap "/**
+Self& itk::simple::LabelOverlayImageFilter::SetColormap(std::vector< uint8_t > Colormap)
 */
 public ";
 
@@ -23668,11 +23666,7 @@ valuates the shape attribute at once.
 
 This implementation was taken from the Insight Journal paper:
 
-<<<<<<< HEAD:Wrapping/JavaDoc.i
-http://hdl.handle.net/1926/584 or http://www.insight-journal.org/browse/publication/176
-=======
 https://hdl.handle.net/1926/584 or http://www.insight-journal.org/browse/publication/176
->>>>>>> v0.10rc1:Wrapping/Java/JavaDoc.i
 
 
 Gaetan Lehmann. Biologie du Developpement et de la Reproduction, INRA
@@ -23720,7 +23714,7 @@ Set the value of ComputePerimeter to true or false respectfully.
 public ";
 
 %javamethodmodifiers  itk::simple::LabelShapeStatisticsImageFilter::Execute "/**
-Image itk::simple::LabelShapeStatisticsImageFilter::Execute(const Image &image1)
+void itk::simple::LabelShapeStatisticsImageFilter::Execute(const Image &image1)
 
 Execute the filter on the input image
 
@@ -23728,7 +23722,7 @@ Execute the filter on the input image
 public ";
 
 %javamethodmodifiers  itk::simple::LabelShapeStatisticsImageFilter::Execute "/**
-Image itk::simple::LabelShapeStatisticsImageFilter::Execute(const Image &image1, double backgroundValue, bool
+void itk::simple::LabelShapeStatisticsImageFilter::Execute(const Image &image1, double backgroundValue, bool
 computeFeretDiameter, bool computePerimeter)
 
 Execute the filter on the input image with the given parameters
@@ -24057,7 +24051,7 @@ C++ includes: sitkLabelStatisticsImageFilter.h
 */"
 
 %javamethodmodifiers  itk::simple::LabelStatisticsImageFilter::Execute "/**
-Image itk::simple::LabelStatisticsImageFilter::Execute(const Image &image, const Image &labelImage)
+void itk::simple::LabelStatisticsImageFilter::Execute(const Image &image, const Image &labelImage)
 
 Execute the filter on the input image
 
@@ -24065,7 +24059,7 @@ Execute the filter on the input image
 public ";
 
 %javamethodmodifiers  itk::simple::LabelStatisticsImageFilter::Execute "/**
-Image itk::simple::LabelStatisticsImageFilter::Execute(const Image &image, const Image &labelImage, bool useHistograms)
+void itk::simple::LabelStatisticsImageFilter::Execute(const Image &image, const Image &labelImage, bool useHistograms)
 
 Execute the filter on the input image with the given parameters
 
@@ -24305,7 +24299,8 @@ Execute the filter on the input image
 public ";
 
 %javamethodmodifiers  itk::simple::LabelToRGBImageFilter::Execute "/**
-Image itk::simple::LabelToRGBImageFilter::Execute(const Image &image1, double backgroundValue)
+Image itk::simple::LabelToRGBImageFilter::Execute(const Image &image1, double backgroundValue, std::vector< uint8_t >
+colormap)
 
 Execute the filter on the input image with the given parameters
 
@@ -24317,6 +24312,11 @@ double itk::simple::LabelToRGBImageFilter::GetBackgroundValue() const
 
 Set/Get the background value
 
+*/
+public ";
+
+%javamethodmodifiers  itk::simple::LabelToRGBImageFilter::GetColormap "/**
+std::vector<uint8_t> itk::simple::LabelToRGBImageFilter::GetColormap() const
 */
 public ";
 
@@ -24342,6 +24342,11 @@ Self& itk::simple::LabelToRGBImageFilter::SetBackgroundValue(double BackgroundVa
 
 Set/Get the background value
 
+*/
+public ";
+
+%javamethodmodifiers  itk::simple::LabelToRGBImageFilter::SetColormap "/**
+Self& itk::simple::LabelToRGBImageFilter::SetColormap(std::vector< uint8_t > Colormap)
 */
 public ";
 
@@ -28266,7 +28271,7 @@ C++ includes: sitkMinimumMaximumImageFilter.h
 */"
 
 %javamethodmodifiers  itk::simple::MinimumMaximumImageFilter::Execute "/**
-Image itk::simple::MinimumMaximumImageFilter::Execute(const Image &image1)
+void itk::simple::MinimumMaximumImageFilter::Execute(const Image &image1)
 
 Execute the filter on the input image
 
@@ -32427,6 +32432,11 @@ virtual unsigned int itk::simple::PimpleImageBase::GetNumberOfComponentsPerPixel
 */
 public ";
 
+%javamethodmodifiers  itk::simple::PimpleImageBase::GetNumberOfPixels "/**
+virtual uint64_t itk::simple::PimpleImageBase::GetNumberOfPixels(void) const =0
+*/
+public ";
+
 %javamethodmodifiers  itk::simple::PimpleImageBase::GetOrigin "/**
 virtual std::vector<double> itk::simple::PimpleImageBase::GetOrigin(void) const =0
 */
@@ -34196,11 +34206,7 @@ a minima or not. The SetFlatIsMinima() method let the user choose which behavior
 
 This class was contribtued to the Insight Journal by
 Gaetan Lehmann. Biologie du Developpement et de la Reproduction, INRA
-<<<<<<< HEAD:Wrapping/JavaDoc.i
-de Jouy-en-Josas, France. http://hdl.handle.net/1926/153
-=======
 de Jouy-en-Josas, France. https://hdl.handle.net/1926/153
->>>>>>> v0.10rc1:Wrapping/Java/JavaDoc.i
 RegionalMaximaImageFilter MathematicalMorphologyImageFilters
 
 
@@ -36310,7 +36316,7 @@ public ";
 
 %javamethodmodifiers  itk::simple::ScalarToRGBColormapImageFilter::Execute "/**
 Image itk::simple::ScalarToRGBColormapImageFilter::Execute(const Image &image1, ScalarToRGBColormapImageFilter::ColormapType
-colormap)
+colormap, bool useInputImageExtremaForScaling)
 
 Execute the filter on the input image with the given parameters
 
@@ -36333,6 +36339,16 @@ Name of this class
 */
 public ";
 
+%javamethodmodifiers  itk::simple::ScalarToRGBColormapImageFilter::GetUseInputImageExtremaForScaling "/**
+bool itk::simple::ScalarToRGBColormapImageFilter::GetUseInputImageExtremaForScaling() const
+
+Set/Get UseInputImageExtremaForScaling. If true, the colormap uses the
+min and max values from the image to scale appropriately. Otherwise,
+these values can be set in the colormap manually.
+
+*/
+public ";
+
 %javamethodmodifiers  itk::simple::ScalarToRGBColormapImageFilter::ScalarToRGBColormapImageFilter "/**
 itk::simple::ScalarToRGBColormapImageFilter::ScalarToRGBColormapImageFilter()
 
@@ -36347,10 +36363,34 @@ Self& itk::simple::ScalarToRGBColormapImageFilter::SetColormap(ColormapType Colo
 */
 public ";
 
+%javamethodmodifiers  itk::simple::ScalarToRGBColormapImageFilter::SetUseInputImageExtremaForScaling "/**
+Self& itk::simple::ScalarToRGBColormapImageFilter::SetUseInputImageExtremaForScaling(bool UseInputImageExtremaForScaling)
+
+Set/Get UseInputImageExtremaForScaling. If true, the colormap uses the
+min and max values from the image to scale appropriately. Otherwise,
+these values can be set in the colormap manually.
+
+*/
+public ";
+
 %javamethodmodifiers  itk::simple::ScalarToRGBColormapImageFilter::ToString "/**
 std::string itk::simple::ScalarToRGBColormapImageFilter::ToString() const
 
 Print ourselves out
+
+*/
+public ";
+
+%javamethodmodifiers  itk::simple::ScalarToRGBColormapImageFilter::UseInputImageExtremaForScalingOff "/**
+Self& itk::simple::ScalarToRGBColormapImageFilter::UseInputImageExtremaForScalingOff()
+*/
+public ";
+
+%javamethodmodifiers  itk::simple::ScalarToRGBColormapImageFilter::UseInputImageExtremaForScalingOn "/**
+Self& itk::simple::ScalarToRGBColormapImageFilter::UseInputImageExtremaForScalingOn()
+
+Set the value of UseInputImageExtremaForScaling to true or false
+respectfully.
 
 */
 public ";
@@ -38159,7 +38199,7 @@ C++ includes: sitkSimilarityIndexImageFilter.h
 */"
 
 %javamethodmodifiers  itk::simple::SimilarityIndexImageFilter::Execute "/**
-Image itk::simple::SimilarityIndexImageFilter::Execute(const Image &image1, const Image &image2)
+void itk::simple::SimilarityIndexImageFilter::Execute(const Image &image1, const Image &image2)
 
 Execute the filter on the input images
 
@@ -39207,7 +39247,7 @@ C++ includes: sitkStatisticsImageFilter.h
 */"
 
 %javamethodmodifiers  itk::simple::StatisticsImageFilter::Execute "/**
-Image itk::simple::StatisticsImageFilter::Execute(const Image &image1)
+void itk::simple::StatisticsImageFilter::Execute(const Image &image1)
 
 Execute the filter on the input image
 
@@ -41047,7 +41087,7 @@ C++ includes: sitkTransform.h
 */"
 
 %javamethodmodifiers  itk::simple::Transform::AddTransform "/**
-Transform& itk::simple::Transform::AddTransform(Transform t)
+Self& itk::simple::Transform::AddTransform(Transform t)
 */
 public ";
 
@@ -47398,7 +47438,8 @@ unsigned int sliceDimension=0u,
 LabelMapContourOverlayImageFilter::ContourTypeType
 contourType=itk::simple::LabelMapContourOverlayImageFilter::CONTOUR,
 LabelMapContourOverlayImageFilter::PriorityType priority=itk::simple::
-LabelMapContourOverlayImageFilter::HIGH_LABEL_ON_TOP)
+LabelMapContourOverlayImageFilter::HIGH_LABEL_ON_TOP, std::vector<
+uint8_t > colormap=std::vector< uint8_t >())
 
 Apply a colormap to the contours (outlines) of each object in a label
 map and superimpose it on top of the feature image.
@@ -47434,7 +47475,9 @@ See:
 public ";
 
 %javamethodmodifiers  itk::simple::LabelMapOverlay "/**
-Image itk::simple::LabelMapOverlay(const Image &image1, const Image &image2, double opacity=0.5)
+Image itk::simple::LabelMapOverlay(const Image &labelMapImage, const Image &featureImage, double
+opacity=0.5, std::vector< unsigned char > colormap=std::vector<
+unsigned char >())
 
 Apply a colormap to a label map and superimpose it on an image.
 
@@ -47483,7 +47526,8 @@ See:
 public ";
 
 %javamethodmodifiers  itk::simple::LabelMapToRGB "/**
-Image itk::simple::LabelMapToRGB(const Image &image1)
+Image itk::simple::LabelMapToRGB(const Image &image1, std::vector< uint8_t > colormap=std::vector<
+uint8_t >())
 
 Convert a LabelMap to a colored image.
 
@@ -47500,7 +47544,8 @@ public ";
 
 %javamethodmodifiers  itk::simple::LabelOverlay "/**
 Image itk::simple::LabelOverlay(const Image &image, const Image &labelImage, double opacity=0.5,
-double backgroundValue=0.0)
+double backgroundValue=0.0, std::vector< uint8_t >
+colormap=std::vector< uint8_t >())
 
 Apply a colormap to a label image and put it on top of the input
 image.
@@ -47517,7 +47562,8 @@ See:
 public ";
 
 %javamethodmodifiers  itk::simple::LabelToRGB "/**
-Image itk::simple::LabelToRGB(const Image &image1, double backgroundValue=0.0)
+Image itk::simple::LabelToRGB(const Image &image1, double backgroundValue=0.0, std::vector< uint8_t
+> colormap=std::vector< uint8_t >())
 
 Apply a colormap to a label image.
 
@@ -48930,7 +48976,8 @@ public ";
 
 %javamethodmodifiers  itk::simple::ScalarToRGBColormap "/**
 Image itk::simple::ScalarToRGBColormap(const Image &image1, ScalarToRGBColormapImageFilter::ColormapType
-colormap=itk::simple::ScalarToRGBColormapImageFilter::Grey)
+colormap=itk::simple::ScalarToRGBColormapImageFilter::Grey, bool
+useInputImageExtremaForScaling=true)
 
 Implements pixel-wise intensity->rgb mapping operation on one image.
 
@@ -49026,14 +49073,14 @@ public ";
 void SITKIO_EXPORT itk::simple::Show(const Image &image, const std::string &title=\"\", const bool
 debugOn=false)
 
-Display an image using ImageJ
+Display an image using Fiji, ImageJ or another application.
 
-This function requires that ImageJ ( http://rsb.info.nih.gov/ij/) be properly installed for Mac and Windows, and in the user's path
+This function requires that Fiji ( https://fiji.sc ) or ImageJ ( http://rsb.info.nih.gov/ij/) be properly installed for Mac and Windows, and in the user's path
 for Linux. ImageJ must have a plugin for reading Nifti formatted files
 ( http://www.loci.wisc.edu/bio-formats/imagej).
 
 Nifti is the default file format used to export images. A different
-format can by chosen by setting the SITK_SHOW_EXTENSION environment
+format can be chosen by setting the SITK_SHOW_EXTENSION environment
 variable. For example, set SITK_SHOW_EXTENSION to \".png\" to use PNG
 format.
 
@@ -49045,21 +49092,10 @@ The user can also select applications specifically for color images or
 environment variables.
 
 SITK_SHOW_COMMAND, SITK_SHOW_COLOR_COMMAND and SITK_SHOW_3D_COMMAND
-<<<<<<< HEAD:Wrapping/JavaDoc.i
 allow the following tokens in their strings.\\\\li \\\\c \"%a\"  for the ImageJ application \\\\li \\\\c \"%f\"
 for SimpleITK's temporary image file
 
 For example, the default SITK_SHOW_COMMAND string on Linux systems is:
-=======
-allow the following tokens in their strings.
-
-
-\"%a\" for the ImageJ application
-
-\"%f\" for SimpleITK's temporary image file
- For example, the default SITK_SHOW_COMMAND string on Linux systems
-is:
->>>>>>> v0.10rc1:Wrapping/Java/JavaDoc.i
 
 
 After token substitution it may become:

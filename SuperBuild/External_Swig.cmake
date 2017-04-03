@@ -20,34 +20,37 @@ if(NOT SWIG_DIR)
 
   if( USE_SWIG_FROM_GIT )
     set(SWIG_GIT_REPOSITORY "${git_protocol}://github.com/swig/swig.git" CACHE STRING "URL of swig git repo")
-    set(SWIG_GIT_TAG "rel-3.0.10" CACHE STRING "Tag in swig git repo")
+    set(SWIG_GIT_TAG "rel-3.0.11" CACHE STRING "Tag in swig git repo")
     mark_as_advanced(SWIG_GIT_REPO)
     mark_as_advanced(SWIG_GIT_TAG)
   endif()
 
-  set(SWIG_TARGET_VERSION "3.0.10" )
-  set(SWIG_DOWNLOAD_SOURCE_HASH "bb4ab8047159469add7d00910e203124")
-  set(SWIG_DOWNLOAD_WIN_HASH "f229724fe856aa78df6128ecfefe6e0a")
+  set(SWIG_TARGET_VERSION "3.0.11" )
+  set(SWIG_DOWNLOAD_SOURCE_HASH "13732eb0f1ab2123d180db8425c1edea")
+  set(SWIGWIN_DOWNLOAD_HASH "5cc57e3658f62b7f648bec7eed91a4f0" )
 
   if(WIN32)
     # binary SWIG for windows
     #------------------------------------------------------------------------------
 
+    sitkSourceDownload(SWIGWIN_URL "swigwin-${SWIG_TARGET_VERSION}.zip"  ${SWIGWIN_DOWNLOAD_HASH})
 
-    set(swig_source_dir ${CMAKE_CURRENT_BINARY_DIR}/swigwin-${SWIG_TARGET_VERSION})
+    set(swig_source_dir "${CMAKE_CURRENT_BINARY_DIR}/swigwin")
 
     # swig.exe available as pre-built binary on Windows:
     ExternalProject_Add(Swig
-      URL https://midas3.kitware.com/midas/api/rest?method=midas.bitstream.download&checksum=${SWIG_DOWNLOAD_WIN_HASH}&name=swigwin-${SWIG_TARGET_VERSION}.zip
+      URL "${SWIGWIN_URL}"
       URL_MD5 ${SWIG_DOWNLOAD_WIN_HASH}
-      SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/swigwin-${SWIG_TARGET_VERSION}
+      SOURCE_DIR ${swig_source_dir}
       CONFIGURE_COMMAND ""
       BUILD_COMMAND ""
       INSTALL_COMMAND ""
+      ${External_Project_USES_TERMINAL}
       )
+    add_dependencies(Swig  "SuperBuildSimpleITKSource")
 
-    set(SWIG_DIR ${CMAKE_CURRENT_BINARY_DIR}/swigwin-${SWIG_TARGET_VERSION}) # path specified as source in ep
-    set(SWIG_EXECUTABLE ${CMAKE_CURRENT_BINARY_DIR}/swigwin-${SWIG_TARGET_VERSION}/swig.exe)
+    set(SWIG_DIR "${swig_source_dir}") # path specified as source in ep
+    set(SWIG_EXECUTABLE ${SWIG_DIR}/swig.exe)
 
   else()
     # compiled SWIG for others
@@ -93,8 +96,9 @@ if(NOT SWIG_DIR)
         GIT_TAG "${SWIG_GIT_TAG}"
         )
     else()
+      sitkSourceDownload(SWIG_URL "swig-${SWIG_TARGET_VERSION}.tar.gz" ${SWIG_DOWNLOAD_SOURCE_HASH})
       set(SWIG_DOWNLOAD_STEP
-        URL "https://midas3.kitware.com/midas/api/rest?method=midas.bitstream.download&checksum=${SWIG_DOWNLOAD_SOURCE_HASH}&name=swig-${SWIG_TARGET_VERSION}.tar.gz"
+        URL "${SWIG_URL}"
         URL_MD5 "${SWIG_DOWNLOAD_SOURCE_HASH}"
         )
     endif()
@@ -103,7 +107,12 @@ if(NOT SWIG_DIR)
       ${SWIG_DOWNLOAD_STEP}
       CONFIGURE_COMMAND ${swig_CONFIGURE_COMMAND}
       DEPENDS "${Swig_DEPENDENCIES}"
+      ${External_Project_USES_TERMINAL}
       )
+
+    if(NOT USE_SWIG_FROM_GIT)
+      sitkSourceDownloadDependency(Swig)
+    endif()
 
     set(SWIG_DIR ${swig_install_dir}/share/swig/${SWIG_TARGET_VERSION})
     set(SWIG_EXECUTABLE ${swig_install_dir}/bin/swig)

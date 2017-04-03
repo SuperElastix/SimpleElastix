@@ -15,8 +15,8 @@
 *  limitations under the License.
 *
 *=========================================================================*/
-#ifndef __sitkDisplacementFieldTransform_h
-#define __sitkDisplacementFieldTransform_h
+#ifndef sitkDisplacementFieldTransform_h
+#define sitkDisplacementFieldTransform_h
 
 #include "sitkCommon.h"
 #include "sitkTransform.h"
@@ -91,6 +91,7 @@ public:
    */
   Image GetInverseDisplacementField() const;
 
+  /** Set the interpolator used between the field voxels. */
   SITK_RETURN_SELF_TYPE_HEADER SetInterpolator(InterpolatorEnum interp);
   // InterpolatorEnum GetInterpolator() const; How to do this?
 
@@ -169,4 +170,4 @@ private:
 }
 }
 
-#endif // __sitkDisplacementFieldTransform_h
+#endif // sitkDisplacementFieldTransform_h

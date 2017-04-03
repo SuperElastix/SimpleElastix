@@ -10,6 +10,14 @@
 
 include(sitkTargetLinkLibrariesWithDynamicLookup)
 
+sitk_check_dynamic_lookup(MODULE
+  SHARED
+  SITK_UNDEFINED_SYMBOLS_ALLOWED
+  )
+
+option(WRAP_DEFAULT "The default initial value for wrapping a language when it is detected on the system." ON)
+mark_as_advanced(WRAP_DEFAULT)
+
 #
 # Macro to set "_QUIET" and "_QUIET_LIBRARY" based on the first
 # argument being defined and true, to either REQUIRED or QUIET.
@@ -40,7 +48,7 @@ else()
   find_package ( Lua ${_QUIET} )
 endif()
 if ( LUA_FOUND )
-  set( WRAP_LUA_DEFAULT ON )
+  set( WRAP_LUA_DEFAULT ${WRAP_DEFAULT} )
 else()
   set( WRAP_LUA_DEFAULT OFF )
 endif()
@@ -68,15 +76,20 @@ endif()
 
 set_QUIET( WRAP_PYTHON )
 find_package ( PythonInterp ${_QUIET})
-find_package ( PythonLibs ${PYTHON_VERSION_STRING} EXACT ${_QUIET_LIBRARY} )
+if ( PYTHONINTERP_FOUND )
+  find_package ( PythonLibs ${PYTHON_VERSION_STRING} EXACT ${_QUIET_LIBRARY} )
+else ()
+  find_package ( PythonLibs ${_QUIET_LIBRARY} )
+endif()
 
-if (PYTHON_VERSION_STRING VERSION_LESS 2.6)
-  message( WARNING "Python version less that 2.6: \"${PYTHON_VERSION_STRING}\"." )
+if ( PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND
+    AND PYTHON_VERSION_STRING VERSION_LESS 2.7 )
+  message( WARNING "Python version less that 2.7: \"${PYTHON_VERSION_STRING}\"." )
 endif()
 
 if ( PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND
     AND (PYTHON_VERSION_STRING VERSION_EQUAL PYTHONLIBS_VERSION_STRING) )
-  set( WRAP_PYTHON_DEFAULT ON )
+  set( WRAP_PYTHON_DEFAULT ${WRAP_DEFAULT} )
 else()
   set( WRAP_PYTHON_DEFAULT OFF )
 endif()
@@ -106,7 +119,7 @@ set_QUIET( WRAP_JAVA )
 find_package ( Java COMPONENTS Development Runtime ${_QUIET} )
 find_package ( JNI ${_QUIET} )
 if ( ${JAVA_FOUND} AND ${JNI_FOUND} )
-  set( WRAP_JAVA_DEFAULT ON )
+  set( WRAP_JAVA_DEFAULT ${WRAP_DEFAULT} )
 else ( ${JAVA_FOUND} AND ${JNI_FOUND} )
   set( WRAP_JAVA_DEFAULT OFF )
 endif ( ${JAVA_FOUND} AND ${JNI_FOUND} )
@@ -144,7 +157,7 @@ set_QUIET(WRAP_TCL)
 find_package ( TCL ${_QUIET} )
 
 if ( ${TCL_FOUND} )
-  set ( WRAP_TCL_DEFAULT ON )
+  set ( WRAP_TCL_DEFAULT ${WRAP_DEFAULT} )
 else ( ${TCL_FOUND} )
   set ( WRAP_TCL_DEFAULT OFF )
 endif ( ${TCL_FOUND} )
@@ -167,7 +180,7 @@ set_QUIET( WRAP_RUBY )
 
 find_package ( Ruby ${_QUIET} )
 if ( ${RUBY_FOUND} )
-  set ( WRAP_RUBY_DEFAULT ON )
+  set ( WRAP_RUBY_DEFAULT ${WRAP_DEFAULT} )
 else ( ${RUBY_FOUND} )
   set ( WRAP_RUBY_DEFAULT OFF )
 endif ( ${RUBY_FOUND} )
@@ -194,7 +207,7 @@ endif()
 
 find_package( CSharp ${_QUIET} )
 if ( ${CSHARP_FOUND} AND NOT MINGW )
-  set ( WRAP_CSHARP_DEFAULT ON )
+  set ( WRAP_CSHARP_DEFAULT ${WRAP_DEFAULT} )
 else ()
   set ( WRAP_CSHARP_DEFAULT OFF )
 endif ()
@@ -214,7 +227,7 @@ set_QUIET( WRAP_R )
 
 find_package(R ${_QUIET})
 if ( ${R_FOUND} AND NOT WIN32 )
-  set ( WRAP_R_DEFAULT ON )
+  set ( WRAP_R_DEFAULT ${WRAP_DEFAULT} )
 else( )
   set ( WRAP_R_DEFAULT OFF )
 endif( )

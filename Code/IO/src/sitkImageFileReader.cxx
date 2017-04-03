@@ -27,7 +27,7 @@
 namespace itk {
   namespace simple {
 
-  Image ReadImage ( std::string filename, PixelIDValueEnum outputPixelType )
+  Image ReadImage ( const std::string &filename, PixelIDValueEnum outputPixelType )
     {
       ImageFileReader reader;
       return reader.SetFileName ( filename ).SetOutputPixelType(outputPixelType).Execute();
@@ -57,7 +57,7 @@ namespace itk {
       return out.str();
     }
 
-    ImageFileReader& ImageFileReader::SetFileName ( std::string fn ) {
+    ImageFileReader& ImageFileReader::SetFileName ( const std::string &fn ) {
       this->m_FileName = fn;
       return *this;
     }
@@ -83,7 +83,7 @@ namespace itk {
         this->GetPixelIDFromImageIO( imageio, unused, dimension );
         }
 
-#ifdef SITK_4D_IMAGES
+#ifdef SimpleITK_4D_IMAGES
       if ( dimension != 2 && dimension != 3  && dimension != 4 )
 #else
       if ( dimension != 2 && dimension != 3 )

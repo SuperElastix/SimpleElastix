@@ -15,8 +15,8 @@
 *  limitations under the License.
 *
 *=========================================================================*/
-#ifndef __sitkCastImageFilter_h
-#define __sitkCastImageFilter_h
+#ifndef sitkCastImageFilter_h
+#define sitkCastImageFilter_h
 
 #include "sitkImageFilter.h"
 #include "sitkPixelIDTokens.h"
@@ -46,7 +46,6 @@ public:
 
   /** Set/Get the output pixel type */
   SITK_RETURN_SELF_TYPE_HEADER SetOutputPixelType( PixelIDValueEnum pixelID );
-  SITK_RETURN_SELF_TYPE_HEADER SetOutputPixelType( PixelIDValueType pixelID );
   PixelIDValueEnum GetOutputPixelType( void ) const;
 
   /**

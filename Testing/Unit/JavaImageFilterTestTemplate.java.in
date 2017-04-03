@@ -89,12 +89,12 @@ end)
       CastImageFilter caster = new CastImageFilter();
 $(if inputA_cast then
  OUT=[[
-      caster.setOutputPixelType( PixelIDValueEnum.${inputA_cast}.swigValue() );
+      caster.setOutputPixelType( PixelIDValueEnum.${inputA_cast} );
       inputs[0]  = caster.execute( inputs[0] );
 ]]
 end)$(if inputB_cast then
  OUT=[[
-      caster.setOutputPixelType( PixelIDValueEnum.${inputB_cast}.swigValue() );
+      caster.setOutputPixelType( PixelIDValueEnum.${inputB_cast} );
       inputs[1]  = caster.execute( inputs[1] );
 ]]
 end)
@@ -108,7 +108,7 @@ $(if parameter == "SeedList" then
         int v[] = " .. value[i] .. ";\
         VectorUInt32 idx = new VectorUInt32();\
         for (int i = 0; i < inputs[0].getDimension(); i++) {\
-          idx.push_back(v[i]);\
+          idx.add(v[i]);\
         }\
         filter.addSeed(idx);\
       }\
@@ -119,7 +119,7 @@ elseif parameter == "TrialPoints" then
         int v[] = " .. value[i] .. ";\
         VectorUInt32 idx = new VectorUInt32();\
         for (int i = 0; i < inputs[0].getDimension(); i++) {\
-          idx.push_back(v[i]);\
+          idx.add(v[i]);\
         }\
         filter.addTrialPoint(idx);\
       }\
@@ -134,7 +134,7 @@ elseif point_vec and point_vec == 1 then
                   int v[] = ]] .. value[i] .. [[;
                   VectorUInt32 pts = new VectorUInt32( );
                   for (int i = 0; i < inputs[0].getDimension(); i++) {
-                    pts.push_back(v[i]);
+                    pts.add(v[i]);
                   }
                   filter.add${parameter:gsub('s([0-9]?)$','%1')}(pts);
                 }
@@ -189,7 +189,7 @@ elseif dim_vec == 1 then
         elseif type == "double" then
           OUT="VectorDouble idx = new VectorDouble( v.length );"
         elseif type == "uint8_t" then
-          OUT="VectorUInt16 idx = new VectorUInt16( v.length );"
+          OUT="VectorUInt8 idx = new VectorUInt8( v.length );"
         elseif type == "uint16_t" then
           OUT="VectorUInt16 idx = new VectorUInt16( v.length );"
         elseif type == "uint32_t" then
@@ -197,7 +197,7 @@ elseif dim_vec == 1 then
         elseif type == "uint64_t" then
           OUT="VectorUInt64 idx = new VectorUInt64( v.length );"
         elseif type == "int8_t" then
-          OUT="VectorInt16 idx = new VectorInt16( v.length );"
+          OUT="VectorInt8 idx = new VectorInt8( v.length );"
         elseif type == "int16_t" then
           OUT="VectorInt16 idx = new VectorInt16( v.length );"
         elseif type == "int32_t" then
@@ -224,7 +224,7 @@ end)
 )
 
       // Run the filter
-      Image output = filter.execute ( $(if #inputs > 0 then OUT=[[inputs[0] ]] end)$(for inum=1,#inputs-1 do OUT=OUT..", inputs["..inum.."]" end) );
+      $(if not no_return_image then OUT=[[Image output =]] end) filter.execute ( $(if #inputs > 0 then OUT=[[inputs[0] ]] end)$(for inum=1,#inputs-1 do OUT=OUT..", inputs["..inum.."]" end) );
 
       PixelIDValueEnum[] labelIDs = { PixelIDValueEnum.sitkLabelUInt8, PixelIDValueEnum.sitkLabelUInt16, PixelIDValueEnum.sitkLabelUInt32, PixelIDValueEnum.sitkLabelUInt64 };
 

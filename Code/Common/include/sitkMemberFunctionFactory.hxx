@@ -15,8 +15,8 @@
 *  limitations under the License.
 *
 *=========================================================================*/
-#ifndef __sitkMemberFunctionFactory_hxx
-#define __sitkMemberFunctionFactory_hxx
+#ifndef sitkMemberFunctionFactory_hxx
+#define sitkMemberFunctionFactory_hxx
 
 #include <cassert>
 
@@ -182,7 +182,7 @@ MemberFunctionFactory<TMemberFunctionPointer>
                            << GetPixelIDValueAsString(pixelID)
                            << " is not supported in 4D by "
                            << typeid(ObjectType).name()
-                           << " or SimpleITK compiled with SITK_4D_IMAGES set to OFF." );
+                           << " or SimpleITK compiled with SimpleITK_4D_IMAGES set to OFF." );
     case 3:
       // check if tr1::function has been set
       if ( Superclass::m_PFunction3.find( pixelID ) != Superclass::m_PFunction3.end() )
@@ -221,4 +221,4 @@ MemberFunctionFactory<TMemberFunctionPointer>
 } // end namespace itk
 
 
-#endif //  __sitkMemberFunctionFactory_h
+#endif //  sitkMemberFunctionFactory_h

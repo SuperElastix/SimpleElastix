@@ -15,8 +15,8 @@
 *  limitations under the License.
 *
 *=========================================================================*/
-#ifndef __sitkPimpleTransform_hxx
-#define __sitkPimpleTransform_hxx
+#ifndef sitkPimpleTransform_hxx
+#define sitkPimpleTransform_hxx
 
 #include "sitkTransform.h"
 
@@ -53,7 +53,7 @@ namespace simple
 // The interface provide virutal method and other generic methods to
 // the concrete ITK transform type, there by provide encapsulation and
 // a uniform interface
-class PimpleTransformBase
+class SITKCommon_HIDDEN PimpleTransformBase
 {
 public:
   virtual ~PimpleTransformBase( void ) {};
@@ -162,7 +162,7 @@ protected:
 };
 
 template< typename TTransformType >
-class PimpleTransform
+class SITKCommon_HIDDEN PimpleTransform
   : public PimpleTransformBase
 {
 public:
@@ -381,4 +381,4 @@ private:
 }
 
 
-#endif //  __sitkPimpleTransform_hxx
+#endif //  sitkPimpleTransform_hxx

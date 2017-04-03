@@ -21,19 +21,23 @@
 #include "itkGradientDescentOptimizerv4.h"
 #include "itkRegularStepGradientDescentOptimizerv4.h"
 #include "itkLBFGSBOptimizerv4.h"
+#include "itkOnePlusOneEvolutionaryOptimizerv4.h"
+#include "itkNormalVariateGenerator.h"
 #include "itkExhaustiveOptimizerv4.h"
 #include "itkAmoebaOptimizerv4.h"
-#include <itkPowellOptimizerv4.h>
+#include "itkPowellOptimizerv4.h"
+
+#include <time.h>
 
 
 namespace {
 
 template <typename T>
 void UpdateWithBestValueExhaustive(itk::ExhaustiveOptimizerv4<T> *exhaustiveOptimizer,
-                                   double &outValue,
+                                   double *outValue,
                                    itk::TransformBase *outTransform)
 {
-  outValue = exhaustiveOptimizer->GetMinimumMetricValue();
+  *outValue = exhaustiveOptimizer->GetMinimumMetricValue();
   if (outTransform)
     {
     outTransform->SetParameters(exhaustiveOptimizer->GetMinimumMetricValuePosition());
@@ -52,7 +56,15 @@ struct PositionOptimizerCustomCast
     }
 };
 
+struct CurrentIterationCustomCast
+{
+  static unsigned int CustomCast(const itk::ObjectToObjectOptimizerBaseTemplate<double> *opt)
+    {
+      return static_cast<unsigned int>(std::min<itk::SizeValueType>(opt->GetCurrentIteration(), std::numeric_limits<unsigned int>::max()));
+    }
+};
 }
+
 
 namespace itk
 {
@@ -89,7 +101,7 @@ namespace simple
       optimizer->SetMaximumStepSizeInPhysicalUnits( this->m_OptimizerMaximumStepSizeInPhysicalUnits );
 
       this->m_pfGetMetricValue = nsstd::bind(&_OptimizerType::GetCurrentMetricValue,optimizer.GetPointer());
-      this->m_pfGetOptimizerIteration = nsstd::bind(&_OptimizerType::GetCurrentIteration,optimizer.GetPointer());
+      this->m_pfGetOptimizerIteration = nsstd::bind(&CurrentIterationCustomCast::CustomCast,optimizer.GetPointer());
       this->m_pfGetOptimizerPosition = nsstd::bind(&PositionOptimizerCustomCast::CustomCast,optimizer.GetPointer());
       this->m_pfGetOptimizerLearningRate = nsstd::bind(&_OptimizerType::GetLearningRate,optimizer.GetPointer());
       this->m_pfGetOptimizerConvergenceValue = nsstd::bind(&_OptimizerType::GetConvergenceValue,optimizer.GetPointer());
@@ -111,7 +123,7 @@ namespace simple
       optimizer->SetMaximumStepSizeInPhysicalUnits( this->m_OptimizerMaximumStepSizeInPhysicalUnits );
 
       this->m_pfGetMetricValue = nsstd::bind(&_OptimizerType::GetCurrentMetricValue,optimizer.GetPointer());
-      this->m_pfGetOptimizerIteration = nsstd::bind(&_OptimizerType::GetCurrentIteration,optimizer.GetPointer());
+      this->m_pfGetOptimizerIteration = nsstd::bind(&CurrentIterationCustomCast::CustomCast,optimizer.GetPointer());
       this->m_pfGetOptimizerPosition = nsstd::bind(&PositionOptimizerCustomCast::CustomCast,optimizer.GetPointer());
       this->m_pfGetOptimizerLearningRate = nsstd::bind(&_OptimizerType::GetLearningRate,optimizer.GetPointer());
       this->m_pfGetOptimizerConvergenceValue = nsstd::bind(&_OptimizerType::GetConvergenceValue,optimizer.GetPointer());
@@ -137,7 +149,7 @@ namespace simple
       optimizer->SetMaximumStepSizeInPhysicalUnits( this->m_OptimizerMaximumStepSizeInPhysicalUnits );
 
       this->m_pfGetMetricValue = nsstd::bind(&_OptimizerType::GetCurrentMetricValue,optimizer.GetPointer());
-      this->m_pfGetOptimizerIteration = nsstd::bind(&_OptimizerType::GetCurrentIteration,optimizer.GetPointer());
+      this->m_pfGetOptimizerIteration = nsstd::bind(&CurrentIterationCustomCast::CustomCast,optimizer.GetPointer());
       this->m_pfGetOptimizerPosition = nsstd::bind(&PositionOptimizerCustomCast::CustomCast,optimizer.GetPointer());
       this->m_pfGetOptimizerLearningRate = nsstd::bind(&_OptimizerType::GetLearningRate,optimizer.GetPointer());
       this->m_pfGetOptimizerConvergenceValue = nsstd::bind(&_OptimizerType::GetConvergenceValue,optimizer.GetPointer());
@@ -162,7 +174,7 @@ namespace simple
       optimizer->Register();
 
       this->m_pfGetMetricValue = nsstd::bind(&_OptimizerType::GetValue,optimizer);
-      this->m_pfGetOptimizerIteration = nsstd::bind(&_OptimizerType::GetCurrentIteration,optimizer.GetPointer());
+      this->m_pfGetOptimizerIteration = nsstd::bind(&CurrentIterationCustomCast::CustomCast,optimizer.GetPointer());
       this->m_pfGetOptimizerPosition = nsstd::bind(&PositionOptimizerCustomCast::CustomCast,optimizer.GetPointer());
       this->m_pfGetOptimizerLearningRate = nsstd::bind(&_OptimizerType::GetLearningRate,optimizer.GetPointer());
       this->m_pfGetOptimizerConvergenceValue = nsstd::bind(&_OptimizerType::GetConvergenceValue,optimizer.GetPointer());
@@ -212,8 +224,9 @@ namespace simple
       optimizer->Register();
 
       this->m_pfGetMetricValue = nsstd::bind(&_OptimizerType::GetValue,optimizer.GetPointer());
-      this->m_pfGetOptimizerIteration = nsstd::bind(&_OptimizerType::GetCurrentIteration,optimizer.GetPointer());
+      this->m_pfGetOptimizerIteration = nsstd::bind(&CurrentIterationCustomCast::CustomCast,optimizer.GetPointer());
       this->m_pfGetOptimizerPosition = nsstd::bind(&PositionOptimizerCustomCast::CustomCast,optimizer.GetPointer());
+      this->m_pfGetOptimizerScales = nsstd::bind(&PositionOptimizerCustomCast::Helper<_OptimizerType::ScalesType>, nsstd::bind(&_OptimizerType::GetScales, optimizer.GetPointer()));
 
       return optimizer.GetPointer();
       }
@@ -226,14 +239,14 @@ namespace simple
       optimizer->SetNumberOfSteps( sitkSTLVectorToITKArray<_OptimizerType::StepsType::ValueType>(this->m_OptimizerNumberOfSteps));
 
       this->m_pfGetMetricValue = nsstd::bind(&_OptimizerType::GetCurrentValue,optimizer);
-      this->m_pfGetOptimizerIteration = nsstd::bind(&_OptimizerType::GetCurrentIteration,optimizer);
+      this->m_pfGetOptimizerIteration = nsstd::bind(&CurrentIterationCustomCast::CustomCast,optimizer.GetPointer());
       this->m_pfGetOptimizerPosition = nsstd::bind(&PositionOptimizerCustomCast::CustomCast,optimizer);
 
       this->m_pfGetOptimizerScales = nsstd::bind(&PositionOptimizerCustomCast::Helper<_OptimizerType::ScalesType>, nsstd::bind(&_OptimizerType::GetScales, optimizer.GetPointer()));
 
       this->m_pfUpdateWithBestValue = nsstd::bind(&UpdateWithBestValueExhaustive<double>,
                                                   optimizer,
-                                                  this->m_MetricValue,
+                                                  &(this->m_MetricValue),
                                                   nsstd::placeholders::_1);
 
 
@@ -256,8 +269,9 @@ namespace simple
 
 
       this->m_pfGetMetricValue = nsstd::bind(&_OptimizerType::GetValue,optimizer);
-      this->m_pfGetOptimizerIteration = nsstd::bind(&_OptimizerType::GetCurrentIteration,optimizer);
+      this->m_pfGetOptimizerIteration = nsstd::bind(&CurrentIterationCustomCast::CustomCast,optimizer.GetPointer());
       this->m_pfGetOptimizerPosition = nsstd::bind(&PositionOptimizerCustomCast::CustomCast,optimizer);
+      this->m_pfGetOptimizerScales = nsstd::bind(&PositionOptimizerCustomCast::Helper<_OptimizerType::ScalesType>, nsstd::bind(&_OptimizerType::GetScales, optimizer.GetPointer()));
 
       optimizer->Register();
       return optimizer.GetPointer();
@@ -274,8 +288,44 @@ namespace simple
       optimizer->SetValueTolerance( this->m_OptimizerValueTolerance );
 
       this->m_pfGetMetricValue = nsstd::bind(&_OptimizerType::GetValue,optimizer.GetPointer());
-      this->m_pfGetOptimizerIteration = nsstd::bind(&_OptimizerType::GetCurrentIteration,optimizer.GetPointer());
+      this->m_pfGetOptimizerIteration = nsstd::bind(&CurrentIterationCustomCast::CustomCast,optimizer.GetPointer());
       this->m_pfGetOptimizerPosition = nsstd::bind(&PositionOptimizerCustomCast::CustomCast,optimizer.GetPointer());
+      this->m_pfGetOptimizerScales = nsstd::bind(&PositionOptimizerCustomCast::Helper<_OptimizerType::ScalesType>, nsstd::bind(&_OptimizerType::GetScales, optimizer.GetPointer()));
+
+      optimizer->Register();
+      return optimizer.GetPointer();
+      }
+    else if ( m_OptimizerType == OnePlusOneEvolutionary )
+      {
+       typedef itk::OnePlusOneEvolutionaryOptimizerv4<double> _OptimizerType;
+      _OptimizerType::Pointer optimizer = _OptimizerType::New();
+      optimizer->SetMaximumIteration( this->m_OptimizerNumberOfIterations );
+      optimizer->SetEpsilon( this->m_OptimizerEpsilon );
+      optimizer->Initialize( this->m_OptimizerInitialRadius,
+                             this->m_OptimizerGrowthFactor,
+                             this->m_OptimizerShrinkFactor);
+
+      typedef itk::Statistics::NormalVariateGenerator  GeneratorType;
+      GeneratorType::Pointer generator = GeneratorType::New();
+      if ( this->m_OptimizerSeed == sitkWallClock )
+        {
+        // use time() and clock() to generate a unlikely-to-repeat
+        // seed.
+        uint64_t seed =  time(ITK_NULLPTR);
+        seed ^= (uint64_t)clock();
+        generator->Initialize( static_cast<unsigned int>(seed) );
+        }
+      else
+        {
+        generator->Initialize(this->m_OptimizerSeed);
+        }
+      optimizer->SetNormalVariateGenerator( generator );
+
+      this->m_pfGetMetricValue = nsstd::bind(&_OptimizerType::GetValue,optimizer.GetPointer());
+      this->m_pfGetOptimizerIteration = nsstd::bind(&CurrentIterationCustomCast::CustomCast,optimizer.GetPointer());
+      this->m_pfGetOptimizerPosition = nsstd::bind(&PositionOptimizerCustomCast::CustomCast,optimizer.GetPointer());
+      this->m_pfGetOptimizerConvergenceValue = nsstd::bind(&_OptimizerType::GetFrobeniusNorm,optimizer.GetPointer());
+      this->m_pfGetOptimizerScales = nsstd::bind(&PositionOptimizerCustomCast::Helper<_OptimizerType::ScalesType>, nsstd::bind(&_OptimizerType::GetScales, optimizer.GetPointer()));
 
       optimizer->Register();
       return optimizer.GetPointer();

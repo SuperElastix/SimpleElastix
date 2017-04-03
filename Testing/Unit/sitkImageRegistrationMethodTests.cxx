@@ -18,7 +18,6 @@
 #include <SimpleITKTestHarness.h>
 #include <SimpleITK.h>
 
-#include <stdint.h>
 #include <memory>
 
 namespace
@@ -57,7 +56,12 @@ public:
       std::cout << std::fixed << std::setfill(' ') << std::setprecision( 5 );
       std::cout << std::setw(3) << m_Method.GetOptimizerIteration();
       std::cout << " = " << std::setw(10) << m_Method.GetMetricValue();
-      std::cout << " : " << m_Method.GetOptimizerPosition() << std::endl;
+      std::cout << " : " << m_Method.GetOptimizerPosition();
+      if ( m_Method.GetOptimizerConvergenceValue() != 0.0 )
+        {
+        std::cout << " ( " << m_Method.GetOptimizerConvergenceValue() << " )";
+        }
+      std::cout << std::endl;
 
       std::cout.copyfmt(state);
     }
@@ -118,7 +122,7 @@ public:
                                     const std::vector<double> &pt1,
                                     const std::vector<unsigned int> &size)
     {
-       sitk::GaussianImageSource source1;
+      sitk::GaussianImageSource source1;
       source1.SetMean(pt0);
       source1.SetScale(1.0);
 
@@ -161,7 +165,6 @@ TEST_F(sitkRegistrationMethodTest, Metric_Evaluate)
 {
   sitk::Image fixed = fixedBlobs;
   sitk::Image moving = fixedBlobs;
-
 
   sitk::ImageRegistrationMethod R;
   R.SetInitialTransform(sitk::Transform(fixed.GetDimension(),sitk::sitkIdentity));
@@ -441,6 +444,186 @@ TEST_F(sitkRegistrationMethodTest, Mask_Test2)
 }
 
 
+TEST_F(sitkRegistrationMethodTest, VirtualDomain_Test)
+{
+  // Test usage of setting virtual domain
+
+  sitk::ImageRegistrationMethod R;
+  R.SetInterpolator(sitk::sitkLinear);
+  //R.DebugOn();
+  sitk::Image virtualImage = MakeGaussianBlob( v2(32,32), std::vector<unsigned int>(2,64) );
+
+  R.SetVirtualDomainFromImage(virtualImage);
+
+  // transform to optimize
+  sitk::TranslationTransform tx(virtualImage.GetDimension());
+  tx.SetOffset(v2(3.2,-1.2));
+  R.SetInitialTransform(tx, false);
+
+  sitk::Image fixedImage = virtualImage;
+  fixedImage.SetOrigin(v2(100, 0));
+
+  // virtual image to fixed image
+  sitk::TranslationTransform fixedTransform(fixedImage.GetDimension());
+  fixedTransform.SetOffset(v2(100, 0));
+  R.SetFixedInitialTransform(fixedTransform);
+
+  sitk::Image movingImage = virtualImage;
+  movingImage.SetOrigin(v2(0, 200));
+
+  // transform from virtual domain to moving image with "optimizing" transform
+  sitk::TranslationTransform movingTransform(movingImage.GetDimension());
+  movingTransform.SetOffset(v2(0, 200));
+  R.SetMovingInitialTransform(movingTransform);
+
+  R.SetMetricAsCorrelation();
+
+  double minStep=1e-5;
+  unsigned int numberOfIterations=100;
+  double relaxationFactor=0.75;
+  double gradientMagnitudeTolerance = 1e-20;
+  R.SetOptimizerAsRegularStepGradientDescent(.1,
+                                             minStep,
+                                             numberOfIterations,
+                                             relaxationFactor,
+                                             gradientMagnitudeTolerance);
+
+
+  IterationUpdate cmd(R);
+  R.AddCommand(sitk::sitkIterationEvent, cmd);
+
+  sitk::Transform outTx = R.Execute(fixedImage, movingImage);
+
+
+  std::cout << "-------" << std::endl;
+  std::cout << outTx.ToString() << std::endl;
+  std::cout << "Optimizer stop condition: " << R.GetOptimizerStopConditionDescription() << std::endl;
+  std::cout << " Iteration: " << R.GetOptimizerIteration() << std::endl;
+  std::cout << " Metric value: " << R.GetMetricValue() << std::endl;
+
+  EXPECT_VECTOR_DOUBLE_NEAR(v2(0.0,0.0), outTx.GetParameters(), 1e-3);
+  EXPECT_GT( R.GetOptimizerIteration(), 1u );
+
+}
+
+TEST_F(sitkRegistrationMethodTest, VirtualDomain_MultiRes_Test)
+{
+  // Test usage of setting virtual domain
+
+  sitk::ImageRegistrationMethod R;
+  R.SetInterpolator(sitk::sitkLinear);
+  //R.DebugOn();
+  sitk::Image virtualImage = MakeGaussianBlob( v3(32,32,32), std::vector<unsigned int>(3,64) );
+
+  R.SetVirtualDomainFromImage(virtualImage);
+
+  // transform to optimize
+  sitk::TranslationTransform tx(virtualImage.GetDimension());
+  tx.SetOffset(v3(5.21231, 3.2,-1.2));
+  R.SetInitialTransform(tx, false);
+
+  sitk::Image fixedImage = virtualImage;
+  fixedImage.SetOrigin(v3(1000, 100, 0));
+
+  // virtual image to fixed image
+  sitk::TranslationTransform fixedTransform(fixedImage.GetDimension());
+  fixedTransform.SetOffset(v3(1000, 100, 0));
+  R.SetFixedInitialTransform(fixedTransform);
+
+  sitk::Image movingImage = virtualImage;
+  movingImage.SetOrigin(v3(0, 200, 512));
+
+  // transform from virtual domain to moving image with "optimizing" transform
+  sitk::TranslationTransform movingTransform(movingImage.GetDimension());
+  movingTransform.SetOffset(v3(0, 200, 512));
+  R.SetMovingInitialTransform(movingTransform);
+
+  R.SetMetricAsMeanSquares();
+
+  double minStep=1e-3;
+  unsigned int numberOfIterations=10;
+  double relaxationFactor=0.6;
+  double gradientMagnitudeTolerance = 1e-10;
+  sitk::ImageRegistrationMethod::EstimateLearningRateType estimateLearningRate = sitk::ImageRegistrationMethod::Never;
+  R.SetOptimizerAsRegularStepGradientDescent(2,
+                                             minStep,
+                                             numberOfIterations,
+                                             relaxationFactor,
+                                             gradientMagnitudeTolerance,
+                                             estimateLearningRate);
+
+  std::vector<unsigned int> shrinkFactors(2);
+  shrinkFactors[0] = 8;
+  shrinkFactors[1] = 1;
+  R.SetShrinkFactorsPerLevel( shrinkFactors );
+  R.SetSmoothingSigmasPerLevel( v2(0.0, 0.0) );
+
+  R.SetOptimizerScalesFromJacobian();
+
+  IterationUpdate cmd(R);
+  R.AddCommand(sitk::sitkIterationEvent, cmd);
+
+  sitk::Transform outTx = R.Execute(fixedImage, movingImage);
+
+
+  std::cout << "-------" << std::endl;
+  std::cout << outTx.ToString() << std::endl;
+  std::cout << "Optimizer stop condition: " << R.GetOptimizerStopConditionDescription() << std::endl;
+  std::cout << " Iteration: " << R.GetOptimizerIteration() << std::endl;
+  std::cout << " Metric value: " << R.GetMetricValue() << std::endl;
+
+  EXPECT_VECTOR_DOUBLE_NEAR(v3(0.0,0.0,0.0), outTx.GetParameters(), 1e-1);
+  EXPECT_GT( R.GetOptimizerIteration(), 1u );
+
+}
+
+
+
+TEST_F(sitkRegistrationMethodTest, VirtualDomain_Parameters)
+{
+
+  sitk::ImageRegistrationMethod R;
+  R.SetInterpolator(sitk::sitkLinear);
+
+  sitk::Image virtualImage = MakeGaussianBlob( v3(32,32,32), std::vector<unsigned int>(3,64) );
+
+  std::vector<uint32_t> size(3, 64);
+
+  EXPECT_NO_THROW(
+    R.SetVirtualDomain(size,
+                       v3(0.0,0.0,0.0),
+                       v3(1.0,1.0,1.0),
+                       v9(1.0,0.0,0.0,
+                          0.0,1.0,0.0,
+                          0.0,0.0,1.0)) );
+
+  EXPECT_THROW(
+    R.SetVirtualDomain(size,
+                       v2(0.0,0.0),
+                       v3(1.0,1.0,1.0),
+                       v9(1.0,0.0,0.0,
+                          0.0,1.0,0.0,
+                          0.0,0.0,1.0)),
+    sitk::GenericException);
+
+
+  EXPECT_THROW(
+    R.SetVirtualDomain(size,
+                       v3(0.0,0.0,0.0),
+                       v2(1.0,1.0),
+                       v9(1.0,0.0,0.0,
+                          0.0,1.0,0.0,
+                          0.0,0.0,1.0)),
+    sitk::GenericException );
+
+  EXPECT_THROW(
+    R.SetVirtualDomain(size,
+                       v3(0.0,0.0,0.0),
+                       v3(1.0,1.0,1.0),
+                       v3(1.0,0.0,0.0)),
+    sitk::GenericException );
+}
+
 TEST_F(sitkRegistrationMethodTest, OptimizerWeights_Test)
 {
   // Test the usage of optimizer weights
@@ -500,7 +683,7 @@ TEST_F(sitkRegistrationMethodTest, Optimizer_LBFGSB)
   R.SetInitialTransform(tx, false);
 
   R.SetMetricAsMeanSquares();
-
+  R.SetOptimizerScalesFromIndexShift();
   R.SetOptimizerAsLBFGSB(1e-20,
                          20,
                          5,
@@ -523,6 +706,7 @@ TEST_F(sitkRegistrationMethodTest, Optimizer_LBFGSB)
   std::cout << " Metric value: " << R.GetMetricValue() << std::endl;
 
   EXPECT_VECTOR_DOUBLE_NEAR(v2(0.0,0.0), outTx.GetParameters(), 1e-3);
+  EXPECT_VECTOR_DOUBLE_NEAR(v2(1.0,1.0), cmd.scales, 1e-1);
 
   tx.SetOffset(v2(-1,-2));
   R.SetOptimizerAsLBFGSB(1e-20,
@@ -553,6 +737,7 @@ TEST_F(sitkRegistrationMethodTest, Optimizer_Exhaustive)
 
   R.SetMetricAsMeanSquares();
 
+  // Search grid of size 11x11
   R.SetOptimizerAsExhaustive(std::vector<unsigned int>(2,5), 0.5);
 
   IterationUpdate cmd(R);
@@ -567,10 +752,20 @@ TEST_F(sitkRegistrationMethodTest, Optimizer_Exhaustive)
   std::cout << " Iteration: " << R.GetOptimizerIteration() << std::endl;
   std::cout << " Metric value: " << R.GetMetricValue() << std::endl;
 
-  EXPECT_VECTOR_DOUBLE_NEAR(v2(0.0,0.0), outTx.GetParameters(), 1e-3);
+  // We expect the returned metric value after registration to
+  // correspond to the best value and not necessarily to the last value
+  double metric_value = R.GetMetricValue();
+  R.SetInitialTransform(outTx);
+  EXPECT_DOUBLE_EQ(R.MetricEvaluate(image,image), metric_value);
+  //final metric value is expected to be zero as this is the same image
+  EXPECT_DOUBLE_EQ(0.0, metric_value);
 
+  EXPECT_VECTOR_DOUBLE_NEAR(v2(0.0,0.0), outTx.GetParameters(), 1e-3);
+  EXPECT_EQ(0u, cmd.scales.size());
 
   // Execute in place
+
+  R.SetOptimizerScalesFromIndexShift();
 
   tx.SetOffset(v2(-1,-2));
   R.SetInitialTransform(tx, true);
@@ -587,7 +782,7 @@ TEST_F(sitkRegistrationMethodTest, Optimizer_Exhaustive)
   std::cout << " Metric value: " << R.GetMetricValue() << std::endl;
 
   EXPECT_VECTOR_DOUBLE_NEAR(v2(0.0,0.0), outTx.GetParameters(), 1e-3);
-
+  EXPECT_VECTOR_DOUBLE_NEAR(v2(1.0,1.0), cmd.scales, 1e-1);
 }
 
 
@@ -605,6 +800,8 @@ TEST_F(sitkRegistrationMethodTest, Optimizer_Amoeba)
 
   R.SetMetricAsMeanSquares();
 
+  R.SetOptimizerScalesFromIndexShift();
+
   R.SetOptimizerAsAmoeba(2.0, 200);
 
   IterationUpdate cmd(R);
@@ -620,7 +817,7 @@ TEST_F(sitkRegistrationMethodTest, Optimizer_Amoeba)
   std::cout << " Metric value: " << R.GetMetricValue() << std::endl;
 
   EXPECT_VECTOR_DOUBLE_NEAR(v2(0.0,0.0), outTx.GetParameters(), 1e-3);
-
+  EXPECT_VECTOR_DOUBLE_NEAR(v2(1.0,1.0), cmd.scales, 1e-1);
 
 }
 
@@ -640,6 +837,8 @@ TEST_F(sitkRegistrationMethodTest, Optimizer_Powell)
 
   R.SetMetricAsMeanSquares();
 
+  R.SetOptimizerScalesFromIndexShift();
+
   R.SetOptimizerAsPowell(10, 50, .2, .01, .0001 );
 
   IterationUpdate cmd(R);
@@ -655,7 +854,48 @@ TEST_F(sitkRegistrationMethodTest, Optimizer_Powell)
   std::cout << " Metric value: " << R.GetMetricValue() << std::endl;
 
   EXPECT_VECTOR_DOUBLE_NEAR(v2(0.0,0.0), outTx.GetParameters(), 1e-3);
+  EXPECT_VECTOR_DOUBLE_NEAR(v2(1.0,1.0), cmd.scales, 1e-1);
 
+}
+
+TEST_F(sitkRegistrationMethodTest, Optimizer_OnePlusOneEvolutionary)
+{
+  sitk::Image image = MakeGaussianBlob( v2(64, 64), std::vector<unsigned int>(2,256) );
+
+
+  sitk::ImageRegistrationMethod R;
+  R.SetInterpolator(sitk::sitkLinear);
+
+  sitk::TranslationTransform tx(image.GetDimension());
+  tx.SetOffset(v2(-1,-2));
+  R.SetInitialTransform(tx, false);
+
+  R.SetMetricAsMeanSquares();
+
+  R.SetOptimizerScalesFromIndexShift();
+
+  R.SetOptimizerAsOnePlusOneEvolutionary(200,
+                                         1.5e-4,
+                                         1.0,
+                                         1.1,
+                                         .9,
+                                         0);
+
+  IterationUpdate cmd(R);
+  R.AddCommand(sitk::sitkIterationEvent, cmd);
+
+  sitk::Transform outTx = R.Execute(image, image);
+
+
+  std::cout << "-------" << std::endl;
+  std::cout << outTx.ToString() << std::endl;
+  std::cout << "Optimizer stop condition: " << R.GetOptimizerStopConditionDescription() << std::endl;
+  std::cout << " Iteration: " << R.GetOptimizerIteration() << std::endl;
+  std::cout << " Convergence value: " << R.GetOptimizerConvergenceValue() << std::endl;
+  std::cout << " Metric value: " << R.GetMetricValue() << std::endl;
+
+  EXPECT_VECTOR_DOUBLE_NEAR(v2(0.0,0.0), outTx.GetParameters(), 1e-3);
+  EXPECT_VECTOR_DOUBLE_NEAR(v2(1.0,1.0), cmd.scales, 1e-1);
 
 }
 
@@ -675,7 +915,7 @@ TEST_F(sitkRegistrationMethodTest, Optimizer_ScalesEstimator)
   R.SetMetricAsMeanSquares();
 
   unsigned int numberOfIterations=100;
-  double convergenceMinimumValue = 1e-5;
+  double convergenceMinimumValue = 1e-6;
   unsigned int convergenceWindowSize = 2;
   R.SetOptimizerAsConjugateGradientLineSearch( 1.0,
                                                numberOfIterations,
@@ -690,7 +930,7 @@ TEST_F(sitkRegistrationMethodTest, Optimizer_ScalesEstimator)
   sitk::Transform outTx = R.Execute(fixedImage, movingImage);
 
   EXPECT_VECTOR_DOUBLE_NEAR(v3(0.0,-2.8,9.5), outTx.GetParameters(), 0.6);
-  EXPECT_VECTOR_DOUBLE_NEAR(v3(127025,1.0,1.0), cmd.scales, 1e-1);\
+  EXPECT_VECTOR_DOUBLE_NEAR(v3(130049,1.0,1.0), cmd.scales, 1.0);\
   EXPECT_TRUE( cmd.toString.find("ScalesFromIndexShift") != std::string::npos );
 
 
@@ -698,7 +938,7 @@ TEST_F(sitkRegistrationMethodTest, Optimizer_ScalesEstimator)
   outTx = R.Execute(fixedImage, movingImage);
 
   EXPECT_VECTOR_DOUBLE_NEAR(v3(0.0,-2.8,9.5), outTx.GetParameters(), 0.6);
-  EXPECT_VECTOR_DOUBLE_NEAR(v3(44198,1.0,1.0), cmd.scales, 1e-1);
+  EXPECT_VECTOR_DOUBLE_NEAR(v3(65025,1.0,1.0), cmd.scales, 1.0);
   EXPECT_TRUE( cmd.toString.find("ScalesFromJacobian") != std::string::npos );
 
 
@@ -706,7 +946,7 @@ TEST_F(sitkRegistrationMethodTest, Optimizer_ScalesEstimator)
   outTx = R.Execute(fixedImage, movingImage);
 
   EXPECT_VECTOR_DOUBLE_NEAR(v3(0.0,-2.8,9.5), outTx.GetParameters(), 0.6);
-  EXPECT_VECTOR_DOUBLE_NEAR(v3(119572,1.0,1.0), cmd.scales, 1e-1);
+  EXPECT_VECTOR_DOUBLE_NEAR(v3(130049,1.0,1.0), cmd.scales, 1.0);
   EXPECT_TRUE( cmd.toString.find("ScalesFromPhysicalShift") != std::string::npos );
 
   R.SetOptimizerScales(v3(200000,1.0,1.0));
@@ -716,4 +956,80 @@ TEST_F(sitkRegistrationMethodTest, Optimizer_ScalesEstimator)
   EXPECT_VECTOR_DOUBLE_NEAR(v3(200000,1.0,1.0), cmd.scales, 1e-10);
 
 
+}
+
+
+TEST_F(sitkRegistrationMethodTest, Optimizer_Sampling)
+{
+  sitk::Image fixedImage = MakeDualGaussianBlobs( v2(64, 64), v2(54, 74), std::vector<unsigned int>(2,256) );
+  sitk::Image movingImage = MakeDualGaussianBlobs( v2(61.2, 65.5), v2(51.2, 75.5), std::vector<unsigned int>(2,256) );
+
+  fixedImage = sitk::AdditiveGaussianNoise(fixedImage,  0.5, 0, 1u);
+
+  sitk::ImageRegistrationMethod R;
+  R.SetInterpolator(sitk::sitkLinear);
+
+  sitk::TranslationTransform tx(2u);
+  R.SetInitialTransform(tx, false);
+
+  R.SetMetricAsMeanSquares();
+
+  double minStep=1e-4;
+  unsigned int numberOfIterations=100;
+  double relaxationFactor=0.5;
+  double gradientMagnitudeTolerance = 1e-5;
+  R.SetOptimizerAsRegularStepGradientDescent(1.0,
+                                             minStep,
+                                             numberOfIterations,
+                                             relaxationFactor,
+                                             gradientMagnitudeTolerance);
+
+  IterationUpdate cmd(R);
+  R.AddCommand(sitk::sitkIterationEvent, cmd);
+
+  sitk::Transform outTx1, outTx2;
+
+
+  // set fixed seed and expect the same results
+  R.SetMetricSamplingStrategy(R.RANDOM);
+  R.SetMetricSamplingPercentage(.02,1u);
+
+  outTx1 = R.Execute(fixedImage, movingImage);
+  outTx2 = R.Execute(fixedImage, movingImage);
+
+  EXPECT_VECTOR_DOUBLE_NEAR(outTx1.GetParameters(), outTx1.GetParameters(), 1e-10) << "Same registration with fixed seed and random sampling";
+
+  // set fixed seed and expect the same results
+  R.SetMetricSamplingStrategy(R.REGULAR);
+  R.SetMetricSamplingPercentage(.02,1u);
+
+  outTx1 = R.Execute(fixedImage, movingImage);
+  outTx2 = R.Execute(fixedImage, movingImage);
+
+  EXPECT_VECTOR_DOUBLE_NEAR(outTx1.GetParameters(), outTx1.GetParameters(), 1e-10)  << "Same registration with fixed seed and regular sampling";
+
+  // set wall clock seed and expect the same results with full sampling
+  R.SetMetricSamplingStrategy(R.NONE);
+  R.SetMetricSamplingPercentage(.02,sitk::sitkWallClock);
+
+  outTx1 = R.Execute(fixedImage, movingImage);
+  outTx2 = R.Execute(fixedImage, movingImage);
+
+  EXPECT_VECTOR_DOUBLE_NEAR(outTx1.GetParameters(), outTx1.GetParameters(), 1e-10)  << "Same registration with fixed seed and regular sampling";
+
+
+  // Use wall clock random seed.
+ R.SetMetricSamplingStrategy(R.RANDOM);
+ R.SetMetricSamplingPercentage(.02,sitk::sitkWallClock);
+
+ R.Execute(fixedImage, movingImage);
+ double firstValue = R.GetMetricValue();
+ double totalDiff = 0.0;
+
+ for( unsigned int i=1; i<5; ++i)
+   {
+   R.Execute(fixedImage, movingImage);
+   totalDiff += std::abs(firstValue -R.GetMetricValue());
+   }
+ EXPECT_TRUE(totalDiff > 1e-10) << "Expect difference between metric values with random sampling\n";
 }

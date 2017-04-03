@@ -24,7 +24,7 @@ if(NOT ExternalData_OBJECT_STORES)
 endif()
 list(APPEND ExternalData_OBJECT_STORES
   # Local data store populated by the ITK pre-commit hook
-  "${CMAKE_SOURCE_DIR}/.ExternalData"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../.ExternalData"
   )
 
 set(ExternalData_BINARY_ROOT ${CMAKE_BINARY_DIR}/ExternalData)
@@ -33,13 +33,22 @@ set(ExternalData_URL_TEMPLATES "" CACHE STRING
   "Additional URL templates for the ExternalData CMake script to look for testing data. E.g.
 file:///var/bigharddrive/%(algo)/%(hash)")
 mark_as_advanced(ExternalData_URL_TEMPLATES)
-if(NOT SITK_FORBID_DOWNLOADS)
+if(NOT SimpleITK_FORBID_DOWNLOADS)
   list(APPEND ExternalData_URL_TEMPLATES
     # Data published by MIDAS
-    "http://midas3.kitware.com/midas/api/rest?method=midas.bitstream.download&checksum=%(hash)&algorithm=%(algo)"
+    "https://placid.nlm.nih.gov/api/rest?method=midas.bitstream.download&checksum=%(hash)&algorithm=%(algo)"
+
+    # Data published on GitHub Pages
+    "https://simpleitk.github.io/SimpleITKExternalData/%(algo)/%(hash)"
+
+    # Data published on Girder
+    "https://data.kitware.com:443/api/v1/file/hashsum/%(algo)/%(hash)/download"
+
+    # Data published by MIDAS
     "https://midas3.kitware.com/midas/api/rest?method=midas.bitstream.download&checksum=%(hash)&algorithm=%(algo)"
 
     # Data published by developers using git-gerrit-push.
+    "https://insightsoftwareconsortium.github.io/ITKTestingData/%(algo)/%(hash)"
     "https://itk.org/files/ExternalData/%(algo)/%(hash)"
     )
 endif()

@@ -1,6 +1,7 @@
 #include "SimpleITKTestHarness.h"
 #include "sitkCastImageFilter.h"
 #include "sitkSimpleElastix.h"
+#include "sitkImageFileReader.h"
 #include "sitkImageFileWriter.h"
 #include "sitkBinaryThresholdImageFilter.h"
   
