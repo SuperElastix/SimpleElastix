@@ -1,15 +1,15 @@
-#ifndef __sitksimpleelastiximpl_cxx_
-#define __sitksimpleelastiximpl_cxx_
+#ifndef __sitkelastiximagefilterimpl_cxx_
+#define __sitkelastiximagefilterimpl_cxx_
 
-#include "sitkSimpleElastix.h"
-#include "sitkSimpleElastixImpl.h"
+#include "sitkElastixImageFilter.h"
+#include "sitkElastixImageFilterImpl.h"
 #include "sitkCastImageFilter.h"
 
 namespace itk {
   namespace simple {
 
-SimpleElastix::SimpleElastixImpl
-::SimpleElastixImpl( void )
+ElastixImageFilter::ElastixImageFilterImpl
+::ElastixImageFilterImpl( void )
 {
   // Register this class with SimpleITK
   this->m_DualMemberFactory.reset( new detail::DualMemberFunctionFactory< MemberFunctionType >( this ) );
@@ -36,7 +36,7 @@ SimpleElastix::SimpleElastixImpl
   m_LogFileName                 = "";
 
   this->m_LogToFile = false;
-  this->m_LogToConsole = false;
+  this->m_LogToConsole = true;
 
   ParameterMapVectorType defaultParameterMap;
   defaultParameterMap.push_back( ParameterObjectType::GetDefaultParameterMap( "translation" ) );
@@ -45,14 +45,14 @@ SimpleElastix::SimpleElastixImpl
   this->SetParameterMap( defaultParameterMap );
 }
 
-SimpleElastix::SimpleElastixImpl
-::~SimpleElastixImpl( void )
+ElastixImageFilter::ElastixImageFilterImpl
+::~ElastixImageFilterImpl( void )
 {
 }
 
 
 Image
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::Execute( void )
 {
   if( this->GetNumberOfFixedImages() == 0 )
@@ -133,17 +133,17 @@ SimpleElastix::SimpleElastixImpl
     return this->m_DualMemberFactory->GetMemberFunction( sitkFloat32, sitkFloat32, FixedImageDimension )();
   }
 
-  sitkExceptionMacro( << "SimpleElastix does not support the combination of "
+  sitkExceptionMacro( << "ElastixImageFilter does not support the combination of "
                       << FixedImageDimension << "-dimensional "
                       << GetPixelIDValueAsElastixParameter( FixedImagePixelID ) << " fixed image and a "
                       << MovingImageDimension << "-dimensional " 
                       << GetPixelIDValueAsElastixParameter( MovingImagePixelID ) << " moving image. "
-                      << "This a serious error. Contact developers at https://github.com/kaspermarstal/SimpleElastix/issues." )
+                      << "This a serious error. Contact developers at https://github.com/kaspermarstal/ElastixImageFilter/issues." )
 }
 
 template< typename TFixedImage, typename TMovingImage >
 Image
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::DualExecuteInternal( void )
 {
   typedef elastix::ElastixFilter< TFixedImage, TMovingImage >   ElastixFilterType;
@@ -212,15 +212,15 @@ SimpleElastix::SimpleElastixImpl
 }
 
 const std::string 
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::GetName( void )
 { 
-  const std::string name = "SimpleElastix";
+  const std::string name = "ElastixImageFilter";
   return name;
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::SetFixedImage( const Image& fixedImage )
 {
   if( this->IsEmpty( fixedImage ) )
@@ -233,7 +233,7 @@ SimpleElastix::SimpleElastixImpl
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::SetFixedImage( const VectorOfImage& fixedImages )
 {
   if( fixedImages.size() == 0u )
@@ -246,7 +246,7 @@ SimpleElastix::SimpleElastixImpl
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::AddFixedImage( const Image& fixedImage )
 {
   if( this->IsEmpty( fixedImage ) )
@@ -258,7 +258,7 @@ SimpleElastix::SimpleElastixImpl
 }
 
 Image&
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::GetFixedImage( const unsigned long index )
 {
   if( index < this->m_FixedImages.size() )
@@ -269,15 +269,15 @@ SimpleElastix::SimpleElastixImpl
   sitkExceptionMacro( "Index out of range (index: " << index << ", number of fixed images: " << this->m_FixedImages.size() << ")" );
 }
 
-SimpleElastix::SimpleElastixImpl::VectorOfImage&
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl::VectorOfImage&
+ElastixImageFilter::ElastixImageFilterImpl
 ::GetFixedImage( void )
 {
   return this->m_FixedImages;
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::RemoveFixedImage( const unsigned long index )
 {
   if( index < this->m_FixedImages.size() )
@@ -289,21 +289,21 @@ SimpleElastix::SimpleElastixImpl
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::RemoveFixedImage( void )
 {
   this->m_FixedImages.clear();
 }
 
 unsigned int
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::GetNumberOfFixedImages( void )
 {
   return this->m_FixedImages.size();
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::SetMovingImage( const Image& movingImage )
 {
   if( this->IsEmpty( movingImage ) )
@@ -316,7 +316,7 @@ SimpleElastix::SimpleElastixImpl
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::SetMovingImage( const VectorOfImage& movingImages )
 {
   if( movingImages.size() == 0u )
@@ -329,7 +329,7 @@ SimpleElastix::SimpleElastixImpl
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::AddMovingImage( const Image& movingImage )
 {
   if( this->IsEmpty( movingImage ) )
@@ -341,7 +341,7 @@ SimpleElastix::SimpleElastixImpl
 }
 
 Image&
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::GetMovingImage( const unsigned long index )
 {
   if( index < this->m_MovingImages.size() )
@@ -352,15 +352,15 @@ SimpleElastix::SimpleElastixImpl
   sitkExceptionMacro( "Index out of range (index: " << index << ", number of moving images: " << this->m_MovingImages.size() << ")" );
 }
 
-SimpleElastix::SimpleElastixImpl::VectorOfImage&
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl::VectorOfImage&
+ElastixImageFilter::ElastixImageFilterImpl
 ::GetMovingImage( void )
 {
   return this->m_MovingImages;
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::RemoveMovingImage( const unsigned long index )
 {
   if( index < this->m_MovingImages.size() )
@@ -372,21 +372,21 @@ SimpleElastix::SimpleElastixImpl
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::RemoveMovingImage( void )
 {
   this->m_MovingImages.clear();
 }
 
 unsigned int
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::GetNumberOfMovingImages( void )
 {
   return this->m_MovingImages.size();
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::SetFixedMask( const Image& fixedMask )
 {
   if( this->IsEmpty( fixedMask ) )
@@ -399,7 +399,7 @@ SimpleElastix::SimpleElastixImpl
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::SetFixedMask( const VectorOfImage& fixedMasks )
 {
   if( fixedMasks.size() == 0u )
@@ -412,7 +412,7 @@ SimpleElastix::SimpleElastixImpl
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::AddFixedMask( const Image& fixedMask )
 {
   if( this->IsEmpty( fixedMask ) )
@@ -424,7 +424,7 @@ SimpleElastix::SimpleElastixImpl
 }
 
 Image&
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::GetFixedMask( const unsigned long index )
 {
   if( index < this->m_FixedMasks.size() )
@@ -435,15 +435,15 @@ SimpleElastix::SimpleElastixImpl
   sitkExceptionMacro( "Index out of range (index: " << index << ", number of fixed masks: " << this->m_FixedMasks.size() << ")" );
 }
 
-SimpleElastix::VectorOfImage&
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::VectorOfImage&
+ElastixImageFilter::ElastixImageFilterImpl
 ::GetFixedMask( void )
 {
   return this->m_FixedMasks;
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::RemoveFixedMask( const unsigned long index )
 {
   if( index < this->m_FixedMasks.size()  )
@@ -455,21 +455,21 @@ SimpleElastix::SimpleElastixImpl
 }
 
 void 
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::RemoveFixedMask( void )
 {
   this->m_FixedMasks.clear();
 }
 
 unsigned int
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::GetNumberOfFixedMasks( void )
 {
   return this->m_FixedMasks.size();
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::SetMovingMask( const Image& movingMask )
 {
   if( this->IsEmpty( movingMask ) )
@@ -482,7 +482,7 @@ SimpleElastix::SimpleElastixImpl
 }
 
 void 
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::SetMovingMask( const VectorOfImage& movingMasks )
 {
   if( movingMasks.size() == 0u )
@@ -495,7 +495,7 @@ SimpleElastix::SimpleElastixImpl
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::AddMovingMask( const Image& movingMask )
 {
   if( this->IsEmpty( movingMask ) )
@@ -507,7 +507,7 @@ SimpleElastix::SimpleElastixImpl
 }
 
 Image&
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::GetMovingMask( const unsigned long index )
 {
   if( index < this->m_MovingMasks.size()  )
@@ -518,15 +518,15 @@ SimpleElastix::SimpleElastixImpl
   sitkExceptionMacro( "Index out of range (index: " << index << ", number of moving masks: " << this->m_MovingMasks.size() << ")" );
 }
 
-SimpleElastix::SimpleElastixImpl::VectorOfImage&
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl::VectorOfImage&
+ElastixImageFilter::ElastixImageFilterImpl
 ::GetMovingMask( void )
 {
   return this->m_MovingMasks;
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::RemoveMovingMask( const unsigned long index )
 {
   if( index < this->m_MovingMasks.size()  )
@@ -538,161 +538,161 @@ SimpleElastix::SimpleElastixImpl
 }
 
 void 
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::RemoveMovingMask( void )
 {
   this->m_MovingMasks.clear();
 }
 
 unsigned int
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::GetNumberOfMovingMasks( void )
 {
   return this->m_MovingMasks.size();
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::SetFixedPointSetFileName( const std::string fixedPointSetFileName )
 {
   this->m_FixedPointSetFileName = fixedPointSetFileName;
 }
 
 std::string
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::GetFixedPointSetFileName( void )
 {
   return this->m_FixedPointSetFileName;
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::RemoveFixedPointSetFileName( void )
 {
   this->m_FixedPointSetFileName = "";
 }
 
 void 
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::SetMovingPointSetFileName( const std::string movingPointSetFileName )
 {
   this->m_MovingPointSetFileName = movingPointSetFileName;
 }
 
 std::string
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::GetMovingPointSetFileName( void )
 {
   return this->m_MovingPointSetFileName;
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::RemoveMovingPointSetFileName( void )
 {
   this->m_MovingPointSetFileName = "";
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::SetOutputDirectory( const std::string outputDirectory )
 {
   this->m_OutputDirectory = outputDirectory;
 }
 
 std::string
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::GetOutputDirectory( void )
 {
   return this->m_OutputDirectory;
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::RemoveOutputDirectory( void )
 {
   this->m_OutputDirectory = "";
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::SetLogFileName( std::string logFileName )
 {
   this->m_LogFileName = logFileName;
 }
 
 std::string
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::GetLogFileName( void )
 {
   return this->m_LogFileName;
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::RemoveLogFileName( void )
 {
   this->m_LogFileName = "";
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::SetLogToFile( bool logToFile )
 {
   this->m_LogToFile = logToFile;
 }
 
 bool
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::GetLogToFile( void )
 {
   return this->m_LogToFile;
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::LogToFileOn()
 {
   this->SetLogToFile( true );
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::LogToFileOff()
 {
   this->SetLogToFile( false );
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::SetLogToConsole( bool logToConsole )
 {
   this->m_LogToConsole = logToConsole;
 }
 
 bool
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::GetLogToConsole( void )
 {
   return this->m_LogToConsole;
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::LogToConsoleOn()
 {
   this->SetLogToConsole( true );
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::LogToConsoleOff()
 {
   this->SetLogToConsole( false );
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::SetParameterMap( const std::string transformName, const unsigned int numberOfResolutions, const double finalGridSpacingInPhysicalUnits )
 {
   ParameterMapType parameterMap = ParameterObjectType::GetDefaultParameterMap( transformName, numberOfResolutions, finalGridSpacingInPhysicalUnits );
@@ -700,7 +700,7 @@ SimpleElastix::SimpleElastixImpl
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::SetParameterMap( const ParameterMapType parameterMap )
 {
   ParameterMapVectorType parameterMapVector = ParameterMapVectorType( 1, parameterMap );
@@ -708,56 +708,56 @@ SimpleElastix::SimpleElastixImpl
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::SetParameterMap( const ParameterMapVectorType parameterMapVector )
 {
   this->m_ParameterMapVector = parameterMapVector;
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::AddParameterMap( const ParameterMapType parameterMap )
 {
   this->m_ParameterMapVector.push_back( parameterMap );
 }
 
-SimpleElastix::SimpleElastixImpl::ParameterMapVectorType 
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl::ParameterMapVectorType 
+ElastixImageFilter::ElastixImageFilterImpl
 ::GetParameterMap( void )
 {
   return this->m_ParameterMapVector;
 }
 
 unsigned int 
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::GetNumberOfParameterMaps( void )
 {
   return this->m_ParameterMapVector.size();
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::SetInitialTransformParameterFileName( const std::string initialTransformParameterFileName )
 {
   this->m_InitialTransformParameterMapFileName = initialTransformParameterFileName;
 }
 
 std::string
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::GetInitialTransformParameterFileName( void )
 {
   return m_InitialTransformParameterMapFileName ;
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::RemoveInitialTransformParameterFileName( void )
 {
   this->m_InitialTransformParameterMapFileName = "";
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::SetParameter( const ParameterKeyType key, const ParameterValueType value )
 {
   for( unsigned int i = 0; i < this->m_ParameterMapVector.size(); i++ )
@@ -767,7 +767,7 @@ SimpleElastix::SimpleElastixImpl
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::SetParameter( const ParameterKeyType key, const ParameterValueVectorType value )
 {
   for( unsigned int i = 0; i < this->m_ParameterMapVector.size(); i++ )
@@ -777,7 +777,7 @@ SimpleElastix::SimpleElastixImpl
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::SetParameter( const unsigned int index, const ParameterKeyType key, const ParameterValueType value )
 {
   if( index >= this->m_ParameterMapVector.size() )
@@ -789,7 +789,7 @@ SimpleElastix::SimpleElastixImpl
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::SetParameter( const unsigned int index, const ParameterKeyType key, const ParameterValueVectorType value )
 {
   if( index >= this->m_ParameterMapVector.size() )
@@ -801,7 +801,7 @@ SimpleElastix::SimpleElastixImpl
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::AddParameter( const ParameterKeyType key, const ParameterValueType value )
 {
   for( unsigned int i = 0; i < this->m_ParameterMapVector.size(); i++ )
@@ -811,7 +811,7 @@ SimpleElastix::SimpleElastixImpl
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::AddParameter( const ParameterKeyType key, const ParameterValueVectorType value )
 {
   for( unsigned int i = 0; i < this->m_ParameterMapVector.size(); i++ )
@@ -821,7 +821,7 @@ SimpleElastix::SimpleElastixImpl
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::AddParameter( const unsigned int index, const ParameterKeyType key, const ParameterValueType value )
 {
   if( index >= this->m_ParameterMapVector.size() )
@@ -840,7 +840,7 @@ SimpleElastix::SimpleElastixImpl
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::AddParameter( const unsigned int index, const ParameterKeyType key, const ParameterValueVectorType value )
 {
   if( index >= this->m_ParameterMapVector.size() )
@@ -861,8 +861,8 @@ SimpleElastix::SimpleElastixImpl
   }
 }
 
-SimpleElastix::SimpleElastixImpl::ParameterValueVectorType
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl::ParameterValueVectorType
+ElastixImageFilter::ElastixImageFilterImpl
 ::GetParameter( const ParameterKeyType key )
 {
   if( this->m_ParameterMapVector.size() > 0 )
@@ -873,8 +873,8 @@ SimpleElastix::SimpleElastixImpl
   return this->GetParameter( 0, key );
 }
 
-SimpleElastix::SimpleElastixImpl::ParameterValueVectorType
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl::ParameterValueVectorType
+ElastixImageFilter::ElastixImageFilterImpl
 ::GetParameter( const unsigned int index, const ParameterKeyType key )
 {
   if( index >= this->m_ParameterMapVector.size() )
@@ -886,7 +886,7 @@ SimpleElastix::SimpleElastixImpl
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::RemoveParameter( const ParameterKeyType key )
 {
   for( unsigned int i = 0; i < this->m_ParameterMapVector.size(); i++ )
@@ -896,7 +896,7 @@ SimpleElastix::SimpleElastixImpl
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::RemoveParameter( const unsigned int index, const ParameterKeyType key )
 {
   if( index >= this->m_ParameterMapVector.size() )
@@ -907,8 +907,8 @@ SimpleElastix::SimpleElastixImpl
   this->m_ParameterMapVector[ index ].erase( key );
 }
 
-SimpleElastix::SimpleElastixImpl::ParameterMapType
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl::ParameterMapType
+ElastixImageFilter::ElastixImageFilterImpl
 ::ReadParameterFile( const std::string fileName )
 {
   ParameterObjectPointer parameterObject = ParameterObjectType::New();
@@ -917,22 +917,22 @@ SimpleElastix::SimpleElastixImpl
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::WriteParameterFile( ParameterMapType const parameterMap, const std::string parameterFileName )
 {
   ParameterObjectPointer parameterObject = ParameterObjectType::New();
   parameterObject->WriteParameterFile( parameterMap, parameterFileName );
 }
 
-SimpleElastix::SimpleElastixImpl::ParameterMapType
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl::ParameterMapType
+ElastixImageFilter::ElastixImageFilterImpl
 ::GetDefaultParameterMap( const std::string transformName, const unsigned int numberOfResolutions, const double finalGridSpacingInPhysicalUnits )
 { 
   return ParameterObjectType::GetDefaultParameterMap( transformName, numberOfResolutions, finalGridSpacingInPhysicalUnits );
 }
 
-SimpleElastix::SimpleElastixImpl::ParameterMapVectorType 
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl::ParameterMapVectorType 
+ElastixImageFilter::ElastixImageFilterImpl
 ::GetTransformParameterMap( void )
 {
   if( this->m_TransformParameterMapVector.size() == 0 )
@@ -943,8 +943,8 @@ SimpleElastix::SimpleElastixImpl
   return this->m_TransformParameterMapVector;
 }
 
-SimpleElastix::SimpleElastixImpl::ParameterMapType 
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl::ParameterMapType 
+ElastixImageFilter::ElastixImageFilterImpl
 ::GetTransformParameterMap( const unsigned int index )
 {
   if( this->GetNumberOfParameterMaps() == 0 )
@@ -962,7 +962,7 @@ SimpleElastix::SimpleElastixImpl
 }
 
 Image
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::GetResultImage( void )
 {
   if( this->IsEmpty( this->m_ResultImage ) )
@@ -973,22 +973,22 @@ SimpleElastix::SimpleElastixImpl
   return this->m_ResultImage;
 }
 
-SimpleElastix::SimpleElastixImpl::ParameterMapVectorType
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl::ParameterMapVectorType
+ElastixImageFilter::ElastixImageFilterImpl
 ::ExecuteInverse( void )
 {
   return this->ExecuteInverse( this->GetParameterMap() );
 }
 
-SimpleElastix::SimpleElastixImpl::ParameterMapVectorType
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl::ParameterMapVectorType
+ElastixImageFilter::ElastixImageFilterImpl
 ::ExecuteInverse( std::map< std::string, std::vector< std::string > > inverseParameterMap )
 {
   return this->ExecuteInverse( ParameterMapVectorType( 1, inverseParameterMap ) );
 }
 
-SimpleElastix::SimpleElastixImpl::ParameterMapVectorType
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl::ParameterMapVectorType
+ElastixImageFilter::ElastixImageFilterImpl
 ::ExecuteInverse( std::vector< std::map< std::string, std::vector< std::string > > > inverseParameterMapVector )
 {
   if( this->m_FixedImages.size() == 0 )
@@ -1036,11 +1036,11 @@ SimpleElastix::SimpleElastixImpl
   }
 
   // Setup inverse registration
-  SimpleElastix selx;
+  ElastixImageFilter selx;
   selx.SetInitialTransformParameterFileName( forwardTransformParameterFileNames[ 0 ] );
   selx.SetParameterMap( inverseParameterMapVector );  
 
-  // Pass options from this SimpleElastix
+  // Pass options from this ElastixImageFilter
   selx.SetFixedImage( this->GetFixedImage( 0 ) ); 
   selx.SetMovingImage( this->GetFixedImage( 0 ) ); // <-- The fixed image is also used as the moving image. This is not a bug.
   selx.SetOutputDirectory( this->GetOutputDirectory() );
@@ -1071,8 +1071,8 @@ SimpleElastix::SimpleElastixImpl
   return this->m_InverseTransformParameterMapVector;
 }
 
-SimpleElastix::SimpleElastixImpl::ParameterMapVectorType 
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl::ParameterMapVectorType 
+ElastixImageFilter::ElastixImageFilterImpl
 ::GetInverseTransformParameterMap( void )
 {
   if( this->m_InverseTransformParameterMapVector.size() == 0 )
@@ -1084,7 +1084,7 @@ SimpleElastix::SimpleElastixImpl
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::PrintParameterMap( void )
 {
   if( this->GetNumberOfParameterMaps() == 0 )
@@ -1096,14 +1096,14 @@ SimpleElastix::SimpleElastixImpl
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::PrintParameterMap( const ParameterMapType parameterMap )
 {
   this->PrintParameterMap( ParameterMapVectorType( 1, parameterMap ) );
 }
 
 void
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::PrintParameterMap( const ParameterMapVectorType parameterMapVector )
 {
   ParameterObjectPointer parameterObject = ParameterObjectType::New();
@@ -1112,7 +1112,7 @@ SimpleElastix::SimpleElastixImpl
 }
 
 bool
-SimpleElastix::SimpleElastixImpl
+ElastixImageFilter::ElastixImageFilterImpl
 ::IsEmpty( const Image& image )
 {
   const bool isEmpty = image.GetWidth() == 0 && image.GetHeight() == 0;
@@ -1122,4 +1122,4 @@ SimpleElastix::SimpleElastixImpl
 } // end namespace simple
 } // end namespace itk
 
-#endif // __sitksimpleelastiximpl_cxx_
+#endif // __sitkelastiximagefilterimpl_cxx_

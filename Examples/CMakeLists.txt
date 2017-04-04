@@ -28,11 +28,11 @@ if(NOT CMAKE_PROJECT_NAME STREQUAL "SimpleITK")
 endif()
 
 # Add individual cxx executables
-add_executable ( SimpleElastix1 SimpleElastix1.cxx )
-target_link_libraries ( SimpleElastix1 ${SimpleITK_LIBRARIES} )
+add_executable ( elx elx.cxx )
+target_link_libraries ( elx ${SimpleITK_LIBRARIES} )
 
-add_executable ( SimpleTransformix1 SimpleTransformix1.cxx )
-target_link_libraries ( SimpleTransformix1 ${SimpleITK_LIBRARIES} )
+add_executable ( tfx tfx.cxx )
+target_link_libraries ( tfx ${SimpleITK_LIBRARIES} )
 
 add_executable ( SimpleGaussianFunctional SimpleGaussianFunctional.cxx )
 target_link_libraries ( SimpleGaussianFunctional ${SimpleITK_LIBRARIES} )

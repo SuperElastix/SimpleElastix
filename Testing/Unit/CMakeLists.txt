@@ -51,9 +51,9 @@ set ( SimpleITKUnitTestSource
   itkHashImageFilterTest.cxx
   itkSliceImageFilterTest.cxx
   sitkParameterMapTests.cxx
-  sitkSimpleElastixTests.cxx
-  sitkSimpleTransformixTests.cxx
+  sitkElastixImageFilterTests.cxx
   sitkElastixFilterTests.cxx
+  sitkTransformixImageFilterTests.cxx
   sitkTransformixFilterTests.cxx
   )
 

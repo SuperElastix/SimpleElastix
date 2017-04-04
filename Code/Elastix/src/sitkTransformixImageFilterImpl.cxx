@@ -1,15 +1,15 @@
-#ifndef __sitksimpletransformiximpl_cxx_
-#define __sitksimpletransformiximpl_cxx_
+#ifndef __sitktransformiximagefilterimpl_cxx_
+#define __sitktransformiximagefilterimpl_cxx_
 
-#include "sitkSimpleTransformix.h"
-#include "sitkSimpleTransformixImpl.h"
+#include "sitkTransformixImageFilter.h"
+#include "sitkTransformixImageFilterImpl.h"
 #include "sitkCastImageFilter.h"
 
 namespace itk {
   namespace simple {
 
-SimpleTransformix::SimpleTransformixImpl
-::SimpleTransformixImpl( void )
+TransformixImageFilter::TransformixImageFilterImpl
+::TransformixImageFilterImpl( void )
 {
   // Register this class with SimpleITK
   this->m_MemberFactory.reset( new detail::MemberFunctionFactory< MemberFunctionType >( this ) );
@@ -37,13 +37,13 @@ SimpleTransformix::SimpleTransformixImpl
   this->m_LogToConsole = "";
 }
 
-SimpleTransformix::SimpleTransformixImpl
-::~SimpleTransformixImpl( void )
+TransformixImageFilter::TransformixImageFilterImpl
+::~TransformixImageFilterImpl( void )
 {
 }
 
 Image
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::Execute( void )
 {
   const PixelIDValueEnum MovingImagePixelEnum = this->m_MovingImage.GetPixelID();
@@ -54,7 +54,7 @@ SimpleTransformix::SimpleTransformixImpl
     return this->m_MemberFactory->GetMemberFunction( sitkFloat32, MovingImageDimension )();
   }
 
-  sitkExceptionMacro( << "SimpleTransformix does not support the combination of image type "
+  sitkExceptionMacro( << "TransformixImageFilter does not support the combination of image type "
                       << GetPixelIDValueAsElastixParameter( MovingImagePixelEnum ) << " and dimension "
                       << MovingImageDimension << ". This a serious error. "
                       << "Contact developers at https://github.com/kaspermarstal/SimpleElastix/issues." );
@@ -62,7 +62,7 @@ SimpleTransformix::SimpleTransformixImpl
 
 template< typename TMovingImage >
 Image
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::ExecuteInternal( void )
 {
   typedef elastix::TransformixFilter< TMovingImage > TransformixFilterType;
@@ -113,71 +113,71 @@ SimpleTransformix::SimpleTransformixImpl
 }
 
 const std::string 
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::GetName( void )
 { 
-  const std::string name = std::string( "SimpleTransformix" );
+  const std::string name = std::string( "TransformixImageFilter" );
   return name;
 }
 
 void
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::SetMovingImage( const Image& movingImage )
 {
   this->m_MovingImage = movingImage;
 }
 
 Image&
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::GetMovingImage( void )
 {
   return this->m_MovingImage;
 }
 
 void
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::RemoveMovingImage( void )
 {
   this->SetMovingImage( Image() );
 }
 
 void 
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::SetFixedPointSetFileName( const std::string movingPointSetFileName )
 {
   this->m_MovingPointSetFileName = movingPointSetFileName;
 }
 
 std::string 
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::GetFixedPointSetFileName( void )
 {
   return this->m_MovingPointSetFileName;
 }
 
 void
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::RemoveFixedPointSetFileName( void )
 {
   this->m_MovingPointSetFileName = std::string();
 }
 
 void
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::SetComputeSpatialJacobian( const bool computeSpatialJacobian )
 {
   this->m_ComputeSpatialJacobian = computeSpatialJacobian;
 }
 
 bool 
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::GetComputeSpatialJacobian( void )
 {
   return this->m_ComputeSpatialJacobian;
 }
 
 void
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::ComputeSpatialJacobianOn( void )
 {
   this->SetComputeSpatialJacobian( true );
@@ -185,35 +185,35 @@ SimpleTransformix::SimpleTransformixImpl
 }
 
 void
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::ComputeSpatialJacobianOff( void )
 {
   this->SetComputeSpatialJacobian( false );
 }
 
 void
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::SetComputeDeterminantOfSpatialJacobian( const bool computeDeterminantOfSpatialJacobian )
 {
   this->m_ComputeDeterminantOfSpatialJacobian = computeDeterminantOfSpatialJacobian;
 }
 
 bool 
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::GetComputeDeterminantOfSpatialJacobian( void )
 {
   return this->m_ComputeDeterminantOfSpatialJacobian;
 }
 
 void
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::ComputeDeterminantOfSpatialJacobianOn( void )
 {
   this->SetComputeDeterminantOfSpatialJacobian( true );
 }
 
 void
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::ComputeDeterminantOfSpatialJacobianOff( void )
 {
   this->SetComputeDeterminantOfSpatialJacobian( false );
@@ -221,28 +221,28 @@ SimpleTransformix::SimpleTransformixImpl
 }
 
 void
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::SetComputeDeformationField( const bool computeDeformationField )
 {
   this->m_ComputeDeformationField = computeDeformationField;
 }
 
 bool
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::GetComputeDeformationField( void )
 {
   return this->m_ComputeDeformationField;
 }
 
 void
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::ComputeDeformationFieldOn( void )
 {
   this->SetComputeDeformationField( true );
 }
 
 void
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::ComputeDeformationFieldOff( void )
 {
   this->SetComputeDeformationField( false );
@@ -250,49 +250,49 @@ SimpleTransformix::SimpleTransformixImpl
 }
 
 void 
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::SetOutputDirectory( const std::string outputDirectory )
 {
   this->m_OutputDirectory = outputDirectory;
 }
 
 std::string
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::GetOutputDirectory( void )
 {
   return this->m_OutputDirectory;
 }
 
 void 
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::RemoveOutputDirectory( void )
 {
   this->m_OutputDirectory = std::string();
 }
 
 void 
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::SetLogFileName( std::string logFileName )
 {
   this->m_LogFileName = logFileName;
 }
 
 std::string
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::GetLogFileName( void )
 {
   return this->m_LogFileName;
 }
 
 void 
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::RemoveLogFileName( void )
 {
   this->m_LogFileName = std::string();
 }
 
 void 
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::SetLogToFile( bool logToFile )
 {
   this->m_LogToFile = logToFile;
@@ -300,63 +300,63 @@ SimpleTransformix::SimpleTransformixImpl
 }
 
 bool
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::GetLogToFile( void )
 {
   return this->m_LogToFile;
 }
 
 void 
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::LogToFileOn()
 {
   this->SetLogToFile( true );
 }
 
 void 
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::LogToFileOff()
 {
   this->SetLogToFile( false );
 }
 
 void 
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::SetLogToConsole( bool logToConsole )
 {
   this->m_LogToConsole = logToConsole;
 }
 
 bool
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::GetLogToConsole( void )
 {
   return this->m_LogToConsole;
 }
 
 void 
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::LogToConsoleOn()
 {
   this->SetLogToConsole( true );
 }
 
 void 
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::LogToConsoleOff()
 {
   this->SetLogToConsole( false );
 }
 
 void
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::SetTransformParameterMap( const ParameterMapVectorType parameterMapVector )
 {
   this->m_TransformParameterMapVector = parameterMapVector;
 }
 
 void
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::SetTransformParameterMap( const ParameterMapType parameterMap )
 {
   ParameterMapVectorType parameterMapVector;
@@ -366,28 +366,28 @@ SimpleTransformix::SimpleTransformixImpl
 }
 
 void
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::AddTransformParameterMap( const ParameterMapType parameterMap )
 {
   this->m_TransformParameterMapVector.push_back( parameterMap );
 }
 
-SimpleTransformix::SimpleTransformixImpl::ParameterMapVectorType
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl::ParameterMapVectorType
+TransformixImageFilter::TransformixImageFilterImpl
 ::GetTransformParameterMap( void )
 {
   return this->m_TransformParameterMapVector;
 }
 
 unsigned int
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::GetNumberOfTransformParameterMaps( void )
 {
   return this->m_TransformParameterMapVector.size();
 }
 
 void
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::SetTransformParameter( const ParameterKeyType key, const ParameterValueType value )
 {
   for( unsigned int i = 0; i < this->m_TransformParameterMapVector.size(); i++ )
@@ -397,7 +397,7 @@ SimpleTransformix::SimpleTransformixImpl
 }
 
 void
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::SetTransformParameter( const ParameterKeyType key, const ParameterValueVectorType value )
 {
   for( unsigned int i = 0; i < this->m_TransformParameterMapVector.size(); i++ )
@@ -407,7 +407,7 @@ SimpleTransformix::SimpleTransformixImpl
 }
 
 void
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::SetTransformParameter( const unsigned int index, const ParameterKeyType key, const ParameterValueType value )
 {
   if( index >= this->m_TransformParameterMapVector.size() )
@@ -419,7 +419,7 @@ SimpleTransformix::SimpleTransformixImpl
 }
 
 void
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::SetTransformParameter( const unsigned int index, const ParameterKeyType key, const ParameterValueVectorType value )
 {
   if( index >= this->m_TransformParameterMapVector.size() )
@@ -431,7 +431,7 @@ SimpleTransformix::SimpleTransformixImpl
 }
 
 void
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::AddTransformParameter( const ParameterKeyType key, const ParameterValueType value )
 {
   for( unsigned int i = 0; i < this->m_TransformParameterMapVector.size(); i++ )
@@ -441,7 +441,7 @@ SimpleTransformix::SimpleTransformixImpl
 }
 
 void
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::AddTransformParameter( const unsigned int index, const ParameterKeyType key, const ParameterValueType value )
 {
   if( index >= this->m_TransformParameterMapVector.size() )
@@ -459,8 +459,8 @@ SimpleTransformix::SimpleTransformixImpl
   }
 }
 
-SimpleTransformix::SimpleTransformixImpl::ParameterValueVectorType
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl::ParameterValueVectorType
+TransformixImageFilter::TransformixImageFilterImpl
 ::GetTransformParameter( const ParameterKeyType key )
 {
   if( this->m_TransformParameterMapVector.size() > 0 )
@@ -471,8 +471,8 @@ SimpleTransformix::SimpleTransformixImpl
   return this->GetTransformParameter( 0, key );
 }
 
-SimpleTransformix::SimpleTransformixImpl::ParameterValueVectorType
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl::ParameterValueVectorType
+TransformixImageFilter::TransformixImageFilterImpl
 ::GetTransformParameter( const unsigned int index, const ParameterKeyType key )
 {
   if( index >= this->m_TransformParameterMapVector.size() )
@@ -484,7 +484,7 @@ SimpleTransformix::SimpleTransformixImpl
 }
 
 void
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::RemoveTransformParameter( const ParameterKeyType key )
 {
   for( unsigned int i = 0; i < this->m_TransformParameterMapVector.size(); i++ )
@@ -494,7 +494,7 @@ SimpleTransformix::SimpleTransformixImpl
 }
 
 void
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::RemoveTransformParameter( const unsigned int index, const ParameterKeyType key )
 {
   if( index >= this->m_TransformParameterMapVector.size() )
@@ -505,8 +505,8 @@ SimpleTransformix::SimpleTransformixImpl
   this->m_TransformParameterMapVector[ index ].erase( key );
 }
 
-SimpleTransformix::SimpleTransformixImpl::ParameterMapType 
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl::ParameterMapType 
+TransformixImageFilter::TransformixImageFilterImpl
 ::ReadParameterFile( const std::string filename )
 {
   ParameterFileParserPointer parser = ParameterFileParserType::New();
@@ -524,7 +524,7 @@ SimpleTransformix::SimpleTransformixImpl
 }
 
 void
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::WriteParameterFile( const ParameterMapType parameterMap, const std::string parameterFileName )
 {
   ParameterObjectPointer parameterObject = ParameterObjectType::New();
@@ -532,14 +532,14 @@ SimpleTransformix::SimpleTransformixImpl
 }
 
 void
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::PrintParameterMap( void )
 {
   this->PrintParameterMap( this->GetTransformParameterMap() );
 }
 
 void 
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::PrintParameterMap( const ParameterMapType parameterMap )
 {
   ParameterMapVectorType parameterMapVector = ParameterMapVectorType( 1 );
@@ -548,7 +548,7 @@ SimpleTransformix::SimpleTransformixImpl
 }
 
 void 
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::PrintParameterMap( const ParameterMapVectorType parameterMapVector )
 {
   ParameterObjectPointer parameterObject = ParameterObjectType::New();
@@ -558,7 +558,7 @@ SimpleTransformix::SimpleTransformixImpl
 }
 
 Image
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::GetResultImage( void )
 {
   if( this->IsEmpty( this->m_ResultImage ) )
@@ -571,7 +571,7 @@ SimpleTransformix::SimpleTransformixImpl
 
 
 bool
-SimpleTransformix::SimpleTransformixImpl
+TransformixImageFilter::TransformixImageFilterImpl
 ::IsEmpty( const Image& image )
 {
   bool isEmpty = image.GetWidth() == 0 && image.GetHeight() == 0;
@@ -581,4 +581,4 @@ SimpleTransformix::SimpleTransformixImpl
 } // end namespace simple
 } // end namespace itk
 
-#endif // __sitksimpletransformiximpl_cxx_
+#endif // __sitktransformiximagefilterimpl_cxx_

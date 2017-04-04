@@ -1,8 +1,8 @@
 #include "SimpleITKTestHarness.h"
 #include "sitkImageFileReader.h"
 #include "sitkCastImageFilter.h"
-#include "sitkSimpleElastix.h"
-#include "sitkSimpleTransformix.h"
+#include "sitkElastixImageFilter.h"
+#include "sitkTransformixImageFilter.h"
 
 namespace itk {
   namespace simple {
@@ -13,18 +13,18 @@ return ( image.GetWidth() == 0 && image.GetHeight() == 0 );
 }
 
 
-TEST( SimpleTransformix, ObjectOrientedInterface )
+TEST( TransformixImageFilter, ObjectOrientedInterface )
 {
   Image fixedImage = Cast( ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) ), sitkFloat32 );
   Image movingImage = Cast( ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) ), sitkFloat32 );
 
-  SimpleElastix silx;
+  ElastixImageFilter silx;
   silx.SetFixedImage( fixedImage );
   silx.SetMovingImage( movingImage );
   silx.Execute();
 
-  SimpleTransformix stfx;
-  EXPECT_EQ( stfx.GetName(), "SimpleTransformix" );
+  TransformixImageFilter stfx;
+  EXPECT_EQ( stfx.GetName(), "TransformixImageFilter" );
   EXPECT_EQ( stfx.GetTransformParameterMap().size(), 0u );
 
   ASSERT_THROW( stfx.Execute(), GenericException );
@@ -43,13 +43,13 @@ TEST( SimpleTransformix, ObjectOrientedInterface )
 }
 
 
-TEST( SimpleTransformix, ProceduralInterface )
+TEST( TransformixImageFilter, ProceduralInterface )
 {
   Image fixedImage = Cast( ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) ), sitkFloat32 );
   Image movingImage = Cast( ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) ), sitkFloat32 );
   Image resultImage;
 
-  SimpleElastix silx;
+  ElastixImageFilter silx;
   silx.SetFixedImage( fixedImage );
   silx.SetMovingImage( movingImage );
   silx.Execute();
@@ -74,15 +74,15 @@ TEST( SimpleTransformix, ProceduralInterface )
   EXPECT_NO_THROW( resultImage = Transformix( movingImage, silx.GetTransformParameterMap(), false, outputDirectory ) );
   EXPECT_FALSE( stfxIsEmpty( resultImage ) );
 
-  SimpleElastix::ParameterMapVectorType parameterMapVector = silx.GetTransformParameterMap();
-  parameterMapVector[ parameterMapVector.size()-1 ][ "WriteResultImage" ] = SimpleElastix::ParameterValueVectorType( 1, "false" );
+  ElastixImageFilter::ParameterMapVectorType parameterMapVector = silx.GetTransformParameterMap();
+  parameterMapVector[ parameterMapVector.size()-1 ][ "WriteResultImage" ] = ElastixImageFilter::ParameterValueVectorType( 1, "false" );
   EXPECT_NO_THROW( resultImage = Transformix( movingImage, silx.GetTransformParameterMap() ) );
   EXPECT_FALSE( stfxIsEmpty( resultImage ) );
 }
 
 #ifdef SITK_4D_IMAGES
 
-TEST( SimpleTransformix, Transformation4D )
+TEST( TransformixImageFilter, Transformation4D )
 {
   Image fixedImage = ReadImage( dataFinder.GetFile( "Input/4D.nii.gz" ) );
   Image movingImage1 = ReadImage( dataFinder.GetFile( "Input/4D.nii.gz" ) );
@@ -90,7 +90,7 @@ TEST( SimpleTransformix, Transformation4D )
   Image resultImage1;
   Image resultImage2;
 
-  SimpleElastix silx;
+  ElastixImageFilter silx;
   silx.SetParameterMap( "groupwise" );
   silx.SetParameter( "MaximumNumberOfIterations", "8.0" );
   silx.SetParameter( "FinalGridSpacingInPhysicalUnits", "32.0" );
@@ -100,7 +100,7 @@ TEST( SimpleTransformix, Transformation4D )
 
   silx.PrintParameterMap(silx.GetTransformParameterMap());
 
-  SimpleTransformix stfx;
+  TransformixImageFilter stfx;
   stfx.SetMovingImage( movingImage2 );
   stfx.SetTransformParameterMap( silx.GetTransformParameterMap() );
   resultImage2 = stfx.Execute();

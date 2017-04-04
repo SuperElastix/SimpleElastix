@@ -1,6 +1,6 @@
 #include "SimpleITKTestHarness.h"
 #include "sitkCastImageFilter.h"
-#include "sitkSimpleElastix.h"
+#include "sitkElastixImageFilter.h"
 #include "sitkImageFileReader.h"
 #include "sitkImageFileWriter.h"
 #include "sitkBinaryThresholdImageFilter.h"
@@ -15,18 +15,18 @@ bool silxIsEmpty( const Image image )
   return ( image.GetWidth() == 0 && image.GetHeight() == 0 );
 }
 
-TEST( SimpleElastix, Instantiation )
+TEST( ElastixImageFilter, Instantiation )
 {
-    SimpleElastix silx;
+    ElastixImageFilter silx;
 }
 
-TEST( SimpleElastix, DefaultParameterMaps )
+TEST( ElastixImageFilter, DefaultParameterMaps )
 {
   Image fixedImage = ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
   Image movingImage = ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
   Image resultImage; 
 
-  SimpleElastix silx;
+  ElastixImageFilter silx;
   EXPECT_NO_THROW( silx.SetFixedImage( fixedImage ) );
   EXPECT_NO_THROW( silx.SetMovingImage( movingImage ) );
 
@@ -56,20 +56,20 @@ TEST( SimpleElastix, DefaultParameterMaps )
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
 }
 
-TEST( SimpleElastix, Registration2D )
+TEST( ElastixImageFilter, Registration2D )
 {
   Image fixedImage = ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
   Image movingImage = ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
   Image resultImage; 
 
-  SimpleElastix silx;
+  ElastixImageFilter silx;
   EXPECT_NO_THROW( silx.SetFixedImage( fixedImage ) );
   EXPECT_NO_THROW( silx.SetMovingImage( movingImage ) );
   EXPECT_NO_THROW( resultImage = silx.Execute() );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
 }
 
-TEST( SimpleElastix, Masks )
+TEST( ElastixImageFilter, Masks )
 {
   Image fixedImage = ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
   Image fixedMask = Cast( ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20Mask.png" ) ), sitkUInt8 );
@@ -79,7 +79,7 @@ TEST( SimpleElastix, Masks )
   Image movingMaskInvalidType = Cast( ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20Mask.png" ) ), sitkFloat32 );
   Image resultImage; 
 
-  SimpleElastix silx;
+  ElastixImageFilter silx;
   EXPECT_NO_THROW( silx.SetParameter( "ImageSampler", "RandomSparseMask" ) );
   EXPECT_NO_THROW( silx.SetFixedImage( fixedImage ) );
   EXPECT_NO_THROW( silx.SetFixedMask( fixedMask ) );
@@ -96,7 +96,7 @@ TEST( SimpleElastix, Masks )
   EXPECT_THROW( silx.Execute(), GenericException );
 }
 
-TEST( SimpleElastix, ProceduralInterface )
+TEST( ElastixImageFilter, ProceduralInterface )
 {
   Image fixedImage = ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
   Image fixedMask = Cast( ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20Mask.png" ) ), sitkUInt8 );
@@ -153,7 +153,7 @@ TEST( SimpleElastix, ProceduralInterface )
   EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, defaultParameterMapName, false, true, outputDirectory ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
 
-  SimpleElastix::ParameterMapType parameterMap = GetDefaultParameterMap( defaultParameterMapName );
+  ElastixImageFilter::ParameterMapType parameterMap = GetDefaultParameterMap( defaultParameterMapName );
   EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMap ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
   EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMap, true ) );
@@ -177,7 +177,7 @@ TEST( SimpleElastix, ProceduralInterface )
   EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMap, false, true, outputDirectory ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
 
-  SimpleElastix::ParameterMapVectorType parameterMapVector;
+  ElastixImageFilter::ParameterMapVectorType parameterMapVector;
   parameterMapVector.push_back( GetDefaultParameterMap( defaultParameterMapName ) );
   parameterMapVector.push_back( GetDefaultParameterMap( "rigid" ) );
   EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMapVector ) );
@@ -275,7 +275,7 @@ TEST( SimpleElastix, ProceduralInterface )
   EXPECT_NO_THROW( PrintParameterMap( parameterMapVector ) );
 }
 
-TEST( SimpleElastix, MultipleFixedAndMovingImages )
+TEST( ElastixImageFilter, MultipleFixedAndMovingImages )
 {
   Image fixedImage0 = ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
   Image fixedImage1 = ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
@@ -283,7 +283,7 @@ TEST( SimpleElastix, MultipleFixedAndMovingImages )
   Image movingImage1 = ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
   Image resultImage;
 
-  SimpleElastix silx;
+  ElastixImageFilter silx;
   silx.SetParameterMap( "translation" );
   silx.SetParameter( "Registration", "MultiMetricMultiResolutionRegistration" );
   silx.AddParameter( "ImageSampler", silx.GetParameter( 0, "ImageSampler" ) );
@@ -301,7 +301,7 @@ TEST( SimpleElastix, MultipleFixedAndMovingImages )
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
 }
 
-TEST( SimpleElastix, RegistrationWithPointSets )
+TEST( ElastixImageFilter, RegistrationWithPointSets )
 {
   // We generate the point sets manually
   std::string fixedPointSetFileName = dataFinder.GetOutputFile( "FixedPointSet.pts" );
@@ -322,7 +322,7 @@ TEST( SimpleElastix, RegistrationWithPointSets )
   Image movingImage = ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
   Image resultImage; 
 
-  SimpleElastix silx;
+  ElastixImageFilter silx;
   silx.SetParameterMap( "translation" );
   silx.SetParameter( "Registration", "MultiMetricMultiResolutionRegistration" );
   silx.AddParameter( "Metric", "CorrespondingPointsEuclideanDistanceMetric" );
@@ -336,7 +336,7 @@ TEST( SimpleElastix, RegistrationWithPointSets )
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
  }
 
-TEST( SimpleElastix, InitialTransform )
+TEST( ElastixImageFilter, InitialTransform )
 {
   std::string initialTransformParameterFileName = dataFinder.GetOutputFile( "InitialTransformTestParameterFile.txt" );
   Image fixedImage = ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
@@ -344,14 +344,14 @@ TEST( SimpleElastix, InitialTransform )
   Image resultImage1; 
   Image resultImage2; 
 
-  SimpleElastix silx1;
+  ElastixImageFilter silx1;
   EXPECT_NO_THROW( silx1.SetFixedImage( fixedImage ) );
   EXPECT_NO_THROW( silx1.SetMovingImage( movingImage ) );
   EXPECT_NO_THROW( resultImage1 = silx1.Execute() );
   EXPECT_FALSE( silxIsEmpty( resultImage1 ) );
   WriteParameterFile( silx1.GetTransformParameterMap()[ 0 ], initialTransformParameterFileName );
 
-  SimpleElastix silx2;
+  ElastixImageFilter silx2;
   EXPECT_NO_THROW( silx2.SetFixedImage( fixedImage ) );
   EXPECT_NO_THROW( silx2.SetMovingImage( movingImage ) );
   EXPECT_NO_THROW( silx2.SetInitialTransformParameterFileName( initialTransformParameterFileName ) );
@@ -359,14 +359,14 @@ TEST( SimpleElastix, InitialTransform )
   EXPECT_FALSE( silxIsEmpty( resultImage2 ) );
 }
 
-TEST( SimpleElastix, InverseTransform )
+TEST( ElastixImageFilter, InverseTransform )
 {
   Image fixedImage = ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
   Image movingImage = ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
   Image resultImage; 
 
-  SimpleElastix silx; silx.LogToConsoleOn(); 
-  SimpleElastix::ParameterMapVectorType inverseParameterMapVector;
+  ElastixImageFilter silx; silx.LogToConsoleOn(); 
+  ElastixImageFilter::ParameterMapVectorType inverseParameterMapVector;
   EXPECT_NO_THROW( silx.SetFixedImage( fixedImage ) );
   EXPECT_NO_THROW( silx.SetMovingImage( movingImage ) );
   EXPECT_NO_THROW( resultImage = silx.Execute() );
@@ -376,7 +376,7 @@ TEST( SimpleElastix, InverseTransform )
   EXPECT_NO_THROW( inverseParameterMapVector = silx.GetInverseTransformParameterMap() );
 }
 
-TEST( SimpleElastix, SameFixedImageForMultipleRegistrations )
+TEST( ElastixImageFilter, SameFixedImageForMultipleRegistrations )
 { 
   Image fixedImage = ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
   Image movingImage1 = ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
@@ -384,7 +384,7 @@ TEST( SimpleElastix, SameFixedImageForMultipleRegistrations )
   Image resultImage1;
   Image resultImage2; 
 
-  SimpleElastix silx;
+  ElastixImageFilter silx;
   EXPECT_NO_THROW( silx.SetFixedImage( fixedImage ) );
   EXPECT_NO_THROW( silx.SetMovingImage( movingImage1 ) );
   EXPECT_NO_THROW( resultImage1 = silx.Execute() );
@@ -394,13 +394,13 @@ TEST( SimpleElastix, SameFixedImageForMultipleRegistrations )
   EXPECT_FALSE( silxIsEmpty( resultImage2 ) );
 }
 
-TEST( SimpleElastix, Registration3D )
+TEST( ElastixImageFilter, Registration3D )
 {
   Image fixedImage = ReadImage( dataFinder.GetFile( "Input/OAS1_0001_MR1_mpr-1_anon.nrrd" ) );
   Image movingImage = ReadImage( dataFinder.GetFile( "Input/OAS1_0002_MR1_mpr-1_anon.nrrd" ) );
   Image resultImage; 
 
-  SimpleElastix silx;
+  ElastixImageFilter silx;
   EXPECT_NO_THROW( silx.SetFixedImage( fixedImage ) );
   EXPECT_NO_THROW( silx.SetMovingImage( movingImage ) );
   EXPECT_NO_THROW( resultImage = silx.Execute() );
@@ -409,13 +409,13 @@ TEST( SimpleElastix, Registration3D )
 
 #ifdef SITK_4D_IMAGES
 
-TEST( SimpleElastix, Registration4D )
+TEST( ElastixImageFilter, Registration4D )
 {
   Image fixedImage = ReadImage( dataFinder.GetFile( "Input/4D.nii.gz" ) );
   Image movingImage = ReadImage( dataFinder.GetFile( "Input/4D.nii.gz" ) );
   Image resultImage; 
 
-  SimpleElastix silx; silx.LogToConsoleOn();
+  ElastixImageFilter silx; silx.LogToConsoleOn();
   silx.SetParameterMap( "groupwise" );
   silx.SetParameter("MaximumNumberOfIterations", "8.0");
   silx.SetParameter("FinalGridSpacingInPhysicalUnits", "32.0");

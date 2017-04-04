@@ -14,24 +14,24 @@ int main ( int argc, char* argv[] ) {
   }
 
   // Instantiate SimpleElastix
-  sitk::SimpleElastix elastix;
+  sitk::ElastixImageFilter elastixImageFilter;
 
   // Read input
   sitk::ImageFileReader reader;
   reader.SetFileName( std::string( argv[1] ) );
-  elastix.SetFixedImage( reader.Execute() );
+  elastixImageFilter.SetFixedImage( reader.Execute() );
   reader.SetFileName( std::string( argv[2] ) );
-  elastix.SetMovingImage( reader.Execute() );
-  elastix.SetParameterMap( sitk::ReadParameterFile( std::string( argv[3] ) ) );
-  elastix.LogToConsoleOn();
+  elastixImageFilter.SetMovingImage( reader.Execute() );
+  elastixImageFilter.SetParameterMap( sitk::ReadParameterFile( std::string( argv[3] ) ) );
+  elastixImageFilter.LogToConsoleOn();
 
   // Run registration
-  elastix.Execute();
+  elastixImageFilter.Execute();
 
   // Write result image
   sitk::ImageFileWriter writer;
   writer.SetFileName( std::string( argv[4] ) );
-  writer.Execute( elastix.GetResultImage() );
+  writer.Execute( elastixImageFilter.GetResultImage() );
 
   return 0;
 }

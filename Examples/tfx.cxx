@@ -14,32 +14,32 @@ int main ( int argc, char* argv[] ) {
   }
 
   // Make transform
-  sitk::SimpleElastix elastix;
+  sitk::ElastixImageFilter elastixImageFilter;
   sitk::ImageFileReader reader;
   reader.SetFileName( std::string( argv[1] ) );
-  elastix.SetFixedImage( reader.Execute() );
+  elastixImageFilter.SetFixedImage( reader.Execute() );
   reader.SetFileName( std::string( argv[2] ) );
-  elastix.SetMovingImage( reader.Execute() );
-  elastix.SetParameterMap( sitk::ReadParameterFile( std::string( argv[3] ) ) );
-  elastix.LogToConsoleOn();
-  elastix.Execute();
+  elastixImageFilter.SetMovingImage( reader.Execute() );
+  elastixImageFilter.SetParameterMap( sitk::ReadParameterFile( std::string( argv[3] ) ) );
+  elastixImageFilter.LogToConsoleOn();
+  elastixImageFilter.Execute();
 
   // Instantiate transformix
-  sitk::SimpleTransformix transformix;
-  transformix.LogToConsoleOn();
+  sitk::TransformixImageFilter transformixImageFilter;
+  transformixImageFilter.LogToConsoleOn();
 
   // Read input
   reader.SetFileName( std::string( argv[4] ) );
-  transformix.SetMovingImage( reader.Execute() );
-  transformix.SetTransformParameterMap( elastix.GetTransformParameterMap() );
+  transformixImageFilter.SetMovingImage( reader.Execute() );
+  transformixImageFilter.SetTransformParameterMap( elastixImageFilter.GetTransformParameterMap() );
 
   // Run warp
-  transformix.Execute();
+  transformixImageFilter.Execute();
 
   // Write result image
   sitk::ImageFileWriter writer;
   writer.SetFileName( std::string( argv[5] ) );
-  writer.Execute( transformix.GetResultImage() );
+  writer.Execute( transformixImageFilter.GetResultImage() );
 
   return 0;
 }

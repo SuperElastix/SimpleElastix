@@ -1,8 +1,8 @@
-#ifndef __sitksimpleelastiximpl_h_
-#define __sitksimpleelastiximpl_h_
+#ifndef __sitkelastiximagefilterimpl_h_
+#define __sitkelastiximagefilterimpl_h_
 
 // SimpleITK
-#include "sitkSimpleElastix.h"
+#include "sitkElastixImageFilter.h"
 #include "sitkMemberFunctionFactory.h"
 #include "sitkDualMemberFunctionFactory.h"
 
@@ -13,24 +13,24 @@
 namespace itk { 
   namespace simple {
 
-struct SimpleElastix::SimpleElastixImpl
+struct ElastixImageFilter::ElastixImageFilterImpl
 {
 
-  SimpleElastixImpl( void );
-  ~SimpleElastixImpl( void );
+  ElastixImageFilterImpl( void );
+  ~ElastixImageFilterImpl( void );
 
-  typedef SimpleElastixImpl Self;                                
+  typedef ElastixImageFilterImpl Self;                                
 
-  typedef SimpleElastix::VectorOfImage                VectorOfImage;
+  typedef ElastixImageFilter::VectorOfImage                VectorOfImage;
 
-  typedef SimpleElastix::ParameterKeyType             ParameterKeyType;
-  typedef SimpleElastix::ParameterValueType           ParameterValueType;
-  typedef SimpleElastix::ParameterValueVectorType     ParameterValueVectorType;
-  typedef SimpleElastix::ParameterValueVectorIterator ParameterValueVectorIterator;
-  typedef SimpleElastix::ParameterMapType             ParameterMapType;
-  typedef SimpleElastix::ParameterMapVectorType       ParameterMapVectorType;
-  typedef SimpleElastix::ParameterMapIterator         ParameterMapIterator;
-  typedef SimpleElastix::ParameterMapConstIterator    ParameterMapConstIterator;
+  typedef ElastixImageFilter::ParameterKeyType             ParameterKeyType;
+  typedef ElastixImageFilter::ParameterValueType           ParameterValueType;
+  typedef ElastixImageFilter::ParameterValueVectorType     ParameterValueVectorType;
+  typedef ElastixImageFilter::ParameterValueVectorIterator ParameterValueVectorIterator;
+  typedef ElastixImageFilter::ParameterMapType             ParameterMapType;
+  typedef ElastixImageFilter::ParameterMapVectorType       ParameterMapVectorType;
+  typedef ElastixImageFilter::ParameterMapIterator         ParameterMapIterator;
+  typedef ElastixImageFilter::ParameterMapConstIterator    ParameterMapConstIterator;
 
   typedef elastix::ParameterObject                    ParameterObjectType;
   typedef elastix::ParameterObject::Pointer           ParameterObjectPointer;           
@@ -174,4 +174,4 @@ struct SimpleElastix::SimpleElastixImpl
 } // end namespace simple
 } // end namespace itk
 
-#endif // __sitksimpleelastiximpl_h_
+#endif // __sitkelastiximagefilterimpl_h_

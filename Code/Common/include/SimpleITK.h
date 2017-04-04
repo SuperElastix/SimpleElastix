@@ -83,8 +83,8 @@
 
 #include "sitkAdditionalProcedures.h"
 
-#include "sitkSimpleElastix.h"
-#include "sitkSimpleTransformix.h"
+#include "sitkElastixImageFilter.h"
+#include "sitkTransformixImageFilter.h"
 
 #include "sitkImageRegistrationMethod.h"
 

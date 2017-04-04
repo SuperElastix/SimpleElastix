@@ -1,33 +1,33 @@
-#ifndef __sitksimpletransformix_cxx_
-#define __sitksimpletransformix_cxx_
+#ifndef __sitktransformiximagefilter_cxx_
+#define __sitktransformiximagefilter_cxx_
 
-#include "sitkSimpleTransformix.h"
-#include "sitkSimpleTransformixImpl.h"
+#include "sitkTransformixImageFilter.h"
+#include "sitkTransformixImageFilterImpl.h"
 
 namespace itk {
   namespace simple {
 
-SimpleTransformix
-::SimpleTransformix( void ) : m_Pimple( new SimpleTransformixImpl )
+TransformixImageFilter
+::TransformixImageFilter( void ) : m_Pimple( new TransformixImageFilterImpl )
 {
 }
 
-SimpleTransformix
-::~SimpleTransformix( void )
+TransformixImageFilter
+::~TransformixImageFilter( void )
 {
   delete m_Pimple;
   m_Pimple = NULL;
 }
 
 const std::string 
-SimpleTransformix
+TransformixImageFilter
 ::GetName( void )
 { 
   return this->m_Pimple->GetName();
 }
 
-SimpleTransformix::Self&
-SimpleTransformix
+TransformixImageFilter::Self&
+TransformixImageFilter
 ::SetMovingImage( const Image& movingImage )
 {
   this->m_Pimple->SetMovingImage( movingImage );
@@ -35,22 +35,22 @@ SimpleTransformix
 }
 
 Image&
-SimpleTransformix
+TransformixImageFilter
 ::GetMovingImage( void )
 {
   return this->m_Pimple->GetMovingImage();
 }
 
-SimpleTransformix::Self&
-SimpleTransformix
+TransformixImageFilter::Self&
+TransformixImageFilter
 ::RemoveMovingImage( void )
 {
   this->m_Pimple->RemoveMovingImage();
   return *this;
 }
 
-SimpleTransformix::Self& 
-SimpleTransformix
+TransformixImageFilter::Self& 
+TransformixImageFilter
 ::SetFixedPointSetFileName( const std::string movingPointSetFileName )
 {
   this->m_Pimple->SetFixedPointSetFileName( movingPointSetFileName );
@@ -58,22 +58,22 @@ SimpleTransformix
 }
 
 std::string 
-SimpleTransformix
+TransformixImageFilter
 ::GetFixedPointSetFileName( void )
 {
   return this->m_Pimple->GetFixedPointSetFileName();
 }
 
-SimpleTransformix::Self&
-SimpleTransformix
+TransformixImageFilter::Self&
+TransformixImageFilter
 ::RemoveFixedPointSetFileName( void )
 {
   this->m_Pimple->RemoveFixedPointSetFileName();
   return *this;
 }
 
-SimpleTransformix::Self&
-SimpleTransformix
+TransformixImageFilter::Self&
+TransformixImageFilter
 ::SetComputeSpatialJacobian( const bool computeSpatialJacobian )
 {
   this->m_Pimple->SetComputeSpatialJacobian( computeSpatialJacobian );
@@ -81,30 +81,30 @@ SimpleTransformix
 }
 
 bool 
-SimpleTransformix
+TransformixImageFilter
 ::GetComputeSpatialJacobian( void )
 {
   return this->m_Pimple->GetComputeSpatialJacobian();
 }
 
-SimpleTransformix::Self&
-SimpleTransformix
+TransformixImageFilter::Self&
+TransformixImageFilter
 ::ComputeSpatialJacobianOn( void )
 {
   this->m_Pimple->SetComputeSpatialJacobian( true );
   return *this;
 }
 
-SimpleTransformix::Self&
-SimpleTransformix
+TransformixImageFilter::Self&
+TransformixImageFilter
 ::ComputeSpatialJacobianOff( void )
 {
   this->m_Pimple->SetComputeSpatialJacobian( false );
   return *this;
 }
 
-SimpleTransformix::Self&
-SimpleTransformix
+TransformixImageFilter::Self&
+TransformixImageFilter
 ::SetComputeDeterminantOfSpatialJacobian( const bool computeDeterminantOfSpatialJacobian )
 {
   this->m_Pimple->SetComputeDeterminantOfSpatialJacobian( computeDeterminantOfSpatialJacobian );
@@ -112,30 +112,30 @@ SimpleTransformix
 }
 
 bool 
-SimpleTransformix
+TransformixImageFilter
 ::GetComputeDeterminantOfSpatialJacobian( void )
 {
   return this->m_Pimple->GetComputeDeterminantOfSpatialJacobian();
 }
 
-SimpleTransformix::Self&
-SimpleTransformix
+TransformixImageFilter::Self&
+TransformixImageFilter
 ::ComputeDeterminantOfSpatialJacobianOn( void )
 {
   this->m_Pimple->SetComputeDeterminantOfSpatialJacobian( true );
   return *this;
 }
 
-SimpleTransformix::Self&
-SimpleTransformix
+TransformixImageFilter::Self&
+TransformixImageFilter
 ::ComputeDeterminantOfSpatialJacobianOff( void )
 {
   this->m_Pimple->SetComputeDeterminantOfSpatialJacobian( false );
   return *this;
 }
 
-SimpleTransformix::Self&
-SimpleTransformix
+TransformixImageFilter::Self&
+TransformixImageFilter
 ::SetComputeDeformationField( const bool computeDeformationField )
 {
   this->m_Pimple->SetComputeDeformationField( computeDeformationField );
@@ -143,30 +143,30 @@ SimpleTransformix
 }
 
 bool
-SimpleTransformix
+TransformixImageFilter
 ::GetComputeDeformationField( void )
 {
   return this->m_Pimple->GetComputeDeformationField();
 }
 
-SimpleTransformix::Self&
-SimpleTransformix
+TransformixImageFilter::Self&
+TransformixImageFilter
 ::ComputeDeformationFieldOn( void )
 {
   this->m_Pimple->SetComputeDeformationField( true );
   return *this;
 }
 
-SimpleTransformix::Self&
-SimpleTransformix
+TransformixImageFilter::Self&
+TransformixImageFilter
 ::ComputeDeformationFieldOff( void )
 {
   this->m_Pimple->SetComputeDeformationField( false );
   return *this;
 }
 
-SimpleTransformix::Self& 
-SimpleTransformix
+TransformixImageFilter::Self& 
+TransformixImageFilter
 ::SetOutputDirectory( const std::string outputDirectory )
 {
   this->m_Pimple->SetOutputDirectory( outputDirectory );
@@ -174,22 +174,22 @@ SimpleTransformix
 }
 
 std::string
-SimpleTransformix
+TransformixImageFilter
 ::GetOutputDirectory( void )
 {
   return this->m_Pimple->GetOutputDirectory();
 }
 
-SimpleTransformix::Self& 
-SimpleTransformix
+TransformixImageFilter::Self& 
+TransformixImageFilter
 ::RemoveOutputDirectory( void )
 {
   this->m_Pimple->RemoveOutputDirectory();
   return *this;
 }
 
-SimpleTransformix::Self& 
-SimpleTransformix
+TransformixImageFilter::Self& 
+TransformixImageFilter
 ::SetLogFileName( std::string logFileName )
 {
   this->m_Pimple->SetLogFileName( logFileName );
@@ -197,22 +197,22 @@ SimpleTransformix
 }
 
 std::string
-SimpleTransformix
+TransformixImageFilter
 ::GetLogFileName( void )
 {
   return this->m_Pimple->GetLogFileName();
 }
 
-SimpleTransformix::Self& 
-SimpleTransformix
+TransformixImageFilter::Self& 
+TransformixImageFilter
 ::RemoveLogFileName( void )
 {
   this->m_Pimple->RemoveLogFileName();
   return *this;
 }
 
-SimpleTransformix::Self& 
-SimpleTransformix
+TransformixImageFilter::Self& 
+TransformixImageFilter
 ::SetLogToFile( bool logToFile )
 {
   this->m_Pimple->SetLogToFile( logToFile );
@@ -220,30 +220,30 @@ SimpleTransformix
 }
 
 bool
-SimpleTransformix
+TransformixImageFilter
 ::GetLogToFile( void )
 {
   return this->m_Pimple->GetLogToFile();
 }
 
-SimpleTransformix::Self& 
-SimpleTransformix
+TransformixImageFilter::Self& 
+TransformixImageFilter
 ::LogToFileOn()
 {
   this->m_Pimple->SetLogToFile( true );
   return *this;
 }
 
-SimpleTransformix::Self& 
-SimpleTransformix
+TransformixImageFilter::Self& 
+TransformixImageFilter
 ::LogToFileOff()
 {
   this->m_Pimple->SetLogToFile( false );
   return *this;
 }
 
-SimpleTransformix::Self& 
-SimpleTransformix
+TransformixImageFilter::Self& 
+TransformixImageFilter
 ::SetLogToConsole( bool logToConsole )
 {
   this->m_Pimple->SetLogToConsole( logToConsole );
@@ -251,177 +251,177 @@ SimpleTransformix
 }
 
 bool
-SimpleTransformix
+TransformixImageFilter
 ::GetLogToConsole( void )
 {
   return this->m_Pimple->GetLogToConsole();
 }
 
-SimpleTransformix::Self& 
-SimpleTransformix
+TransformixImageFilter::Self& 
+TransformixImageFilter
 ::LogToConsoleOn()
 {
   this->m_Pimple->SetLogToConsole( true );
   return *this;
 }
 
-SimpleTransformix::Self& 
-SimpleTransformix
+TransformixImageFilter::Self& 
+TransformixImageFilter
 ::LogToConsoleOff()
 {
   this->m_Pimple->SetLogToConsole( false );
   return *this;
 }
 
-SimpleTransformix::Self&
-SimpleTransformix
+TransformixImageFilter::Self&
+TransformixImageFilter
 ::SetTransformParameterMap( const ParameterMapVectorType transformParameterMapVector )
 {
   this->m_Pimple->SetTransformParameterMap( transformParameterMapVector );
   return *this;
 }
 
-SimpleTransformix::Self&
-SimpleTransformix
+TransformixImageFilter::Self&
+TransformixImageFilter
 ::SetTransformParameterMap( const ParameterMapType transformParameterMap )
 {
   this->m_Pimple->SetTransformParameterMap( transformParameterMap );
   return *this;
 }
 
-SimpleTransformix::Self&
-SimpleTransformix
+TransformixImageFilter::Self&
+TransformixImageFilter
 ::AddTransformParameterMap( const ParameterMapType transformParameterMap )
 {
   this->m_Pimple->AddTransformParameterMap( transformParameterMap );
   return *this;
 }
 
-SimpleTransformix::ParameterMapVectorType
-SimpleTransformix
+TransformixImageFilter::ParameterMapVectorType
+TransformixImageFilter
 ::GetTransformParameterMap( void )
 {
   return this->m_Pimple->GetTransformParameterMap();
 }
 
 unsigned int
-SimpleTransformix
+TransformixImageFilter
 ::GetNumberOfTransformParameterMaps( void )
 {
   return this->m_Pimple->GetNumberOfTransformParameterMaps();
 }
 
-SimpleTransformix::Self&
-SimpleTransformix
+TransformixImageFilter::Self&
+TransformixImageFilter
 ::SetTransformParameter( const ParameterKeyType key, const ParameterValueType value )
 {
   this->m_Pimple->SetTransformParameter( key, value );
   return *this;
 }
 
-SimpleTransformix::Self&
-SimpleTransformix
+TransformixImageFilter::Self&
+TransformixImageFilter
 ::SetTransformParameter( const ParameterKeyType key, const ParameterValueVectorType value )
 {
   this->m_Pimple->SetTransformParameter( key, value );
   return *this;
 }
 
-SimpleTransformix::Self&
-SimpleTransformix
+TransformixImageFilter::Self&
+TransformixImageFilter
 ::SetTransformParameter( const unsigned int index, const ParameterKeyType key, const ParameterValueType value )
 {
   this->m_Pimple->SetTransformParameter( index, key, value );
   return *this;
 }
 
-SimpleTransformix::Self&
-SimpleTransformix
+TransformixImageFilter::Self&
+TransformixImageFilter
 ::SetTransformParameter( const unsigned int index, const ParameterKeyType key, const ParameterValueVectorType value )
 {
   this->m_Pimple->SetTransformParameter( index, key, value );
   return *this;
 }
 
-SimpleTransformix::Self&
-SimpleTransformix
+TransformixImageFilter::Self&
+TransformixImageFilter
 ::AddTransformParameter( const ParameterKeyType key, const ParameterValueType value )
 {
   this->m_Pimple->AddTransformParameter( key, value );
   return *this;
 }
 
-SimpleTransformix::Self&
-SimpleTransformix
+TransformixImageFilter::Self&
+TransformixImageFilter
 ::AddTransformParameter( const unsigned int index, const ParameterKeyType key, const ParameterValueType value )
 {
   this->m_Pimple->AddTransformParameter( index, key, value );
   return *this;
 }
 
-SimpleTransformix::ParameterValueVectorType
-SimpleTransformix
+TransformixImageFilter::ParameterValueVectorType
+TransformixImageFilter
 ::GetTransformParameter( const ParameterKeyType key )
 {
   return this->m_Pimple->GetTransformParameter( key );
 }
 
-SimpleTransformix::ParameterValueVectorType
-SimpleTransformix
+TransformixImageFilter::ParameterValueVectorType
+TransformixImageFilter
 ::GetTransformParameter( const unsigned int index, const ParameterKeyType key )
 {
   return this->m_Pimple->GetTransformParameter( index, key );
 }
 
-SimpleTransformix::Self&
-SimpleTransformix
+TransformixImageFilter::Self&
+TransformixImageFilter
 ::RemoveTransformParameter( const ParameterKeyType key )
 {
   this->m_Pimple->RemoveTransformParameter( key );
   return *this;
 }
 
-SimpleTransformix::Self&
-SimpleTransformix
+TransformixImageFilter::Self&
+TransformixImageFilter
 ::RemoveTransformParameter( const unsigned int index, const ParameterKeyType key )
 {
   this->m_Pimple->RemoveTransformParameter( index, key );
   return *this;
 }
 
-SimpleTransformix::ParameterMapType 
-SimpleTransformix
+TransformixImageFilter::ParameterMapType 
+TransformixImageFilter
 ::ReadParameterFile( const std::string parameterFileName )
 {
   return this->m_Pimple->ReadParameterFile( parameterFileName );
 }
 
-SimpleTransformix::Self&
-SimpleTransformix
+TransformixImageFilter::Self&
+TransformixImageFilter
 ::WriteParameterFile( const ParameterMapType parameterMap, const std::string parameterFileName )
 {
   this->m_Pimple->WriteParameterFile( parameterMap, parameterFileName );
   return *this;
 }
 
-SimpleTransformix::Self&
-SimpleTransformix
+TransformixImageFilter::Self&
+TransformixImageFilter
 ::PrintParameterMap( void )
 {
   this->m_Pimple->PrintParameterMap();
   return *this;
 }
 
-SimpleTransformix::Self& 
-SimpleTransformix
+TransformixImageFilter::Self& 
+TransformixImageFilter
 ::PrintParameterMap( const ParameterMapType parameterMap )
 {
   this->m_Pimple->PrintParameterMap( parameterMap );
   return *this;
 }
 
-SimpleTransformix::Self& 
-SimpleTransformix
+TransformixImageFilter::Self& 
+TransformixImageFilter
 ::PrintParameterMap( const ParameterMapVectorType parameterMapVector )
 {
   this->m_Pimple->PrintParameterMap( parameterMapVector );
@@ -429,14 +429,14 @@ SimpleTransformix
 }
 
 Image
-SimpleTransformix
+TransformixImageFilter
 ::Execute( void )
 {
   return this->m_Pimple->Execute();
 }
 
 Image
-SimpleTransformix
+TransformixImageFilter
 ::GetResultImage( void )
 {
   return this->m_Pimple->GetResultImage();
@@ -447,17 +447,17 @@ SimpleTransformix
  */
 
 Image
-Transformix( const Image& movingImage, const SimpleTransformix::ParameterMapType parameterMap, const bool logToConsole, const std::string outputDirectory )
+Transformix( const Image& movingImage, const TransformixImageFilter::ParameterMapType parameterMap, const bool logToConsole, const std::string outputDirectory )
 {
-  SimpleTransformix::ParameterMapVectorType parameterMapVector;
+  TransformixImageFilter::ParameterMapVectorType parameterMapVector;
   parameterMapVector.push_back( parameterMap );
   return Transformix( movingImage, parameterMapVector, logToConsole, outputDirectory );
 }
 
 Image
-Transformix( const Image& movingImage, const SimpleTransformix::ParameterMapVectorType parameterMapVector, const bool logToConsole, const std::string outputDirectory )
+Transformix( const Image& movingImage, const TransformixImageFilter::ParameterMapVectorType parameterMapVector, const bool logToConsole, const std::string outputDirectory )
 {
-  SimpleTransformix stfx;
+  TransformixImageFilter stfx;
   stfx.SetMovingImage( movingImage );
   stfx.SetTransformParameterMap( parameterMapVector );
   stfx.SetOutputDirectory( outputDirectory );
@@ -470,4 +470,4 @@ Transformix( const Image& movingImage, const SimpleTransformix::ParameterMapVect
 } // end namespace simple
 } // end namespace itk
 
-#endif // __sitksimpletransformix_cxx_
+#endif // __sitktransformiximagefilter_cxx_

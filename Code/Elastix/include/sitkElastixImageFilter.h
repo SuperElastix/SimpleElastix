@@ -1,5 +1,5 @@
-#ifndef __sitksimpleelastix_h_
-#define __sitksimpleelastix_h_
+#ifndef __sitkelastiximagefilter_h_
+#define __sitkelastiximagefilter_h_
 
 #include "sitkCommon.h"
 #include "sitkImage.h"
@@ -7,14 +7,14 @@
 namespace itk { 
   namespace simple {
 
-class SITKCommon_EXPORT SimpleElastix
+class SITKCommon_EXPORT ElastixImageFilter
 {
   public:
 
-    SimpleElastix( void );
-    ~SimpleElastix( void );
+    ElastixImageFilter( void );
+    ~ElastixImageFilter( void );
 
-    typedef SimpleElastix Self;                                
+    typedef ElastixImageFilter Self;                                
 
     typedef std::vector< Image >                                    VectorOfImage;
 
@@ -135,8 +135,8 @@ class SITKCommon_EXPORT SimpleElastix
 
   private:
 
-    struct SimpleElastixImpl;
-    SimpleElastixImpl* m_Pimple;
+    struct ElastixImageFilterImpl;
+    ElastixImageFilterImpl* m_Pimple;
     
 };
 
@@ -158,4 +158,4 @@ SITKCommon_EXPORT Image Elastix( const Image& fixedImage, const Image& movingIma
 } // end namespace simple
 } // end namespace itk
 
-#endif // __sitksimpleelastix_h_
+#endif // __sitkelastiximagefilter_h_

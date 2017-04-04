@@ -205,8 +205,8 @@ namespace std
 // SimpleElastix
 %template( ParameterMap ) std::map< std::string, std::vector< std::string > >;
 %template( VectorOfParameterMap ) std::vector< std::map< std::string, std::vector< std::string > > >;
-%include "sitkSimpleElastix.h"
-%include "sitkSimpleTransformix.h"
+%include "sitkElastixImageFilter.h"
+%include "sitkTransformixImageFilter.h"
 
 // Registration
 %include "sitkImageRegistrationMethod.h"

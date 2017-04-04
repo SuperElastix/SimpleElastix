@@ -1,8 +1,8 @@
-#ifndef __sitksimpletransformiximpl_h_
-#define __sitksimpletransformiximpl_h_
+#ifndef __sitktransformiximagefilterimpl_h_
+#define __sitktransformiximagefilterimpl_h_
 
 // SimpleITK
-#include "sitkSimpleTransformix.h"
+#include "sitkTransformixImageFilter.h"
 #include "sitkMemberFunctionFactory.h"
 
 // Transformix
@@ -12,13 +12,13 @@
 namespace itk { 
   namespace simple {
 
-struct SimpleTransformix::SimpleTransformixImpl
+struct TransformixImageFilter::TransformixImageFilterImpl
 {
 
-  SimpleTransformixImpl( void );
-  ~SimpleTransformixImpl( void );
+  TransformixImageFilterImpl( void );
+  ~TransformixImageFilterImpl( void );
 
-  typedef SimpleTransformixImpl Self;
+  typedef TransformixImageFilterImpl Self;
 
   typedef elastix::ParameterObject                       ParameterObjectType;
   typedef ParameterObjectType::Pointer                   ParameterObjectPointer;
@@ -131,4 +131,4 @@ struct SimpleTransformix::SimpleTransformixImpl
 } // end namespace simple
 } // end namespace itk
 
-#endif // __sitksimpletransformiximpl_h_
+#endif // __sitktransformiximagefilterimpl_h_

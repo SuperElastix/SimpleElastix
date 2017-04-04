@@ -1,5 +1,5 @@
-#ifndef __sitksimpletransformix_h_
-#define __sitksimpletransformix_h_
+#ifndef __sitktransformiximagefilter_h_
+#define __sitktransformiximagefilter_h_
 
 #include "sitkCommon.h"
 #include "sitkImage.h"
@@ -7,14 +7,14 @@
 namespace itk { 
   namespace simple {
 
-class SITKCommon_EXPORT SimpleTransformix
+class SITKCommon_EXPORT TransformixImageFilter
 {
   public:
 
-    SimpleTransformix( void );
-    ~SimpleTransformix( void );
+    TransformixImageFilter( void );
+    ~TransformixImageFilter( void );
 
-    typedef SimpleTransformix Self;                                
+    typedef TransformixImageFilter Self;                                
 
     typedef std::string                                             ParameterKeyType;
     typedef std::string                                             ParameterValueType;
@@ -98,8 +98,8 @@ class SITKCommon_EXPORT SimpleTransformix
 
   private:
 
-    struct SimpleTransformixImpl;
-    SimpleTransformixImpl* m_Pimple;
+    struct TransformixImageFilterImpl;
+    TransformixImageFilterImpl* m_Pimple;
     
 };
 
@@ -110,4 +110,4 @@ SITKCommon_EXPORT Image Transformix( const Image& movingImage, const std::vector
 } // end namespace simple
 } // end namespace itk
 
-#endif // __sitksimpletransformix_h_
+#endif // __sitktransformiximagefilter_h_
