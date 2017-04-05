@@ -12,9 +12,9 @@ compiler:
   - gcc
 
 before_script:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get remove cmake && sudo apt-get install swig lua5.1 libinsighttoolkit4-dev doxygen graphviz
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cd ${ExternalData_OBJECT_STORES} && if [[ ! -e ${CMAKE_DOWNLOAD_FILE} ]]; then curl -sSO https://cmake.org/files/v3.6/${CMAKE_DOWNLOAD_FILE}; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; echo "y\n" | sudo bash "${ExternalData_OBJECT_STORES}/${CMAKE_DOWNLOAD_FILE}" --prefix=/usr/local --exclude-subdir
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get remove cmake && sudo apt-get install swig lua5.1 libinsighttoolkit4-dev; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cd ${ExternalData_OBJECT_STORES} && if [[ ! -e ${CMAKE_DOWNLOAD_FILE} ]]; then curl -sSO https://cmake.org/files/v3.6/${CMAKE_DOWNLOAD_FILE}; fi; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; echo "y\n" | sudo bash "${ExternalData_OBJECT_STORES}/${CMAKE_DOWNLOAD_FILE}" --prefix=/usr/local --exclude-subdir; fi
   - cmake --version
   # OMP detects threads of VM host machine, be nice to Travis CI
   - export OMP_NUM_THREADS=2
