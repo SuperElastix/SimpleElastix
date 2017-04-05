@@ -1,17 +1,22 @@
-sudo: required
-dist: trusty
-
 language: cpp
 
-os:
-  - linux
-  - osx
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+      sudo: required
+    - os: osx
 
 compiler:
   - clang
   - gcc
 
 before_script:
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get remove cmake && sudo apt-get install swig lua5.1 libinsighttoolkit4-dev doxygen graphviz
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cd ${ExternalData_OBJECT_STORES} && if [[ ! -e ${CMAKE_DOWNLOAD_FILE} ]]; then curl -sSO https://cmake.org/files/v3.6/${CMAKE_DOWNLOAD_FILE}; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; echo "y\n" | sudo bash "${ExternalData_OBJECT_STORES}/${CMAKE_DOWNLOAD_FILE}" --prefix=/usr/local --exclude-subdir
+  - cmake --version
+  # OMP detects threads of VM host machine, be nice to Travis CI
   - export OMP_NUM_THREADS=2
   - echo $OMP_NUM_THREADS
   # Out-of-source build
@@ -20,5 +25,5 @@ before_script:
   - cd SimpleElastix-build
 
 script:
-  - cmake -DWRAP_LUA:BOOL=OFF -DWRAP_PYTHON:BOOL=OFF -DWRAP_JAVA:BOOL=OFF -DWRAP_CSHARP:BOOL=OFF -DWRAP_TCL:BOOL=OFF -DWRAP_R:BOOL=OFF -DWRAP_RUBY:BOOL=OFF -DBUILD_EXAMPLES:BOOL=OFF -DBUILD_TESTING:BOOL=OFF -DCMAKE_BUILD_TYPE=Release ../SimpleElastix/SuperBuild
+  - cmake ../SimpleElastix/SuperBuild -DBUILD_TESTING=OFF # Not enough time
   - make --jobs=2
