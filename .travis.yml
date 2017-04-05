@@ -4,6 +4,10 @@ env:
   global:
     ExternalData_OBJECT_STORES=${HOME}/.ExternalData
     CMAKE_DOWNLOAD_FILE=cmake-3.6.0-Linux-x86_64.sh
+
+cache:
+  directories:
+    - ${ExternalData_OBJECT_STORES}
     
 matrix:
   include:
