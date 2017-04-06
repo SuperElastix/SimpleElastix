@@ -1,8 +1,6 @@
 set( proj elastix )
 
-get_cmake_property( _varNames VARIABLES )#
-
-if( ${ITK_WRAPPING} OR ${BUILD_SHARED_LIBS} )
+if( ${BUILD_SHARED_LIBS} )
   set( ELASTIX_BUILD_SHARED_LIBS ON )
 else()
   set( ELASTIX_BUILD_SHARED_LIBS OFF )
@@ -12,13 +10,6 @@ file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/${proj}-build/CMakeCacheInit.txt" "${ep
 
 set( ELASTIX_GIT_REPOSITORY ${git_protocol}://github.com/mstaring/elastix )
 set( ELASTIX_GIT_TAG 617b0729fb6200fce279f7e6388967c6315ddc90 )
-
-if( ${ITK_WRAPPING} OR ${BUILD_SHARED_LIBS} )
-  set( ELASTIX_BUILD_SHARED_LIBS ON )
-else()
-  set( ELASTIX_BUILD_SHARED_LIBS OFF )
-  list( APPEND ep_itk_args"-DCMAKE_C_VISIBILITY_PRESET:BOOL=hidden" "-DCMAKE_CXX_VISIBILITY_PRESET:BOOL=hidden" )
-endif()
 
 ExternalProject_Add( ${proj} 
   GIT_REPOSITORY ${ELASTIX_GIT_REPOSITORY}
