@@ -20,17 +20,17 @@ The following code runs multi-resolution affine initialization and starts a non-
 
 	import SimpleITK as sitk
 
-	SimpleElastix = sitk.SimpleElastix()
-	SimpleElastix.SetFixedImage(sitk.ReadImage("fixedImage.nii"))
-	SimpleElastix.SetMovingImage(sitk.ReadImage("movingImage.nii"))
+	elastixImageFilter = sitk.ElastixImageFilter()
+	elastixImageFilter.SetFixedImage(sitk.ReadImage("fixedImage.nii"))
+	elastixImageFilter.SetMovingImage(sitk.ReadImage("movingImage.nii"))
 
 	parameterMapVector = sitk.VectorOfParameterMap()
 	parameterMapVector.append(sitk.GetDefaultParameterMap("affine"))
 	parameterMapVector.append(sitk.GetDefaultParameterMap("bspline"))
-	SimpleElastix.SetParameterMap(parameterMapVector)
+	elastixImageFilter.SetParameterMap(parameterMapVector)
 
-	SimpleElastix.Execute()
-	sitk.WriteImage(SimpleElastix.GetResultImage())
+	elastixImageFilter.Execute()
+	sitk.WriteImage(elastixImageFilter.GetResultImage())
 
 The result image is seen below.
 

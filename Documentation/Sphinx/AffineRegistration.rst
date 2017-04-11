@@ -1,7 +1,7 @@
 Affine Registration
 ===================
 
-The affine transform allows for shearing and scaling in addition to the rotation and translation we saw in the previous section. This is usually a good choice of transform for initialization of non-rigid transforms like the B-Spline transform. The affine transform is selected using :code:`sitk.GetDefaultParameterMap("affine")`.
+The affine transform allows for shearing and scaling in addition to the rotation and translation. This is usually a good choice of transform for initialization of non-rigid transforms like the B-Spline transform. The affine transform is selected using :code:`sitk.GetDefaultParameterMap("affine")`.
 
 Consider the images in Figure 10.
 
@@ -24,12 +24,12 @@ The image on the right has been sheared, scaled 1.2x, rotated 10 degrees and tra
 
     import SimpleITK as sitk
 
-    SimpleElastix = sitk.SimpleElastix()
-    SimpleElastix.SetFixedImage(sitk.ReadImage("fixedImage.nii")
-    SimpleElastix.SetMovingImage(sitk.ReadImage(movingImage.nii")
-    SimpleElastix.SetParameterMap(sitk.GetDefaultParameterMap("affine"))
-    SimpleElastix.Execute()
-    sitk.WriteImage(SimpleElastix.GetResultImage())
+    elastixImageFilter = sitk.ElastixImageFilter()
+    elastixImageFilter.SetFixedImage(sitk.ReadImage("fixedImage.nii")
+    elastixImageFilter.SetMovingImage(sitk.ReadImage(movingImage.nii")
+    elastixImageFilter.SetParameterMap(sitk.GetDefaultParameterMap("affine"))
+    elastixImageFilter.Execute()
+    sitk.WriteImage(elastixImageFilter.GetResultImage())
 
 It is clear from the result mean image on right in Fig. 11 that registration was successful.
 
@@ -55,6 +55,6 @@ Notice that the only difference from the previous example is the requested param
     parameterMap = sitk.GetDefaultParameterMap("rigid")
     parameterMap["Transform"] = ["AffineTransform"]
 
-You can inspect the default parameter maps in the `elastix repository <https://github.com/kaspermarstal/elastix/blob/master/src/Core/Main/elxParameterObject.cxx#L256-L362>`_ to convince yourself. 
+You can inspect the default parameter maps in the `elastix repository <https://github.com/mstaring/elastix/blob/617b0729fb6200fce279f7e6388967c6315ddc90/src/Core/Main/elxParameterObject.cxx#L260-L362`_ to convince yourself.
 
 This demonstrates how easy it is to try out different registration components with SimpleElastix. In the next example we will introduce non-rigid registration and initialize the moving image with an affine transform.

@@ -33,7 +33,7 @@ We identify that the objects are related by a simple spatial shift and that a tr
                              "translation")
 
 
-That's it! We have effectively registered two images using a rsingle line of code. Compare this to the `ITK Hello World example <https://github.com/InsightSoftwareConsortium/ITK/blob/master/Examples/RegistrationITKv4/DeformableRegistration1.cxx>`_. We refer to this short-hand notation as the procedural interface (some people also refer to it as the functional interface) because it consists of functions that accomplish a specific task. The procedural interface is less flexible than the object-oriented interface introduced below, but it is very simple to use. Let's break down what goes on under the hood of this single function call.
+That's it! We have effectively registered two images using a single line of code. Compare this to the `ITK Hello World example <https://github.com/InsightSoftwareConsortium/ITK/blob/master/Examples/RegistrationITKv4/DeformableRegistration1.cxx>`_. We refer to this short-hand notation as the procedural interface (some people also refer to it as the functional interface) because it consists of functions that accomplish a specific task. The procedural interface is less flexible than the object-oriented interface introduced below, but it is very simple to use. Let's break down what goes on under the hood of this single function call.
 
 First of all, :code:`import SimpleITK as sitk` loads the SimpleITK module from which SimpleElastix is accessed. This assumes that SimpleElastix has been compiled and installed on your machine.
 
@@ -67,30 +67,30 @@ The example above used procedural interface. While the procedural interface may 
     movingImage = sitk.ReadImage('movingImage.nii')
     parameterMap = sitk.GetDefaultParameterMap('translation')
 
-    SimpleElastix = sitk.SimpleElastix()
-    SimpleElastix.SetFixedImage(fixedImage)
-    SimpleElastix.SetMovingImage(movingImage)
-    SimpleElastix.SetParameterMap(parameterMap)
-    SimpleElastix.Execute()
+    elastixImageFilter = sitk.ElastixImageFilter()
+    elastixImageFilter.SetFixedImage(fixedImage)
+    elastixImageFilter.SetMovingImage(movingImage)
+    elastixImageFilter.SetParameterMap(parameterMap)
+    elastixImageFilter.Execute()
 
-    resultImage = SimpleElastix.GetResultImage()
-    transformParameterMap = SimpleElastix.GetTransformParameterMap()
+    resultImage = elastixImageFilter.GetResultImage()
+    transformParameterMap = elastixImageFilter.GetTransformParameterMap()
 
 This is more verbose but also a lot more powerful. We can now warp an entire population of images (e.g. binary label images for segmentation of different brain regions) using the same parameter map and a single instance of transformix:
 
 ::
     
-    SimpleTransformix = sitk.SimpleTransformix()
-    SimpleTransformix.SetTransformParameterMap(transformParameterMap)
+    transformixImageFilter = sitk.TransformixImageFilter()
+    transformixImageFilter.SetTransformParameterMap(transformParameterMap)
 
     population = ['image1.hdr', 'image2.hdr', ... , 'imageN.hdr']
 
     for filename in population:
-        SimpleTransformix.SetMovingImage(sitk.ReadImage(filename))
-        SimpleTransformix.Execute()
-        sitk.WriteImage(SimpleTransformix.GetResultImage(), "result_"+filename)
+        transformixImageFilter.SetMovingImage(sitk.ReadImage(filename))
+        transformixImageFilter.Execute()
+        sitk.WriteImage(transformixImageFilter.GetResultImage(), "result_"+filename)
 
-The object-oriented interface facilitates reuse of components and dramatically simplifies book-keeping and boilerplate code. We will use the object-oriented interface from this point forward.
+The object-oriented interface facilitates reuse of components and dramatically simplifies book-keeping and boilerplate code. We will use the object-oriented interface in the documentation from this point forward.
 
 In the next section, we will take a closer look at the parameter map interface that configures the registration components.
 

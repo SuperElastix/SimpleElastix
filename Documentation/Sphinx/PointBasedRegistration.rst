@@ -16,20 +16,20 @@ To use :code:`CorrespondingPointsEuclideanDistanceMetric` we append it to the li
 
 	The :code:`CorrespondingPointsEuclideanDistanceMetric` metric must be specified as the last metric due to technical constraints in elastix.
 
-The metric can also be added to all metrics in the SimpleElastix object with a single call.
+The metric can also be added to all metrics in the ElastixImageFilter object with a single call.
 
 ::
 
     import SimpleITK as sitk
 
-    SimpleElastix = sitk.SimpleElastix()
-    SimpleElastix.AddParameter( "Metric", "CorrespondingPointsEuclideanDistanceMetric" )
+    elastixImageFilter = sitk.ElastixImageFilter()
+    elastixImageFilter.AddParameter( "Metric", "CorrespondingPointsEuclideanDistanceMetric" )
 
 Or to a single parameter map (here we assume that SimpleElastix contains at least two parameter maps)
 
 ::
 
-    SimpleElastix.AddParameter( 1, "Metric", "CorrespondingPointsEuclideanDistanceMetric" )
+    elastixImageFilter.AddParameter( 1, "Metric", "CorrespondingPointsEuclideanDistanceMetric" )
 
 
 The point set are specified as text files. They can either be in `VTK pointdata legacy format <http://dunne.uni-hd.de/VisuSimple/documents/vtkfileformat.html#pointdata>`_ or elastix' own format that usually has the :code:`pts` extension.
@@ -61,21 +61,22 @@ We can apply a transformation computed with SimpleElastix to a point set with Si
     import SimpleITK as sitk
 
     # Compute the transformation from moving image to the fixed image
-    SimpleElastix = sitk.SimpleElastix()
-    SimpleElastix.SetFixedImage(sitk.ReadImage("fixedImage.nii")
-    SimpleElastix.SetMovingImage(sitk.ReadImage("movingImage.nii")
-    SimpleElastix.Execute()
+    elastixImageFilter = sitk.ElastixImageFilter()
+    elastixImageFilter.SetFixedImage(sitk.ReadImage("fixedImage.nii")
+    elastixImageFilter.SetMovingImage(sitk.ReadImage("movingImage.nii")
+    elastixImageFilter.Execute()
 
     # Warp point set. The transformed points will be written to a file named 
     # outputpoints.txt in the output directory determined by SetOutputDirectory()
     # (defaults to working directory)
-    SimpleTransformix = sitk.SimpleTransformix()
-    SimpleTransformix.SetFixedPointSet("fixedPointSet.pts")
-    SimpleTransformix.Execute()
+    transformixImageFilter = sitk.TransformixImageFilter()
+    transformixImageFilter.SetTransformParameterMap(elastixImageFilter.GetTransformParameterMap())
+    transformixImageFilter.SetFixedPointSet("fixedPointSet.pts")
+    transformixImageFilter.Execute()
 
 .. warning::
 	
-	The input points are specified in the fixed image domain (!) and warped from the fixed image to moving image since the transformation direction is from fixed to moving image. If we want to warp points from the moving image to fixed image, we need the inverse transform. This can be computed manually (see section 6.1.6 in the `elastix manual <http://elastix.isi.uu.nl/download/elastix_manual_v4.8.pdf>`_) or via :code:`SimpleElastix.ExecuteInverse()`.
+	The input points are specified in the fixed image domain (!) and warped from the fixed image to moving image since the transformation direction is from fixed to moving image. If we want to warp points from the moving image to fixed image, we need the inverse transform. This can be computed manually (see section 6.1.6 in the `elastix manual <http://elastix.isi.uu.nl/download/elastix_manual_v4.8.pdf>`_) or via :code:`elastixImageFilter.ExecuteInverse()`.
 
 
     

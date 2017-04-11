@@ -34,7 +34,7 @@ SimpleElastix can read these types of files as well but further introduces nativ
       p['Transform'] = ['TranslationTransform']
       ...
 
-and so on. Elastix has default settings for most parameters, but still, there are quite a lot of parameters to be set. While we can specify a parameter map scratch as above, we can also load one of the default parameter maps and tweak its settings to get started more quickly, as shown in the following section.
+and so on. ElastixImageFilter has default settings that allows us to get started right away.
 
 The Default Parameter Maps
 --------------------------
@@ -46,26 +46,26 @@ In the Hello World example we obtained a registered image by running
                              sitk.ReadImage('movingImage.nii'), \
                              'translation')
 
-Internally, SimpleElastix passes images along with a parameter map to elastix and invokes registration. The parameter map is returned by an internal call to :code:`sitk.GetDefaultParameterFile('translation')`. This function provides parameter maps for rigid, affine, non-rigid and groupwise registration methods (in order of increasing complexity). 
+Internally, ElastixImageFilter uses a pre-configured parameter map to register images. The parameter map is obtained by an internal call to :code:`sitk.GetDefaultParameterFile('translation')`. This function provides parameter maps for rigid, affine, non-rigid and groupwise registration methods (in order of increasing complexity). 
 
 .. tip::
   
-  SimpleElastix will register our images with a :code:`translation -> affine -> b-spline` multi-resolution approach by default. We simply leave out the call to :code:`SetParameterMap` to achieve this functionality. 
+  ElastixImageFilter will register our images with a :code:`translation -> affine -> b-spline` multi-resolution approach by default. We simply leave out the call to :code:`SetParameterMap` to achieve this functionality. 
 
   ::
   
     import SimpleITK as sitk
 
     # Functional interface
-    resultImage = sitk.Elastix(sitk.ReadImage('fixedImage.nii'), sitk.ReadImage('movingImage.nii')
+    resultImage = sitk.Elastix(sitk.ReadImage('fixedImage.nii'), sitk.ReadImage('movingImage.nii'))
 
     # Object oritented interface
-    SimpleElastix = sitk.SimpleElastix()
-    SimpleElastix.SetFixedImage(sitk.ReadImage('fixedImage.nii'))
-    SimpleElastix.SetMovingImage(sitk.ReadImage('movingImage.nii'))
-    resultImage = SimpleElastix.Execute()
+    elastixImageFilter = sitk.ElastixImageFilter()
+    elastixImageFilter.SetFixedImage(sitk.ReadImage('fixedImage.nii'))
+    elastixImageFilter.SetMovingImage(sitk.ReadImage('movingImage.nii'))
+    resultImage = elastixImageFilter.Execute()
 
-We can also retrieve this parameter map ourselves and reconfigure it before passing it back to SimpleElastix, allowing us to quickly optimize a registration method to a particular problem:
+We can also retrieve the parameter map ourselves and reconfigure it before passing it back to ElastixImageFilter, allowing us to quickly optimize a registration method for a particular problem:
 
 ::
 
@@ -90,8 +90,8 @@ We can also retrieve this parameter map ourselves and reconfigure it before pass
   ::
 
     import SimpleITK as sitk
-    SimpleElastix = sitk.SimpleElastix()
-    SimpleElastix.PrintParameterMap()
+    elastixImageFilter = sitk.ElastixImageFilter()
+    elastixImageFilter.PrintParameterMap()
 
 We will study other parameter maps more closely in later examples. For now, we simply print the translation parameter map to console and examine its contents.
 
@@ -123,7 +123,7 @@ We will study other parameter maps more closely in later examples. For now, we s
       (Transform "TranslationTransform")
       (WriteResultImage "true")
 
-The first thing to note is that the parameter map is enumerated. SimpleElastix can take a vector of parameter maps and apply the corresponding registrations sequentially. The resulting transform is called a composite transform since the final transformation is a composition of sequentially applied deformation fields. For example, a non-rigid registration is often initialized with an affine transformation (translation, scale, rotation, shearing) to bring the objects into rough alignment. This makes the registration less suscetible to local minima. We can also ask SimpleElastix to add the individual deformation fields and apply them in one go (but make sure you know what you are doing before opting for this apprach). 
+The first thing to note is that the parameter map is enumerated. ElastixImageFilter can take a vector of parameter maps and apply the corresponding registrations sequentially. The resulting transform is called a composite transform since the final transformation is a composition of sequentially applied deformation fields. For example, a non-rigid registration is often initialized with an affine transformation (translation, scale, rotation, shearing) to bring the objects into rough alignment. This makes the registration less suscetible to local minima. We can also ask SimpleElastix to add the individual deformation fields and apply them in one go (but make sure you know what you are doing before opting for this apprach). 
 
 .. tip::
 
@@ -132,11 +132,11 @@ The first thing to note is that the parameter map is enumerated. SimpleElastix c
   ::
 
     import SimpleITK as sitk
-    SimpleElastix = sitk.SimpleElastix()
-    SimpleElastix.SetParameterMap(sitk.GetDefaultParameterMap('translation'))
-    SimpleElastix.AddParameterMap(sitk.GetDefaultParameterMap('affine'))
+    elastixImageFilter = sitk.ElastixImageFilter()
+    elastixImageFilter.SetParameterMap(sitk.GetDefaultParameterMap('translation'))
+    elastixImageFilter.AddParameterMap(sitk.GetDefaultParameterMap('affine'))
 
-  Note that the first call is a :code:`Set` method. This deletes any prevously set parameter maps. We add our own custom parameter maps in the same way.
+  Note that the first call is a :code:`Set` method. This deletes any prevously set parameter maps. Subsequent calls to :code:`AddParameterMap` appends parameter maps to the internal list of parameter maps
 
 Let's examine the parameters above in detail.
 

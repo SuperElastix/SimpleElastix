@@ -1,7 +1,11 @@
 Rigid Registration
 ==================
 
-A rigid transform can register objects that are related by rotation and translation. For example, if you are registering images of a patient's bones, you can often assume that a rigid transform is sufficient to align these structures. In fact, it is often advantageus to chose a simple transform for problems that allows it, as this constrains the solution space and ensures no spurious non-rigid local minima affects your results. Think of it as a way of embedding expert knowledge in the registration procedure. Rigid registration is one of the simplest of methods in the catagory of linear transformation models and is often used as initialization for affine- and non-rigid transforms. 
+A rigid transform can register objects that are related by rotation and translation. For example, if you are registering images of a patient's bones, you can often assume that a rigid transform is sufficient to align these structures. In fact, it is often advantageus to chose a simple transform if problems that allows it, as this constrains the solution space and ensures no spurious non-rigid local minima affect your results. Think of it as a way of embedding expert knowledge in the registration procedure. 
+
+.. tip::
+
+    Rigid registration is one of the simplest of methods in the catagory of linear transformation models and is often used as initialization for affine- and non-rigid transforms. 
 
 The rigid transform is selected using :code:`(Transform "EulerTransform")`. Consider the images in Figure 8. 
 
@@ -24,12 +28,12 @@ The image on right has been rotated 10 degrees and translated 13 pixels in the x
 
     import SimpleITK as sitk
 
-    SimpleElastix = sitk.SimpleElastix()
-    SimpleElastix.SetFixedImage(sitk.SetFixedImage("fixedImage.nii"))
-    SimpleElastix.SetMovingImage(sitk.SetFixedImage("movingImage.nii"))
-    SimpleElastix.SetParameterMap(sitk.GetDefaultParameterMap("rigid"))
-    SimpleElastix.Execute()
-    sitk.WriteImage(SimpleElastix.GetResultImage())
+    elastixImageFilter = sitk.ElastixImageFilter()
+    elastixImageFilter.SetFixedImage(sitk.SetFixedImage("fixedImage.nii"))
+    elastixImageFilter.SetMovingImage(sitk.SetFixedImage("movingImage.nii"))
+    elastixImageFilter.SetParameterMap(sitk.GetDefaultParameterMap("rigid"))
+    elastixImageFilter.Execute()
+    sitk.WriteImage(elastixImageFilter.GetResultImage())
 
 It is clear from the result mean image on right in Fig. 9 that registration was successful.
 
