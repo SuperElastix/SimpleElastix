@@ -13,6 +13,12 @@ endforeach()
 if(NOT CMAKE_PROJECT_NAME STREQUAL "SimpleITK")
   find_package(SimpleITK REQUIRED)
 
+  find_package(OpenMP QUIET)
+  if( OPENMP_FOUND )
+    set(SimpleITK_REQUIRED_C_FLAGS "${SimpleITK_REQUIRED_C_FLAGS} ${OpenMP_C_FLAGS}")
+    set(SimpleITK_REQUIRED_CXX_FLAGS "${SimpleITK_REQUIRED_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+  endif()
+
   if(NOT EXISTS ${ELASTIX_USE_FILE})
     set( ELASTIX_USE_FILE "" CACHE PATH "Path to UseElastix.cmake" )
     message(FATAL_ERROR "Could not find UseElastix.cmake. The CMake variable ELASTIX_USE_FILE must point to UseElastix.cmake when using SimpleElastix as an external project.")
