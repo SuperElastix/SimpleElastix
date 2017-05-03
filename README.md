@@ -54,17 +54,7 @@ for filename in population
 This example demonstrates the efficiency of combining SimpleElastix's object oriented interface (the way we used elastix to register images) and procedural interface (the way we used transformix to warp labels) with SimpleITK (the way we computed statistics). Previously, using elastix and transformix on large datasets would incur a significant overhead, from scripting command line invocations and arguments to copying images and transform parameter files across folders. With SimpleElastix this complexity is easier to manage and more memory and disk I/O efficient. For more examples see [the documentation](https://simpleelastix.readthedocs.org/) or the [Examples/SimpleElastix](Examples/SimpleElastix) directory. 
 
 ### Building with the SuperBuild
-SimpleElastix integrates elastix and transformix with the SimpleITK SuperBuild. Simply clone this repository and invoke the SuperBuild.
-
-```
-git clone https://github.com/kaspermarstal/SimpleElastix
-mkdir build
-cd build
-cmake ../SimpleElastix/SuperBuild
-make -j4
-```
-
-The SuperBuild will download and install dependencies (elastix, ITK, SimpleITK and SWIG) and compile SimpleElastix. Target language dependencies need to be pre-installed, e.g. `sudo apt-get install cmake swig monodevelop r-base r-base-dev ruby ruby-dev python python-dev tcl tcl-dev tk tk-dev`. Note that this project takes around an hour to build on a quad-core machine.
+SimpleElastix integrates elastix and transformix with the SimpleITK SuperBuild. Simply clone this repository and invoke the SuperBuild as outlined in [the documentation](http://simpleelastix.readthedocs.org/GettingStarted.html). The SuperBuild will download and install dependencies (elastix, ITK, SimpleITK and SWIG) and compile SimpleElastix. Target language dependencies need to be pre-installed, e.g. `sudo apt-get install cmake swig monodevelop r-base r-base-dev ruby ruby-dev python python-dev tcl tcl-dev tk tk-dev`. Note that this project takes around an hour to build on a quad-core machine.
 
 The documentation further describes how to [build SimpleElastix on Windows](http://simpleelastix.readthedocs.org/GettingStarted.html#Windows) and how to [build SimpleElastix manually](http://simpleelastix.readthedocs.org/GettingStarted.html#building-manually-on-linux) without the SuperBuild.
 
