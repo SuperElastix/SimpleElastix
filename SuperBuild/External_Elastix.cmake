@@ -1,22 +1,14 @@
-set( proj elastix )
-
-if( ${BUILD_SHARED_LIBS} )
-  set( ELASTIX_BUILD_SHARED_LIBS ON )
-else()
-  set( ELASTIX_BUILD_SHARED_LIBS OFF )
-endif()
-
 file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/${proj}-build/CMakeCacheInit.txt" "${ep_common_cache}" )
 
 set( ELASTIX_GIT_REPOSITORY ${git_protocol}://github.com/mstaring/elastix )
-set( ELASTIX_GIT_TAG 617b0729fb6200fce279f7e6388967c6315ddc90 )
+set( ELASTIX_GIT_TAG dedf2c3282107b515ea0a8d054a51aa8c03e60e7 )
 
-ExternalProject_Add( ${proj} 
+ExternalProject_Add( Elastix
   GIT_REPOSITORY ${ELASTIX_GIT_REPOSITORY}
   GIT_TAG ${ELASTIX_GIT_TAG}
   UPDATE_COMMAND ""
-  SOURCE_DIR ${proj}
-  BINARY_DIR ${proj}-build
+  SOURCE_DIR Elastix
+  BINARY_DIR Elastix-build
   CMAKE_GENERATOR ${gen}
   CMAKE_ARGS
   --no-warn-unused-cli
@@ -25,7 +17,8 @@ ExternalProject_Add( ${proj}
   -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON
   -DBUILD_TESTING:BOOL=OFF
   -DELASTIX_BUILD_EXECUTABLE:BOOL=OFF
-  -DBUILD_SHARED_LIBS:BOOL=${ELASTIX_BUILD_SHARED_LIBS}
+  -DELASTIX_USE_OPENMP:BOOL=${SimpleITK_OPENMP}
+  -DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
   -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
   -DITK_DIR:PATH=${ITK_DIR}
   -DELASTIX_IMAGE_2D_PIXELTYPES:STRING=float
@@ -114,5 +107,5 @@ ExternalProject_Add( ${proj}
   DEPENDS ${${CMAKE_PROJECT_NAME}_DEPENDENCIES}
 )
 
-ExternalProject_Get_Property( elastix BINARY_DIR )
+ExternalProject_Get_Property( Elastix BINARY_DIR )
 set( ELASTIX_USE_FILE "${BINARY_DIR}/src/UseElastix.cmake" )

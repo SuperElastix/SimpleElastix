@@ -366,19 +366,32 @@ endif()
 # Elastix
 #------------------------------------------------------------------------------
 
-set(USE_SYSTEM_ELASTIX OFF CACHE BOOL "Use a pre-built version of elastix")
-mark_as_advanced(USE_SYSTEM_ELASTIX)
+option( USE_SYSTEM_ELASTIX "Use system install of elastix." OFF )
+mark_as_advanced( USE_SYSTEM_ELASTIX )
+
 if(USE_SYSTEM_ELASTIX)
   if(NOT EXISTS ${ELASTIX_USE_FILE})
     set(ELASTIX_USE_FILE ${ELASTIX_DIR}/UseElastix.cmake)
   endif()
+
   if(NOT EXISTS ${ELASTIX_USE_FILE})
     set(ELASTIX_DIR "" CACHE PATH "Path to folder containing UseElastix.cmake")
     message(FATAL_ERROR "Could not find UseElastix.cmake. Point ELASTIX_DIR to folder containing UseElastix.cmake or set USE_SYSTEM_ELASTIX to OFF.")
   endif()
 else()
+  mark_as_advanced( SimpleITK_OPENMP )
+  option( SimpleITK_OPENMP "If available, use OpenMP to speed up certain elastix computations." OFF )
+
+  if( SimpleITK_OPENMP )
+    find_package( OpenMP QUIET )
+    if( OPENMP_FOUND )
+      set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    endif()
+  endif()
+  
   include(External_Elastix)
-  list(APPEND ${CMAKE_PROJECT_NAME}_DEPENDENCIES elastix)
+  list(APPEND ${CMAKE_PROJECT_NAME}_DEPENDENCIES Elastix)
 endif()
 
 #------------------------------------------------------------------------------
@@ -476,7 +489,7 @@ include(External_SimpleITKExamples)
 #------------------------------------------------------------------------------
 # List of external projects
 #------------------------------------------------------------------------------
-set(external_project_list ITK Swig elastix SimpleITKExamples PCRE Lua GTest virtualenv ${CMAKE_PROJECT_NAME})
+set(external_project_list ITK Swig Elastix SimpleITKExamples PCRE Lua GTest virtualenv ${CMAKE_PROJECT_NAME})
 
 #-----------------------------------------------------------------------------
 # Dump external project dependencies

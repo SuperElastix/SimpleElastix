@@ -84,10 +84,15 @@ endif()
 
 #-----------------------------------------------------------
 # Configure Elastix
-find_package( OpenMP QUIET )
-if( OPENMP_FOUND )
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+mark_as_advanced( SimpleITK_OPENMP )
+option( SimpleITK_OPENMP "If available, use OpenMP to speed up certain elastix computations." OFF )
+
+if( SimpleITK_OPENMP )
+  find_package( OpenMP QUIET )
+  if( OPENMP_FOUND )
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+  endif()
 endif()
 
 # Find UseElastix.cmake 
