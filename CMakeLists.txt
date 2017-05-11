@@ -145,9 +145,9 @@ option( SimpleITK_INT64_PIXELIDS "Instantiate 64-bit integer pixels, including u
 sitk_legacy_naming(SimpleITK_INT64_PIXELIDS)
 
 
-option( SimpleITK_4D_IMAGES "Add Image and I/O support for four spatial dimensions." OFF )
+option( SimpleITK_4D_IMAGES "Add Image and I/O support for four spatial dimensions." ON )
 mark_as_advanced( SimpleITK_4D_IMAGES )
-sitk_legacy_naming(SimpleITK_4D_IMAGES)
+sitk_legacy_naming( SimpleITK_4D_IMAGES )
 
 
 # Setup build locations.
