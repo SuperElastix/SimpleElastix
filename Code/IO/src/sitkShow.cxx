@@ -359,6 +359,8 @@ namespace itk
 
 
   //
+  // Search some standard directories for an executable, possibly inside a named directory.
+  // The directories that are searched depend on the system type.
   //
   static std::string FindApplication(const std::string directory = "", const std::string name = "", const bool debugOn=false )
   {
@@ -414,7 +416,6 @@ namespace itk
     paths.push_back( homedir + "/bin/" + directory );
     }
 
-  paths.push_back( "~/bin/" + directory );
   paths.push_back( "/opt/" + directory );
   paths.push_back( "/usr/local/" + directory );
   ExecutableName = itksys::SystemTools::FindFile ( name.c_str(), paths );
@@ -429,7 +430,68 @@ namespace itk
 
   return ExecutableName;
   }
+  
+  //
+  // Find an ImageJ or Fiji executable for Show.
+  //
+  static std::string FindImageJ(const bool debugOn)
+  {
+  std::string ExecutableName;
 
+#if defined(_WIN32)
+
+  // Windows
+  ExecutableName = FindApplication( "Fiji.app", "ImageJ-win64.exe", debugOn );
+  if (!ExecutableName.length())
+    {
+    ExecutableName = FindApplication( "Fiji.app", "ImageJ-win32.exe", debugOn );
+    }
+  if (!ExecutableName.length())
+    {
+    ExecutableName = FindApplication( "ImageJ", "ImageJ.exe", debugOn );
+    }
+
+#elif defined(__APPLE__)
+
+  ExecutableName = FindApplication( "", "Fiji.app", debugOn );
+  if (!ExecutableName.length())
+    {
+    ExecutableName = FindApplication( "ImageJ", "ImageJ64.app", debugOn );
+    }
+  if (!ExecutableName.length())
+    {
+    ExecutableName = FindApplication( "ImageJ", "ImageJ.app", debugOn );
+    }
+
+#else
+
+  // Linux and other systems
+  ExecutableName = FindApplication( "Fiji.app", "ImageJ-linux64", debugOn );
+  if (!ExecutableName.length())
+    {
+    ExecutableName = FindApplication( "Fiji.app", "ImageJ-linux32", debugOn );
+    }
+  if (!ExecutableName.length())
+    {
+    ExecutableName = FindApplication( "ImageJ", "imagej", debugOn );
+    }
+  if (!ExecutableName.length())
+    {
+    ExecutableName = FindApplication( "", "ImageJ", debugOn );
+    }
+  if (!ExecutableName.length())
+    {
+    ExecutableName = FindApplication( "", "imagej", debugOn );
+    }
+#endif
+
+  if (!ExecutableName.length())
+    {
+    sitkExceptionMacro (  << "No appropriate executable found." );
+    }
+
+    return ExecutableName;
+  }
 
   /**
    * This function take a list of command line arguments, and runs a
@@ -538,6 +600,8 @@ namespace itk
   std::string Macro = "";
   std::vector<std::string> CommandLine;
 
+  // is the imagej we're running a script or a binary?
+  bool ImageJScriptFlag = false;
 
 
   bool colorFlag = false;
@@ -549,62 +613,11 @@ namespace itk
                   && ((image.GetPixelIDValue()==sitkVectorUInt8) || (image.GetPixelIDValue()==sitkVectorUInt16)) );
 
 
+  ExecutableName = FindImageJ(debugOn);
 
-
-  // Find the ImageJ executable
-  //
-
-#if defined(_WIN32)
-
-  // Windows
-  ExecutableName = FindApplication( "Fiji.app", "ImageJ-win64.exe", debugOn );
-  if (!ExecutableName.length())
-    {
-    ExecutableName = FindApplication( "Fiji.app", "ImageJ-win32.exe", debugOn );
-    }
-  if (!ExecutableName.length())
-    {
-    ExecutableName = FindApplication( "ImageJ", "ImageJ.exe", debugOn );
-    }
-
-#elif defined(__APPLE__)
-
-  ExecutableName = FindApplication( "", "Fiji.app", debugOn );
-  if (!ExecutableName.length())
-    {
-    ExecutableName = FindApplication( "ImageJ", "ImageJ64.app", debugOn );
-    }
-  if (!ExecutableName.length())
-    {
-    ExecutableName = FindApplication( "ImageJ", "ImageJ.app", debugOn );
-    }
-
-#else
-
-  // Linux and other systems
-  ExecutableName = FindApplication( "Fiji.app", "ImageJ-linux64", debugOn );
-  if (!ExecutableName.length())
-    {
-    ExecutableName = FindApplication( "Fiji.app", "ImageJ-linux32", debugOn );
-    }
-  if (!ExecutableName.length())
-    {
-    ExecutableName = FindApplication( "ImageJ", "imagej", debugOn );
-    }
-  if (!ExecutableName.length())
-    {
-    ExecutableName = FindApplication( "", "ImageJ", debugOn );
-    }
-  if (!ExecutableName.length())
-    {
-    ExecutableName = FindApplication( "", "imagej", debugOn );
-    }
+#if not defined(__APPLE__) and not defined(_WIN32)
+  ImageJScriptFlag = itksys::SystemTools::FileHasSignature( ExecutableName.c_str(), "#!" );
 #endif
-
-  if (!ExecutableName.length())
-    {
-    sitkExceptionMacro (  << "No appropriate executable found." );
-    }
 
   bool fijiFlag = ExecutableName.find( "Fiji.app" ) != std::string::npos;
 
@@ -632,7 +645,18 @@ namespace itk
         }
       else
         {
+#if defined(__APPLE__) or defined(_WIN32)
         Command = ShowColorImageCommand;
+#else
+        if (ImageJScriptFlag)
+	  {
+          Command = ShowColorImageCommand;
+	  }
+	else
+	  {
+	  Command = "%a -eval \'" IMAGEJ_OPEN_MACRO NIFTI_COLOR_MACRO "\'";
+	  }
+#endif
         }
       }
     }
@@ -647,7 +671,18 @@ namespace itk
           }
         else
           {
+#if defined(__APPLE__) or defined(_WIN32)
           Command = ShowImageCommand;
+#else
+          if (ImageJScriptFlag)
+	    {
+            Command = ShowImageCommand;
+	    }
+	  else
+	    {
+	    Command = "%a -eval \'" IMAGEJ_OPEN_MACRO "\'";
+	    }
+#endif
           }
         }
     }
