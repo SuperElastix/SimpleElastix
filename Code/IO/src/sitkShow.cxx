@@ -600,8 +600,6 @@ namespace itk
   std::string Macro = "";
   std::vector<std::string> CommandLine;
 
-  // is the imagej we're running a script or a binary?
-  bool ImageJScriptFlag = false;
 
 
   bool colorFlag = false;
@@ -616,7 +614,8 @@ namespace itk
   ExecutableName = FindImageJ(debugOn);
 
 #if not defined(__APPLE__) and not defined(_WIN32)
-  ImageJScriptFlag = itksys::SystemTools::FileHasSignature( ExecutableName.c_str(), "#!" );
+  // is the imagej we're running a script or a binary?
+  bool ImageJScriptFlag = itksys::SystemTools::FileHasSignature( ExecutableName.c_str(), "#!" );
 #endif
 
   bool fijiFlag = ExecutableName.find( "Fiji.app" ) != std::string::npos;
@@ -645,14 +644,9 @@ namespace itk
         }
       else
         {
-#if defined(__APPLE__) or defined(_WIN32)
         Command = ShowColorImageCommand;
-#else
-        if (ImageJScriptFlag)
-	  {
-          Command = ShowColorImageCommand;
-	  }
-	else
+#if not defined(__APPLE__) and not defined(_WIN32)
+        if (!ImageJScriptFlag)
 	  {
 	  Command = "%a -eval \'" IMAGEJ_OPEN_MACRO NIFTI_COLOR_MACRO "\'";
 	  }
@@ -671,14 +665,9 @@ namespace itk
           }
         else
           {
-#if defined(__APPLE__) or defined(_WIN32)
           Command = ShowImageCommand;
-#else
-          if (ImageJScriptFlag)
-	    {
-            Command = ShowImageCommand;
-	    }
-	  else
+#if not defined(__APPLE__) and not defined(_WIN32)
+          if (!ImageJScriptFlag)
 	    {
 	    Command = "%a -eval \'" IMAGEJ_OPEN_MACRO "\'";
 	    }
