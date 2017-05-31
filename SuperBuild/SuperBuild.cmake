@@ -366,17 +366,22 @@ endif()
 # Elastix
 #------------------------------------------------------------------------------
 
-option( USE_SYSTEM_ELASTIX "Use system install of elastix." OFF )
-mark_as_advanced( USE_SYSTEM_ELASTIX )
+option(SimpleITK_USE_SYSTEM_ELASTIX "Use system install of elastix." OFF)
+sitk_legacy_naming(SimpleITK_USE_SYSTEM_ELASTIX USE_SYSTEM_ELASTIX)
+mark_as_advanced(SimpleITK_USE_SYSTEM_ELASTIX)
 
-if(USE_SYSTEM_ELASTIX)
+if(SimpleITK_USE_SYSTEM_ELASTIX)
   if(NOT EXISTS ${ELASTIX_USE_FILE})
     set(ELASTIX_USE_FILE ${ELASTIX_DIR}/UseElastix.cmake)
   endif()
 
   if(NOT EXISTS ${ELASTIX_USE_FILE})
+    set(ELASTIX_USE_FILE ${ELASTIX_DIR}/src/UseElastix.cmake)
+  endif()
+
+  if(NOT EXISTS ${ELASTIX_USE_FILE})
     set(ELASTIX_DIR "" CACHE PATH "Path to folder containing UseElastix.cmake")
-    message(FATAL_ERROR "Could not find UseElastix.cmake. Point ELASTIX_DIR to folder containing UseElastix.cmake or set USE_SYSTEM_ELASTIX to OFF.")
+    message(FATAL_ERROR "Could not find UseElastix.cmake. Point ELASTIX_DIR to folder containing UseElastix.cmake or set SimpleITK_USE_SYSTEM_ELASTIX to OFF.")
   endif()
 else()
   mark_as_advanced( SimpleITK_OPENMP )
@@ -462,6 +467,7 @@ ExternalProject_Add(${proj}
     -DWRAP_TCL:BOOL=${WRAP_TCL}
     -DWRAP_CSHARP:BOOL=${WRAP_CSHARP}
     -DWRAP_R:BOOL=${WRAP_R}
+    -DWRAP_NODE:BOOL=${WRAP_NODE}
     -DBUILD_EXAMPLES:BOOL=${BUILD_TESTING}
   DEPENDS ${${CMAKE_PROJECT_NAME}_DEPENDENCIES}
   ${External_Project_USES_TERMINAL}
