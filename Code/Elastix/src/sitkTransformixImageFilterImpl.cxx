@@ -30,7 +30,7 @@ TransformixImageFilter::TransformixImageFilterImpl
   this->m_ComputeDeformationField = false;
   this->m_MovingPointSetFileName = "";
 
-  this->m_OutputDirectory = "."
+  this->m_OutputDirectory = ".";
   this->m_LogFileName = "";
   
   this->m_LogToFile = false;
