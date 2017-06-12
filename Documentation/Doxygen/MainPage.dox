@@ -10,6 +10,11 @@ Image registration is the process of transforming images into a common coordinat
 - A user-friendly API that aligns with the design philosophy of SimpleITK developed specifically for rapid prototyping. If you are interested, The Design of SimpleITK is a great read.
 - The complete set of SimpleITK image processing algorithms.
 
-This documentation describes the C++ API of \ref SimpleElastix "SimpleElastix", \ref SimpleTransformix "SimpleTransformix" and SimpleITK. A more friendly introduction to SimpleElastix and medical image registration in general is available at [simpleelastix.readthedocs.org](https://simpleelastix.readthedocs.io).
+This documentation describes the C++ API of the SimpleITK interface
+to the Insight Toolkit. The wrapped languages have a very simular
+interface, that should only be trivially different.  The
+Related Pages link presents interface conventions, user and
+developer information. Additionally the Example tab provides a
+variety of example of SimpleITK with different language bindings.
  */
 
