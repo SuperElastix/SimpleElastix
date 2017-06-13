@@ -14,7 +14,7 @@ SimpleElastix can be compiled with the SuperBuild. The SuperBuild is a script th
 
 ::
 
-    $ git clone https://github.com/kaspermarstal/SimpleElastix
+    $ git clone https://github.com/SuperElastix/SimpleElastix
     $ mkdir build
     $ cd build
     $ cmake ../SimpleElastix/SuperBuild
@@ -153,14 +153,14 @@ The following approach allows us to use a locally installed version of ITK and/o
     - Configure CMake. Set the following CMake variables: BUILD_SHARED_LIBS=OFF, Module_ITKReview=ON, ITK_WRAP_*=OFF.
     - Compile ITK. Make sure to note the build settings, e.g. Release x64.
 4. Build elastix. 
-    - Clone elastix from `github.com/kaspermarstal/elastix <https://github.com/kaspermarstal/elastix>`_.
+    - Clone elastix from `github.com/SuperElastix/elastix <https://github.com/SuperElastix/elastix>`_.
     - Set ITK_DIR to the location of the ITK build directory
     - Configure CMake. Set the following CMake variables: BUILD_EXECUTABLE=OFF, USE_KNNGraphAlphaMutualInformationMetric=OFF 
     - Set appropriate ELASTIX_IMAGE_2/3/4D_PIXELTYPES and any components that you might require.
     - If you are developing your own elastix components, make sure they are properly registered by the elastix build system.
     - Compile elastix. Make sure to configure the build settings exactly the same as ITK e.g. Release x64.
 5. Build SimpleElastix. 
-    - Clone SimpleElastix from `github.com/kaspermarstal/SimpleElastix <https://github.com/kaspermarstal/SimpleElastix>`_.
+    - Clone SimpleElastix from `github.com/SuperElastix/SimpleElastix <https://github.com/SuperElastix/SimpleElastix>`_.
     - Configure CMake. Point ITK_DIR to the location of the ITK build directory and ELASTIX_DIR to the location of the elastix build directory, specifically the src/ directory in it.
     - Build SimpleElastix. Make sure to configure the build settings exactly the same as ITK e.g. Release x64.
 
