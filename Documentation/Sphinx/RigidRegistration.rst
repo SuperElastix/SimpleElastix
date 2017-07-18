@@ -29,8 +29,8 @@ The image on right has been rotated 10 degrees and translated 13 pixels in the x
     import SimpleITK as sitk
 
     elastixImageFilter = sitk.ElastixImageFilter()
-    elastixImageFilter.SetFixedImage(sitk.SetFixedImage("fixedImage.nii"))
-    elastixImageFilter.SetMovingImage(sitk.SetFixedImage("movingImage.nii"))
+    elastixImageFilter.SetFixedImage(sitk.ReadImage("fixedImage.nii"))
+    elastixImageFilter.SetMovingImage(sitk.ReadImage("movingImage.nii"))
     elastixImageFilter.SetParameterMap(sitk.GetDefaultParameterMap("rigid"))
     elastixImageFilter.Execute()
     sitk.WriteImage(elastixImageFilter.GetResultImage())
