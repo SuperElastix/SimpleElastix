@@ -403,6 +403,7 @@ TEST( ElastixImageFilter, Registration3D )
   Image resultImage; 
 
   ElastixImageFilter silx;
+  silx.SetParameter("MaximumNumberOfIterations", "1");
   EXPECT_NO_THROW( silx.SetFixedImage( fixedImage ) );
   EXPECT_NO_THROW( silx.SetMovingImage( movingImage ) );
   EXPECT_NO_THROW( resultImage = silx.Execute() );
