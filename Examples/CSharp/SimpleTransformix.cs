@@ -6,37 +6,37 @@ namespace itk.simple.examples {
         static void Main(string[] args) {
             try {
                 if (args.Length < 4) {
-                    Console.WriteLine("Usage: SimpleElastix <fixedImage> <movingImage> <inputImage> <parameterFile> <output>");
+                    Console.WriteLine("Usage: SimpleTransformix <fixedImage> <movingImage> <inputImage> <parameterFile> <output>");
                     return;
                 }
                 // Make transform
-                SimpleElastix elastix;
+                ElastixImageFilter silx;
                 ImageFileReader reader = new ImageFileReader();
                 reader.SetFileName(args[0]);
-                elastix.SetFixedImage(reader.Execute());
+                silx.SetFixedImage(reader.Execute());
                 reader.SetFileName(args[1]);
-                elastix.SetMovingImage(reader.Execute());
-                elastix.SetParameterMap(ReadParameterFile(args[3]));
-                elastix.Execute();
+                silx.SetMovingImage(reader.Execute());
+                silx.SetParameterMap(ReadParameterFile(args[3]));
+                silx.Execute();
 
                 // Instantiate transformix
-                SimpleTransformix transformix;
+                TransformixImageFilter stfx;
 
                 // Read input
                 reader.SetFileName(args[4]);
-                transformix.SetInputImage(reader.execute());
-                transformix.SetTransformParameterMap(elastix.GetTransformParameterMap());
+                stfx.SetInputImage(reader.execute());
+                stfx.SetTransformParameterMap(silx.GetTransformParameterMap());
 
                 // Perform warp
-                transformix.LogToConsoleOn();
-                transformix.Execute();
+                stfx.LogToConsoleOn();
+                stfx.Execute();
 
                 // Write result image
-                sitk.WriteImage(transformix.GetResultImage(), args[5]);
+                sitk.WriteImage(stfx.GetResultImage(), args[5]);
                 
 
-            } catch (Exception ex) {
-                Console.WriteLine(ex);
+            } catch (Exception e) {
+                Console.WriteLine(e);
             }
         }
     }
