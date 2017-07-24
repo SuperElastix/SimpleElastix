@@ -82,7 +82,7 @@ ElastixImageFilter::ElastixImageFilterImpl
 
   for( unsigned int i = 1; i < this->GetNumberOfMovingImages(); ++i )
   {
-    if( this->GetMovingImage( i ).GetDimension() != MovingImageDimension )
+    if( this->GetMovingImage( i ).GetDimension() != FixedImageDimension )
     {
       sitkExceptionMacro( "Moving images must be of same dimension as fixed images (fixed image at index 0 is of dimension " 
                        << this->GetFixedImage( 0 ).GetDimension() << ", moving image at index " << i
@@ -90,32 +90,52 @@ ElastixImageFilter::ElastixImageFilterImpl
     }
   }
 
-  for( unsigned int i = 1; i < this->GetNumberOfFixedMasks(); ++i )
+  if( this->GetNumberOfFixedMasks() != 0 && this->GetNumberOfFixedMasks() != 1 && this->GetNumberOfFixedMasks() != this->GetNumberOfFixedImages() )
   {
-    if( this->GetFixedMask( i ).GetDimension() != FixedImageDimension )
-    {
-      sitkExceptionMacro( "Fixed masks must be of same dimension as fixed images (fixed images are of dimension " 
-                       << this->GetFixedImage( 0 ).GetDimension() << ", fixed mask at index " << i
-                       << " is of dimension \"" << this->GetFixedMask( i ).GetDimension() << "\")." );
-    }
+    sitkExceptionMacro( "Number of fixed masks must be 0, 1 or " << this->GetNumberOfFixedImages() << " (the number of fixed images)." )
   }
 
-  for( unsigned int i = 1; i < this->GetNumberOfMovingMasks(); ++i )
+  if( this->GetNumberOfMovingMasks() != 0 && this->GetNumberOfMovingMasks() != 1 && this->GetNumberOfMovingMasks() != this->GetNumberOfMovingImages() )
   {
-    if( this->GetMovingMask( i ).GetDimension() != MovingImageDimension )
-    {
-      sitkExceptionMacro( "Moving masks must be of same dimension as moving images (moving images are of dimension " 
-                       << this->GetMovingImage( 0 ).GetDimension() << ", moving mask at index " << i
-                       << " is of dimension \"" << this->GetMovingMask( i ).GetDimension() << "\")." );
-    }
+    sitkExceptionMacro( "Number of moving masks must be 0, 1 or " << this->GetNumberOfMovingImages() << " (the number of moving images)." )
   }
 
   for( unsigned int i = 0; i < this->GetNumberOfFixedMasks(); ++i )
   {
     if( this->GetFixedMask( i ).GetPixelID() != sitkUInt8 )
     {
-      sitkExceptionMacro( "Fixed mask must be of pixel type unsigned char (fixed mask at index " 
-                       << i << " is of type \"" << GetPixelIDValueAsElastixParameter( this->GetFixedMask( i ).GetPixelID() ) << "\")." );
+      sitkExceptionMacro( "Fixed mask must be of pixel type sitkUInt8 but fixed mask " 
+                       << i << " is of type \"" << GetPixelIDValueAsString( this->GetFixedMask( i ).GetPixelID() ) << "\". Cast with `SimpleITK.Cast(mask, sitk.sitkUInt8)`." );
+    }
+
+    if( this->GetFixedMask( i ).GetDimension() != FixedImageDimension )
+    {
+      sitkExceptionMacro( "Fixed masks must be of same dimension as fixed images (fixed images are of dimension " 
+                       << this->GetFixedImage( 0 ).GetDimension() << ", fixed mask at index " << i
+                       << " is of dimension \"" << this->GetFixedMask( i ).GetDimension() << "\")." );
+    }
+
+    if( this->GetFixedMask( i ).GetOrigin() != this->GetFixedImage( i ).GetOrigin() )
+    {
+      sitkExceptionMacro( "Fixed masks must have same origins as fixed images (fixed image at index 0 has origin at " 
+                       << this->GetFixedImage( i ).GetOrigin() << ", fixed mask at index " << i
+                       << " has origin at  \"" << this->GetFixedMask( i ).GetOrigin() << "\")." );
+    }
+
+    if( this->GetFixedMask( i ).GetDirection() != this->GetFixedImage( i ).GetDirection() )
+    {
+      sitkExceptionMacro( "Fixed masks must have same direction cosines as fixed images (fixed image at index " << i 
+                       << " has direction cosine " 
+                       << this->GetFixedImage( i ).GetDirection() << ", fixed mask at index " << i
+                       << " has direction cosine \"" << this->GetFixedMask( i ).GetDirection() << "\")." );
+    }
+
+    if( this->GetFixedMask( i ).GetSpacing() != this->GetFixedImage( i ).GetSpacing() )
+    {
+      sitkExceptionMacro( "Fixed masks must have same spacing as fixed images (fixed image at index " << i
+                       << " has spacing " 
+                       << this->GetFixedImage( i ).GetSpacing() << ", fixed mask at index " << i
+                       << " has spacing  \"" << this->GetFixedMask( i ).GetSpacing() << "\")." );
     }
   }
 
@@ -123,8 +143,36 @@ ElastixImageFilter::ElastixImageFilterImpl
   {
     if( this->GetMovingMask( i ).GetPixelID() != sitkUInt8 )
     {
-      sitkExceptionMacro( "Moving mask must be of pixel type unsigned char (moving mask at index " 
-                       << i << " is of type \"" << GetPixelIDValueAsElastixParameter( this->GetMovingMask( i ).GetPixelID() ) << "\")." );
+      sitkExceptionMacro( "Moving mask must be of pixel type sitkUInt8 but moving mask " 
+                       << i << " is of type \"" << GetPixelIDValueAsString( this->GetFixedMask( i ).GetPixelID() ) << "\". Cast with `SimpleITK.Cast(mask, sitk.sitkUInt8)`." );
+    }
+
+    if( this->GetMovingMask( i ).GetDimension() != MovingImageDimension )
+    {
+      sitkExceptionMacro( "Moving masks must be of same dimension as moving images (moving images are of dimension " 
+                       << this->GetMovingImage( 0 ).GetDimension() << ", moving mask at index " << i
+                       << " is of dimension \"" << this->GetMovingMask( i ).GetDimension() << "\")." );
+    }
+
+    if( this->GetMovingMask( i ).GetOrigin() != this->GetMovingImage( i ).GetOrigin() )
+    {
+      sitkExceptionMacro( "Moving masks must have same origins as moving images (moving image at index " << i << " has origin " 
+                       << this->GetMovingImage( i ).GetOrigin() << ", moving mask at index " << i
+                       << " has origin \"" << this->GetMovingMask( i ).GetOrigin() << "\")." );
+    }
+
+    if( this->GetMovingMask( i ).GetDirection() != this->GetMovingImage( i ).GetDirection() )
+    {
+      sitkExceptionMacro( "Moving masks must have same direction cosines as moving images (moving image at index " << i << " has direction cosine " 
+                       << this->GetMovingImage( i ).GetDirection() << ", moving mask at index " << i
+                       << " has direction cosine \"" << this->GetMovingMask( i ).GetDirection() << "\")." );
+    }
+
+    if( this->GetMovingMask( i ).GetSpacing() != this->GetMovingImage( i ).GetSpacing() )
+    {
+      sitkExceptionMacro( "Moving masks must have same spacing as moving images (moving image at index " << i << " has spacing " 
+                       << this->GetMovingImage( i ).GetSpacing() << ", moving mask at index " << i
+                       << " has spacing  \"" << this->GetMovingMask( i ).GetSpacing() << "\")." );
     }
   }
 
@@ -135,10 +183,9 @@ ElastixImageFilter::ElastixImageFilterImpl
 
   sitkExceptionMacro( << "ElastixImageFilter does not support the combination of "
                       << FixedImageDimension << "-dimensional "
-                      << GetPixelIDValueAsElastixParameter( FixedImagePixelID ) << " fixed image and a "
+                      << GetPixelIDValueAsString( FixedImagePixelID ) << " fixed image and a "
                       << MovingImageDimension << "-dimensional " 
-                      << GetPixelIDValueAsElastixParameter( MovingImagePixelID ) << " moving image. "
-                      << "This a serious error. Contact developers at https://github.com/kaspermarstal/ElastixImageFilter/issues." )
+                      << GetPixelIDValueAsString( MovingImagePixelID ) << " moving image. " )
 }
 
 template< typename TFixedImage, typename TMovingImage >

@@ -81,6 +81,7 @@ TEST( ElastixImageFilter, Masks )
 
   ElastixImageFilter silx;
   EXPECT_NO_THROW( silx.SetParameter( "ImageSampler", "RandomSparseMask" ) );
+  EXPECT_NO_THROW( silx.SetParameter( "MaximumNumberOfIterations", "1" ) );
   EXPECT_NO_THROW( silx.SetFixedImage( fixedImage ) );
   EXPECT_NO_THROW( silx.SetFixedMask( fixedMask ) );
   EXPECT_NO_THROW( silx.SetMovingImage( movingImage ) );
@@ -88,6 +89,7 @@ TEST( ElastixImageFilter, Masks )
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
 
   // Only accept masks of pixel type unsigned char
+  EXPECT_NO_THROW( silx.SetFixedMask( fixedMask ) );
   EXPECT_NO_THROW( silx.SetMovingMask( movingMaskInvalidType ) );
   EXPECT_THROW( silx.Execute(), GenericException );
   EXPECT_NO_THROW( silx.SetMovingMask( movingMask ) );
@@ -415,9 +417,9 @@ TEST( ElastixImageFilter, Registration4D )
   Image movingImage = ReadImage( dataFinder.GetFile( "Input/4D.nii.gz" ) );
   Image resultImage; 
 
-  ElastixImageFilter silx; silx.LogToConsoleOn();
+  ElastixImageFilter silx;
   silx.SetParameterMap( "groupwise" );
-  silx.SetParameter("MaximumNumberOfIterations", "8.0");
+  silx.SetParameter("MaximumNumberOfIterations", "1");
   silx.SetParameter("FinalGridSpacingInPhysicalUnits", "32.0");
   EXPECT_NO_THROW( silx.SetFixedImage( fixedImage ) );
   EXPECT_NO_THROW( silx.SetMovingImage( movingImage ) );
