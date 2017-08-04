@@ -7,6 +7,9 @@
 namespace itk { 
   namespace simple {
 
+/** \class ElastixImageFilter
+* \brief The class that wraps the elastix registration library.
+*/
 class SITKCommon_EXPORT ElastixImageFilter
 {
   public:
@@ -29,9 +32,24 @@ class SITKCommon_EXPORT ElastixImageFilter
 
     const std::string GetName( void );
 
+    /** \brief Sets a fixed image.
+     *
+     * @{
+     */
     Self& SetFixedImage( const Image& fixedImage );
+    /**@}*/
+
+    /** \brief Sets multiple fixed images.
+     *
+     * @{
+     */
     Self& SetFixedImage( const VectorOfImage& fixedImages );
+    /**@}*/
+    
+    // TODO: Add Doxygen documentation for all methods.
     Self& AddFixedImage( const Image& fixedImage );
+    
+
     Image& GetFixedImage( const unsigned long index );
     VectorOfImage& GetFixedImage( void );
     Self& RemoveFixedImage( const unsigned long index );

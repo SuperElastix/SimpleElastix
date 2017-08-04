@@ -156,6 +156,7 @@ TEST( ElastixImageFilter, ProceduralInterface )
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
 
   ElastixImageFilter::ParameterMapType parameterMap = GetDefaultParameterMap( defaultParameterMapName );
+  parameterMap["MaximumNumberOfIterations"] = ["1"]
   EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMap ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
   EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMap, true ) );
@@ -181,7 +182,9 @@ TEST( ElastixImageFilter, ProceduralInterface )
 
   ElastixImageFilter::ParameterMapVectorType parameterMapVector;
   parameterMapVector.push_back( GetDefaultParameterMap( defaultParameterMapName ) );
+  parameterMapVector[0]["MaximumNumberOfIterations"] = ["1"]
   parameterMapVector.push_back( GetDefaultParameterMap( "rigid" ) );
+  parameterMapVector[1]["MaximumNumberOfIterations"] = ["1"]
   EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMapVector ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
   EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMapVector, true ) );

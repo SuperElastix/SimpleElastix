@@ -55,7 +55,7 @@ if(NOT SimpleITK_DOC_FILES)
   set ( SimpleITK_DOC_FILES
     "${SimpleITK_SOURCE_DIR}/LICENSE"
     "${SimpleITK_SOURCE_DIR}/NOTICE"
-    "${SimpleITK_SOURCE_DIR}/Readme.md"
+    "${SimpleITK_SOURCE_DIR}/README.md"
   )
 endif()
 

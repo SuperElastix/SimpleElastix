@@ -60,15 +60,18 @@ We can apply a transformation computed with SimpleElastix to a point set with Si
 
     import SimpleITK as sitk
 
+    fixedImage = sitk.ReadImage("fixedImage.nii")
+    movingImage = sitk.ReadImage("movingImage.nii")
     # Compute the transformation from moving image to the fixed image
     elastixImageFilter = sitk.ElastixImageFilter()
-    elastixImageFilter.SetFixedImage(sitk.ReadImage("fixedImage.nii")
-    elastixImageFilter.SetMovingImage(sitk.ReadImage("movingImage.nii")
+    elastixImageFilter.SetFixedImage(fixedImage)
+    elastixImageFilter.SetMovingImage(movingImage)
     elastixImageFilter.Execute()
 
     # Warp point set. The transformed points will be written to a file named 
     # outputpoints.txt in the output directory determined by SetOutputDirectory()
-    # (defaults to working directory)
+    # (defaults to working directory). The moving image is needed for transformix
+    # to correctly infer the dimensionality of the point set.
     transformixImageFilter = sitk.TransformixImageFilter()
     transformixImageFilter.SetTransformParameterMap(elastixImageFilter.GetTransformParameterMap())
     transformixImageFilter.SetFixedPointSet("fixedPointSet.pts")
