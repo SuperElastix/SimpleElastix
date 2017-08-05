@@ -19,8 +19,8 @@ if ( SITK_UNDEFINED_SYMBOLS_ALLOWED )
 else()
   set( _QUIET_LIBRARY "REQUIRED" )
 endif()
-find_package ( PythonLibs ${_QUIET_LIBRARY} )
 find_package ( PythonInterp REQUIRED )
+find_package ( PythonLibs ${_QUIET_LIBRARY} )
 include_directories ( ${SimpleITK_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR} )
 
 #
@@ -49,6 +49,13 @@ SWIG_add_module ( SimpleITK python
   sitkPyCommand.cxx )
 set(SWIG_MODULE_SimpleITKPython_TARGET_NAME "${SWIG_MODULE_SimpleITK_TARGET_NAME}")
 target_link_libraries( ${SWIG_MODULE_SimpleITKPython_TARGET_NAME} ${SimpleITK_LIBRARIES} )
+if(NOT PYTHON_DEBUG_LIBRARIES AND MSVC)
+  # If there is not a specified debug library use the release library,
+  # via a special sitkPython.h header.
+  target_compile_definitions(${SWIG_MODULE_SimpleITKPython_TARGET_NAME}
+    PRIVATE
+    $<$<CONFIG:Debug>:SWIG_PYTHON_INTERPRETER_NO_DEBUG>)
+endif()
 sitk_target_link_libraries_with_dynamic_lookup( ${SWIG_MODULE_SimpleITKPython_TARGET_NAME} ${PYTHON_LIBRARIES} )
 
 target_include_directories( ${SWIG_MODULE_SimpleITKPython_TARGET_NAME}
@@ -76,9 +83,9 @@ sitk_strip_target( ${SWIG_MODULE_SimpleITKPython_TARGET_NAME} )
 # Installation
 set( SimpleITK_PYTHON_PACKAGE_DIR "${CMAKE_CURRENT_BINARY_DIR}" )
 file( TO_NATIVE_PATH "${SimpleITK_PYTHON_PACKAGE_DIR}" SimpleITK_PYTHON_PACKAGE_DIR )
-get_target_property( SWIG_MODULE_SimpleITKPython_TARGET_LOCATION ${SWIG_MODULE_SimpleITKPython_TARGET_NAME} OUTPUT_NAME )
-get_target_property( SimpleITK_RELATIVE_BINARY_MODULE ${SWIG_MODULE_SimpleITKPython_TARGET_NAME} LOCATION )
-get_filename_component( SimpleITK_RELATIVE_BINARY_MODULE "${SimpleITK_RELATIVE_BINARY_MODULE}" NAME )
+get_target_property( SimpleITK_BINARY_MODULE ${SWIG_MODULE_SimpleITKPython_TARGET_NAME} LOCATION )
+get_filename_component( SimpleITK_BINARY_MODULE "${SimpleITK_BINARY_MODULE}" NAME )
+set( SimpleITK_BINARY_MODULE "${CMAKE_CURRENT_BINARY_DIR}/${SimpleITK_BINARY_MODULE}" )
 
 set(SimpleITK_PYTHON_TEST_EXECUTABLE "${PYTHON_EXECUTABLE}" CACHE INTERNAL "Python executable for testing." FORCE )
 

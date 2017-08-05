@@ -111,6 +111,10 @@ namespace itk
               break;
             case 'a':
               // %a for application
+              if (!app.length())
+                {
+                sitkExceptionMacro( "No ImageJ/Fiji application found." )
+                }
               result.append(app);
               i++;
               break;
@@ -380,6 +384,11 @@ namespace itk
     paths.push_back ( ProgramFiles + "\\" + directory + "\\");
     }
 
+  if ( itksys::SystemTools::GetEnv ( "USERPROFILE", ProgramFiles ) )
+    {
+    paths.push_back ( ProgramFiles + "\\" + directory + "\\");
+    paths.push_back ( ProgramFiles + "\\Desktop\\" + directory + "\\");
+    }
 
   // Find the executable
   ExecutableName = itksys::SystemTools::FindFile ( ExecutableName.c_str(), paths );
@@ -399,6 +408,12 @@ namespace itk
 
   // linux and other systems
   paths.push_back( "./" + directory );
+  std::string homedir;
+  if ( itksys::SystemTools::GetEnv ( "HOME", homedir ) )
+    {
+    paths.push_back( homedir + "/bin/" + directory );
+    }
+
   paths.push_back( "~/bin/" + directory );
   paths.push_back( "/opt/" + directory );
   paths.push_back( "/usr/local/" + directory );
@@ -574,6 +589,10 @@ namespace itk
   if (!ExecutableName.length())
     {
     ExecutableName = FindApplication( "ImageJ", "imagej", debugOn );
+    }
+  if (!ExecutableName.length())
+    {
+    ExecutableName = FindApplication( "", "ImageJ", debugOn );
     }
   if (!ExecutableName.length())
     {

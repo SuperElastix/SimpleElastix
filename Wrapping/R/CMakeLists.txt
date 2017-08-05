@@ -52,10 +52,16 @@ file( COPY "${CMAKE_CURRENT_SOURCE_DIR}/Packaging"
 
 set(SimpleITKR_VERSION "${SimpleITK_VERSION_MAJOR}.${SimpleITK_VERSION_MINOR}")
 if(DEFINED SimpleITK_VERSION_PATCH)
-  set(SimpleITK_VERSIONR "${SimpleITKR_VERSION}.${SimpleITK_VERSION_PATCH}")
+  set(SimpleITKR_VERSION "${SimpleITKR_VERSION}.${SimpleITK_VERSION_PATCH}")
   if(DEFINED SimpleITK_VERSION_TWEAK)
     set(SimpleITKR_VERSION "${SimpleITKR_VERSION}.${SimpleITK_VERSION_TWEAK}")
   endif()
+endif()
+if(DEFINED SimpleITK_VERSION_POST)
+  set(SimpleITKR_VERSION "${SimpleITKR_VERSION}-${SimpleITK_VERSION_POST}")
+elseif(DEFINED SimpleITK_VERSION_DEV)
+  math(EXPR DEV "9000 + ${SimpleITK_VERSION_DEV}")
+  set(SimpleITKR_VERSION "${SimpleITKR_VERSION}-${DEV}")
 endif()
 
 configure_file(
@@ -110,11 +116,19 @@ if(NOT SimpleITK_FORBID_DOWNLOADS)
 
 endif()
 
+if(BUILD_SHARED_LIBS AND DEFINED SimpleITK_LIBRARY_OUTPUT_DIRECTORY)
+  if(TARGET itkTestDriver)
+    set(CMD_PREFIX itkTestDriver --add-before-libpath "${SimpleITK_LIBRARY_OUTPUT_DIRECTORY}")
+  else()
+    message(WARNING "Unable to use \"itkTestDriver\" to set run-time library patch for R packaging.")
+  endif()
+endif()
+
 add_custom_command( TARGET ${SWIG_MODULE_SimpleITK_TARGET_NAME}
   POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/R_libs
   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/SimpleITK.R ${CMAKE_CURRENT_BINARY_DIR}/Packaging/SimpleITK/R/
   # install for running tests and create binary package
-  COMMAND ${R_COMMAND} CMD INSTALL --build ${CMAKE_CURRENT_BINARY_DIR}/Packaging/SimpleITK --library=${CMAKE_CURRENT_BINARY_DIR}/R_libs
+  COMMAND ${CMD_PREFIX} ${R_COMMAND} CMD INSTALL --build ${CMAKE_CURRENT_BINARY_DIR}/Packaging/SimpleITK --library=${CMAKE_CURRENT_BINARY_DIR}/R_libs --no-multiarch
   COMMENT "Installing R package for testing and building binary version for distribution"
   )
