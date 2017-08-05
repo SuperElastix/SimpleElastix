@@ -1,14 +1,15 @@
+set( proj Elastix )
 file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/${proj}-build/CMakeCacheInit.txt" "${ep_common_cache}" )
 
 set( ELASTIX_GIT_REPOSITORY ${git_protocol}://github.com/SuperElastix/elastix )
-set( ELASTIX_GIT_TAG ef057ff89233822b26b04b31c3c043af57d5deff )
+set( ELASTIX_GIT_TAG db8dea537208b29d5ef3c85d9e22917c9472115b )
 
-ExternalProject_Add( Elastix
+ExternalProject_Add( ${proj}
   GIT_REPOSITORY ${ELASTIX_GIT_REPOSITORY}
   GIT_TAG ${ELASTIX_GIT_TAG}
   UPDATE_COMMAND ""
-  SOURCE_DIR Elastix
-  BINARY_DIR Elastix-build
+  SOURCE_DIR ${proj}
+  BINARY_DIR ${proj}-build
   CMAKE_GENERATOR ${gen}
   CMAKE_ARGS
   --no-warn-unused-cli
@@ -108,4 +109,4 @@ ExternalProject_Add( Elastix
 )
 
 ExternalProject_Get_Property( Elastix BINARY_DIR )
-set( ELASTIX_USE_FILE "${BINARY_DIR}/src/UseElastix.cmake" )
+set( ELASTIX_USE_FILE "${BINARY_DIR}/UseElastix.cmake" )

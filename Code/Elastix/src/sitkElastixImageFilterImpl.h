@@ -99,6 +99,9 @@ struct ElastixImageFilter::ElastixImageFilterImpl
   void LogToConsoleOn();
   void LogToConsoleOff();
 
+  void SetNumberOfThreads( int n );
+  int GetNumberOfThreads( void );
+
   void SetParameterMap( const std::string transformName, const unsigned int numberOfResolutions = 4u, const double finalGridSpacingInPhysicalUnits = 10.0 );
   void SetParameterMap( const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapVector );
   void SetParameterMap( const std::map< std::string, std::vector< std::string > > parameterMap );
@@ -168,6 +171,8 @@ struct ElastixImageFilter::ElastixImageFilterImpl
 
   bool                    m_LogToFile;
   bool                    m_LogToConsole;
+
+  int                     m_NumberOfThreads;
 
 };
 

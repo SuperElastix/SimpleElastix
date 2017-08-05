@@ -413,6 +413,18 @@ TEST( ElastixImageFilter, Registration3D )
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
 }
 
+TEST( ElastixImageFilter, SetNumberOfThreads )
+{
+  Image fixedImage = ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
+  Image movingImage = ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
+
+  ElastixImageFilter silx;
+  silx.SetParameter('UseMultiThreadingForMetrics');
+  silx.SetParameter("MaximumNumberOfIterations", "1");
+  EXPECT_NO_THROW( silx.SetNumberOfThreads( 1 ) );
+  EXPECT_NO_THROW( silx.Execute() );
+}
+
 #ifdef SITK_4D_IMAGES
 
 TEST( ElastixImageFilter, Registration4D )

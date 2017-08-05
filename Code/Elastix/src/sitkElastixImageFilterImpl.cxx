@@ -740,6 +740,20 @@ ElastixImageFilter::ElastixImageFilterImpl
 
 void
 ElastixImageFilter::ElastixImageFilterImpl
+::SetNumberOfThreads( int n )
+{
+  this->m_NumberOfThreads = n;
+}
+
+int
+ElastixImageFilter::ElastixImageFilterImpl
+::GetNumberOfThreads()
+{
+  return this->m_NumberOfThreads;
+}
+
+void
+ElastixImageFilter::ElastixImageFilterImpl
 ::SetParameterMap( const std::string transformName, const unsigned int numberOfResolutions, const double finalGridSpacingInPhysicalUnits )
 {
   ParameterMapType parameterMap = ParameterObjectType::GetDefaultParameterMap( transformName, numberOfResolutions, finalGridSpacingInPhysicalUnits );
