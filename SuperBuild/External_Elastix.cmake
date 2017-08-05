@@ -108,5 +108,13 @@ ExternalProject_Add( ${proj}
   DEPENDS ${${CMAKE_PROJECT_NAME}_DEPENDENCIES}
 )
 
+ExternalProject_Add_Step(${proj} forcebuild
+  COMMAND ${CMAKE_COMMAND} -E remove
+    ${CMAKE_CURRENT_BUILD_DIR}/${proj}-prefix/src/${proj}-stamp/${prog}-build
+  DEPENDEES configure
+  DEPENDERS build
+  ALWAYS 1
+)
+
 ExternalProject_Get_Property( Elastix BINARY_DIR )
 set( ELASTIX_USE_FILE "${BINARY_DIR}/UseElastix.cmake" )
