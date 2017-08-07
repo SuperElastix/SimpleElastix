@@ -321,19 +321,6 @@ itk::TransformIOFactoryRegisterManager::TransformIOFactoryRegisterManager(void(*
 */
 public ";
 
-<<<<<<< HEAD
-
-%typemap(javaimports) itk::Vector "/**
-C++ includes: sitkImageConvert.h
-*/"
-
-
-%typemap(javaimports) itk::VectorImage "/**
-C++ includes: sitkPixelIDTypes.h
-*/"
-
-=======
->>>>>>> v1.0.1
 
 %typemap(javaimports) itk::simple::AbsImageFilter "/**
 
