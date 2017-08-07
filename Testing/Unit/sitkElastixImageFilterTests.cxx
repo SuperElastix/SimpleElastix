@@ -421,8 +421,9 @@ TEST( ElastixImageFilter, SetNumberOfThreads )
   Image movingImage = ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
 
   ElastixImageFilter silx;
-  silx.SetParameter("UseMultiThreadingForMetrics", "true" );
-  silx.SetParameter("MaximumNumberOfIterations", "1" );
+  EXPECT_NO_THROW( silx.SetFixedImage( fixedImage ) );
+  EXPECT_NO_THROW( silx.SetMovingImage( movingImage ) );
+  EXPECT_NO_THROW( silx.SetParameter("MaximumNumberOfIterations", "1" ) );
   EXPECT_NO_THROW( silx.SetNumberOfThreads( 1 ) );
   EXPECT_NO_THROW( silx.Execute() );
 }
