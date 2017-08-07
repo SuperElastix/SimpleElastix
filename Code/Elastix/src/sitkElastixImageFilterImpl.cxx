@@ -20,23 +20,26 @@ ElastixImageFilter::ElastixImageFilterImpl
   this->m_DualMemberFactory->RegisterMemberFunctions< FloatPixelIDTypeList, FloatPixelIDTypeList, 4 >();
 #endif
  
-  m_FixedImages                 = VectorOfImage();
-  m_MovingImages                = VectorOfImage();
-  m_FixedMasks                  = VectorOfImage();
-  m_MovingMasks                 = VectorOfImage();
-  m_ResultImage                 = Image();
+  this->m_FixedImages                 = VectorOfImage();
+  this->m_MovingImages                = VectorOfImage();
+  this->m_FixedMasks                  = VectorOfImage();
+  this->m_MovingMasks                 = VectorOfImage();
+  this->m_ResultImage                 = Image();
 
-  m_ParameterMapVector          = ParameterMapVectorType();
-  m_TransformParameterMapVector = ParameterMapVectorType();
+  this->m_ParameterMapVector          = ParameterMapVectorType();
+  this->m_TransformParameterMapVector = ParameterMapVectorType();
 
-  m_FixedPointSetFileName       = "";
-  m_MovingPointSetFileName      = "";
+  this->m_FixedPointSetFileName       = "";
+  this->m_MovingPointSetFileName      = "";
 
-  m_OutputDirectory             = ".";
-  m_LogFileName                 = "";
+  this->m_OutputDirectory             = ".";
+  this->m_LogFileName                 = "";
 
   this->m_LogToFile = false;
   this->m_LogToConsole = true;
+
+  // Use all available threads by default
+  this->m_NumberOfThreads = 0;
 
   ParameterMapVectorType defaultParameterMap;
   defaultParameterMap.push_back( ParameterObjectType::GetDefaultParameterMap( "translation" ) );
@@ -230,6 +233,7 @@ ElastixImageFilter::ElastixImageFilterImpl
     elastixFilter->SetLogFileName( this->GetLogFileName() );
     elastixFilter->SetLogToFile( this->GetLogToFile() );
     elastixFilter->SetLogToConsole( this->GetLogToConsole() );
+    elastixFilter->SetNumberOfThreads( this->GetNumberOfThreads() );
 
     ParameterMapVectorType parameterMapVector = this->m_ParameterMapVector;
     for( unsigned int i = 0; i < parameterMapVector.size(); i++ )
