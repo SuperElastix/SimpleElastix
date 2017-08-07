@@ -155,8 +155,10 @@ TEST( ElastixImageFilter, ProceduralInterface )
   EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, defaultParameterMapName, false, true, outputDirectory ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
 
+  typedef ElastixImageFilter::ParameterMapVectorType ParameterMapVectorType;
+  typedef ElastixImageFilter::ParameterValueVectorType ParameterValueVectorType;
   ElastixImageFilter::ParameterMapType parameterMap = GetDefaultParameterMap( defaultParameterMapName );
-  parameterMap["MaximumNumberOfIterations"] = ["1"]
+  parameterMap["MaximumNumberOfIterations"] = ParameterValueVectorType( 1, "1" );
   EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMap ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
   EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMap, true ) );
@@ -180,11 +182,11 @@ TEST( ElastixImageFilter, ProceduralInterface )
   EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMap, false, true, outputDirectory ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
 
-  ElastixImageFilter::ParameterMapVectorType parameterMapVector;
+  ParameterMapVectorType parameterMapVector;
   parameterMapVector.push_back( GetDefaultParameterMap( defaultParameterMapName ) );
-  parameterMapVector[0]["MaximumNumberOfIterations"] = ["1"]
+  parameterMapVector[ 0 ][ "MaximumNumberOfIterations" ] = ParameterValueVectorType( 1, "1" );
   parameterMapVector.push_back( GetDefaultParameterMap( "rigid" ) );
-  parameterMapVector[1]["MaximumNumberOfIterations"] = ["1"]
+  parameterMapVector[ 1 ][ "MaximumNumberOfIterations" ] = ParameterValueVectorType( 1, "1" );
   EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMapVector ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
   EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMapVector, true ) );
@@ -406,7 +408,7 @@ TEST( ElastixImageFilter, Registration3D )
   Image resultImage; 
 
   ElastixImageFilter silx;
-  silx.SetParameter("MaximumNumberOfIterations", "1");
+  silx.SetParameter("MaximumNumberOfIterations", "1" );
   EXPECT_NO_THROW( silx.SetFixedImage( fixedImage ) );
   EXPECT_NO_THROW( silx.SetMovingImage( movingImage ) );
   EXPECT_NO_THROW( resultImage = silx.Execute() );
@@ -419,8 +421,8 @@ TEST( ElastixImageFilter, SetNumberOfThreads )
   Image movingImage = ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
 
   ElastixImageFilter silx;
-  silx.SetParameter('UseMultiThreadingForMetrics');
-  silx.SetParameter("MaximumNumberOfIterations", "1");
+  silx.SetParameter("UseMultiThreadingForMetrics", "true" );
+  silx.SetParameter("MaximumNumberOfIterations", "1" );
   EXPECT_NO_THROW( silx.SetNumberOfThreads( 1 ) );
   EXPECT_NO_THROW( silx.Execute() );
 }
