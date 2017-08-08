@@ -3,24 +3,40 @@
 Getting Started
 ===============
 
-This page explains how to install SimpleElastix. The process involves compiling the C++ project and linking against a target language from which you would like to use SimpleElastix. SimpleElastix can be linked against Python, Java, R, Ruby, Octave, Lua, Tcl and C#. 
+This page explains how to install SimpleElastix. The process involves compiling the C++ project and linking against a target language from which you would like to use SimpleElastix. SimpleElastix can be linked against Python, Java, R, Ruby, Lua, Tcl and C#. 
 
 .. _Linux:
 
-SuperBuild On Linux
+Compiling On Linux
 -------------------
 
-SimpleElastix can be compiled with the SuperBuild. The SuperBuild is a script that automatically downloads and install any dependencies so you can don't have to install elastix, ITK or SWIG on beforehand. The only thing you need is CMake, git and a compiler toolchain. To build SimpleElastix, use the following commands to download the code and start the build:
+SimpleElastix includes a script that automatically downloads and install all dependencies so we don't have to install elastix, ITK, GTest or SWIG manually. This is called a 'SuperBuild' in CMake terms. The only thing we need to compile the SuperBuild is CMake, git and a compiler toolchain. To build SimpleElastix with the SuperBuild, we use the following commands to download the code and start the build:
 
 ::
 
-    $ git clone https://github.com/kaspermarstal/SimpleElastix
+    $ git clone https://github.com/SuperElastix/SimpleElastix
     $ mkdir build
     $ cd build
     $ cmake ../SimpleElastix/SuperBuild
     $ make -j4
 
-When the project has been built, we can find language packages in the :code:`${BUILD_DIRECTORY}/SimpleITK-build/Wrapping` directory. For example, to install the python module onto your system, navigate to
+.. warning::
+
+    Be careful not to run out of memory during the build. A rule of thumb is that we need 4GB of memory per core. For example, if we compile SimpleElastix with 4 cores (e.g. :code:`make -j4`) we need a machine with at least 16GB of RAM. The full project takes around an hour to compile on a quad-core machine.
+
+SimpleElastix will be compiled for languages that it can automatically detect. The language packages will be built in the :code:`${BUILD_DIRECTORY}/SimpleITK-build/Wrapping` directory. 
+
+We then have to run language-specific install scripts to able to use SimpleElastix in the target language environment. Target language dependencies need to be pre-installed. The relevant :code:`apt-get` packages are  
+
+::
+
+    python python-dev monodevelop r-base r-base-dev ruby ruby-dev tcl tcl-dev tk tk-dev
+
+Follow the steps below to install SimpleElastix when compilation has finished.
+
+# Python 
+
+To install the python module onto your system, navigate to
 
 ::
 
@@ -32,52 +48,80 @@ and run the following command:
 
     $ sudo python setup.py install
 
-This will install the SimpleITK python module with SimpleElastix unto your system, which can then be imported into your scripts like any other python module. 
+This will install the SimpleITK python module with SimpleElastix, which can then be imported into scripts like any other python module.  If we want to install SimpleElastix into a virtual environment, activate the virtual environment on beforehand and omit :code:`sudo`. If you don't know what a virtual environment is, don't worry about it, it is entirely optional.
 
-Target language dependencies need to be pre-installed. The relevant :code:`apt-get` packages are  
+# Java
+TODO: Pull request welcome.
 
-::
+# R
+TODO: Pull request welcome.
 
-    python python-dev monodevelop r-base r-base-dev ruby ruby-dev tcl tcl-dev tk tk-dev
+# C#
+TODO: Pull request welcome.
 
-Note that this project takes around an hour to build on a quad-core machine. SimpleElastix has been tried and tested on Ubuntu 14.10 using GCC 4.9.2 and Clang 3.4.0, Mac OSX Yosemite using Apple Clang 600.0.56 and Windows 8.1 using Microsft Visual Studio 2010 C++ compiler.
+# C++
+TODO: Pull request welcome.
 
-.. warning::
+# Ruby
+TODO: Pull request welcome.
 
-    Be careful not to run out of memory during the build. A rule of thumb is that we need 4GB of memory per core. For example, if we compile SimpleElastix with 4 cores (e.g. :code:`make -j4`) we need a machine with at least 16GB of RAM.
+# Lua
+TODO: Pull request welcome. 
+
+.. info::
+    To see if CMake correctly detects a language, run :code:`ccmake .` in the build directory after running :code:`cmake` and check that the relevant :code:`WRAP_*` variable is set to :code:`ON`. For example, WRAP_PYTHON means that SimpleElastix will be compiled for Python. If :code:`WRAP_` is set to :code:`OFF`, it probably means that the language needs to be installed to the system (we can always try set it to :code:`ON`, the error message will tell us what is wrong when we subsequently run :code:`cmake` again). 
 
 .. _MacOSX:
 
-SuperBuild On Mac OS X
+Compiling On Mac OS X
 ----------------------
 
-The Mac OS X installation procedure is identical to that of Linux, so simply follow the Linux installation steps above to install SimpleElastix. Mac OS X comes with Python and Tcl preinstalled. Other target-language dependencies need to be installed seperately. This can be done with `Macports <https://www.macports.org/>`_ or `Homebrew <http://http://brew.sh/>`_.
+The Mac OS X compilation procedure is identical to that of Linux, so simply follow the Linux installation steps above to compile SimpleElastix. We need to have CMake git and a compiler installed. We can check for a working compiler by opening the OS X terminal and run :code:`make`. OS X will know if the Xcode Command Line Tools is missing and prompt you to install them if this is the case. 
 
-It is assumed that a CMake, git and a compiler toolchain has already been installed. We can check for a working compiler by opening the OS X terminal and run :code:`make`. OS X will know if the Xcode Command Line Tools is missing and prompt you to install them if this is the case. 
+Mac OS X comes with Python and Tcl preinstalled but other target-language dependencies need to be installed seperately. This can be done with `Macports <https://www.macports.org/>`_ or `Homebrew <http://http://brew.sh/>`_. SimpleElastix will be compiled for languages that it can automatically detect. The language packages will be built in the :code:`${BUILD_DIRECTORY}/SimpleITK-build/Wrapping` directory.
+
+Follow the steps below to install SimpleElastix when compilation has finished.
+
+# Python 
+
+To install the python module onto our system, we navigate to
+
+::
+
+    ${BUILD_DIRECTORY}/SimpleITK-build/Wrapping/Python/Packaging
+
+and run the following command:
+
+::
+
+    $ sudo python setup.py install
+
+This will install the SimpleITK python module with SimpleElastix, which can then be imported into scripts like any other python module.  If we want to install SimpleElastix into a virtual environment, we activate the virtual environment on beforehand and omit :code:`sudo`. If you don't know what a virtual environment is, don't worry about it, it is entirely optional.
+
+# Java
+TODO: Pull request welcome.
+
+# R
+TODO: Pull request welcome.
+
+# C#
+TODO: Pull request welcome.
+
+# C++
+TODO: Pull request welcome.
+
+# Ruby
+TODO: Pull request welcome.
+
+# Lua
+TODO: Pull request welcome. 
 
 .. _Windows:
 
-SuperBuild On Windows
+Compiling On Windows
 ---------------------
 
-SimpleElastix can be compiled with the SuperBuild. The SuperBuild is a script that automatically downloads and install any dependencies so you can don't have to install elastix, ITK or SWIG on beforehand. The only thing you need is CMake, git and a compiler toolchain. 
-
-Using the command line
-~~~~~~~~~~~~~~~~~~~~~~
-
-We will use CMake to generate build files and the msbuild.exe program to compile the project (which is also what Visual Studio uses under the good). 
-
-1. Download CMake, git and code, and setup directories. 
-    - Download and install `CMake GUI <http://www.cmake.org/download/>`_. Be sure to select `Add CMake to the system PATH` option.
-    - :code:`git clone https://github.com/kaspermarstal/SimpleElastix` into a source folder of your choice. You can install `GitHub Desktop <https://desktop.github.com/>`_ and use the accompanying command line tool with git automatically added to its path.
-    - Make a new directory named `build` and cd into it by typing `cd build`. Here we will assume that the build directory and the source directory is in the same folder.
-2. Compile the project.
-    - Open "Developer Command Prompt for VS2015" (or equivalent depending on your version of Visual Studio)
-    - Run `cmake ../SimpleElastix/SuperBuild`.
-    - Run `msbuild /p:configuration=release ALL_BUILD.vcxproj`. 
-3. Enable x64 bit build (Optional).
-    - Prior to running the `cmake` command in step 2, navigate to `C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC>` (or equivalent depending on your version of Visual Studio) and `vcvarsall amd64`.
-
+SimpleElastix includes a script that automatically downloads and install all dependencies so we don't have to install elastix, ITK, GTest or SWIG manually. This is called a 'SuperBuild' in CMake terms. The only things needed to compile the SuperBuild is CMake, git and a compiler toolchain. Here, we use the compiler that comes the free `Visual Studio Community 2017 <https://www.visualstudio.com/downloads/>`_ package.
 
 Using Visual Studio
 ~~~~~~~~~~~~~~~~~~~
@@ -118,7 +162,7 @@ Will use CMake to generate build files and the Visual Studio compiler to compile
     - Press generate.
 
 3. If you are comfortable with the commandline, this is by far the easiest and least error-prone way of compiling the project. Otherwise skip to steps 4 and 5 that uses Visual Studio . 
-    - Open x64 native tools command prompt. On Windows 10, open the stat menu and click on "All Apps". Find the Visual Studio folder (e.g. "Microsoft Visual Studio 2012"), open it, and click on "Open VS2012 x64 Native Tools Command Prompt."
+    - Open x64 native tools command prompt. On Windows 10, open the stat menu and click on "All Apps". Find the Visual Studio folder (e.g. "Microsoft Visual Studio 2012"), open it, and click on "Open VS2012 x64 Native Tools Command Prompt."`w
     - Navigate to the build folder specified in CMake. 
     - Run :code:`msbuild ALL_BUILD.vcxproj /p:Configuration=Release`.
     - Done. Ignore steps 4 and 5.
@@ -140,6 +184,55 @@ Will use CMake to generate build files and the Visual Studio compiler to compile
 
         Figure 6: Right-click on :code:`ALL_BUILD` and click :code:`Build`.
 
+# Python 
+
+To install the python module onto your system, navigate to
+
+::
+
+    ${BUILD_DIRECTORY}/SimpleITK-build/Wrapping/Python/Packaging
+
+and run the following command:
+
+::
+
+    $ sudo python setup.py install
+
+This will install the SimpleITK python module with SimpleElastix, which can then be imported into scripts like any other python module.  If we want to install SimpleElastix into a virtual environment, activate the virtual environment on beforehand and omit :code:`sudo`. If you don't know what a virtual environment is, don't worry about it, it is entirely optional.
+
+# Java
+TODO: Pull request welcome.
+
+# R
+TODO: Pull request welcome.
+
+# C#
+TODO: Pull request welcome.
+
+# C++
+TODO: Pull request welcome.
+
+# Ruby
+TODO: Pull request welcome.
+
+# Lua
+TODO: Pull request welcome. 
+
+Using the command line
+~~~~~~~~~~~~~~~~~~~~~~
+
+SimpleElastix can also be compiled via the Windows shell. We will still use CMake to generate build files and the msbuild.exe program to compile the project (which Visual Studio uses under the hood) but we do not have to use a GUI. 
+
+1. Download CMake, git and code, and setup directories. 
+    - Download and install `CMake GUI <http://www.cmake.org/download/>`_. Be sure to select `Add CMake to the system PATH` option.
+    - :code:`git clone https://github.com/kaspermarstal/SimpleElastix` into a source folder of your choice. You can install `GitHub Desktop <https://desktop.github.com/>`_ and use the accompanying command line tool with git automatically added to its path.
+    - Make a new directory named `build` and cd into it by typing `cd build`. Here we will assume that the build directory and the source directory is in the same folder.
+2. Compile the project.
+    - Open "Developer Command Prompt for VS2015" (or equivalent depending on your version of Visual Studio)
+    - Run `cmake ../SimpleElastix/SuperBuild`.
+    - Run `msbuild /p:configuration=release ALL_BUILD.vcxproj`. 
+3. Enable x64 bit build (Optional).
+    - Prior to running the `cmake` command in step 2, navigate to `C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC>` (or equivalent depending on your version of Visual Studio) and `vcvarsall amd64`.
 
 Manually Building On Linux
 --------------------------
@@ -153,16 +246,16 @@ The following approach allows us to use a locally installed version of ITK and/o
     - Configure CMake. Set the following CMake variables: BUILD_SHARED_LIBS=OFF, Module_ITKReview=ON, ITK_WRAP_*=OFF.
     - Compile ITK. Make sure to note the build settings, e.g. Release x64.
 4. Build elastix. 
-    - Clone elastix from `github.com/kaspermarstal/elastix <https://github.com/kaspermarstal/elastix>`_.
+    - Clone elastix from `github.com/SuperElastix/elastix <https://github.com/SuperElastix/elastix>`_.
     - Set ITK_DIR to the location of the ITK build directory
-    - Configure CMake. Set the following CMake variables: BUILD_EXECUTABLE=OFF, USE_KNNGraphAlphaMutualInformationMetric=OFF 
+    - Configure CMake. Set the CMake variable :code:`BUILD_EXECUTABLE` to :code:`OFF`. 
     - Set appropriate ELASTIX_IMAGE_2/3/4D_PIXELTYPES and any components that you might require.
     - If you are developing your own elastix components, make sure they are properly registered by the elastix build system.
     - Compile elastix. Make sure to configure the build settings exactly the same as ITK e.g. Release x64.
 5. Build SimpleElastix. 
-    - Clone SimpleElastix from `github.com/kaspermarstal/SimpleElastix <https://github.com/kaspermarstal/SimpleElastix>`_.
-    - Configure CMake. Point ITK_DIR to the location of the ITK build directory and ELASTIX_DIR to the location of the elastix build directory, specifically the src/ directory in it.
-    - Build SimpleElastix. Make sure to configure the build settings exactly the same as ITK e.g. Release x64.
+    - Clone SimpleElastix from `github.com/SuperElastix/SimpleElastix <https://github.com/SuperElastix/SimpleElastix>`_.
+    - Configure CMake. Point :code:`ITK_DIR` to the location of the ITK build directory and :code:`ELASTIX_DIR` to the location of the elastix build directory, specifically the src/ directory in it.
+    - Build SimpleElastix. Make sure to configure the build settings exactly the same as ITK and Elastix, e.g. Release x64.
 
 Troubleshooting
 ---------------

@@ -40,7 +40,9 @@ namespace itk {
 
       this->m_MemberFactory.reset( new detail::MemberFunctionFactory<MemberFunctionType>( this ) );
 
+#ifdef SITK_4D_IMAGES
       this->m_MemberFactory->RegisterMemberFunctions< PixelIDTypeList, 4 > ();
+#endif
       this->m_MemberFactory->RegisterMemberFunctions< PixelIDTypeList, 3 > ();
       this->m_MemberFactory->RegisterMemberFunctions< PixelIDTypeList, 2 > ();
       }
@@ -83,13 +85,13 @@ namespace itk {
         this->GetPixelIDFromImageIO( imageio, unused, dimension );
         }
 
-#ifdef SimpleITK_4D_IMAGES
+#ifdef SITK_4D_IMAGES
       if ( dimension != 2 && dimension != 3  && dimension != 4 )
 #else
       if ( dimension != 2 && dimension != 3 )
 #endif
         {
-        sitkExceptionMacro( "The file has unsupported " << dimension - 1 << " dimensions." );
+        sitkExceptionMacro( "The file has unsupported " << dimension << " dimensions." );
         }
 
       if ( !this->m_MemberFactory->HasMemberFunction( type, dimension ) )

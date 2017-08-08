@@ -7,37 +7,37 @@ class SimpleTransformix {
     // If you get "no SimpleITKJava in java.library.path" point java.library.path to lib/libSimpeITKJava.jnilib
 
     if ( argv.length < 4 ) {
-      System.out.println("Usage: java -cp SimpleTransformixJava.jar SimpleTransformix <fixedImage> <movingImage> <parameterFile> <inputImage> <output>");
+      System.out.println("Usage: java -cp SimpleTransformix.jar SimpleTransformix <fixedImage> <movingImage> <parameterFile> <inputImage> <output>");
       return;
     }
 
     // Make transform
     org.itk.simple.ImageFileReader reader = new org.itk.simple.ImageFileReader();
     reader.setFileName(argv[0]);
-    org.itk.simple.SimpleElastix elastix = new org.itk.simple.SimpleElastix();
-    elastix.setFixedImage(reader.execute());
+    org.itk.simple.ElastixImageFilter elastixImageFilter = new org.itk.simple.ElastixImageFilter();
+    elastixImageFilter.setFixedImage(reader.execute());
     reader.setFileName(argv[1]);
-    elastix.setMovingImage(reader.execute());
-    elastix.setParameterMap(elastix.readParameterFile(argv[2]));
-    elastix.logToConsoleOn();
-    elastix.execute();
+    elastixImageFilter.setMovingImage(reader.execute());
+    elastixImageFilter.setParameterMap(silx.readParameterFile(argv[2]));
+    elastixImageFilter.logToConsoleOn();
+    elastixImageFilter.execute();
 
     // Instantiate transformix
-    org.itk.simple.SimpleTransformix transformix = new org.itk.simple.SimpleTransformix();
+    org.itk.simple.TransformixImageFilter transformixImageFilter = new org.itk.simple.TransformixImageFilter();
 
     // Read input
     reader.setFileName(argv[3]);
-    transformix.setInputImage(reader.execute());
-    transformix.setTransformParameterMap(elastix.getTransformParameterMap());
+    transformixImageFilter.setInputImage(reader.execute());
+    transformixImageFilter.setTransformParameterMap(silx.getTransformParameterMap());
 
     // Perform warp
-    transformix.logToConsoleOn();
-    transformix.execute();
+    transformixImageFilter.logToConsoleOn();
+    transformixImageFilter.execute();
 
     // Write result image
     ImageFileWriter writer = new org.itk.simple.ImageFileWriter();
     writer.setFileName(argv[4]);
-    writer.execute(transformix.getResultImage()); 
+    writer.execute(transformixImageFilter.getResultImage()); 
 
   }
 

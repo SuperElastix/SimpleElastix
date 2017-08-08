@@ -81,6 +81,7 @@ TEST( ElastixImageFilter, Masks )
 
   ElastixImageFilter silx;
   EXPECT_NO_THROW( silx.SetParameter( "ImageSampler", "RandomSparseMask" ) );
+  EXPECT_NO_THROW( silx.SetParameter( "MaximumNumberOfIterations", "1" ) );
   EXPECT_NO_THROW( silx.SetFixedImage( fixedImage ) );
   EXPECT_NO_THROW( silx.SetFixedMask( fixedMask ) );
   EXPECT_NO_THROW( silx.SetMovingImage( movingImage ) );
@@ -88,6 +89,7 @@ TEST( ElastixImageFilter, Masks )
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
 
   // Only accept masks of pixel type unsigned char
+  EXPECT_NO_THROW( silx.SetFixedMask( fixedMask ) );
   EXPECT_NO_THROW( silx.SetMovingMask( movingMaskInvalidType ) );
   EXPECT_THROW( silx.Execute(), GenericException );
   EXPECT_NO_THROW( silx.SetMovingMask( movingMask ) );
@@ -153,7 +155,10 @@ TEST( ElastixImageFilter, ProceduralInterface )
   EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, defaultParameterMapName, false, true, outputDirectory ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
 
+  typedef ElastixImageFilter::ParameterMapVectorType ParameterMapVectorType;
+  typedef ElastixImageFilter::ParameterValueVectorType ParameterValueVectorType;
   ElastixImageFilter::ParameterMapType parameterMap = GetDefaultParameterMap( defaultParameterMapName );
+  parameterMap["MaximumNumberOfIterations"] = ParameterValueVectorType( 1, "1" );
   EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMap ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
   EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMap, true ) );
@@ -177,9 +182,11 @@ TEST( ElastixImageFilter, ProceduralInterface )
   EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMap, false, true, outputDirectory ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
 
-  ElastixImageFilter::ParameterMapVectorType parameterMapVector;
+  ParameterMapVectorType parameterMapVector;
   parameterMapVector.push_back( GetDefaultParameterMap( defaultParameterMapName ) );
+  parameterMapVector[ 0 ][ "MaximumNumberOfIterations" ] = ParameterValueVectorType( 1, "1" );
   parameterMapVector.push_back( GetDefaultParameterMap( "rigid" ) );
+  parameterMapVector[ 1 ][ "MaximumNumberOfIterations" ] = ParameterValueVectorType( 1, "1" );
   EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMapVector ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
   EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMapVector, true ) );
@@ -401,10 +408,24 @@ TEST( ElastixImageFilter, Registration3D )
   Image resultImage; 
 
   ElastixImageFilter silx;
+  silx.SetParameter("MaximumNumberOfIterations", "1" );
   EXPECT_NO_THROW( silx.SetFixedImage( fixedImage ) );
   EXPECT_NO_THROW( silx.SetMovingImage( movingImage ) );
   EXPECT_NO_THROW( resultImage = silx.Execute() );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
+}
+
+TEST( ElastixImageFilter, SetNumberOfThreads )
+{
+  Image fixedImage = ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
+  Image movingImage = ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
+
+  ElastixImageFilter silx;
+  EXPECT_NO_THROW( silx.SetFixedImage( fixedImage ) );
+  EXPECT_NO_THROW( silx.SetMovingImage( movingImage ) );
+  EXPECT_NO_THROW( silx.SetParameter("MaximumNumberOfIterations", "1" ) );
+  EXPECT_NO_THROW( silx.SetNumberOfThreads( 1 ) );
+  EXPECT_NO_THROW( silx.Execute() );
 }
 
 #ifdef SITK_4D_IMAGES
@@ -415,9 +436,9 @@ TEST( ElastixImageFilter, Registration4D )
   Image movingImage = ReadImage( dataFinder.GetFile( "Input/4D.nii.gz" ) );
   Image resultImage; 
 
-  ElastixImageFilter silx; silx.LogToConsoleOn();
+  ElastixImageFilter silx;
   silx.SetParameterMap( "groupwise" );
-  silx.SetParameter("MaximumNumberOfIterations", "8.0");
+  silx.SetParameter("MaximumNumberOfIterations", "1");
   silx.SetParameter("FinalGridSpacingInPhysicalUnits", "32.0");
   EXPECT_NO_THROW( silx.SetFixedImage( fixedImage ) );
   EXPECT_NO_THROW( silx.SetMovingImage( movingImage ) );

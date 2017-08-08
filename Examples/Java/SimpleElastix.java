@@ -7,31 +7,31 @@ class SimpleElastix {
     // If you get "no SimpleITKJava in java.library.path" point java.library.path to lib/libSimpeITKJava.jnilib
 
     if ( argv.length < 4 ) {
-      System.out.println("Usage: java -cp SimpleElastixJava.jar SimpleElastix <fixedImage> <movingImage> <parameterFile> <outputDirectory>");
+      System.out.println("Usage: java -cp SimpleElastix.jar SimpleElastix <fixedImage> <movingImage> <parameterFile> <outputDirectory>");
       return;
     }
 
     // Instantiate SimpleElastix
-    org.itk.simple.SimpleElastix elastix = new org.itk.simple.SimpleElastix();
+    org.itk.simple.ElastixImageFilter elastixImageFilter = new org.itk.simple.ElastixImageFilter();
 
     // Read input
     org.itk.simple.ImageFileReader reader = new org.itk.simple.ImageFileReader();
     reader.setFileName(argv[0]);
-    elastix.setFixedImage(reader.execute());
+    elastixImageFilter.setFixedImage(reader.execute());
     reader.setFileName(argv[1]);
-    elastix.setMovingImage(reader.execute());
-    elastix.setParameterMap(elastix.readParameterFile(argv[2]));
+    elastixImageFilter.setMovingImage(reader.execute());
+    elastixImageFilter.setParameterMap(silx.readParameterFile(argv[2]));
 
     // Perform registration
-    elastix.logToConsoleOn();
-    elastix.execute();
+    elastixImageFilter.logToConsoleOn();
+    elastixImageFilter.execute();
 
     // Write result image
     ImageFileWriter writer = new org.itk.simple.ImageFileWriter();
     writer.setFileName(argv[3]);
-    writer.execute(elastix.getResultImage(), "."); 
+    writer.execute(elastixImageFilter.getResultImage(), "."); 
 
-    elastix.prettyPrint(elastix.getTransformParameterMap());
+    elastixImageFilter.prettyPrint(elastixImageFilter.getTransformParameterMap());
 
   }
 

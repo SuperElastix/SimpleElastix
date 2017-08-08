@@ -426,6 +426,21 @@ ElastixImageFilter
 
 ElastixImageFilter::Self& 
 ElastixImageFilter
+::SetNumberOfThreads( int n )
+{
+  this->m_Pimple->SetNumberOfThreads( n );
+  return *this;
+}
+
+int
+ElastixImageFilter
+::GetNumberOfThreads()
+{
+  return this->m_Pimple->GetNumberOfThreads();
+}
+
+ElastixImageFilter::Self& 
+ElastixImageFilter
 ::SetParameterMap( const std::string transformName, const unsigned int numberOfResolutions, const double finalGridSpacingInPhysicalUnits )
 {
   this->m_Pimple->SetParameterMap( transformName, numberOfResolutions, finalGridSpacingInPhysicalUnits );

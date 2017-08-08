@@ -24,7 +24,8 @@ if (NOT CMAKE_PROJECT_NAME STREQUAL "SimpleITK" )
   if(MSVC)
      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
   endif()
-
+else()
+  set(SimpleITK_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 endif()
 
 
@@ -55,7 +56,7 @@ if(NOT SimpleITK_DOC_FILES)
   set ( SimpleITK_DOC_FILES
     "${SimpleITK_SOURCE_DIR}/LICENSE"
     "${SimpleITK_SOURCE_DIR}/NOTICE"
-    "${SimpleITK_SOURCE_DIR}/Readme.md"
+    "${SimpleITK_SOURCE_DIR}/README.md"
   )
 endif()
 

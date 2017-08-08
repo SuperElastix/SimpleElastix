@@ -1,7 +1,7 @@
 library(SimpleITK)
 
-SimpleElastixObj <- SimpleElastix()
-SimpleElastixObj$SetFixedImage(ReadImage("fixedImage.nii"))
-SimpleElastixObj$SetMovingImage(ReadImage("movingImage.nii"))
-SimpleElastixObj$Execute()
-resultImage <- SimpleElastixObj.GetResultImage()
+elastixImageFilter <- ElastixImageFilter()
+elastixImageFilter$SetFixedImage(ReadImage("fixedImage.nii"))
+elastixImageFilter$SetMovingImage(ReadImage("movingImage.nii"))
+elastixImageFilter$Execute()
+resultImage <- elastixImageFilter.GetResultImage()

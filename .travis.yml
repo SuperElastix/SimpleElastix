@@ -2,15 +2,24 @@ language: cpp
 
 env:
   global:
-    ExternalData_OBJECT_STORES=${HOME}/.ExternalData
-    CMAKE_DOWNLOAD_FILE=cmake-3.6.0-Linux-x86_64.sh
-    SIMPLEELASTIX_SOURCE_DIR=${TRAVIS_BUILD_DIR}
-    SIMPLEELASTIX_BUILD_DIR=${SIMPLEELASTIX_SOURCE_DIR}/Build
-    SIMPLEELASTIX_SUPERBUILD_DIR=${SIMPLEELASTIX_SOURCE_DIR}/SuperBuild
+    HOME_DIR=${TRAVIS_BUILD_DIR}/..
+    ITK_URL=https://github.com/InsightSoftwareConsortium/ITK
+    ITK_SOURCE_DIR=${HOME_DIR}/ITK-source
+    ITK_BUILD_DIR=${HOME_DIR}/ITK-build
+    ELASTIX_URL=https://github.com/SuperElastix/elastix
+    ELASTIX_SOURCE_DIR=${HOME_DIR}/Elastix-source
+    ELASTIX_BUILD_DIR=${HOME_DIR}/Elastix-build
+    SIMPLEELASTIX_SOURCE_DIR=${TRAVIS_BUILD_DIR}/SuperBuild
+    SIMPLEELASTIX_BUILD_DIR=${HOME_DIR}/SimpleElastix-build
+    OMP_NUM_THREADS=2
 
 cache:
   directories:
-    - ${ExternalData_OBJECT_STORES}
+    - ExternalData_OBJECT_STORES=${HOME}/.ExternalData
+    - ${ITK_SOURCE_DIR}
+    - ${ITK_BUILD_DIR}
+    - ${ELASTIX_SOURCE_DIR}
+    - ${ELASTIX_BUILD_DIR}
     
 matrix:
   include:
@@ -28,14 +37,29 @@ matrix:
       compiler: gcc
 
 before_script:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get remove cmake && sudo apt-get install swig lua5.1; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cd ${ExternalData_OBJECT_STORES} && if [[ ! -e ${CMAKE_DOWNLOAD_FILE} ]]; then curl -sSO https://cmake.org/files/v3.6/${CMAKE_DOWNLOAD_FILE}; fi; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then echo "y\n" | sudo bash "${ExternalData_OBJECT_STORES}/${CMAKE_DOWNLOAD_FILE}" --prefix=/usr/local --exclude-subdir; fi
-  - cmake --version
-  - export OMP_NUM_THREADS=2
   - mkdir -p ${SIMPLEELASTIX_BUILD_DIR}
 
 script:
+  - if [[ ! -e ${ITK_BUILD_DIR}/ITKConfig.cmake ]]; then
+      rm -rf ${ITK_SOURCE_DIR} {ITK_BUILD_DIR} &&
+      git clone ${ITK_URL} ${ITK_SOURCE_DIR} &&
+      cd ${ITK_SOURCE_DIR} &&
+      git checkout v4.11.1 &&
+      mkdir -p ${ITK_BUILD_DIR} &&
+      cd ${ITK_BUILD_DIR} &&
+      cmake -DBUILD_EXAMPLES=OFF -DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release   -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON -DCMAKE_VISIBILITY_INLINES_HIDDEN:BOOL=ON -DBUILD_SHARED_LIBS:BOOL=OFF -DCMAKE_SKIP_RPATH:BOOL=ON -DITK_LEGACY_REMOVE:BOOL=ON -DITK_USE_KWSTYLE:BOOL=OFF -DITK_BUILD_DEFAULT_MODULES:BOOL=ON -DModule_ITKReview:BOOL=ON ${ITK_SOURCE_DIR} &&
+      make --jobs=4; fi
+  - if [[ ! -e ${ELASTIX_BUILD_DIR}/src/UseElastix.cmake ]]; then
+      rm -rf ${ELASTIX_SOURCE_DIR} ${ELASTIX_BUILD_DIR} &&
+      git clone ${ELASTIX_URL} ${ELASTIX_SOURCE_DIR} &&
+      cd ${ELASTIX_SOURCE_DIR} &&
+      git checkout ef057ff89233822b26b04b31c3c043af57d5deff &&
+      mkdir -p ${ELASTIX_BUILD_DIR} &&
+      cd ${ELASTIX_BUILD_DIR} &&
+      cmake -DBUILD_TESTING:BOOL=OFF -DELASTIX_BUILD_EXECUTABLE:BOOL=OFF -DITK_DIR=${ITK_BUILD_DIR} -DCMAKE_BUILD_TYPE=Release ${ELASTIX_SOURCE_DIR} &&
+      make --jobs=4 && 
+      touch ${HOME_DIR}/built_cache; fi
   - cd ${SIMPLEELASTIX_BUILD_DIR}
-  - cmake -DWRAP_LUA:BOOL=OFF -DWRAP_PYTHON:BOOL=OFF -DWRAP_JAVA:BOOL=OFF -DWRAP_CSHARP:BOOL=OFF -DWRAP_TCL:BOOL=OFF -DWRAP_R:BOOL=OFF -DWRAP_RUBY:BOOL=OFF -DBUILD_EXAMPLES:BOOL=ON -DBUILD_TESTING:BOOL=OFF -DCMAKE_CXX_FLAGS=-w -DCMAKE_C_FLAGS=-w -DCMAKE_BUILD_TYPE=Release ${SIMPLEELASTIX_SUPERBUILD_DIR}
-  - make --jobs=4
+  - if [[ ! -e ${HOME_DIR}/built_cache ]]; then
+      cmake -DWRAP_LUA:BOOL=OFF -DWRAP_PYTHON:BOOL=OFF -DWRAP_JAVA:BOOL=OFF -DWRAP_CSHARP:BOOL=OFF -DWRAP_TCL:BOOL=OFF -DWRAP_R:BOOL=OFF -DWRAP_RUBY:BOOL=OFF -DBUILD_EXAMPLES:BOOL=ON -DBUILD_TESTING:BOOL=OFF -DCMAKE_CXX_FLAGS=-w -DCMAKE_C_FLAGS=-w -DCMAKE_BUILD_TYPE=Release -DSimpleITK_USE_SYSTEM_ITK:BOOL=ON -DITK_DIR=${ITK_BUILD_DIR} -DSimpleITK_USE_SYSTEM_ELASTIX:BOOL=ON -DELASTIX_DIR=${ELASTIX_BUILD_DIR} -DSimpleITK_4D_IMAGES:BOOL=OFF ${SIMPLEELASTIX_SOURCE_DIR} &&
+       make --jobs=4; fi

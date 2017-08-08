@@ -82,10 +82,13 @@ if(ITK_FOUND)
   link_directories( "${ITK_LIBRARY_DIRS}")
 endif()
 
+
+list(APPEND SimpleITK_PRIVATE_COMPILE_OPTIONS ${CXX_ADDITIONAL_WARNING_FLAGS})
+
 #-----------------------------------------------------------
 # Configure Elastix
 mark_as_advanced( SimpleITK_OPENMP )
-option( SimpleITK_OPENMP "If available, use OpenMP to speed up certain elastix computations." OFF )
+option( SimpleITK_OPENMP "Use OpenMP to speed up certain elastix computations." ON )
 
 if( SimpleITK_OPENMP )
   find_package( OpenMP QUIET )
@@ -110,10 +113,8 @@ include( ${ELASTIX_USE_FILE} )
 
 # Check if libraries are available
 if( ELASTIX_BUILD_EXECUTABLE )
-  message(FATAL_ERROR "SimpleElastix requires elastix libraries, please set ELASTIX_BUILD_EXECUTABLE=OFF and rebuild elastix")
+  message(FATAL_ERROR "SimpleElastix requires elastix libraries, please set ELASTIX_BUILD_EXECUTABLE=OFF and rebuild elastix.")
 endif()
-
-list(APPEND SimpleITK_PRIVATE_COMPILE_OPTIONS ${CXX_ADDITIONAL_WARNING_FLAGS})
 
 #----------------------------------------------------------
 # Place all options to go into sitkConfigure.h here

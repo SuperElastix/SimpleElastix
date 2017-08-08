@@ -2,23 +2,23 @@ import SimpleITK as sitk
 import sys
 
 # Make transform 
-elastix = sitk.SimpleElastix()
-elastix.SetFixedImage(sitk.ReadImage(str(sys.argv[1])))
-elastix.SetMovingImage(sitk.ReadImage(str(sys.argv[2])))
-elastix.SetParameterMap(sitk.ReadParameterFile(str(sys.argv[3])))
-elastix.LogToConsoleOn()
-elastix.Execute()
+elastixImageFilter = sitk.ElastixImageFilter()
+elastixImageFilter.SetFixedImage(sitk.ReadImage(str(sys.argv[1])))
+elastixImageFilter.SetMovingImage(sitk.ReadImage(str(sys.argv[2])))
+elastixImageFilter.SetParameterMap(sitk.ReadParameterFile(str(sys.argv[3])))
+elastixImageFilter.LogToConsoleOn()
+elastixImageFilter.Execute()
 
 # Instantiate SimpleTransformix
-transformix = sitk.SimpleTransformix()
+transformixImageFilter = sitk.TransformixImageFilter()
 
 # Read Input
-transformix.SetInputImage(sitk.ReadImage(str(sys.argv[4])))
-transformix.SetParameterMap(elastix.GetTransformParameterMap())
+transformixImageFilter.SetInputImage(sitk.ReadImage(str(sys.argv[4])))
+transformixImageFilter.SetParameterMap(elastixImageFilter.GetTransformParameterMap())
 
 # Perform warp
-transformix.LogToConsoleOn()
-transformix.Execute()
+transformixImageFilter.LogToConsoleOn()
+transformixImageFilter.Execute()
 
 # Write result image
-sitk.WriteImage(transformix.GetResultImage(), str(sys.argv[5]))
+sitk.WriteImage(transformixImageFilter.GetResultImage(), str(sys.argv[5]))
