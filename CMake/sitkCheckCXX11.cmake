@@ -36,7 +36,7 @@ function(sitkCXX11Test VARIABLE)
   if(NOT DEFINED ${VARIABLE})
     message(STATUS "Performing Test ${VARIABLE}")
     try_compile(${VARIABLE}
-      "${PROJECT_BINARY_DIR}/CMakeTmp"
+      "${PROJECT_BINARY_DIR}"
       "${CMAKE_CURRENT_LIST_DIR}/sitk_check_cxx11.cxx"
       COMPILE_DEFINITIONS "-D${VARIABLE}" ${CMAKE_REQUIRED_DEFINITIONS}
       OUTPUT_VARIABLE output)
