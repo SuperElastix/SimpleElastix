@@ -15,6 +15,11 @@ if(NOT CMAKE_PROJECT_NAME STREQUAL "SimpleITK")
   include(${SimpleITK_USE_FILE})
 endif()
 
+option(SimpleITK_SHOW_TESTING_ENABLED "Enable the Show function in SimpleITK testing." OFF)
+if (NOT SimpleITK_SHOW_TESTING_ENABLED)
+  set(ENV{SITK_NOSHOW} TRUE)
+endif ()
+
 # Add individual cxx executables
 add_executable ( elx elx.cxx )
 target_link_libraries ( elx ${SimpleITK_LIBRARIES} )
@@ -38,6 +43,7 @@ set(TEST_HARNESS_DATA_DIRECTORY ${SimpleITK_BINARY_DIR}/ExternalData/Testing/Dat
 set(ITK_TEST_DRIVER  "$<TARGET_FILE:itkTestDriver>")
 
 # Add example organized sub-directories with multiple languages
+add_subdirectory(HelloWorld)
 add_subdirectory(SimpleGaussian)
 add_subdirectory(ImageRegistrationMethod1)
 add_subdirectory(ImageRegistrationMethod2)
