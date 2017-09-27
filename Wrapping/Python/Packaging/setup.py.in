@@ -70,7 +70,7 @@ class build_ext(_build_ext):
 
 
 setup(
-    name = 'SimpleElastix',
+    name = 'SimpleITK',
     version = get_pep386version(),
     author = 'Insight Software Consortium',
     author_email = 'insight-users@itk.org',
