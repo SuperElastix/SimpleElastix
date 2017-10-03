@@ -42,7 +42,7 @@ VariableListToArgs( ITK_VARS  ep_itk_args )
 
 set(proj ITK)  ## Use ITK convention of calling it ITK
 if(NOT DEFINED ITK_REPOSITORY)
-  set(ITK_REPOSITORY "${git_protocol}://itk.org/ITK.git")
+  set(ITK_REPOSITORY "${git_protocol}://github.com/InsightSoftwareConsortium/ITK.git")
 endif()
 
 set(ITK_USE_GIT_PROTOCOL 0)
@@ -51,7 +51,7 @@ if("${git_protocol}" STREQUAL "git")
 endif()
 
 # NOTE: it is very important to update the ITK_DIR path with the ITK version
-set(ITK_TAG_COMMAND GIT_TAG v4.11.1) # v4.11.1 tag
+set(ITK_TAG_COMMAND GIT_TAG v4.12.2) # v4.12.2 tag
 
 if( ${BUILD_SHARED_LIBS} )
   set( ITK_BUILD_SHARED_LIBS ON )
@@ -95,4 +95,4 @@ ExternalProject_Add(${proj}
 
 
 ExternalProject_Get_Property(ITK install_dir)
-set(ITK_DIR "${install_dir}/lib/cmake/ITK-4.11" )
+set(ITK_DIR "${install_dir}/lib/cmake/ITK-4.12" )
