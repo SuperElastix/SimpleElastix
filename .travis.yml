@@ -2,20 +2,20 @@ language: cpp
 
 env:
   global:
-    HOME_DIR=${TRAVIS_BUILD_DIR}/..
+    EXTERNAL_DATA_DIR=${HOME}/.ExternalData
     ITK_URL=https://github.com/InsightSoftwareConsortium/ITK
-    ITK_SOURCE_DIR=${HOME_DIR}/ITK-source
-    ITK_BUILD_DIR=${HOME_DIR}/ITK-build
+    ITK_SOURCE_DIR=${HOME}/ITK-source
+    ITK_BUILD_DIR=${HOME}/ITK-build
     ELASTIX_URL=https://github.com/SuperElastix/elastix
-    ELASTIX_SOURCE_DIR=${HOME_DIR}/Elastix-source
-    ELASTIX_BUILD_DIR=${HOME_DIR}/Elastix-build
-    SIMPLEELASTIX_SOURCE_DIR=${TRAVIS_BUILD_DIR}/SuperBuild
-    SIMPLEELASTIX_BUILD_DIR=${HOME_DIR}/SimpleElastix-build
+    ELASTIX_SOURCE_DIR=${HOME}/Elastix-source
+    ELASTIX_BUILD_DIR=${HOME}/Elastix-build
+    SIMPLEELASTIX_SOURCE_DIR=${HOME}/SuperBuild
+    SIMPLEELASTIX_BUILD_DIR=${HOME}/SimpleElastix-build
     OMP_NUM_THREADS=2
 
 cache:
   directories:
-    - ExternalData_OBJECT_STORES=${HOME}/.ExternalData
+    - ${EXTERNAL_DATA_DIR}
     - ${ITK_SOURCE_DIR}
     - ${ITK_BUILD_DIR}
     - ${ELASTIX_SOURCE_DIR}
@@ -24,12 +24,8 @@ cache:
 matrix:
   include:
     - os: linux
-      dist: trusty
-      sudo: required
       compiler: clang
     - os: linux
-      dist: trusty
-      sudo: required
       compiler: gcc
     - os: osx
       compiler: clang
@@ -58,8 +54,8 @@ script:
       cd ${ELASTIX_BUILD_DIR} &&
       cmake -DBUILD_TESTING:BOOL=OFF -DELASTIX_BUILD_EXECUTABLE:BOOL=OFF -DITK_DIR=${ITK_BUILD_DIR} -DCMAKE_BUILD_TYPE=Release ${ELASTIX_SOURCE_DIR} &&
       make --jobs=4 && 
-      touch ${HOME_DIR}/built_cache; fi
+      touch ${HOME}/built_cache; fi
   - cd ${SIMPLEELASTIX_BUILD_DIR}
-  - if [[ ! -e ${HOME_DIR}/built_cache ]]; then
+  - if [[ ! -e ${HOME}/built_cache ]]; then
       cmake -DWRAP_LUA:BOOL=OFF -DWRAP_PYTHON:BOOL=OFF -DWRAP_JAVA:BOOL=OFF -DWRAP_CSHARP:BOOL=OFF -DWRAP_TCL:BOOL=OFF -DWRAP_R:BOOL=OFF -DWRAP_RUBY:BOOL=OFF -DBUILD_EXAMPLES:BOOL=ON -DBUILD_TESTING:BOOL=OFF -DCMAKE_CXX_FLAGS=-w -DCMAKE_C_FLAGS=-w -DCMAKE_BUILD_TYPE=Release -DSimpleITK_USE_SYSTEM_ITK:BOOL=ON -DITK_DIR=${ITK_BUILD_DIR} -DSimpleITK_USE_SYSTEM_ELASTIX:BOOL=ON -DELASTIX_DIR=${ELASTIX_BUILD_DIR} -DSimpleITK_4D_IMAGES:BOOL=OFF ${SIMPLEELASTIX_SOURCE_DIR} &&
        make --jobs=4; fi
