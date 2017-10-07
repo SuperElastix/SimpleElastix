@@ -2,7 +2,7 @@ set( proj Elastix )
 file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/${proj}-build/CMakeCacheInit.txt" "${ep_common_cache}" )
 
 set( ELASTIX_GIT_REPOSITORY ${git_protocol}://github.com/SuperElastix/elastix )
-set( ELASTIX_GIT_TAG db8dea537208b29d5ef3c85d9e22917c9472115b )
+set( ELASTIX_GIT_TAG 5df7a77872f4a9005f2dd8f69840c1f1961454c0 )
 
 ExternalProject_Add( ${proj}
   GIT_REPOSITORY ${ELASTIX_GIT_REPOSITORY}
@@ -18,7 +18,8 @@ ExternalProject_Add( ${proj}
   -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON
   -DBUILD_TESTING:BOOL=OFF
   -DELASTIX_BUILD_EXECUTABLE:BOOL=OFF
-  -DELASTIX_USE_OPENMP:BOOL=${SimpleITK_OPENMP}
+  -DELASTIX_USE_OPENMP:BOOL=${OPENMP_FOUND}
+  -DELASTIX_USE_OPENCL:BOOL=OFF
   -DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
   -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
   -DITK_DIR:PATH=${ITK_DIR}
@@ -108,13 +109,5 @@ ExternalProject_Add( ${proj}
   DEPENDS ${${CMAKE_PROJECT_NAME}_DEPENDENCIES}
 )
 
-ExternalProject_Add_Step(${proj} forcebuild
-  COMMAND ${CMAKE_COMMAND} -E remove
-    ${CMAKE_CURRENT_BUILD_DIR}/${proj}-prefix/src/${proj}-stamp/${prog}-build
-  DEPENDEES configure
-  DEPENDERS build
-  ALWAYS 1
-)
-
 ExternalProject_Get_Property( Elastix BINARY_DIR )
-set( ELASTIX_USE_FILE "${BINARY_DIR}/UseElastix.cmake" )
+set( Elastix_DIR ${BINARY_DIR} )

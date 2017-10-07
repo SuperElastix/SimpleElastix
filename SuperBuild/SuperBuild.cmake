@@ -374,25 +374,23 @@ sitk_legacy_naming(SimpleITK_USE_SYSTEM_ELASTIX USE_SYSTEM_ELASTIX)
 mark_as_advanced(SimpleITK_USE_SYSTEM_ELASTIX)
 
 if(SimpleITK_USE_SYSTEM_ELASTIX)
-  if(NOT EXISTS ${ELASTIX_USE_FILE})
-    set(ELASTIX_USE_FILE ${ELASTIX_DIR}/UseElastix.cmake)
-  endif()
+  find_package(Elastix)
+  include(${ELASTIX_USE_FILE})
 
-  if(NOT EXISTS ${ELASTIX_USE_FILE})
-    set(ELASTIX_USE_FILE ${ELASTIX_DIR}/src/UseElastix.cmake)
-  endif()
-
-  if(NOT EXISTS ${ELASTIX_USE_FILE})
-    set(ELASTIX_DIR "" CACHE PATH "Path to folder containing UseElastix.cmake")
-    message(FATAL_ERROR "Could not find UseElastix.cmake. Point ELASTIX_DIR to folder containing UseElastix.cmake or set SimpleITK_USE_SYSTEM_ELASTIX to OFF.")
+  if(ELASTIX_USE_OPENMP)
+    find_package(OpenMP QUIET)
+    if( OPENMP_FOUND )
+      set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    endif()
   endif()
 else()
   mark_as_advanced( SimpleITK_OPENMP )
   option( SimpleITK_OPENMP "If available, use OpenMP to speed up certain elastix computations." OFF )
 
-  if( SimpleITK_OPENMP )
-    find_package( OpenMP QUIET )
-    if( OPENMP_FOUND )
+  if(SimpleITK_OPENMP)
+    find_package(OpenMP QUIET)
+    if(OPENMP_FOUND)
       set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
     endif()
@@ -455,11 +453,8 @@ ExternalProject_Add(${proj}
     -DCMAKE_RUNTIME_OUTPUT_DIRECTORY:PATH=<BINARY_DIR>/bin
     -DCMAKE_BUNDLE_OUTPUT_DIRECTORY:PATH=<BINARY_DIR>/bin
     ${ep_languages_args}
-    # ITK
     -DITK_DIR:PATH=${ITK_DIR}
-    # Elastix
-    -DELASTIX_USE_FILE:PATH=${ELASTIX_USE_FILE}
-    # Swig
+    -DElastix_DIR:PATH=${Elastix_DIR}
     -DSWIG_DIR:PATH=${SWIG_DIR}
     -DSWIG_EXECUTABLE:PATH=${SWIG_EXECUTABLE}
     -DBUILD_TESTING:BOOL=${BUILD_TESTING}
@@ -491,7 +486,6 @@ ExternalProject_Add_Step(${proj} forcebuild
 
 # We build SimpleITKExamples as an enternal project to verify
 # installation of SimpleITK
-
 include(External_SimpleITKExamples)
 
 

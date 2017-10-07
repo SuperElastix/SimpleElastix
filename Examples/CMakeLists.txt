@@ -12,31 +12,14 @@ endforeach()
 
 if(NOT CMAKE_PROJECT_NAME STREQUAL "SimpleITK")
   find_package(SimpleITK REQUIRED)
-
-  mark_as_advanced( SimpleITK_OPENMP )
-  option( SimpleITK_OPENMP "If available, use OpenMP to speed up certain elastix computations." OFF )
-
-  if( SimpleITK_OPENMP )
-    find_package( OpenMP QUIET )
-    if( OPENMP_FOUND )
-      set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-    endif()
-  endif()
-
-  if(NOT EXISTS ${ELASTIX_USE_FILE})
-    set( ELASTIX_USE_FILE "" CACHE PATH "Path to UseElastix.cmake" )
-    message(FATAL_ERROR "Could not find UseElastix.cmake. The CMake variable ELASTIX_USE_FILE must point to UseElastix.cmake when using SimpleElastix as an external project.")
-  endif()
-  include(${ELASTIX_USE_FILE})
 endif()
 
 # Add individual cxx executables
 add_executable ( elx elx.cxx )
-target_link_libraries ( elx ${SimpleITK_LIBRARIES} elastix )
+target_link_libraries ( elx ${SimpleITK_LIBRARIES} )
 
 add_executable ( tfx tfx.cxx )
-target_link_libraries ( tfx ${SimpleITK_LIBRARIES} transformix )
+target_link_libraries ( tfx ${SimpleITK_LIBRARIES} )
 
 add_executable ( SimpleGaussianFunctional SimpleGaussianFunctional.cxx )
 target_link_libraries ( SimpleGaussianFunctional ${SimpleITK_LIBRARIES} )
@@ -52,7 +35,6 @@ add_subdirectory(ITKIntegration)
 set(TEST_HARNESS_TEMP_DIRECTORY ${SimpleITK_BINARY_DIR}/Testing/Temporary)
 set(TEST_HARNESS_DATA_DIRECTORY ${SimpleITK_BINARY_DIR}/ExternalData/Testing/Data)
 set(ITK_TEST_DRIVER  "$<TARGET_FILE:itkTestDriver>")
-
 
 # Add example organized sub-directories with multiple languages
 add_subdirectory(SimpleGaussian)

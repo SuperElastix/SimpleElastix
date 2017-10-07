@@ -87,32 +87,19 @@ list(APPEND SimpleITK_PRIVATE_COMPILE_OPTIONS ${CXX_ADDITIONAL_WARNING_FLAGS})
 
 #-----------------------------------------------------------
 # Configure Elastix
-mark_as_advanced( SimpleITK_OPENMP )
-option( SimpleITK_OPENMP "Use OpenMP to speed up certain elastix computations." ON )
+find_package(Elastix REQUIRED)
+include(${ELASTIX_USE_FILE})
 
-if( SimpleITK_OPENMP )
-  find_package( OpenMP QUIET )
+if(ELASTIX_USE_OPENMP)
+  find_package(OpenMP QUIET)
   if( OPENMP_FOUND )
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
   endif()
 endif()
 
-# Find UseElastix.cmake 
-if( NOT EXISTS ${ELASTIX_USE_FILE} )
-  set( ELASTIX_USE_FILE ${ELASTIX_DIR}/UseElastix.cmake )
-endif()
-
-if( NOT EXISTS ${ELASTIX_USE_FILE} )
-  # UseElastix.cmake path NOT passed to build. Ask user to specify custom elastix install or use the SuperBuild.
-  set( ELASTIX_DIR "" CACHE PATH "Path to elastix build folder" )
-  message(FATAL_ERROR "Could not find UseElastix.cmake. Point ELASTIX_DIR to folder containing UseElastix.cmake or use SuperBuild.")
-endif()
-
-include( ${ELASTIX_USE_FILE} )
-
 # Check if libraries are available
-if( ELASTIX_BUILD_EXECUTABLE )
+if(ELASTIX_BUILD_EXECUTABLE)
   message(FATAL_ERROR "SimpleElastix requires elastix libraries, please set ELASTIX_BUILD_EXECUTABLE=OFF and rebuild elastix.")
 endif()
 
