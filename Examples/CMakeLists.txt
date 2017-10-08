@@ -12,6 +12,7 @@ endforeach()
 
 if(NOT CMAKE_PROJECT_NAME STREQUAL "SimpleITK")
   find_package(SimpleITK REQUIRED)
+  include(${SimpleITK_USE_FILE})
 endif()
 
 # Add individual cxx executables

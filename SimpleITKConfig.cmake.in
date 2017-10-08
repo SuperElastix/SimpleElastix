@@ -74,15 +74,16 @@ if(NOT ITK_TARGETS_IMPORTED)
   include("${ITK_CONFIG_TARGETS_FILE}")
 endif()
 
-# Locate elastix
-find_package(Elastix @Elastix_VERSION@ EXACT REQUIRED)
-
-if(ELASTIX_BUILD_EXECUTABLE)
-  message(FATAL_ERROR "Elastix libraries was not build because ELASTIX_BUILD_EXECUTABLE was set to ON. Set this variable to OFF and rebuild.")
+# Locate elastix for required targets
+if(NOT ELASTIX_CONFIG_TARGETS_FILE)
+  if("@SimpleITKConfig_TREE@" STREQUAL "build")
+    set(ELASTIX_CONFIG_TARGETS_FILE "@Elastix_DIR@/ElastixTargets.cmake")
+  else()
+    find_package(Elastix "@Elastix_VERSION@" EXACT REQUIRED)
+  endif()
 endif()
 
-# Import Elastix targets. If headers are needed, e.g. for using the low-level elastix and
-# transformix filters, they need to be made explicitly available via the ELASTIX_USE_FILE.
+# Import elastix targets
 if(NOT ELASTIX_TARGETS_IMPORTED)
   set(ELASTIX_TARGETS_IMPORTED 1)
   include("${ELASTIX_CONFIG_TARGETS_FILE}")

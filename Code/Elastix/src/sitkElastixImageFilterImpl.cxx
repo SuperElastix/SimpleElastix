@@ -250,7 +250,7 @@ ElastixImageFilter::ElastixImageFilterImpl
     
     elastixFilter->Update();
 
-    this->m_ResultImage = Image( itkDynamicCastInDebugMode< TFixedImage * >( elastixFilter->GetOutput() ) );
+    this->m_ResultImage = Image( itkDynamicCastInDebugMode< TFixedImage* >( elastixFilter->GetOutput() ) );
     this->m_ResultImage.MakeUnique();
     this->m_TransformParameterMapVector = elastixFilter->GetTransformParameterObject()->GetParameterMap();
   }

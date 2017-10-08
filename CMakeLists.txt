@@ -87,6 +87,7 @@ list(APPEND SimpleITK_PRIVATE_COMPILE_OPTIONS ${CXX_ADDITIONAL_WARNING_FLAGS})
 
 #-----------------------------------------------------------
 # Configure Elastix
+
 find_package(Elastix REQUIRED)
 include(${ELASTIX_USE_FILE})
 
