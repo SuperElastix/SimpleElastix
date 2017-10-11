@@ -9,7 +9,7 @@ env:
     ELASTIX_URL=https://github.com/SuperElastix/elastix
     ELASTIX_SOURCE_DIR=${HOME}/Elastix-source
     ELASTIX_BUILD_DIR=${HOME}/Elastix-build
-    SIMPLEELASTIX_SOURCE_DIR=${HOME}/SuperBuild
+    SIMPLEELASTIX_SOURCE_DIR=${HOME}/SuperElastix/SimpleElastix/SuperBuild
     SIMPLEELASTIX_BUILD_DIR=${HOME}/SimpleElastix-build
     OMP_NUM_THREADS=2
 
