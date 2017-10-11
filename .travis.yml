@@ -2,15 +2,15 @@ language: cpp
 
 env:
   global:
-    EXTERNAL_DATA_DIR=${HOME}/.ExternalData
+    EXTERNAL_DATA_DIR=${HOME}/build/.ExternalData
     ITK_URL=https://github.com/InsightSoftwareConsortium/ITK
-    ITK_SOURCE_DIR=${HOME}/ITK-source
-    ITK_BUILD_DIR=${HOME}/ITK-build
+    ITK_SOURCE_DIR=${HOME}/build/ITK-source
+    ITK_BUILD_DIR=${HOME}/build/ITK-build
     ELASTIX_URL=https://github.com/SuperElastix/elastix
-    ELASTIX_SOURCE_DIR=${HOME}/Elastix-source
-    ELASTIX_BUILD_DIR=${HOME}/Elastix-build
-    SIMPLEELASTIX_SOURCE_DIR=${HOME}/SuperElastix/SimpleElastix/SuperBuild
-    SIMPLEELASTIX_BUILD_DIR=${HOME}/SimpleElastix-build
+    ELASTIX_SOURCE_DIR=${HOME}/build/Elastix-source
+    ELASTIX_BUILD_DIR=${HOME}/build/Elastix-build
+    SIMPLEELASTIX_SOURCE_DIR=${HOME}/build/SuperElastix/SimpleElastix/SuperBuild
+    SIMPLEELASTIX_BUILD_DIR=${HOME}/build/SimpleElastix-build
     OMP_NUM_THREADS=2
 
 cache:
@@ -34,6 +34,8 @@ matrix:
 
 before_script:
   - mkdir -p ${SIMPLEELASTIX_BUILD_DIR}
+  - pwd
+  - ls -lR
 
 script:
   - if [[ ! -e ${ITK_BUILD_DIR}/ITKConfig.cmake ]]; then
