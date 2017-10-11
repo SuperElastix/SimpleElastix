@@ -34,6 +34,8 @@ matrix:
 
 before_script:
   - mkdir -p ${SIMPLEELASTIX_BUILD_DIR}
+  - pwd
+  - ls -lR
 
 script:
   - if [[ ! -e ${ITK_BUILD_DIR}/ITKConfig.cmake ]]; then
