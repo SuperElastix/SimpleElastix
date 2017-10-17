@@ -235,7 +235,6 @@ list( APPEND ep_common_list
   CMAKE_SYSTEM_PROGRAM_PATH
   CMAKE_SYSTEM_IGNORE_PATH
 
-
   CMAKE_GENERATOR
   CMAKE_EXTRA_GENERATOR
   MEMORYCHECK_COMMAND_OPTIONS
@@ -442,6 +441,7 @@ ExternalProject_Add(${proj}
   CMAKE_GENERATOR ${gen}
   CMAKE_ARGS
     --no-warn-unused-cli
+    -DCMAKE_TOOLCHAIN_FILE:FILEPATH=${CMAKE_TOOLCHAIN_FILE}
     -C "${CMAKE_CURRENT_BINARY_DIR}/SimpleITK-build/CMakeCacheInit.txt"
     ${ep_simpleitk_args}
     ${ep_common_args}

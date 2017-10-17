@@ -31,6 +31,7 @@ ExternalProject_Add(Lua
   PATCH_COMMAND ${lua_PATCH_COMMAND}
   CMAKE_GENERATOR ${gen}
   CMAKE_ARGS
+    -DCMAKE_TOOLCHAIN_FILE:FILEPATH=${CMAKE_TOOLCHAIN_FILE}
     --no-warn-unused-cli
     -C "${lua_binary_dir}/CMakeCacheInit.txt"
     ${ep_common_args}

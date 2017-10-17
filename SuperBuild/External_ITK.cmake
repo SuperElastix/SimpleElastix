@@ -73,6 +73,7 @@ ExternalProject_Add(${proj}
   BINARY_DIR ${proj}-build
   CMAKE_GENERATOR ${gen}
   CMAKE_ARGS
+  -DCMAKE_TOOLCHAIN_FILE:FILEPATH=${CMAKE_TOOLCHAIN_FILE}
   --no-warn-unused-cli
   -C "${CMAKE_CURRENT_BINARY_DIR}/${proj}-build/CMakeCacheInit.txt"
   ${ep_itk_args}
