@@ -12,30 +12,30 @@ class SimpleTransformix {
     }
 
     // Make transform
-    org.itk.simple.ImageFileReader reader = new org.itk.simple.ImageFileReader();
+    ImageFileReader reader = new ImageFileReader();
     reader.setFileName(argv[0]);
-    org.itk.simple.ElastixImageFilter elastixImageFilter = new org.itk.simple.ElastixImageFilter();
+    ElastixImageFilter elastixImageFilter = new ElastixImageFilter();
     elastixImageFilter.setFixedImage(reader.execute());
     reader.setFileName(argv[1]);
     elastixImageFilter.setMovingImage(reader.execute());
-    elastixImageFilter.setParameterMap(silx.readParameterFile(argv[2]));
+    elastixImageFilter.setParameterMap(elastixImageFilter.readParameterFile(argv[2]));
     elastixImageFilter.logToConsoleOn();
     elastixImageFilter.execute();
 
     // Instantiate transformix
-    org.itk.simple.TransformixImageFilter transformixImageFilter = new org.itk.simple.TransformixImageFilter();
+    TransformixImageFilter transformixImageFilter = new TransformixImageFilter();
 
     // Read input
     reader.setFileName(argv[3]);
-    transformixImageFilter.setInputImage(reader.execute());
-    transformixImageFilter.setTransformParameterMap(silx.getTransformParameterMap());
+    transformixImageFilter.setMovingImage(reader.execute());
+    transformixImageFilter.setTransformParameterMap(elastixImageFilter.getTransformParameterMap());
 
     // Perform warp
     transformixImageFilter.logToConsoleOn();
     transformixImageFilter.execute();
 
     // Write result image
-    ImageFileWriter writer = new org.itk.simple.ImageFileWriter();
+    ImageFileWriter writer = new ImageFileWriter();
     writer.setFileName(argv[4]);
     writer.execute(transformixImageFilter.getResultImage()); 
 
