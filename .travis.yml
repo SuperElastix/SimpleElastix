@@ -51,7 +51,7 @@ script:
       rm -rf ${ELASTIX_SOURCE_DIR} ${ELASTIX_BUILD_DIR} &&
       git clone ${ELASTIX_URL} ${ELASTIX_SOURCE_DIR} &&
       cd ${ELASTIX_SOURCE_DIR} &&
-      git checkout ef057ff89233822b26b04b31c3c043af57d5deff &&
+      git checkout e8354222396c6bd78e9fe6d5a39e4ecac4bb0d52 &&
       mkdir -p ${ELASTIX_BUILD_DIR} &&
       cd ${ELASTIX_BUILD_DIR} &&
       cmake -DBUILD_TESTING:BOOL=OFF -DELASTIX_BUILD_EXECUTABLE:BOOL=OFF -DITK_DIR=${ITK_BUILD_DIR} -DCMAKE_BUILD_TYPE=Release ${ELASTIX_SOURCE_DIR} &&
