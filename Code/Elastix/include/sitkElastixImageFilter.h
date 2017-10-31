@@ -145,11 +145,6 @@ class SITKCommon_EXPORT ElastixImageFilter
     std::map< std::string, std::vector< std::string > > GetTransformParameterMap( const unsigned int index );
     Image GetResultImage( void );
 
-    std::vector< std::map< std::string, std::vector< std::string > > > ExecuteInverse( void );
-    std::vector< std::map< std::string, std::vector< std::string > > > ExecuteInverse( std::map< std::string, std::vector< std::string > > inverseParameterMap );
-    std::vector< std::map< std::string, std::vector< std::string > > > ExecuteInverse( std::vector< std::map< std::string, std::vector< std::string > > > inverseParameterMapVector );
-    std::vector< std::map< std::string, std::vector< std::string > > > GetInverseTransformParameterMap( void );
-
     Self& PrintParameterMap( void );
     Self& PrintParameterMap( const ParameterMapType parameterMapVector );
     Self& PrintParameterMap( const ParameterMapVectorType parameterMapVector );

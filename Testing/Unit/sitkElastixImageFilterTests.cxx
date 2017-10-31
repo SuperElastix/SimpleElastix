@@ -366,22 +366,6 @@ TEST( ElastixImageFilter, InitialTransform )
   EXPECT_FALSE( silxIsEmpty( resultImage2 ) );
 }
 
-TEST( ElastixImageFilter, InverseTransform )
-{
-  Image fixedImage = ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
-  Image movingImage = ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
-  Image resultImage; 
-
-  ElastixImageFilter silx; silx.LogToConsoleOn(); 
-  ElastixImageFilter::ParameterMapVectorType inverseParameterMapVector;
-  EXPECT_NO_THROW( silx.SetFixedImage( fixedImage ) );
-  EXPECT_NO_THROW( silx.SetMovingImage( movingImage ) );
-  EXPECT_NO_THROW( resultImage = silx.Execute() );
-  EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_THROW( inverseParameterMapVector = silx.GetInverseTransformParameterMap(), GenericException );
-  EXPECT_NO_THROW( silx.ExecuteInverse() );
-  EXPECT_NO_THROW( inverseParameterMapVector = silx.GetInverseTransformParameterMap() );
-}
 
 TEST( ElastixImageFilter, SameFixedImageForMultipleRegistrations )
 { 

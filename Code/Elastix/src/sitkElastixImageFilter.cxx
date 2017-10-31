@@ -652,34 +652,6 @@ ElastixImageFilter
   return this->m_Pimple->GetResultImage();
 }
 
-ElastixImageFilter::ParameterMapVectorType
-ElastixImageFilter
-::ExecuteInverse( void )
-{
-  return this->m_Pimple->ExecuteInverse();
-}
-
-ElastixImageFilter::ParameterMapVectorType
-ElastixImageFilter
-::ExecuteInverse( std::map< std::string, std::vector< std::string > > inverseParameterMap )
-{
-  return this->m_Pimple->ExecuteInverse( ParameterMapVectorType( 1, inverseParameterMap ) );
-}
-
-ElastixImageFilter::ParameterMapVectorType
-ElastixImageFilter
-::ExecuteInverse( std::vector< std::map< std::string, std::vector< std::string > > > inverseParameterMapVector )
-{
-  return this->m_Pimple->ExecuteInverse( inverseParameterMapVector );
-}
-
-ElastixImageFilter::ParameterMapVectorType 
-ElastixImageFilter
-::GetInverseTransformParameterMap( void )
-{
-  return this->m_Pimple->GetInverseTransformParameterMap();
-}
-
 ElastixImageFilter::Self&
 ElastixImageFilter
 ::PrintParameterMap( void )

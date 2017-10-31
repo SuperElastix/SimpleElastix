@@ -135,11 +135,6 @@ struct ElastixImageFilter::ElastixImageFilterImpl
   std::map< std::string, std::vector< std::string > > GetTransformParameterMap( const unsigned int index );
   Image GetResultImage( void );
 
-  std::vector< std::map< std::string, std::vector< std::string > > > ExecuteInverse( void );
-  std::vector< std::map< std::string, std::vector< std::string > > > ExecuteInverse( std::map< std::string, std::vector< std::string > > inverseParameterMap );
-  std::vector< std::map< std::string, std::vector< std::string > > > ExecuteInverse( std::vector< std::map< std::string, std::vector< std::string > > > inverseParameterMapVector );
-  std::vector< std::map< std::string, std::vector< std::string > > > GetInverseTransformParameterMap( void );
-
   void PrintParameterMap( void );
   void PrintParameterMap( const ParameterMapType parameterMapVector );
   void PrintParameterMap( const ParameterMapVectorType parameterMapVector );
@@ -164,7 +159,6 @@ struct ElastixImageFilter::ElastixImageFilterImpl
 
   ParameterMapVectorType  m_ParameterMapVector;
   ParameterMapVectorType  m_TransformParameterMapVector;
-  ParameterMapVectorType  m_InverseTransformParameterMapVector;
 
   std::string             m_OutputDirectory;
   std::string             m_LogFileName;
