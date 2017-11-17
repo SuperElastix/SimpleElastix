@@ -52,7 +52,7 @@ The point set are specified as text files. They can either be in `VTK pointdata 
 	180.4 -18.1 78.9
 
 Transforming Point Sets
---------------------------------
+-----------------------
 
 We can apply a transformation computed with SimpleElastix to a point set with SimpleTransformix.
 
@@ -62,7 +62,8 @@ We can apply a transformation computed with SimpleElastix to a point set with Si
 
     fixedImage = sitk.ReadImage("fixedImage.nii")
     movingImage = sitk.ReadImage("movingImage.nii")
-    # Compute the transformation from moving image to the fixed image
+
+    # Compute the transformation
     elastixImageFilter = sitk.ElastixImageFilter()
     elastixImageFilter.SetFixedImage(fixedImage)
     elastixImageFilter.SetMovingImage(movingImage)
@@ -74,7 +75,7 @@ We can apply a transformation computed with SimpleElastix to a point set with Si
     # to correctly infer the dimensionality of the point set.
     transformixImageFilter = sitk.TransformixImageFilter()
     transformixImageFilter.SetTransformParameterMap(elastixImageFilter.GetTransformParameterMap())
-    transformixImageFilter.SetFixedPointSet("fixedPointSet.pts")
+    transformixImageFilter.SetFixedPointSetFileName("fixedPointSet.pts")
     transformixImageFilter.Execute()
 
 .. warning::
