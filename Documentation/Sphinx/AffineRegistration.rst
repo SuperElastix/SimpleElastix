@@ -26,7 +26,7 @@ The image on the right has been sheared, scaled 1.2x, rotated 10 degrees and tra
 
     elastixImageFilter = sitk.ElastixImageFilter()
     elastixImageFilter.SetFixedImage(sitk.ReadImage("fixedImage.nii")
-    elastixImageFilter.SetMovingImage(sitk.ReadImage(movingImage.nii")
+    elastixImageFilter.SetMovingImage(sitk.ReadImage("movingImage.nii")
     elastixImageFilter.SetParameterMap(sitk.GetDefaultParameterMap("affine"))
     elastixImageFilter.Execute()
     sitk.WriteImage(elastixImageFilter.GetResultImage())
@@ -55,6 +55,6 @@ Notice that the only difference from the previous example is the requested param
     parameterMap = sitk.GetDefaultParameterMap("rigid")
     parameterMap["Transform"] = ["AffineTransform"]
 
-You can inspect the default parameter maps in the `elastix repository <https://github.com/mstaring/elastix/blob/617b0729fb6200fce279f7e6388967c6315ddc90/src/Core/Main/elxParameterObject.cxx#L260-L362`_ to convince yourself.
+You can inspect the default parameter maps in the `elastix repository <https://github.com/SuperElastix/elastix/blob/522843d90ff586be051c480514cd14a88db45dbf/src/Core/Main/elxParameterObject.cxx#L260-L362>`_ to convince yourself.
 
 This demonstrates how easy it is to try out different registration components with SimpleElastix. In the next example we will introduce non-rigid registration and initialize the moving image with an affine transform.
