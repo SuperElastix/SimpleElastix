@@ -207,6 +207,10 @@ Image ImportAsDouble(
     return import.Execute();
 }
 
+ImportImageFilter::~ImportImageFilter()
+{
+}
+
 ImportImageFilter::ImportImageFilter()
 {
   m_NumberOfComponentsPerPixel = 0;
@@ -225,7 +229,7 @@ ImportImageFilter::ImportImageFilter()
 #endif
   this->m_MemberFactory->RegisterMemberFunctions< PixelIDTypeList, 3 > ();
   this->m_MemberFactory->RegisterMemberFunctions< PixelIDTypeList, 2 > ();
-      
+
 }
 
 ImportImageFilter::Self& ImportImageFilter::SetSpacing( const std::vector< double > &spacing )
