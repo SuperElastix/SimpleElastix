@@ -318,12 +318,6 @@ function(_test_weak_link_project
       #include <number.h>
     ")
 
-    if(NOT link_exe_mod)
-      file(APPEND "${test_project_src_dir}/main.c" "
-        #include <dlfcn.h>
-      ")
-    endif()
-
     file(APPEND "${test_project_src_dir}/main.c" "
       int my_count() {
         int result = get_number();
