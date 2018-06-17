@@ -25,37 +25,8 @@ namespace itk
 namespace simple
 {
 
-namespace
+ScaleSkewVersor3DTransform::~ScaleSkewVersor3DTransform()
 {
-
-template< typename T, typename TType>
-itk::Versor<T> sitkSTLVectorToITKVersor( const std::vector< TType > & in )
-{
-  typedef itk::Versor<T> itkVectorType;
-  if ( in.size() != 4 )
-    {
-    sitkExceptionMacro(<<"Unable to convert vector to ITK Versor type\n"
-                      << "Expected vector of length " <<  4
-                       << " but got " << in.size() << " elements." );
-    }
-  itkVectorType out;
-  out.Set(in[0],in[1],in[2],in[3]);
-  return out;
-}
-
-
-template< typename TType, typename T>
-std::vector<TType> sitkITKVersorToSTL( const itk::Versor<T> & in )
-{
-  std::vector<TType> out(4);
-  out[0] = in.GetX();
-  out[1] = in.GetY();
-  out[2] = in.GetZ();
-  out[3] = in.GetW();
-  return out;
-}
-
-
 }
 
 // construct identity
@@ -221,7 +192,7 @@ void ScaleSkewVersor3DTransform::InternalInitialization(itk::TransformBase *tran
   this->m_pfTranslate = SITK_NULLPTR;
   this->m_pfGetMatrix = SITK_NULLPTR;
 
-  if (t && (typeid(*t)==typeid(TransformType)))
+  if (t && (typeid(*t) == typeid(TransformType)))
     {
     this->InternalInitialization(t);
     return;
@@ -243,11 +214,12 @@ void ScaleSkewVersor3DTransform::InternalInitialization(TransformType *t)
   SITK_TRANSFORM_SET_MPF(Skew, typename TransformType::SkewVectorType, double);
   SITK_TRANSFORM_SET_MPF_GetMatrix();
 
-  void 	(TransformType::*pfSetRotation1) (const typename TransformType::VersorType &) = &TransformType::SetRotation;
-  this->m_pfSetRotation1 = nsstd::bind(pfSetRotation1,t,nsstd::bind(&sitkSTLVectorToITKVersor<double, double>,nsstd::placeholders::_1));
+  void  (TransformType::*pfSetRotation1) (const typename TransformType::VersorType &) = &TransformType::SetRotation;
+  this->m_pfSetRotation1 = nsstd::bind(pfSetRotation1,t,nsstd::bind(&sitkSTLVectorToITKVersor<double, double>,
+                                                                    nsstd::placeholders::_1));
 
   typename TransformType::OutputVectorType (*pfSTLVectorToITK)(const std::vector<double> &) = &sitkSTLVectorToITK<typename TransformType::OutputVectorType, double>;
-  void 	(TransformType::*pfSetRotation2) (const typename TransformType::AxisType &, double) = &TransformType::SetRotation;
+  void  (TransformType::*pfSetRotation2) (const typename TransformType::AxisType &, double) = &TransformType::SetRotation;
   this->m_pfSetRotation2 = nsstd::bind(pfSetRotation2,t,nsstd::bind(pfSTLVectorToITK,nsstd::placeholders::_1),nsstd::placeholders::_2);
 
   this->m_pfGetVersor  = nsstd::bind(&sitkITKVersorToSTL<double, double>,nsstd::bind(&TransformType::GetVersor,t));

@@ -53,9 +53,9 @@
 
 
 #if __cplusplus >= 201103L
-// In c++11 the override keyword allows you to explicity define that a function
+// In c++11 the override keyword allows you to explicitly define that a function
 // is intended to override the base-class version.  This makes the code more
-// managable and fixes a set of common hard-to-find bugs.
+// manageable and fixes a set of common hard-to-find bugs.
 #define SITK_OVERRIDE override
 // In C++11 the throw-list specification has been deprecated,
 // replaced with the noexcept specifier. Using this function
@@ -75,7 +75,6 @@
 #endif
 
 
-
 #if  !defined(SITK_RETURN_SELF_TYPE_HEADER)
 #define SITK_RETURN_SELF_TYPE_HEADER Self &
 #endif
@@ -93,7 +92,19 @@ class GenericException;
     throw ::itk::simple::GenericException(__FILE__, __LINE__, message.str().c_str()); \
   }
 
-#if defined(SITK_HAS_CXX11_NULLPTR) && !defined(SITK_HAS_TR1_SUB_INCLUDE)
+
+#define sitkDebugMacro(x) \
+  {\
+  if (this->GetDebug())                                                 \
+      {                                                                 \
+      std::ostringstream msg;                                           \
+      msg << "Debug: " << this->GetName() << " (" << this << "): " x    \
+          << "\n\n";                                                    \
+      ::itk::OutputWindowDisplayDebugText( msg.str().c_str() );         \
+      }                                                                 \
+  }
+
+#if defined(SITK_HAS_CXX11_NULLPTR)
 #define SITK_NULLPTR nullptr
 #else
 #define SITK_NULLPTR NULL

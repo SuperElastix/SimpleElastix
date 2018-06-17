@@ -22,7 +22,6 @@
 #include "sitkMemberFunctionFactoryBase.h"
 
 
-
 namespace itk
 {
 namespace simple
@@ -30,7 +29,6 @@ namespace simple
 // this namespace is internal classes not part of the external simple ITK interface
 namespace detail
 {
-
 
 
 /** \class DualMemberFunctionFactory
@@ -144,7 +142,7 @@ public:
     */
   bool HasMemberFunction( PixelIDValueType pixelID1,
                           PixelIDValueType pixelID2,
-                          unsigned int imageDimension  ) const throw();
+                          unsigned int imageDimension  ) const SITK_NOEXCEPT;
 
 
   /** \brief Returns a function object for the combination of
@@ -153,7 +151,7 @@ public:
    *  pixelID1 or pixelID2 is the value of Image::GetPixelIDValue(),
    *  or PixelIDToPixelIDValue<PixelIDType>::Result
    *
-   *  imageDimension is the the value returned by Image::GetDimension()
+   *  imageDimension is the value returned by Image::GetDimension()
    *
    *  Example usage:
    *  \code

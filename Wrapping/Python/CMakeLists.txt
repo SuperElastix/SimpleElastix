@@ -1,16 +1,6 @@
-cmake_minimum_required ( VERSION 2.8.1 FATAL_ERROR )
+cmake_minimum_required ( VERSION 3.0 FATAL_ERROR )
 
 project( SimpleITK_Python )
-
-
-if(POLICY CMP0026)
-  # Allow use of the LOCATION target property.
-  #
-  # These locations are use in a convoluted fashion with the runtime
-  # configuration. This system should be refactored to support
-  # generator expression. This would allow the use of the new policy.
-  cmake_policy(SET CMP0026 OLD)
-endif()
 
 include(../../CMake/sitkProjectLanguageCommon.cmake NO_POLICY_SCOPE)
 
@@ -83,9 +73,6 @@ sitk_strip_target( ${SWIG_MODULE_SimpleITKPython_TARGET_NAME} )
 # Installation
 set( SimpleITK_PYTHON_PACKAGE_DIR "${CMAKE_CURRENT_BINARY_DIR}" )
 file( TO_NATIVE_PATH "${SimpleITK_PYTHON_PACKAGE_DIR}" SimpleITK_PYTHON_PACKAGE_DIR )
-get_target_property( SimpleITK_BINARY_MODULE ${SWIG_MODULE_SimpleITKPython_TARGET_NAME} LOCATION )
-get_filename_component( SimpleITK_BINARY_MODULE "${SimpleITK_BINARY_MODULE}" NAME )
-set( SimpleITK_BINARY_MODULE "${CMAKE_CURRENT_BINARY_DIR}/${SimpleITK_BINARY_MODULE}" )
 
 set(SimpleITK_PYTHON_TEST_EXECUTABLE "${PYTHON_EXECUTABLE}" CACHE INTERNAL "Python executable for testing." FORCE )
 
@@ -100,10 +87,21 @@ if(DEFINED SKBUILD)
     )
 
   install(TARGETS ${SWIG_MODULE_SimpleITKPython_TARGET_NAME}
-    RUNTIME DESTINATION SimpleITK
-    LIBRARY DESTINATION SimpleITK
-    COMPONENT Runtime
+    RUNTIME DESTINATION SimpleITK COMPONENT Runtime
+    LIBRARY DESTINATION SimpleITK COMPONENT Runtime
     )
 else()
   include(LegacyPackaging.cmake)
+endif()
+
+
+
+if (NOT CMAKE_PROJECT_NAME STREQUAL "SimpleITK" AND BUILD_TESTING)
+  set(WRAP_PYTHON 1)
+
+  add_subdirectory("${SimpleITK_SOURCE_DIR}/Testing/Unit/Python" "${CMAKE_BINARY_DIR}/Testing/Unit")
+
+  if(COMMAND ExternalData_Add_Target )
+    ExternalData_Add_Target( SimpleITKData )
+  endif()
 endif()

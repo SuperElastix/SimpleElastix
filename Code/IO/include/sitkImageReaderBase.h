@@ -42,8 +42,10 @@ class SmartPointer;
     public:
       typedef ImageReaderBase Self;
 
+      virtual ~ImageReaderBase();
+
       ImageReaderBase();
-      // The destructor will be implicitly declared as public.
+
 
       /** \brief Set/Get The output PixelType of the image.
        *
@@ -61,6 +63,10 @@ class SmartPointer;
 
       virtual std::string ToString() const;
 
+      /** \brief Get a vector of the names of registered itk ImageIOs
+       */
+      virtual std::vector<std::string> GetRegisteredImageIOs() const;
+
       /** \brief Set/Get loading private DICOM tags into Image's MetaData
        *
        * Unknown private tags may be encoded with Base64 encoding.
@@ -76,16 +82,16 @@ class SmartPointer;
 
       itk::SmartPointer<ImageIOBase> GetImageIOBase(const std::string &fileName);
 
-
       void GetPixelIDFromImageIO( const std::string &fileName,
                                   PixelIDValueType &outPixelType,
-                                  unsigned int & outDimensions);
-      void GetPixelIDFromImageIO( itk::ImageIOBase* iobase,
+                                  unsigned int & outDimensions );
+      void GetPixelIDFromImageIO( const itk::ImageIOBase* iobase,
                                   PixelIDValueType &outPixelType,
-                                  unsigned int & outDimensions);
+                                  unsigned int & outDimensions );
 
-      unsigned int GetDimensionFromImageIO( const std::string &fileName, unsigned int i);
-      unsigned int GetDimensionFromImageIO( itk::ImageIOBase* iobase, unsigned int i);
+      unsigned int GetDimensionFromImageIO( const std::string &fileName, unsigned int i );
+      unsigned int GetDimensionFromImageIO( const itk::ImageIOBase* iobase, unsigned int i );
+
 
     private:
 
@@ -97,7 +103,7 @@ class SmartPointer;
 
 
       PixelIDValueEnum m_OutputPixelType;
-      bool m_LoadPrivateTags;
+      bool             m_LoadPrivateTags;
 
     };
   }

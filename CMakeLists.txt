@@ -11,6 +11,7 @@ cmake_policy( VERSION 3.0 )
 foreach(p
     CMP0042 # CMake 3.0
     CMP0063 # CMake 3.3.2
+    CMP0064 # CMake 3.4
     )
   if(POLICY ${p})
     cmake_policy(SET ${p} NEW)
@@ -134,7 +135,14 @@ option( SimpleITK_INT64_PIXELIDS "Instantiate 64-bit integer pixels, including u
 sitk_legacy_naming(SimpleITK_INT64_PIXELIDS)
 
 
-option( SimpleITK_4D_IMAGES "Add Image and I/O support for four spatial dimensions." ON )
+
+set(SimpleITK_4D_IMAGES_DEFAULT ON)
+# 1900 = VS 14.0 (Visual Studio 2015)
+if(MSVC AND MSVC_VERSION VERSION_LESS 1900)
+  set( SimpleITK_4D_IMAGES_DEFAULT OFF )
+  message("disable")
+endif()
+option( SimpleITK_4D_IMAGES "Add Image and I/O support for four spatial dimensions." ${SimpleITK_4D_IMAGES_DEFAULT} )
 mark_as_advanced( SimpleITK_4D_IMAGES )
 sitk_legacy_naming( SimpleITK_4D_IMAGES )
 
@@ -230,9 +238,9 @@ function(sitk_install_exported_target tgt)
 
   install(TARGETS ${tgt}
     EXPORT SimpleITKTargets
-    RUNTIME DESTINATION ${SimpleITK_INSTALL_RUNTIME_DIR}
-    LIBRARY DESTINATION ${SimpleITK_INSTALL_LIBRARY_DIR}
-    ARCHIVE DESTINATION ${SimpleITK_INSTALL_ARCHIVE_DIR}
+    RUNTIME DESTINATION ${SimpleITK_INSTALL_RUNTIME_DIR} COMPONENT Runtime
+    LIBRARY DESTINATION ${SimpleITK_INSTALL_LIBRARY_DIR} COMPONENT Runtime
+    ARCHIVE DESTINATION ${SimpleITK_INSTALL_ARCHIVE_DIR} COMPONENT Development
     )
 endfunction()
 
@@ -297,26 +305,37 @@ set ( SimpleITK_DOC_FILES
 # root of the source tree
 get_filename_component( _itk_root "${ITK_USE_FILE}" PATH )
 get_filename_component( _itk_root "${_itk_root}" PATH )
-set( _itk_source_path "${_itk_root}" )
+
+set(_itk_doc_search_paths "${_itk_root}")
 
 get_filename_component( _itk_root "${_itk_root}" PATH )
 get_filename_component( _itk_root "${_itk_root}" PATH )
-set( _itk_doc_path "${_itk_root}/share/doc/ITK-${ITK_VERSION_MAJOR}.${ITK_VERSION_MINOR}" )
+list( APPEND _itk_doc_search_paths
+   "${_itk_root}/share/doc/ITK-${ITK_VERSION_MAJOR}.${ITK_VERSION_MINOR}"
+   "${_itk_root}/share/doc/ITK"
+)
 
-if( EXISTS "${_itk_source_path}/NOTICE" )
-  set( ITK_DOC_FILES
-    # "${_itk_source_path}/LICENSE" SimpleITK has same license file
-    "${_itk_source_path}/NOTICE"
-    "${_itk_source_path}/README.txt"
-    )
-elseif( EXISTS "${_itk_doc_path}/NOTICE" )
-  set( ITK_DOC_FILES
-    # "${_itk_doc_path}/LICENSE" SimpleITK has same license file
-    "${_itk_doc_path}/NOTICE"
-    "${_itk_doc_path}/README.txt"
-    )
-else()
-  message( "doc_path: ${_itk_doc_path}" )
+
+#
+# Only append file if it exists
+#
+function(append_if_exists list_var file)
+   if( EXISTS ${file} )
+     list( APPEND ${list_var} ${file} )
+     set( ${list_var} ${${list_var}} PARENT_SCOPE )
+   endif()
+endfunction()
+
+foreach( _p IN LISTS _itk_doc_search_paths)
+  if( EXISTS "${_p}/NOTICE" )
+    append_if_exists(ITK_DOC_FILES "${_p}/NOTICE")
+    append_if_exists(ITK_DOC_FILES "${_p}/README.txt")
+    append_if_exists(ITK_DOC_FILES "${_p}/README.md")
+    break()
+  endif()
+endforeach()
+
+if( NOT ITK_DOC_FILES )
   message( WARNING "Unable to file ITK's NOTICE File!\n This file will not be included in SimpleITK packaging!" )
 endif()
 
@@ -376,21 +395,9 @@ if ( BUILD_TESTING )
 
   include( sitkAddTest )
 
-  file( GLOB_RECURSE content_links
-    RELATIVE "${SimpleITK_SOURCE_DIR}" "Testing/Data/*.md5" )
-  foreach(link ${content_links})
-    string( REGEX REPLACE "\\.md5$" "" link ${link} )
-    ExternalData_Expand_Arguments( SimpleITKData
-      link_location
-      DATA{${link}}
-      )
-  endforeach()
-
   enable_testing()
   add_subdirectory ( Testing )
 
-  option ( RUN_LONG_TESTS "Run long tests.  Some tests have been identified as long running, should these be run?" OFF )
-  mark_as_advanced(RUN_LONG_TESTS)
   set(BUILDNAME "${BUILDNAME}" CACHE STRING "Name of build on the dashboard")
   configure_file(CMake/CTestCustom.cmake.in CTestCustom.cmake)
 endif()

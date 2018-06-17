@@ -15,8 +15,8 @@
 *  limitations under the License.
 *
 *=========================================================================*/
-#ifndef sitkBoundaryConditions_h
-#define sitkBoundaryConditions_h
+#ifndef sitkImageToKernel_hxx
+#define sitkImageToKernel_hxx
 
 #include <memory>
 #include <itkImageKernelOperator.h>
@@ -53,7 +53,7 @@ padFilter->SetConstant( NumericTraits< KernelImagePixelType >::ZeroValue() );
 typename TImageType::SizeType padSize = image->GetLargestPossibleRegion().GetSize();
 for( unsigned int i = 0; i < TImageType::ImageDimension; ++i )
   {
-  // Pad by 1 if the size fo the image in this dimension is even.
+  // Pad by 1 if the size of the image in this dimension is even.
   padSize[i] = 1 - padSize[i]%2;
 
   if ( padSize[i] != 0 )

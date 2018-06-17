@@ -25,6 +25,10 @@ namespace itk
 namespace simple
 {
 
+Euler2DTransform::~Euler2DTransform()
+{
+}
+
 // construct identity
 Euler2DTransform::Euler2DTransform()
   : Transform(2,sitkEuler)
@@ -138,7 +142,7 @@ void Euler2DTransform::InternalInitialization(itk::TransformBase *transform)
   this->m_pfGetMatrix = SITK_NULLPTR;
   this->m_pfSetMatrix = SITK_NULLPTR;
 
-  if (t && (typeid(*t)==typeid(TransformType)))
+  if (t && (typeid(*t) == typeid(TransformType)))
     {
     this->InternalInitialization(t);
     return;

@@ -24,6 +24,17 @@ if (NOT CMAKE_PROJECT_NAME STREQUAL "SimpleITK" )
   if(MSVC)
      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
   endif()
+
+  include(CTest)
+
+  if (BUILD_TESTING)
+    enable_testing()
+    include(sitkAddTest)
+
+    configure_file("${SimpleITK_SOURCE_DIR}/CMake/CTestCustom.cmake.in" CTestCustom.cmake)
+
+  endif()
+
 else()
   set(SimpleITK_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 endif()
@@ -94,7 +105,7 @@ list( APPEND SWIG_EXTRA_DEPS
 
 # check if uint64_t is the same as unsigned long
 try_compile(SITK_ULONG_SAME_AS_UINT64
-  ${PROJECT_BINARY_DIR}/CMakeTmp
+  "${PROJECT_BINARY_DIR}"
   ${SimpleITK_SOURCE_DIR}/CMake/same_uint64_ulong.cxx )
 
 # when "-DSWIGWORDSIZE64" is defined SWIG used unsigned long for uint64_t types

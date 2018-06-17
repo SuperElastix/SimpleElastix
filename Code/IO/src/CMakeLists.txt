@@ -7,15 +7,12 @@ set( SimpleITKIOSource
   sitkImageSeriesWriter.cxx
   sitkImportImageFilter.cxx
   sitkShow.cxx
+  sitkImageIOUtilities.cxx
   )
 
 set(use_itk_modules  ITKCommon ITKLabelMap ITKImageCompose
-  ITKImageIntensity ITKIOImageBase ITKIOTransformBase ITKIOGDCM )
-foreach( mod IN LISTS ITK_MODULES_ENABLED)
-  if( ${mod} MATCHES "IO")
-    list(APPEND use_itk_modules ${mod})
-  endif()
-endforeach()
+  ITKImageIntensity ITKIOImageBase ITKIOTransformBase ITKIOGDCM
+  ITKImageIO ITKTransformIO )
 
 find_package(ITK COMPONENTS ${use_itk_modules} )
 include(${ITK_USE_FILE})

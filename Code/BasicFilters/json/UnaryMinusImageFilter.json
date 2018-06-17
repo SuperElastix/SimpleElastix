@@ -1,5 +1,6 @@
 {
   "name" : "UnaryMinusImageFilter",
+  "itk_name" : "UnaryFunctorImageFilter",
   "template_code_filename" : "ImageFilter",
   "template_test_filename" : "ImageFilter",
   "number_of_inputs" : 1,
@@ -7,6 +8,9 @@
   "pixel_types" : "typelist::Append< SignedPixelIDTypeList, ComplexPixelIDTypeList >::Type",
   "filter_type" : "itk::UnaryFunctorImageFilter< InputImageType, OutputImageType, itk::Functor::UnaryMinus<typename InputImageType::PixelType, typename OutputImageType::PixelType> >",
   "vector_pixel_types_by_component" : "SignedVectorPixelIDTypeList",
+  "include_files" : [
+    "itkArithmeticOpsFunctors.h"
+  ],
   "members" : [],
   "tests" : [
     {
@@ -46,7 +50,7 @@
       ]
     }
   ],
-  "briefdescription" : "Computes the negative of each pixel.\n",
-  "detaileddescription" : "",
+  "briefdescription" : "Implements pixel-wise generic operation on one image.",
+  "detaileddescription" : "This class is parameterized over the type of the input image and the type of the output image. It is also parameterized by the operation to be applied, using a Functor style.\n\nUnaryFunctorImageFilter allows the output dimension of the filter to be larger than the input dimension. Thus subclasses of the UnaryFunctorImageFilter (like the CastImageFilter ) can be used to promote a 2D image to a 3D image, etc.\n\n\\see BinaryFunctorImageFilter TernaryFunctorImageFilter \n\n\\par Wiki Examples:\n\n\\li All Examples \n\n\\li Apply a custom operation to each pixel in an image",
   "itk_module" : "ITKCommon"
 }

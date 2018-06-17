@@ -6,7 +6,7 @@ export SRC_DIR="/tmp/SimpleITK"
 export BLD_DIR="/tmp/SimpleITK-build"
 export OUT_DIR="/work/io"
 
-SIMPLEITK_GIT_TAG=${SIMPLEITK_GIT_TAG:-v1.0rc3}
+SIMPLEITK_GIT_TAG=${SIMPLEITK_GIT_TAG:-v1.1rc1}
 
 PYTHON_VERSIONS=${PYTHON_VERSIONS:-$(ls /opt/python | sed -e 's/cp2[0-6][^ ]\+ \?//g')}
 
@@ -30,7 +30,7 @@ function build_simpleitk {
         -DBUILD_EXAMPLES:BOOL=OFF \
         -DBUILD_SHARED_LIBS:BOOL=OFF \
         -DWRAP_DEFAULT:BOOL=OFF \
-        -DITK_REPOSITORY:STRING="https://github.com/InsightSoftwareConsortium/ITK.git" \
+        -DITK_GIT_REPOSITORY:STRING="https://github.com/InsightSoftwareConsortium/ITK.git" \
         ${SRC_DIR}/SuperBuild &&
     make  &&
     find ./ -name \*.o -delete
@@ -49,6 +49,7 @@ function build_simpleitk_python {
     echo "PYTHON_INCLUDE_DIR:${PYTHON_INCLUDE_DIR}"
     echo "PYTHON_LIBRARY:${PYTHON_LIBRARY}"
 
+    ${PYTHON_EXECUTABLE} -m pip install --user numpy
     rm -rf ${BLD_DIR}-${PYTHON} &&
     mkdir -p ${BLD_DIR}-${PYTHON} &&
     cd ${BLD_DIR}-${PYTHON} &&
@@ -78,6 +79,6 @@ build_simpleitk || exit 1
 
 for PYTHON in ${PYTHON_VERSIONS}; do
     build_simpleitk_python &&
-    ctest -j ${NPROC} &&
+    ctest -j ${NPROC} -LE UNSTABLE &&
     auditwheel repair $(find ${BLD_DIR}-${PYTHON}/ -name SimpleITK*.whl) -w ${OUT_DIR}/wheelhouse/
 done

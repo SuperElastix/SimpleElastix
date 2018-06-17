@@ -134,6 +134,10 @@ void InternalSetInterpolator( TDisplacementFieldTransform *itkDisplacementTx, In
 
 }
 
+DisplacementFieldTransform::~DisplacementFieldTransform()
+{
+}
+
 // construct identity
 DisplacementFieldTransform::DisplacementFieldTransform(unsigned int dimensions)
   : Transform( CreateDisplacementFieldPimpleTransform(dimensions) )
@@ -288,8 +292,18 @@ void DisplacementFieldTransform::InternalInitialization(TransformType *t)
   this->m_pfSetInterpolator = nsstd::bind(&InternalSetInterpolator<TransformType>, t, nsstd::placeholders::_1);
 
   m_pfSetSmoothingOff = nsstd::bind(&Self::InternalSetSmoothingOff<TransformType>, this, t);
-  m_pfSetSmoothingGaussianOnUpdate = nsstd::bind(&Self::InternalSetSmoothingGaussianOnUpdate<TransformType>, this, t, nsstd::placeholders::_1, nsstd::placeholders::_2 );
-  m_pfSetSmoothingBSplineOnUpdate = nsstd::bind(&Self::InternalSetSmoothingBSplineOnUpdate<TransformType>, this, t, nsstd::placeholders::_1, nsstd::placeholders::_2, nsstd::placeholders::_3, nsstd::placeholders::_4 );
+  m_pfSetSmoothingGaussianOnUpdate = nsstd::bind(&Self::InternalSetSmoothingGaussianOnUpdate<TransformType>,
+                                                 this,
+                                                 t,
+                                                 nsstd::placeholders::_1,
+                                                 nsstd::placeholders::_2 );
+  m_pfSetSmoothingBSplineOnUpdate = nsstd::bind(&Self::InternalSetSmoothingBSplineOnUpdate<TransformType>,
+                                                this,
+                                                t,
+                                                nsstd::placeholders::_1,
+                                                nsstd::placeholders::_2,
+                                                nsstd::placeholders::_3,
+                                                nsstd::placeholders::_4 );
 }
 
 PimpleTransformBase *DisplacementFieldTransform::CreateDisplacementFieldPimpleTransform(unsigned int dimension)
@@ -313,7 +327,7 @@ Image DisplacementFieldTransform::InternalGetDisplacementField( const TDisplacem
   // field, but it does not have the correct reference count.
   typedef typename TDisplacementFieldTransform::DisplacementFieldType DisplacementFieldType;
   DisplacementFieldType *itkDisplacement = const_cast<DisplacementFieldType*>(itkDisplacementTx->GetDisplacementField());
-  if (itkDisplacement != NULL)
+  if (itkDisplacement != SITK_NULLPTR)
     {
     return Image(GetVectorImageFromImage(itkDisplacement));
     }
@@ -325,7 +339,7 @@ Image DisplacementFieldTransform::InternalGetInverseDisplacementField( const TDi
 {
   typedef typename TDisplacementFieldTransform::DisplacementFieldType DisplacementFieldType;
   DisplacementFieldType *itkDisplacement = const_cast<DisplacementFieldType*>(itkDisplacementTx->GetInverseDisplacementField());
-  if (itkDisplacement != NULL)
+  if (itkDisplacement != SITK_NULLPTR)
     {
     return Image(GetVectorImageFromImage(itkDisplacement));
     }
@@ -338,7 +352,8 @@ void DisplacementFieldTransform::InternalSetSmoothingOff( TDisplacementFieldTran
   // To set smoothing off we make sure that the displacement type is
   // not of a derived type.
   const unsigned int Dimension = TDisplacementFieldTransform::Dimension;
-  typedef typename TDisplacementFieldTransform::ScalarType ScalarType;
+
+  typedef typename TDisplacementFieldTransform::ScalarType      ScalarType;
   typedef itk::DisplacementFieldTransform<ScalarType,Dimension> NewTransformType;
 
   // already off don't need to create a new transform
@@ -346,10 +361,10 @@ void DisplacementFieldTransform::InternalSetSmoothingOff( TDisplacementFieldTran
     {
     typename NewTransformType::Pointer itkNewDisplacement = NewTransformType::New();
 
-    itkNewDisplacement->SetDisplacementField( itkDisplacement->GetDisplacementField() );
-    itkNewDisplacement->SetInverseDisplacementField( itkDisplacement->GetInverseDisplacementField() );
-    itkNewDisplacement->SetInterpolator( itkDisplacement->GetInterpolator() );
-    itkNewDisplacement->SetInverseInterpolator( itkDisplacement->GetInverseInterpolator() );
+    itkNewDisplacement->SetDisplacementField( itkDisplacement->GetModifiableDisplacementField() );
+    itkNewDisplacement->SetInverseDisplacementField( itkDisplacement->GetModifiableInverseDisplacementField() );
+    itkNewDisplacement->SetInterpolator( itkDisplacement->GetModifiableInterpolator() );
+    itkNewDisplacement->SetInverseInterpolator( itkDisplacement->GetModifiableInverseInterpolator() );
 
     this->SetPimpleTransform( new PimpleTransform<NewTransformType>(itkNewDisplacement));
     }
@@ -373,10 +388,10 @@ void DisplacementFieldTransform::InternalSetSmoothingGaussianOnUpdate( TDisplace
     {
     itkNewDisplacement = NewTransformType::New();
 
-    itkNewDisplacement->SetDisplacementField( itkDisplacement->GetDisplacementField() );
-    itkNewDisplacement->SetInverseDisplacementField( itkDisplacement->GetInverseDisplacementField() );
-    itkNewDisplacement->SetInterpolator( itkDisplacement->GetInterpolator() );
-    itkNewDisplacement->SetInverseInterpolator( itkDisplacement->GetInverseInterpolator() );
+    itkNewDisplacement->SetDisplacementField( itkDisplacement->GetModifiableDisplacementField() );
+    itkNewDisplacement->SetInverseDisplacementField( itkDisplacement->GetModifiableInverseDisplacementField() );
+    itkNewDisplacement->SetInterpolator( itkDisplacement->GetModifiableInterpolator() );
+    itkNewDisplacement->SetInverseInterpolator( itkDisplacement->GetModifiableInverseInterpolator() );
 
     this->SetPimpleTransform( new PimpleTransform<NewTransformType>(itkNewDisplacement));
     }
@@ -411,10 +426,10 @@ void DisplacementFieldTransform::InternalSetSmoothingBSplineOnUpdate( TDisplacem
     {
     itkNewDisplacement = NewTransformType::New();
 
-    itkNewDisplacement->SetDisplacementField( itkDisplacement->GetDisplacementField() );
-    itkNewDisplacement->SetInverseDisplacementField( itkDisplacement->GetInverseDisplacementField() );
-    itkNewDisplacement->SetInterpolator( itkDisplacement->GetInterpolator() );
-    itkNewDisplacement->SetInverseInterpolator( itkDisplacement->GetInverseInterpolator() );
+    itkNewDisplacement->SetDisplacementField( itkDisplacement->GetModifiableDisplacementField() );
+    itkNewDisplacement->SetInverseDisplacementField( itkDisplacement->GetModifiableInverseDisplacementField() );
+    itkNewDisplacement->SetInterpolator( itkDisplacement->GetModifiableInterpolator() );
+    itkNewDisplacement->SetInverseInterpolator( itkDisplacement->GetModifiableInverseInterpolator() );
 
     this->SetPimpleTransform( new PimpleTransform<NewTransformType>(itkNewDisplacement));
     }

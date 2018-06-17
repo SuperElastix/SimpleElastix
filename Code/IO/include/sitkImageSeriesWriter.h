@@ -48,12 +48,18 @@ namespace itk {
     public:
       typedef ImageSeriesWriter Self;
 
+      virtual ~ImageSeriesWriter();
+
       ImageSeriesWriter();
 
       /** Print ourselves to string */
       virtual std::string ToString() const;
 
-      /** return user readable name fo the filter */
+      /** \brief Get a vector of the names of registered itk ImageIOs
+       */
+      virtual std::vector<std::string> GetRegisteredImageIOs() const;
+
+      /** return user readable name of the filter */
       virtual std::string GetName() const { return std::string("ImageSeriesWriter"); }
 
       /** \brief Enable compression if available for file type.
@@ -80,7 +86,7 @@ namespace itk {
 
 
       SITK_RETURN_SELF_TYPE_HEADER Execute( const Image& );
-      SITK_RETURN_SELF_TYPE_HEADER Execute( const Image &image, const std::vector<std::string> &inFileNames, bool inUseCompression );
+      SITK_RETURN_SELF_TYPE_HEADER Execute( const Image &image, const std::vector<std::string> &inFileNames, bool useCompression );
 
     protected:
 
@@ -95,11 +101,11 @@ namespace itk {
       friend struct detail::MemberFunctionAddressor<MemberFunctionType>;
       nsstd::auto_ptr<detail::MemberFunctionFactory<MemberFunctionType> > m_MemberFactory;
 
-      bool m_UseCompression;
+      bool                     m_UseCompression;
       std::vector<std::string> m_FileNames;
     };
 
-  SITKIO_EXPORT void WriteImage ( const Image & image, const std::vector<std::string> &fileNames, bool inUseCompression=false );
+  SITKIO_EXPORT void WriteImage ( const Image & image, const std::vector<std::string> &fileNames, bool useCompression=false );
   }
 }
 

@@ -49,12 +49,14 @@ namespace itk {
     public:
       typedef ImportImageFilter Self;
 
+      virtual ~ImportImageFilter();
+
       ImportImageFilter();
 
       /** Print ourselves to string */
       virtual std::string ToString() const;
 
-      /** return user readable name fo the filter */
+      /** return user readable name of the filter */
       virtual std::string GetName() const { return std::string("ImportImageFilter"); }
 
       SITK_RETURN_SELF_TYPE_HEADER SetSize( const std::vector< unsigned int > &size );
@@ -84,7 +86,7 @@ namespace itk {
 
     protected:
 
-      // Internal method called the the template dispatch system
+      // Internal method called by the template dispatch system
       template <class TImageType> Image ExecuteInternal ( void );
 
       // If the output image type is a VectorImage then the number of

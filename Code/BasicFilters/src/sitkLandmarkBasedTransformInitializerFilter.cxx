@@ -30,6 +30,7 @@
 
 // Additional include files
 #include "sitkTransform.h"
+#include "sitkBSplineTransform.h"
 // Done with additional include files
 
 namespace itk {
@@ -64,7 +65,6 @@ LandmarkBasedTransformInitializerFilter::~LandmarkBasedTransformInitializerFilte
 }
 
 
-
 //
 // ToString
 //
@@ -95,7 +95,12 @@ std::string LandmarkBasedTransformInitializerFilter::ToString() const
 //
 // Execute
 //
-Transform LandmarkBasedTransformInitializerFilter::Execute ( const Transform & transform, const std::vector<double> & fixedLandmarks, const std::vector<double> & movingLandmarks, const std::vector<double> & landmarkWeight, const Image & referenceImage, unsigned int numberOfControlPoints )
+Transform LandmarkBasedTransformInitializerFilter::Execute ( const Transform & transform,
+                                                             const std::vector<double> & fixedLandmarks,
+                                                             const std::vector<double> & movingLandmarks,
+                                                             const std::vector<double> & landmarkWeight,
+                                                             const Image & referenceImage,
+                                                             unsigned int numberOfControlPoints )
 {
   this->SetFixedLandmarks ( fixedLandmarks );
   this->SetMovingLandmarks ( movingLandmarks );
@@ -165,7 +170,6 @@ Transform LandmarkBasedTransformInitializerFilter::ExecuteInternal ( const Trans
   else { filter->SetTransform( const_cast<typename FilterType::TransformType*>(itkTx) ); }
 
 
-
   typedef typename FilterType::LandmarkPointContainer PointContainer;
   PointContainer fixedITKPoints;
   fixedITKPoints = sitkSTLVectorToITKPointVector<PointContainer,double>(m_FixedLandmarks);
@@ -184,17 +188,22 @@ Transform LandmarkBasedTransformInitializerFilter::ExecuteInternal ( const Trans
       {
       sitkExceptionMacro( "Image not set for BSplineTransform initializer." );
       }
+    {
+    BSplineTransform bsTx(*inTransform);
+    if (bsTx.GetOrder() != 3)
+      {
+      sitkExceptionMacro( "BSplineTransform is only supported  with an order of 3." )
+      }
+    }
     // Get the pointer to the ITK image contained in image1
     typename InputImageType::ConstPointer referenceImage = this->CastImageToITK<InputImageType>( this->m_ReferenceImage );
     filter->SetReferenceImage ( referenceImage.GetPointer() );
     filter->SetBSplineNumberOfControlPoints ( this->m_BSplineNumberOfControlPoints );
     }
 
-  if (this->GetDebug())
-    {
-    std::cout << "Executing ITK filter:" << std::endl;
-    filter->Print(std::cout);
-    }
+  sitkDebugMacro( << "Executing ITK filter:" << std::endl
+                  << *filter );
+
 
   filter->InitializeTransform();
 
@@ -208,7 +217,12 @@ Transform LandmarkBasedTransformInitializerFilter::ExecuteInternal ( const Trans
 //
 // Function to run the Execute method of this filter
 //
-Transform LandmarkBasedTransformInitializer ( const Transform & transform, const std::vector<double> & fixedLandmarks, const std::vector<double> & movingLandmarks, const std::vector<double> & landmarkWeight, const Image & referenceImage, unsigned int numberOfControlPoints )
+Transform LandmarkBasedTransformInitializer ( const Transform & transform,
+                                              const std::vector<double> & fixedLandmarks,
+                                              const std::vector<double> & movingLandmarks,
+                                              const std::vector<double> & landmarkWeight,
+                                              const Image & referenceImage,
+                                              unsigned int numberOfControlPoints )
 {
   LandmarkBasedTransformInitializerFilter filter;
   return filter.Execute ( transform, fixedLandmarks, movingLandmarks, landmarkWeight, referenceImage, numberOfControlPoints );

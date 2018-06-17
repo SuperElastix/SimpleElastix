@@ -26,7 +26,8 @@ namespace itk
 namespace simple
 {
 
-/** \brief A rigid 2D transform with rotation in radians around a
+/** \class Euler2DTransform
+ * \brief A rigid 2D transform with rotation in radians around a
  * fixed center with translation.
  *
  * \sa itk::Euler2DTransform
@@ -36,9 +37,11 @@ class SITKCommon_EXPORT Euler2DTransform
 {
 public:
   typedef Euler2DTransform Self;
-  typedef Transform Superclass;
+  typedef Transform        Superclass;
 
-// construct identity
+  virtual ~Euler2DTransform();
+
+  // construct identity
   Euler2DTransform();
 
   explicit Euler2DTransform(const std::vector<double> &fixedCenter,

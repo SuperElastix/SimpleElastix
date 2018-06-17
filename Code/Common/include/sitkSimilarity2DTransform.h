@@ -26,7 +26,8 @@ namespace itk
 namespace simple
 {
 
-/** \brief A similarity 2D transform with rotation in radians and
+/** \class Similarity2DTransform
+ * \brief A similarity 2D transform with rotation in radians and
  * isotropic scaling around a fixed center with translation.
  *
  * \sa itk::Similarity2DTransform
@@ -36,9 +37,11 @@ class SITKCommon_EXPORT Similarity2DTransform
 {
 public:
   typedef Similarity2DTransform Self;
-  typedef Transform Superclass;
+  typedef Transform             Superclass;
 
-// construct identity
+  ~Similarity2DTransform();
+
+  // construct identity
   Similarity2DTransform();
 
   explicit Similarity2DTransform( double scaleFactor,

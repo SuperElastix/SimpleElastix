@@ -2,7 +2,7 @@
 $(if briefdescription and (briefdescription:len() > 0) then OUT=[[\brief ${briefdescription}]] end)
 
 $(if detaileddescription and (detaileddescription:len() >0) then OUT=[[${detaileddescription}]] end)
-$(if (not no_procedure) or (no_procedure == 1) then OUT=[[\sa itk::simple::${name:gsub("ImageFilter$", "")} for the procedural interface]] end)
+$(if (not no_procedure) or (no_procedure == 1) then OUT=[[\sa itk::simple::${name:gsub("ImageSource$", "Source"):gsub("ImageFilter$", "")} for the procedural interface]] end)
 $(if true then
   OUT=[[\sa ]]
   if itk_name and (itk_name:len() > 0) then
@@ -19,12 +19,12 @@ end)
     public:
       typedef ${name} Self;
 
+      /** Destructor */
+      virtual ~${name}();
+
       /** Default Constructor that takes no arguments and initializes
        * default parameters */
       ${name}();
-
-      /** Destructor */
-      ~${name}();
 
       /** Define the pixels types supported by this filter */
       typedef ${pixel_types}  PixelIDTypeList;

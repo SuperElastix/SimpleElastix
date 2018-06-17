@@ -27,14 +27,15 @@
 
 #include <iterator>
 
+namespace itk {
+namespace simple {
+
 // private namespace
 namespace
 {
 const unsigned int UnusedDimension = 2;
 }
 
-namespace itk {
-namespace simple {
 
 Image ImportAsInt8(
     int8_t * buffer,
@@ -206,6 +207,10 @@ Image ImportAsDouble(
     return import.Execute();
 }
 
+ImportImageFilter::~ImportImageFilter()
+{
+}
+
 ImportImageFilter::ImportImageFilter()
 {
   m_NumberOfComponentsPerPixel = 0;
@@ -224,7 +229,7 @@ ImportImageFilter::ImportImageFilter()
 #endif
   this->m_MemberFactory->RegisterMemberFunctions< PixelIDTypeList, 3 > ();
   this->m_MemberFactory->RegisterMemberFunctions< PixelIDTypeList, 2 > ();
-      
+
 }
 
 ImportImageFilter::Self& ImportImageFilter::SetSpacing( const std::vector< double > &spacing )
@@ -472,8 +477,6 @@ Image ImportImageFilter::ExecuteInternal( )
   assert( ImageTypeToPixelIDValue<ImageType>::Result != (int)sitkUnknown );
 
   typename ImageType::Pointer image = ImageType::New();
-
-
 
 
   //

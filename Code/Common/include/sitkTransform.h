@@ -28,7 +28,7 @@ namespace itk
 {
 
 // Forward declaration for pointer
-// After ITK_VERSION 4.5 (Acutally after June 20th, 2013) the ITK Transform
+// After ITK_VERSION 4.5 (Actually after June 20th, 2013) the ITK Transform
 // classes are now templated.  This requires forward declarations to be defined
 // differently.
 #if ( ( SITK_ITK_VERSION_MAJOR == 4 ) && ( SITK_ITK_VERSION_MINOR < 5 ) )
@@ -63,7 +63,8 @@ enum TransformEnum { sitkIdentity,
 };
 
 
-/** \brief A simplified wrapper around a variety of ITK transforms.
+/** \class Transform
+ * \brief A simplified wrapper around a variety of ITK transforms.
  *
  * The interface to ITK transform objects to be used with the
  * ImageRegistrationMethod, ResampleImageFilter and other SimpleITK
@@ -95,10 +96,10 @@ public:
    */
   template<unsigned int NDimension>
   explicit Transform( itk::CompositeTransform< double, NDimension >* compositeTransform )
-    : m_PimpleTransform( NULL )
+    : m_PimpleTransform( SITK_NULLPTR )
     {
       sitkStaticAssert( NDimension == 2 || NDimension == 3, "Only 2D and 3D transforms are supported" );
-      if ( compositeTransform == NULL )
+      if ( compositeTransform == SITK_NULLPTR )
         {
         sitkExceptionMacro( "Unable to construct a null transform!" );
         }
@@ -142,11 +143,11 @@ public:
 
   /** Get access to internal ITK data object.
    *
-   * The return value should imediately be assigned to as
+   * The return value should immediately be assigned to as
    * itk::SmartPointer.
    *
-   * In many cases the value may need to be dynamically casted to
-   * the the actual transform type.
+   * In many cases the value may need to be dynamically cast to
+   * the actual transform type.
    *
    * @{
    */
@@ -164,14 +165,14 @@ public:
    * @{
    */
   void SetParameters ( const std::vector<double>& parameters );
-  std::vector<double> GetParameters( void ) const ;
+  std::vector<double> GetParameters( void ) const;
   /**@}*/
 
   /** Set/Get Fixed Transform Parameter
    * @{
    */
   void SetFixedParameters ( const std::vector<double>& parameters );
-  std::vector<double> GetFixedParameters( void ) const ;
+  std::vector<double> GetFixedParameters( void ) const;
   /**@}*/
 
   // Make composition
@@ -235,7 +236,7 @@ protected:
 private:
 
   template< unsigned int VDimension>
-  void InternalInitialization( TransformEnum type, itk::TransformBase *base = NULL );
+  void InternalInitialization( TransformEnum type, itk::TransformBase *base = SITK_NULLPTR );
 
   struct TransformTryCastVisitor
   {

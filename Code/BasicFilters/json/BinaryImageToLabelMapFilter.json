@@ -37,6 +37,15 @@
       "detaileddescriptionGet" : "Set/Get the value used as \"background\" in the output image. Defaults to NumericTraits<OutputPixelType>::NonpositiveMin() ."
     }
   ],
+  "measurements" : [
+    {
+      "name" : "NumberOfObjects",
+      "type" : "uint64_t",
+      "default" : 0,
+      "briefdescriptionGet" : "",
+      "detaileddescriptionGet" : ""
+    }
+  ],
   "tests" : [
     {
       "tag" : "white_dots",
@@ -50,6 +59,12 @@
       ],
       "inputs" : [
         "Input/WhiteDots.png"
+      ],
+      "measurements_results" : [
+        {
+          "name" : "NumberOfObjects",
+          "value" : "23u"
+        }
       ]
     },
     {
@@ -70,6 +85,12 @@
       ],
       "inputs" : [
         "Input/WhiteDots.png"
+      ],
+      "measurements_results" : [
+        {
+          "name" : "NumberOfObjects",
+          "value" : "21u"
+        }
       ]
     }
   ],

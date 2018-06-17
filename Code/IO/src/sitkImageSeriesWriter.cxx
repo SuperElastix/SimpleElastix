@@ -22,6 +22,7 @@
 #endif
 
 #include "sitkImageSeriesWriter.h"
+#include "sitkImageIOUtilities.h"
 
 #include <itkImageIOBase.h>
 #include <itkImageSeriesWriter.h>
@@ -31,10 +32,14 @@
 namespace itk {
   namespace simple {
 
-  void WriteImage ( const Image& inImage, const std::vector<std::string> &filenames, bool inUseCompression )
+  void WriteImage ( const Image& inImage, const std::vector<std::string> &filenames, bool useCompression )
   {
     ImageSeriesWriter writer;
-    writer.Execute( inImage, filenames, inUseCompression );
+    writer.Execute( inImage, filenames, useCompression );
+  }
+
+  ImageSeriesWriter::~ImageSeriesWriter()
+  {
   }
 
   ImageSeriesWriter::ImageSeriesWriter()
@@ -66,13 +71,21 @@ namespace itk {
     std::vector<std::string>::const_iterator iter  = m_FileNames.begin();
     while( iter != m_FileNames.end() )
       {
-      std::cout << "    \"" << *iter << "\"" << std::endl;
+      out << "    \"" << *iter << "\"" << std::endl;
       ++iter;
       }
+    out << "  Registered ImageIO:" << std::endl;
+    ioutils::PrintRegisteredImageIOs(out);
 
     return out.str();
   }
 
+
+  std::vector<std::string>
+  ImageSeriesWriter::GetRegisteredImageIOs() const
+  {
+    return ioutils::GetRegisteredImageIOs();
+  }
 
   ImageSeriesWriter::Self&
   ImageSeriesWriter::SetUseCompression( bool UseCompression )
@@ -99,10 +112,10 @@ namespace itk {
   }
 
 
-  ImageSeriesWriter& ImageSeriesWriter::Execute ( const Image& image, const std::vector<std::string> &inFileNames, bool inUseCompression )
+  ImageSeriesWriter& ImageSeriesWriter::Execute ( const Image& image, const std::vector<std::string> &inFileNames, bool useCompression )
   {
     this->SetFileNames( inFileNames );
-    this->SetUseCompression( inUseCompression );
+    this->SetUseCompression( useCompression );
     return this->Execute( image );
   }
 

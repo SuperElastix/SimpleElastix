@@ -25,6 +25,7 @@
 #include <itkImageSeriesReader.h>
 
 #include "itkGDCMSeriesFileNames.h"
+#include "sitkMetaDataDictionaryCustomCast.hxx"
 
 namespace itk {
   namespace simple {
@@ -66,6 +67,7 @@ namespace itk {
 
   ImageSeriesReader::ImageSeriesReader()
     :
+    m_Filter(SITK_NULLPTR),
     m_MetaDataDictionaryArrayUpdate(false)
     {
 
@@ -80,6 +82,10 @@ namespace itk {
 
   ImageSeriesReader::~ImageSeriesReader()
   {
+  if (this->m_Filter != SITK_NULLPTR)
+    {
+      m_Filter->UnRegister();
+    }
   }
 
   std::string ImageSeriesReader::ToString() const {
@@ -92,7 +98,7 @@ namespace itk {
       std::vector<std::string>::const_iterator iter  = m_FileNames.begin();
       while( iter != m_FileNames.end() )
         {
-        std::cout << "    \"" << *iter << "\"" << std::endl;
+        out << "    \"" << *iter << "\"" << std::endl;
         ++iter;
         }
 
@@ -162,6 +168,7 @@ namespace itk {
     return this->m_MemberFactory->GetMemberFunction( type, dimension )(imageio);
     }
 
+
   template <class TImageType> Image
   ImageSeriesReader::ExecuteInternal( itk::ImageIOBase* imageio )
     {
@@ -179,7 +186,27 @@ namespace itk {
     // save some computation by not updating this unneeded data-structure
     reader->SetMetaDataDictionaryArrayUpdate(m_MetaDataDictionaryArrayUpdate);
 
+    // release the old filter ( and output data )
+    if ( this->m_Filter != SITK_NULLPTR)
+      {
+      this->m_pfGetMetaDataKeys = SITK_NULLPTR;
+      this->m_pfHasMetaDataKey = SITK_NULLPTR;
+      this->m_pfGetMetaData =  SITK_NULLPTR;
+      this->m_Filter->UnRegister();
+      this->m_Filter = SITK_NULLPTR;
+      }
+
+
     this->PreUpdate( reader.GetPointer() );
+
+    if (m_MetaDataDictionaryArrayUpdate)
+      {
+      this->m_Filter = reader;
+      this->m_Filter->Register();
+      this->m_pfGetMetaDataKeys = nsstd::bind(&GetMetaDataKeysCustomCast<Reader>::CustomCast, reader.GetPointer(), nsstd::placeholders::_1 );
+      this->m_pfHasMetaDataKey = nsstd::bind(&HasMetaDataKeyCustomCast<Reader>::CustomCast, reader.GetPointer(), nsstd::placeholders::_1, nsstd::placeholders::_2 );
+      this->m_pfGetMetaData = nsstd::bind(&GetMetaDataCustomCast<Reader>::CustomCast, reader.GetPointer(), nsstd::placeholders::_1, nsstd::placeholders::_2 );
+      }
 
     reader->Update();
 

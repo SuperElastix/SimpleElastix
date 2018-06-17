@@ -35,7 +35,7 @@ namespace simple
 
 /** List of all pixel ids for the itk::Image class.
  *
- * \todo adress vnl issues with long long types
+ * \todo address vnl issues with long long types
  *
  * \sa BasicPixelID
  */
@@ -114,7 +114,6 @@ typedef typelist::MakeTypeList<BasicPixelID<int8_t>,
 #endif
                                BasicPixelID<float>,
                                BasicPixelID<double> >::Type SignedPixelIDTypeList;
-
 
 
 /** List of pixel ids which are vectors for itk::VectorImage class.

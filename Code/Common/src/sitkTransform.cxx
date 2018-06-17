@@ -56,6 +56,11 @@
 
 #include "nsstd/type_traits.h"
 
+namespace itk
+{
+namespace simple
+{
+
 namespace
 {
 
@@ -72,7 +77,7 @@ template<class T>
 class TransformTraits<T,2>
 {
 public:
-  typedef itk::Euler2DTransform<T>  EulerTransformType;
+  typedef itk::Euler2DTransform<T>       EulerTransformType;
   typedef itk::Similarity2DTransform<T>  SimilarityTransformType;
 };
 
@@ -80,20 +85,10 @@ template<class T>
 class TransformTraits<T,3>
 {
 public:
-  typedef itk::Euler3DTransform<T>  EulerTransformType;
+  typedef itk::Euler3DTransform<T>       EulerTransformType;
   typedef itk::Similarity3DTransform<T>  SimilarityTransformType;
 };
 
-
-}
-
-namespace itk
-{
-namespace simple
-{
-
-namespace
-{
 template<unsigned int Dimension>
 bool RegisterMoreTransforms(void)
 {
@@ -114,7 +109,8 @@ bool RegisterMoreTransforms(void)
 bool initialized = RegisterMoreTransforms<2>() && RegisterMoreTransforms<3>();
 
 
-/** \brief An ITK Command class to hold a object until destruction
+/** \class HolderCommand
+ *  \brief An ITK Command class to hold a object until destruction
  *
  * This command is to add resource management, by utilizing
  * the lifetime of a Command added to an object is about the same as
@@ -131,7 +127,7 @@ public:
   typedef T ObjectType;
 
   typedef  HolderCommand Self;
-  typedef  itk::Command Superclass;
+  typedef  itk::Command  Superclass;
 
   typedef itk::SmartPointer<Self>        Pointer;
   typedef itk::SmartPointer<const Self>  ConstPointer;
@@ -165,7 +161,7 @@ public:
   typedef T ObjectType;
 
   typedef  HolderCommand Self;
-  typedef  itk::Command Superclass;
+  typedef  itk::Command  Superclass;
 
   typedef itk::SmartPointer<Self>        Pointer;
   typedef itk::SmartPointer<const Self>  ConstPointer;
@@ -180,7 +176,7 @@ public:
   void Execute(const itk::Object*, const itk::EventObject&) SITK_OVERRIDE {}
 
 protected:
-  HolderCommand() : m_Object(NULL) {};
+  HolderCommand() : m_Object(SITK_NULLPTR) {};
   ~HolderCommand() { delete m_Object;}
 
 private:
@@ -199,19 +195,19 @@ private:
 //
 
 Transform::Transform( )
-  : m_PimpleTransform( NULL )
+  : m_PimpleTransform( SITK_NULLPTR )
   {
     m_PimpleTransform = new PimpleTransform<itk::IdentityTransform< double, 3 > >();
   }
 
 Transform::Transform( itk::TransformBase *transformBase )
-  : m_PimpleTransform( NULL )
+  : m_PimpleTransform( SITK_NULLPTR )
 {
   this->InternalInitialization( transformBase );
 }
 
   Transform::Transform( unsigned int dimensions, TransformEnum type)
-    : m_PimpleTransform( NULL )
+    : m_PimpleTransform( SITK_NULLPTR )
   {
     if ( dimensions == 2 )
       {
@@ -231,11 +227,11 @@ Transform::Transform( itk::TransformBase *transformBase )
   Transform::~Transform()
   {
     delete m_PimpleTransform;
-    this->m_PimpleTransform = NULL;
+    this->m_PimpleTransform = SITK_NULLPTR;
   }
 
   Transform::Transform( const Transform &txf )
-    : m_PimpleTransform( NULL )
+    : m_PimpleTransform( SITK_NULLPTR )
   {
     Self::SetPimpleTransform( txf.m_PimpleTransform->ShallowCopy() );
   }
@@ -250,7 +246,7 @@ Transform::Transform( itk::TransformBase *transformBase )
 
 
 Transform::Transform( Image &image, TransformEnum txType )
-    : m_PimpleTransform( NULL )
+    : m_PimpleTransform( SITK_NULLPTR )
   {
 
 
@@ -327,8 +323,7 @@ void Transform::InternalBSplineInitialization( Image & inImage )
   itkBSpline->SetTransformDomainPhysicalDimensions( fixedPhysicalDimensions );
 
 
-
-  typedef typename BSplineTransformType::ParametersType ParametersType;;
+  typedef typename BSplineTransformType::ParametersType ParametersType;
 
   typename HolderCommand<ParametersType *>::Pointer holder = HolderCommand<ParametersType *>::New();
   itkBSpline->AddObserver( itk::DeleteEvent(), holder);
@@ -365,8 +360,6 @@ void Transform::InternalBSplineInitialization( Image & inImage )
     Self::SetPimpleTransform( new PimpleTransform< DisplacementTransformType >(itkDisplacement.GetPointer()) );
   }
 
-
-
 void Transform::MakeUnique( void )
 {
   if ( this->m_PimpleTransform->GetReferenceCount() > 1 )
@@ -379,7 +372,7 @@ void Transform::MakeUnique( void )
 Transform::Transform( PimpleTransformBase *pimpleTransform )
     : m_PimpleTransform( pimpleTransform )
   {
-    if ( pimpleTransform == NULL )
+    if ( pimpleTransform == SITK_NULLPTR )
       {
       sitkExceptionMacro("Invalid NULL PimpleTransform!");
       }
@@ -588,7 +581,7 @@ void Transform::SetPimpleTransform( PimpleTransformBase *pimpleTransform )
     nsstd::auto_ptr<PimpleTransformBase> temp;
     {
     // See if a new pimple transform can be created
-    PimpleTransformBase *p = NULL;
+    PimpleTransformBase *p = SITK_NULLPTR;
     if (!this->m_PimpleTransform->GetInverse(p))
       {
       return false;
@@ -716,7 +709,7 @@ void Transform::InternalInitialization(TransformType *t)
     reader->SetFileName(filename.c_str() );
     reader->Update();
 
-    itk::TransformFileReader::TransformListType *list = reader->GetTransformList();
+    const itk::TransformFileReader::TransformListType *list = reader->GetTransformList();
 
     if ( list->empty() )
       {
@@ -725,7 +718,14 @@ void Transform::InternalInitialization(TransformType *t)
 
     if( list->size() != 1 )
       {
-      std::cerr << "Warning: There is more than one transform in the file! Only using the first transform.\n";
+      // sitkWarningMacro
+      if ( ::itk::Object::GetGlobalWarningDisplay() )
+        {
+        std::ostringstream msg;
+        msg << "WARNING: In " __FILE__ ", line " << __LINE__ << "\n"
+            << "There is more than one transform in the file! Only using the first transform.\n";
+        ::itk::OutputWindowDisplayWarningText( msg.str().c_str() );
+        }
       }
 
     if( list->front()->GetInputSpaceDimension() == 3
@@ -740,7 +740,6 @@ void Transform::InternalInitialization(TransformType *t)
       return Transform(itktx3d);
 
       }
-
 
 
     if( list->front()->GetInputSpaceDimension() == 2

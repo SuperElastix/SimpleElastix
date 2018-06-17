@@ -26,7 +26,8 @@ namespace itk
 namespace simple
 {
 
-/** \brief A similarity 3D transform with rotation as a versor, and
+/** \class Similarity3DTransform
+ * \brief A similarity 3D transform with rotation as a versor, and
  * isotropic scaling around a fixed center with translation.
  *
  * \sa itk::Similarity3DTransform
@@ -36,7 +37,9 @@ class SITKCommon_EXPORT Similarity3DTransform
 {
 public:
 typedef Similarity3DTransform Self;
-typedef Transform Superclass;
+typedef Transform             Superclass;
+
+virtual ~Similarity3DTransform();
 
 // construct identity
 Similarity3DTransform();

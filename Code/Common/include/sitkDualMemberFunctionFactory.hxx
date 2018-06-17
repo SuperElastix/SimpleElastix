@@ -48,7 +48,7 @@ struct DualMemberFunctionInstantiater
   template <class TPixelIDType1, class TPixelIDType2>
   typename EnableIf< IsInstantiated<TPixelIDType1,VImageDimension>::Value &&
                      IsInstantiated<TPixelIDType2,VImageDimension>::Value >::Type
-  operator()( TPixelIDType1* t1=NULL, TPixelIDType2*t2=NULL ) const
+  operator()( TPixelIDType1* t1=SITK_NULLPTR, TPixelIDType2*t2=SITK_NULLPTR ) const
     {
       (void)t1;
       (void)t2;
@@ -57,7 +57,7 @@ struct DualMemberFunctionInstantiater
       typedef TAddressor                                                             AddressorType;
 
       AddressorType addressor;
-      m_Factory.Register(addressor.CLANG_TEMPLATE operator()<ImageType1, ImageType2>(), (ImageType1*)(NULL), (ImageType2*)(NULL) );
+      m_Factory.Register(addressor.CLANG_TEMPLATE operator()<ImageType1, ImageType2>(), (ImageType1*)(SITK_NULLPTR), (ImageType2*)(SITK_NULLPTR) );
 
     }
 
@@ -65,7 +65,7 @@ struct DualMemberFunctionInstantiater
   template <class TPixelIDType1, class TPixelIDType2>
   typename DisableIf< IsInstantiated<TPixelIDType1,VImageDimension>::Value &&
                      IsInstantiated<TPixelIDType2,VImageDimension>::Value >::Type
-  operator()( TPixelIDType1*t1=NULL, TPixelIDType2*t2=NULL ) const
+  operator()( TPixelIDType1*t1=SITK_NULLPTR, TPixelIDType2*t2=SITK_NULLPTR ) const
     {
       (void)t1;
       (void)t2;
@@ -93,7 +93,7 @@ DualMemberFunctionFactory< TMemberFunctionPointer >
   PixelIDValueType pixelID1 = ImageTypeToPixelIDValue<TImageType1>::Result;
   PixelIDValueType pixelID2 = ImageTypeToPixelIDValue<TImageType2>::Result;
 
-  // this shouldn't occour, just may be useful for debugging
+  // this shouldn't occur, just may be useful for debugging
   assert( pixelID1 >= 0 && pixelID1 < typelist::Length< InstantiatedPixelIDTypeList >::Result );
   assert( pixelID2 >= 0 && pixelID2 < typelist::Length< InstantiatedPixelIDTypeList >::Result );
 
@@ -145,7 +145,7 @@ DualMemberFunctionFactory< TMemberFunctionPointer >
 template <typename TMemberFunctionPointer>
 bool
 DualMemberFunctionFactory< TMemberFunctionPointer >
-::HasMemberFunction( PixelIDValueType pixelID1, PixelIDValueType pixelID2, unsigned int imageDimension  ) const throw()
+::HasMemberFunction( PixelIDValueType pixelID1, PixelIDValueType pixelID2, unsigned int imageDimension  ) const SITK_NOEXCEPT
 {
   try
     {

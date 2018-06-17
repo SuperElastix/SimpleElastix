@@ -18,16 +18,18 @@ if(NOT SWIG_DIR)
     mark_as_advanced(USE_SWIG_FROM_GIT)
   endif()
 
+
+  set(SWIG_TARGET_VERSION "3.0.12" )
+
   if( USE_SWIG_FROM_GIT )
     set(SWIG_GIT_REPOSITORY "${git_protocol}://github.com/swig/swig.git" CACHE STRING "URL of swig git repo")
-    set(SWIG_GIT_TAG "rel-3.0.11" CACHE STRING "Tag in swig git repo")
+    set(SWIG_GIT_TAG "rel-${SWIG_TARGET_VERSION}" CACHE STRING "Tag in swig git repo")
     mark_as_advanced(SWIG_GIT_REPO)
     mark_as_advanced(SWIG_GIT_TAG)
   endif()
 
-  set(SWIG_TARGET_VERSION "3.0.11" )
-  set(SWIG_DOWNLOAD_SOURCE_HASH "13732eb0f1ab2123d180db8425c1edea")
-  set(SWIGWIN_DOWNLOAD_HASH "5cc57e3658f62b7f648bec7eed91a4f0" )
+  set(SWIG_DOWNLOAD_SOURCE_HASH "82133dfa7bba75ff9ad98a7046be687c")
+  set(SWIGWIN_DOWNLOAD_HASH "a49524dad2c91ae1920974e7062bfc93" )
 
   if(WIN32)
     # binary SWIG for windows
@@ -40,7 +42,7 @@ if(NOT SWIG_DIR)
     # swig.exe available as pre-built binary on Windows:
     ExternalProject_Add(Swig
       URL "${SWIGWIN_URL}"
-      URL_MD5 ${SWIG_DOWNLOAD_WIN_HASH}
+      URL_HASH MD5=${SWIGWIN_DOWNLOAD_HASH}
       SOURCE_DIR ${swig_source_dir}
       CONFIGURE_COMMAND ""
       BUILD_COMMAND ""
@@ -99,7 +101,7 @@ if(NOT SWIG_DIR)
       sitkSourceDownload(SWIG_URL "swig-${SWIG_TARGET_VERSION}.tar.gz" ${SWIG_DOWNLOAD_SOURCE_HASH})
       set(SWIG_DOWNLOAD_STEP
         URL "${SWIG_URL}"
-        URL_MD5 "${SWIG_DOWNLOAD_SOURCE_HASH}"
+        URL_HASH MD5=${SWIG_DOWNLOAD_SOURCE_HASH}
         )
     endif()
 

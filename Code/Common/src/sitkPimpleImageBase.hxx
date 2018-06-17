@@ -63,7 +63,7 @@ namespace itk
         sitkStaticAssert( ImageTypeToPixelIDValue<ImageType>::Result != (int)sitkUnknown,
                           "invalid pixel type" );
 
-        if ( image == NULL )
+        if ( image == SITK_NULLPTR )
           {
           sitkExceptionMacro( << "Unable to initialize an image with NULL" );
           }
@@ -114,7 +114,7 @@ namespace itk
     virtual const itk::DataObject* GetDataBase( void ) const { return this->m_Image.GetPointer(); }
 
 
-    PixelIDValueEnum GetPixelID(void) const throw()
+    PixelIDValueEnum GetPixelID(void) const SITK_NOEXCEPT
       {
         // The constructor ensures that we have a valid image
         // this maps the Image's pixel type to the array index
@@ -777,7 +777,7 @@ namespace itk
 
         typename ImageType::PixelType px = this->m_Image->GetPixel( itkIdx );
 
-        if ( px.GetSize()  != v.size() )
+        if ( px.GetSize() != v.size() )
           {
           sitkExceptionMacro(<<"Unable to convert vector to ITK pixel type\n"
                              << "Expected vector of length " <<  px.GetSize()

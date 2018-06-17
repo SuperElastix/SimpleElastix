@@ -218,7 +218,7 @@ macro(generate_filter_source)
   get_cmake_property( _varNames VARIABLES )
   foreach (_varName ${_varNames})
     if(_varName MATCHES "^SimpleITKBasicFiltersGeneratedSource_")
-      unset(${varName} CACHE)
+      unset(${_varName} CACHE)
     endif()
   endforeach()
 
@@ -281,8 +281,8 @@ macro(generate_filter_source)
   file ( WRITE ${generated_headers_i} "")
 
   # Add ifndefs
-  file ( WRITE "${tmp_generated_headers_h}" "#ifndef __SimpleITK${directory_name}GeneratedHeaders_h\n")
-  file ( APPEND "${tmp_generated_headers_h}" "#define __SimpleITK${directory_name}GeneratedHeaders_h\n")
+  file ( WRITE "${tmp_generated_headers_h}" "#ifndef SimpleITK${directory_name}GeneratedHeaders_h\n")
+  file ( APPEND "${tmp_generated_headers_h}" "#define SimpleITK${directory_name}GeneratedHeaders_h\n")
 
   foreach ( filter ${GENERATED_FILTER_LIST} )
     file ( APPEND "${tmp_generated_headers_h}" "#include \"sitk${filter}.h\"\n" )

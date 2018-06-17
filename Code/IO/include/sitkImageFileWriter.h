@@ -54,13 +54,20 @@ class SmartPointer;
       // list of pixel types supported
       typedef NonLabelPixelIDTypeList PixelIDTypeList;
 
-      ImageFileWriter( void );
+      virtual ~ImageFileWriter();
+
+      ImageFileWriter();
 
       /** Print ourselves to string */
       virtual std::string ToString() const;
 
-      /** return user readable name fo the filter */
+      /** return user readable name of the filter */
       virtual std::string GetName() const { return std::string("ImageFileWriter"); }
+
+      /** \brief Get a vector of the names of registered itk ImageIOs
+       */
+      virtual std::vector<std::string> GetRegisteredImageIOs() const;
+
 
       /** \brief Enable compression if available for file type.
        *
@@ -95,7 +102,7 @@ class SmartPointer;
       std::string GetFileName() const;
 
       SITK_RETURN_SELF_TYPE_HEADER Execute ( const Image& );
-      SITK_RETURN_SELF_TYPE_HEADER Execute ( const Image& , const std::string &inFileName, bool inUseCompression );
+      SITK_RETURN_SELF_TYPE_HEADER Execute ( const Image& , const std::string &inFileName, bool useCompression );
 
     private:
 
@@ -103,9 +110,9 @@ class SmartPointer;
 
       template <class T> Self& ExecuteInternal ( const Image& );
 
-      bool m_UseCompression;
+      bool        m_UseCompression;
       std::string m_FileName;
-      bool m_KeepOriginalImageUID;
+      bool        m_KeepOriginalImageUID;
 
       // function pointer type
       typedef Self& (Self::*MemberFunctionType)( const Image& );

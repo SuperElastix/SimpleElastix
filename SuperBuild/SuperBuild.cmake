@@ -4,15 +4,7 @@
 set(BUILDNAME "NoBuldNameGiven")
 set(SITE      "NoSiteGiven")
 set(BUILD_TESTING_DEFAULT ON)
-if(CMAKE_VERSION VERSION_LESS 2.8.11)
-  set(BUILD_TESTING_DEFAULT OFF)
-endif()
 option( BUILD_TESTING "Turn on Testing for SimpleITK" ${BUILD_TESTING_DEFAULT} )
-
-# 2.8.11 required for ExternalData.cmake.
-if( BUILD_TESTING AND CMAKE_VERSION VERSION_LESS 2.8.11 )
-  message( FATAL_ERROR "BUILD_TESTING ON requires CMake 2.8.11 or newer." )
-endif()
 
 if(CMAKE_GENERATOR MATCHES "Ninja" AND CMAKE_VERSION VERSION_LESS 3.2 )
   message( FATAL_ERROR "Using \"Ninja\" generator requires CMake 3.2.0 or newer." )
@@ -148,8 +140,14 @@ option(BUILD_SHARED_LIBS "Build SimpleITK ITK with shared libraries. This does n
 # as this option does not robustly work across platforms it will be marked as advanced
 mark_as_advanced( FORCE BUILD_SHARED_LIBS )
 
-option( SimpleITK_4D_IMAGES "Add Image and I/O support for four spatial dimensions." ON )
+set(SimpleITK_4D_IMAGES_DEFAULT ON)
+# 1900 = VS 14.0 (Visual Studio 2015)
+if(MSVC AND MSVC_VERSION VERSION_LESS 1900)
+  set( SimpleITK_4D_IMAGES_DEFAULT OFF )
+endif()
+option( SimpleITK_4D_IMAGES "Add Image and I/O support for four spatial dimensions." ${SimpleITK_4D_IMAGES_DEFAULT} )
 mark_as_advanced( SimpleITK_4D_IMAGES )
+unset(SimpleITK_4D_IMAGES_DEFAULT)
 
 #-----------------------------------------------------------------------------
 # Setup build type
@@ -193,6 +191,9 @@ list( APPEND ep_common_list
   CMAKE_C_FLAGS_MINSIZEREL
   CMAKE_C_FLAGS_RELEASE
   CMAKE_C_FLAGS_RELWITHDEBINFO
+  CMAKE_C_STANDARD
+  CMAKE_C_STANDARD_REQUIRED
+  CMAKE_C_EXTENSIONS
 
   CMAKE_CXX_COMPILER
   CMAKE_CXX_COMPILER_LAUNCHER
@@ -202,6 +203,9 @@ list( APPEND ep_common_list
   CMAKE_CXX_FLAGS_MINSIZEREL
   CMAKE_CXX_FLAGS_RELEASE
   CMAKE_CXX_FLAGS_RELWITHDEBINFO
+  CMAKE_CXX_STANDARD
+  CMAKE_CXX_STANDARD_REQUIRED
+  CMAKE_CXX_EXTENSIONS
 
   CMAKE_LINKER
 
@@ -222,6 +226,7 @@ list( APPEND ep_common_list
   CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO
 
   CMAKE_STRIP
+  CMAKE_STRIP_FLAGS
 
   CMAKE_PREFIX_PATH
   CMAKE_FRAMEWORK_PATH
@@ -244,18 +249,11 @@ list( APPEND ep_common_list
   SITE
   BUILDNAME
 
-  SKBUILD )
+  SKBUILD
 
-if( APPLE )
-  list( APPEND ep_common_list
-    CMAKE_OSX_SYSROOT
-    CMAKE_OSX_DEPLOYMENT_TARGET )
-endif()
-
-if( DEFINED CMAKE_STRIP_FLAGS )
-  list( APPEND ep_common_list
-    CMAKE_STRIP_FLAGS )
-endif()
+  CMAKE_OSX_SYSROOT
+  CMAKE_OSX_DEPLOYMENT_TARGET
+)
 
 VariableListToArgs( ep_common_list ep_common_args )
 
@@ -421,8 +419,19 @@ foreach (_varName ${_varNames})
       message( STATUS "Passing variable \"${_varName}=${${_varName}}\" to SimpleITK external project.")
       list(APPEND SimpleITK_VARS ${_varName})
     endif()
+  elseif(_varName MATCHES "^BUILD_DOCUMENTS$"
+       OR
+         _varName MATCHES "^BUILD_DOXYGEN$"
+       OR
+         _varName MATCHES "^DOXYGEN_"
+       OR
+         _varName MATCHES "^CMAKE_DISABLE_FIND_PACKAGE_"
+         )
+    message( STATUS "Passing variable \"${_varName}=${${_varName}}\" to SimpleITK external project.")
+    list(APPEND SimpleITK_VARS ${_varName})
   endif()
 endforeach()
+
 
 list(APPEND SimpleITK_VARS ExternalData_OBJECT_STORES)
 
@@ -479,6 +488,19 @@ ExternalProject_Add_Step(${proj} forcebuild
   DEPENDERS build
   ALWAYS 1
 )
+
+# explicitly add a non-default step to build SimpleITK do
+ExternalProject_Add_Step(${proj} doc
+  COMMAND ${CMAKE_COMMAND}
+      --build <BINARY_DIR>
+      --target Documentation
+  DEPENDEES configure
+  EXCLUDE_FROM_MAIN 1
+  LOG 1
+)
+
+# adds superbuild level target "SimpleITK-documentation" etc..
+ExternalProject_Add_StepTargets(${proj} configure build test forcebuild doc)
 
 
 #------------------------------------------------------------------------------

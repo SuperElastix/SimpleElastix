@@ -29,12 +29,13 @@
 namespace itk {
 
 template<unsigned int VImageDimension> class ImageRegion;
+template<typename T> class Versor;
 
 namespace simple {
 
 /** \brief A function which does nothing
  *
- * This function is to be used to mark parameters as unused to supress
+ * This function is to be used to mark parameters as unused to suppress
  * compiler warning.
  */
 template <typename T>
@@ -69,7 +70,7 @@ TITKPointVector SITKCommon_HIDDEN sitkSTLVectorToITKPointVector( const std::vect
 
   unsigned int Dimension = itkPointVectorType::value_type::GetPointDimension();
 
-  for( unsigned int i = 0; i <= in.size()- Dimension; i += Dimension )
+  for( unsigned int i = 0; i + Dimension <= in.size(); i += Dimension )
     {
     typename itkPointVectorType::value_type pt(&in[i]);
     out.push_back(pt);
@@ -80,7 +81,7 @@ TITKPointVector SITKCommon_HIDDEN sitkSTLVectorToITKPointVector( const std::vect
 
 /** \brief Copy the elements of an std::vector into an ITK fixed width vector
  *
- * If there are more elements in paramter "in" than the templated ITK
+ * If there are more elements in parameter "in" than the templated ITK
  * vector type, they are truncated. If less, then an exception is
  * generated.
  */
@@ -111,6 +112,24 @@ std::vector<TType> SITKCommon_HIDDEN sitkITKVectorToSTL( const TITKVector & in )
   for( unsigned int i = 0; i < TITKVector::Dimension; ++i )
     {
     out[i] = static_cast<TType>(in[i]);
+    }
+  return out;
+}
+
+/** \brief Convert an ITK style array of ITK fixed witdth vector to std::vector
+ *
+ * An example input type is itk::FixedArray<itk::Point<3>, 3>
+ */
+template<typename TType,  typename TVectorOfITKVector>
+std::vector<TType> SITKCommon_HIDDEN sitkVectorOfITKVectorToSTL( const TVectorOfITKVector & in )
+{
+  typedef typename TVectorOfITKVector::ValueType ITKVectorType;
+  std::vector<TType> out;
+  out.reserve( in.Size()*ITKVectorType::Dimension );
+  for( unsigned int i = 0; i < in.Size(); ++i )
+    {
+    const std::vector<TType> &temp =  sitkITKVectorToSTL<TType>(in[i]);
+    out.insert(out.end(), temp.begin(), temp.end());
     }
   return out;
 }
@@ -182,6 +201,33 @@ std::vector<double> SITKCommon_HIDDEN  sitkITKDirectionToSTL( const TDirectionTy
   return std::vector<double>(  d.GetVnlMatrix().begin(), d.GetVnlMatrix().end() );
 }
 
+
+template< typename T, typename TType>
+itk::Versor<T> SITKCommon_HIDDEN  sitkSTLVectorToITKVersor( const std::vector< TType > & in )
+{
+  typedef itk::Versor<T> itkVectorType;
+  if ( in.size() != 4 )
+    {
+    sitkExceptionMacro(<<"Unable to convert vector to ITK Versor type\n"
+                      << "Expected vector of length " <<  4
+                       << " but got " << in.size() << " elements." );
+    }
+  itkVectorType out;
+  out.Set(in[0],in[1],in[2],in[3]);
+  return out;
+}
+
+
+template< typename TType, typename T>
+std::vector<TType> SITKCommon_HIDDEN  sitkITKVersorToSTL( const itk::Versor<T> & in )
+{
+  std::vector<TType> out(4);
+  out[0] = in.GetX();
+  out[1] = in.GetY();
+  out[2] = in.GetZ();
+  out[3] = in.GetW();
+  return out;
+}
 
 
 }

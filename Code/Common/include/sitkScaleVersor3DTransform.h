@@ -27,7 +27,8 @@ namespace simple
 {
 
 
-/** \brief A parameterized 3D transform composed of the
+/** \class ScaleVersor3DTransform
+ * \brief A parameterized 3D transform composed of the
  * addition of a versor rotation matrix and a scale matrix around a
  * fixed center with translation.
  *
@@ -38,7 +39,9 @@ class SITKCommon_EXPORT ScaleVersor3DTransform
 {
 public:
   typedef ScaleVersor3DTransform Self;
-  typedef Transform Superclass;
+  typedef Transform              Superclass;
+
+  virtual ~ScaleVersor3DTransform();
 
 // construct identity
   ScaleVersor3DTransform();

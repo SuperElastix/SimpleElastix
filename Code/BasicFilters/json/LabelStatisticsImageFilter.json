@@ -39,7 +39,7 @@
     {
       "name" : "HasLabel",
       "doc" : "Does the specified label exist? Can only be called after a call a call to Update().",
-      "return_type" : "double",
+      "return_type" : "bool",
       "parameters" : [
         {
           "type" : "int64_t",
@@ -181,7 +181,22 @@
         }
       ],
       "briefdescriptionGet" : "",
-      "detaileddescriptionGet" : "Return the computed bounding box for a label."
+      "detaileddescriptionGet" : "Return the computed bounding box for a label. A vector of minIndex, maxIndex pairs for each axis. The intervals include the endpoints."
+    },
+    {
+      "name" : "Region",
+      "type" : "std::vector<unsigned int>",
+      "no_print" : true,
+      "active" : true,
+      "parameters" : [
+        {
+          "name" : "label",
+          "type" : "int64_t"
+        }
+      ],
+      "custom_cast" : "sitkITKImageRegionToSTL(value)",
+      "briefdescriptionGet" : "",
+      "detaileddescriptionGet" : "Return the computed region."
     },
     {
       "name" : "Labels",

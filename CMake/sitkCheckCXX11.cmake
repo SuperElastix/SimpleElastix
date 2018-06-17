@@ -15,25 +15,38 @@
 # SITK_HAS_TR1_TYPE_TRAITS
 # SITK_HAS_TR1_UNORDERED_MAP
 
+include(CMakePushCheckState)
+
+
+if(POLICY CMP0067) # CMake 3.8.2
+  cmake_policy(SET CMP0067 NEW)
+endif()
+
 #
 # Function to wrap try compiles on the aggregate cxx test file1
 #
 function(sitkCXX11Test VARIABLE)
-  # use the hash of the dependent cxx flags in the variable name to
-  # cache the results.
-  string(MD5 cmake_cxx_flags_hash "#${CMAKE_CXX_FLAGS}")
-  set(cache_var "${VARIABLE}_${cmake_cxx_flags_hash}")
 
-  if(DEFINED "${cache_var}")
-    set(${VARIABLE} "${${cache_var}}"  CACHE INTERNAL "Using hashed value from TRY_COMPILE")
-  else()
+  if(NOT DEFINED ${VARIABLE})
     message(STATUS "Performing Test ${VARIABLE}")
-    set(requred_definitions "${CMAKE_REQUIRED_DEFINITIONS} -D${VARIABLE}")
+
+    if(NOT POLICY CMP0067)
+      if(DEFINED CMAKE_CXX_STANDARD)
+        set(cmake_flags "${cmake_flags} -DCMAKE_CXX_STANDARD:STRING:=${CMAKE_CXX_STANDARD}")
+      endif()
+      if(DEFINED CMAKE_CXX_STANDARD_REQUIRED)
+        set(cmake_flags "${cmake_flags} -DCMAKE_CXX_STANDARD_REQUIRED:STRING:=${CMAKE_CXX_STANDARD_REQUIRED}")
+      endif()
+      if(DEFINED CMAKE_CXX_EXTENSIONS)
+        set(cmake_flags "${cmake_flags} -DCMAKE_CXX_EXTENSIONS:STRING:=${CMAKE_CXX_EXTENSIONS}")
+      endif()
+    endif()
+
     try_compile(${VARIABLE}
-      "${PROJECT_BINARY_DIR}/CMakeTmp"
+      "${PROJECT_BINARY_DIR}"
       "${CMAKE_CURRENT_LIST_DIR}/sitk_check_cxx11.cxx"
-      CMAKE_FLAGS
-      -DCOMPILE_DEFINITIONS:STRING=${requred_definitions}
+      CMAKE_FLAGS ${cmake_flags}
+      COMPILE_DEFINITIONS "-D${VARIABLE}" ${CMAKE_REQUIRED_DEFINITIONS}
       OUTPUT_VARIABLE output)
 
     set(${cache_var} ${${VARIABLE}} CACHE INTERNAL "hashed flags with  try_compile results")
@@ -48,6 +61,8 @@ function(sitkCXX11Test VARIABLE)
     endif()
    endif()
 endfunction()
+
+cmake_push_check_state(RESET)
 
 #
 # Check for CXX11 Features
@@ -66,7 +81,6 @@ sitkCXX11Test(SITK_HAS_CXX11_ALIAS_TEMPLATE)
 # prefix to tr1 headers, while libc++
 sitkCXX11Test(SITK_HAS_TR1_SUB_INCLUDE)
 
-set(CMAKE_REQUIRED_DEFINITIONS_SAVE ${CMAKE_REQUIRED_DEFINITIONS})
 if (SITK_HAS_TR1_SUB_INCLUDE)
   list(APPEND CMAKE_REQUIRED_DEFINITIONS "-DHAS_TR1_SUB_INCLUDE")
 endif()
@@ -78,16 +92,26 @@ sitkCXX11Test(SITK_HAS_TR1_FUNCTIONAL)
 sitkCXX11Test(SITK_HAS_TR1_TYPE_TRAITS)
 sitkCXX11Test(SITK_HAS_TR1_UNORDERED_MAP)
 
-# restore varaible
-set(CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_DEFINITIONS_SAVE})
+# restore variable
+cmake_pop_check_state()
 
 
 if ( (NOT SITK_HAS_TR1_FUNCTIONAL AND NOT SITK_HAS_CXX11_FUNCTIONAL)
     OR
-    (NOT SITK_HAS_TR1_TYPE_TRAITS AND NOT SITK_HAS_CXX11_TYPE_TRAITS) )
-  message( FATAL_ERROR
-    "SimpleITK requires usage of C++11 or C++ Technical Report 1 (TR1).\n"
-    "It may be available as an optional download for your compiler or difference CXX_FLAGS."
-    "Please see the FAQs for details."
-    "https://www.itk.org/Wiki/SimpleITK/FAQ#Do_I_need_to_download_an_option_package_for_TR1_support.3F\n" )
-endif ( )
+    (NOT SITK_HAS_TR1_TYPE_TRAITS AND NOT SITK_HAS_CXX11_TYPE_TRAITS)
+    )
+  if (MSVC)
+    message( FATAL_ERROR
+      "SimpleITK requires usage of C++11 or C++ Technical Report 1 (TR1).\n"
+      "It may be available as an optional download for your compiler or difference CXX_FLAGS."
+      "Please see the FAQs for details."
+      "http://simpleitk.readthedocs.io/en/master/Documentation/docs/source/faq.html#do-i-need-to-download-an-option-package-for-tr1-support\n")
+  else()
+      message( FATAL_ERROR
+        "SimpleITK requires usage of C++11 or C++ Technical Report 1 "
+        "(TR1), but were neither able to detect TR1 nor automatically "
+        "enable C++11. Please review your configuration settings and "
+        "enable C++11.\n")
+
+  endif()
+endif ()
