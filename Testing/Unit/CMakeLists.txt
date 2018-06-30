@@ -287,7 +287,9 @@ ExternalData_Expand_Arguments(  SimpleITKData
   DATA{${SimpleITK_DATA_ROOT}/Input/4D.nii.gz}
   DATA{${SimpleITK_DATA_ROOT}/Input/BlackDots.png}
   DATA{${SimpleITK_DATA_ROOT}/Input/BrainProtonDensitySliceBorder20.png}
+  DATA{${SimpleITK_DATA_ROOT}/Input/BrainProtonDensitySliceBorder20Mask.png}
   DATA{${SimpleITK_DATA_ROOT}/Input/BrainProtonDensitySliceShifted13x17y.png}
+  DATA{${SimpleITK_DATA_ROOT}/Input/BrainProtonDensitySliceR10X13Y17.png}
   DATA{${SimpleITK_DATA_ROOT}/Input/cthead1-Float.mha}
   DATA{${SimpleITK_DATA_ROOT}/Input/cthead1.png}
   DATA{${SimpleITK_DATA_ROOT}/Input/RA-Float.nrrd}
