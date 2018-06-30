@@ -52,8 +52,6 @@ namespace itk {
 
       ImageSeriesReader();
 
-      ~ImageSeriesReader();
-
       /** Print ourselves to string */
       virtual std::string ToString() const;
 
