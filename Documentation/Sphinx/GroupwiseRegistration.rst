@@ -42,6 +42,21 @@ Elastix takes a single N+1 dimensional image for groupwise registration. Therefo
 
 While the groupwise transform works only on the moving image we need to pass a dummy fixed image is to prevent elastix from throwing errors. This does not consume extra memory as only pointers are passed internally. 
 
+The resulting image individual groupwise-registered images can be obtained with an image extract filter:
+
+::
+    
+    transformed_img = elastix_img_filter.GetResultImage()
+    extract_filter = sitk.ExtractImageFilter()
+    size = list(transformed_img.GetSize())
+    size[3] = 0 # set t to 0 to collapse this dimension
+    extract_filter.SetSize(size)
+    imgs = []
+    for i in range(len(imgs_orig)):
+        extract_filter.SetIndex([0, 0, 0, i]) # x, y, z, t
+        img = extract_filter.Execute(transformed_img)
+        imgs.append(sitk.GetArrayFromImage(img))
+
 The result image is shown in Figure 13. It is clear that anatomical correpondence is obtained in many regions of the brain. However, there are a some anatomical regions that have not been registered correctly, particularly near Corpus Collosum. Generally these kinds of difficult registration problems require a lot of parameter tuning. No way around that. In a later chapter we introduce methods for assessment of registration quality.
 
 .. figure:: _static/PostGroupwise.jpg
@@ -49,7 +64,7 @@ The result image is shown in Figure 13. It is clear that anatomical correpondenc
     :figwidth: 90%
     :width: 75% 
 
-    Figure 13: Mean result image. 
+    Figure 13: Overlaid resulting images. 
 
 .. tip::
 
