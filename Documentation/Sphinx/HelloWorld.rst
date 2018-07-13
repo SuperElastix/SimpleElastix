@@ -90,6 +90,17 @@ This is more verbose but also a lot more powerful. We can now warp an entire pop
         transformixImageFilter.Execute()
         sitk.WriteImage(transformixImageFilter.GetResultImage(), "result_"+filename)
 
+.. tip::
+    
+    For labels images, where the exact numerical intensity values should be preserved, the `FinalBSplineInterpolationOrder` needs to be set to 0 in the transform parameter file (see see section 4.3 of the Elastix manual):
+    
+    ::
+        
+        # turn off FinalBSplineInterpolationOrder in the final map to avoid 
+        # overshooting the interpolation for the labels image 
+        transform_param_map = elastix_img_filter.GetTransformParameterMap()
+        transform_param_map[-1]["FinalBSplineInterpolationOrder"] = ["0"]
+
 The object-oriented interface facilitates reuse of components and dramatically simplifies book-keeping and boilerplate code. We will use the object-oriented interface in the documentation from this point forward.
 
 In the next section, we will take a closer look at the parameter map interface that configures the registration components.
