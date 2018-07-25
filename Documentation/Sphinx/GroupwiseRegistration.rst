@@ -28,7 +28,7 @@ Elastix takes a single N+1 dimensional image for groupwise registration. Therefo
     population = ['image1.hdr', ..., 'imageN.hdr']
     vectorOfImages = sitk.VectorOfImage()
 
-    for filename in population
+    for filename in population:
       vectorOfImages.push_back(sitk.ReadImage(filename))
 
     image = sitk.JoinSeries(vectorOfImages)
