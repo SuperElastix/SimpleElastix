@@ -143,6 +143,7 @@ TEST( TransformixFilterTest, ComputeDeformationField )
   typedef itk::ImageFileReader< ImageType > ImageFileReaderType;
   typedef ElastixFilter< ImageType, ImageType > ElastixFilterType;
   typedef TransformixFilter< ImageType > TransformixFilterType;
+  typedef itk::ImageFileWriter< typename TransformixFilterType::OutputDeformationFieldType > ImageFileWriterType;
 
   ImageFileReaderType::Pointer fixedImageReader = ImageFileReaderType::New();
   fixedImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
@@ -150,10 +151,14 @@ TEST( TransformixFilterTest, ComputeDeformationField )
   ImageFileReaderType::Pointer movingImageReader = ImageFileReaderType::New();
   movingImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceR10X13Y17.png" ) );
 
+  ParameterObject::Pointer parameterObject = ParameterObject::New();
+  parameterObject->SetParameterMap( parameterObject->GetDefaultParameterMap( "affine" ) );
+
   ElastixFilterType::Pointer elastixFilter;
   EXPECT_NO_THROW( elastixFilter = ElastixFilterType::New() );
   EXPECT_NO_THROW( elastixFilter->SetFixedImage( fixedImageReader->GetOutput() ) );
   EXPECT_NO_THROW( elastixFilter->SetMovingImage( movingImageReader->GetOutput() ) );
+  EXPECT_NO_THROW( elastixFilter->SetParameterObject( parameterObject ) );
   EXPECT_NO_THROW( elastixFilter->Update() );
 
   TransformixFilterType::Pointer transformixFilter;
@@ -162,6 +167,11 @@ TEST( TransformixFilterTest, ComputeDeformationField )
   EXPECT_NO_THROW( transformixFilter->SetTransformParameterObject( elastixFilter->GetTransformParameterObject() ) );
   EXPECT_NO_THROW( transformixFilter->ComputeDeformationFieldOn() );
   EXPECT_NO_THROW( transformixFilter->Update() );
+
+  ImageFileWriterType::Pointer writer = ImageFileWriterType::New();
+  EXPECT_NO_THROW( writer->SetFileName( dataFinder.GetOutputFile( "TransformixFilterTest.ComputeDeformationField.nii" ) ) );
+  EXPECT_NO_THROW( writer->SetInput( transformixFilter->GetOutputDeformationField() ) );
+  EXPECT_NO_THROW( writer->Update() );
 }
 
 TEST( TransformixFilterTest, TransformPointSet )
