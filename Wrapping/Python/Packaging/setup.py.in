@@ -2,10 +2,11 @@ import sys
 import os
 
 try:
-    from setuptools import setup, Distribution
+    from setuptools import setup, Extension
+    from setuptools.command.build_ext import build_ext as _build_ext
 except ImportError:
-    from distutils.core import setup
-    from distutils.dist import Distribution
+    from distutils.core import setup, Extension
+    from distutils.command.build_ext import build_ext as _build_ext
 
 import re
 
@@ -103,4 +104,4 @@ setup(
     keywords = 'SimpleITK ITK InsightToolkit segmentation registration',
     url = r'http://simpleitk.org/',
     cmdclass={'build_ext':build_ext}
-    )
+)

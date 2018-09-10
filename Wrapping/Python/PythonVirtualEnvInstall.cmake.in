@@ -1,4 +1,3 @@
-
 if(POLICY CMP0012)
   cmake_policy(SET CMP0012 NEW)
 endif()
