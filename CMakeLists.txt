@@ -361,7 +361,8 @@ include(sitkLanguageOptions)
 
 #------------------------------------------------------------------------------
 # Ensure that development strips have been setup
-include(sitkCheckSourceTree)
+# include(sitkCheckSourceTree)
+# This has been disabled for SimpleElastix.
 
 #-----------------------------------------------------------------------------
 if(NOT EXISTS "${SimpleITK_SOURCE_DIR}/.ExternalData/README.rst")
