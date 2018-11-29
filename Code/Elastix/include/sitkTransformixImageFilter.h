@@ -95,6 +95,7 @@ class SITKCommon_EXPORT TransformixImageFilter
     Image Execute();
 
     Image GetResultImage();
+    Image GetDeformationField();
 
   private:
 

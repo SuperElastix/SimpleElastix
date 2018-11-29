@@ -102,6 +102,7 @@ public:
   Image Execute();
 
   Image GetResultImage();
+  Image GetDeformationField();
 
   bool IsEmpty( const Image& image );
 
@@ -113,6 +114,7 @@ public:
 
   Image                   m_MovingImage;
   Image                   m_ResultImage;
+  Image                   m_DeformationField;
 
   ParameterMapVectorType  m_TransformParameterMapVector;
 

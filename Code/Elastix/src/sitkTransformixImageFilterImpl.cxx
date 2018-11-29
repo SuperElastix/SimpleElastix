@@ -4,6 +4,7 @@
 #include "sitkTransformixImageFilter.h"
 #include "sitkTransformixImageFilterImpl.h"
 #include "sitkCastImageFilter.h"
+#include "sitkImageConvert.h"
 
 namespace itk {
   namespace simple {
@@ -103,6 +104,11 @@ TransformixImageFilter::TransformixImageFilterImpl
     {
       this->m_ResultImage = Image( itkDynamicCastInDebugMode< TMovingImage * >( transformixFilter->GetOutput() ) );
       this->m_ResultImage.MakeUnique();
+    }
+
+    if( this->GetComputeDeformationField() ) {
+      this->m_DeformationField = Image( itk::simple::GetVectorImageFromImage( transformixFilter->GetOutputDeformationField() ) );
+      this->m_DeformationField.MakeUnique();
     }
   }
   catch( itk::ExceptionObject &e )
@@ -570,6 +576,17 @@ TransformixImageFilter::TransformixImageFilterImpl
   return this->m_ResultImage;
 }
 
+Image
+TransformixImageFilter::TransformixImageFilterImpl
+::GetDeformationField()
+{
+  if( this->IsEmpty( this->m_DeformationField ) )
+  {
+    sitkExceptionMacro( "No deformation field found. Has transformix run yet? Have you called ComputeDeformationFieldOn()?" )
+  }
+
+  return this->m_DeformationField;
+}
 
 bool
 TransformixImageFilter::TransformixImageFilterImpl

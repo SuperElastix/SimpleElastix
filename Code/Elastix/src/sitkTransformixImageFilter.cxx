@@ -442,6 +442,13 @@ TransformixImageFilter
   return this->m_Pimple->GetResultImage();
 }
 
+Image
+TransformixImageFilter
+::GetDeformationField()
+{
+  return this->m_Pimple->GetDeformationField();
+}
+
 /**
  * Procedural interface 
  */
