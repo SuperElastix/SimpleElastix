@@ -7,7 +7,7 @@ import SimpleITK as sitk
 
 
 class TransformixImageFilterTest(unittest.TestCase):
-    """Test the SimpleITK Process Object and related Command classes"""
+    """Test the deformation field api"""
 
     def setUp(self):
         pass
