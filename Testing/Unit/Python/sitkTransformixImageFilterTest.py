@@ -35,9 +35,5 @@ class TransformixImageFilterTest(unittest.TestCase):
     	  transformixImageFilter.Execute()
     	  deformationField = transformixImageFilter.GetDeformationField()
 
-    	  print("saving")
-
-    	  sitk.WriteImage(deformationField, "/tmp/deformationField.nii")
-
 if __name__ == '__main__':
     unittest.main()
