@@ -72,7 +72,7 @@ SimpleElastix can automatically configure these options for you if you use the d
 Masks
 ~~~~~
 
-You may encounter problems where you are more interested in aligning substructures than global anatomy. For example, 4D CT images of lungs vary considerably due to breating motion and you may not want to align the more static rib cage at the expense of lung overlap. One possibility is to crop the image, but this approach restricts the Region Of Interest (ROI) to be a square (2D) or cube (3D) only. If you need an irregular shaped ROI, you can use masks. A mask is a binary image filled with 0’s and 1’s. Intensity values are only sampled within regions filled with 1's.
+You may encounter problems where you are more interested in aligning substructures than global anatomy. For example, 4D CT images of lungs vary considerably due to breathing motion and you may not want to align the more static rib cage at the expense of lung overlap. One possibility is to crop the image, but this approach restricts the Region Of Interest (ROI) to be a square (2D) or cube (3D) only. If you need an irregular shaped ROI, you can use masks. A mask is a binary image filled with 0’s and 1’s. Intensity values are only sampled within regions filled with 1's.
 
 You should use a mask when: 
 
