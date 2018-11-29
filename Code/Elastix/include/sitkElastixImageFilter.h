@@ -14,8 +14,8 @@ class SITKCommon_EXPORT ElastixImageFilter
 {
   public:
 
-    ElastixImageFilter( void );
-    ~ElastixImageFilter( void );
+    ElastixImageFilter();
+    ~ElastixImageFilter();
 
     typedef ElastixImageFilter Self;                                
 
@@ -30,7 +30,7 @@ class SITKCommon_EXPORT ElastixImageFilter
     typedef ParameterMapType::iterator                              ParameterMapIterator;
     typedef ParameterMapType::const_iterator                        ParameterMapConstIterator;
 
-    const std::string GetName( void );
+    const std::string GetName();
 
     /** \brief Sets a fixed image.
      *
@@ -51,74 +51,74 @@ class SITKCommon_EXPORT ElastixImageFilter
     
 
     Image& GetFixedImage( const unsigned long index );
-    VectorOfImage& GetFixedImage( void );
+    VectorOfImage& GetFixedImage();
     Self& RemoveFixedImage( const unsigned long index );
-    Self& RemoveFixedImage( void );
+    Self& RemoveFixedImage();
     unsigned int GetNumberOfFixedImages();
 
     Self& SetMovingImage( const Image& movingImages );
     Self& SetMovingImage( const VectorOfImage& movingImage );
     Self& AddMovingImage( const Image& movingImage );
     Image& GetMovingImage( const unsigned long index );
-    VectorOfImage& GetMovingImage( void );
+    VectorOfImage& GetMovingImage();
     Self& RemoveMovingImage( const unsigned long index );
-    Self& RemoveMovingImage( void );
+    Self& RemoveMovingImage();
     unsigned int GetNumberOfMovingImages();
 
     Self& SetFixedMask( const Image& fixedMask );
     Self& SetFixedMask( const VectorOfImage& fixedMasks );
     Self& AddFixedMask( const Image& fixedMask );
     Image& GetFixedMask( const unsigned long index );
-    VectorOfImage& GetFixedMask( void );
+    VectorOfImage& GetFixedMask();
     Self& RemoveFixedMask( const unsigned long index );
-    Self& RemoveFixedMask( void );
+    Self& RemoveFixedMask();
     unsigned int GetNumberOfFixedMasks();
 
     Self& SetMovingMask( const Image& movingMask );
     Self& SetMovingMask( const VectorOfImage& movingMasks );
     Self& AddMovingMask( const Image& movingMask );
     Image& GetMovingMask( const unsigned long index );
-    VectorOfImage& GetMovingMask( void );
+    VectorOfImage& GetMovingMask();
     Self& RemoveMovingMask( const unsigned long index );
-    Self& RemoveMovingMask( void );
+    Self& RemoveMovingMask();
     unsigned int GetNumberOfMovingMasks();
 
     Self& SetFixedPointSetFileName( const std::string movingPointSetFileName );
-    std::string GetFixedPointSetFileName( void );
-    Self& RemoveFixedPointSetFileName( void );
+    std::string GetFixedPointSetFileName();
+    Self& RemoveFixedPointSetFileName();
 
     Self& SetMovingPointSetFileName( const std::string movingPointSetFileName );
-    std::string GetMovingPointSetFileName( void );
-    Self& RemoveMovingPointSetFileName( void );
+    std::string GetMovingPointSetFileName();
+    Self& RemoveMovingPointSetFileName();
 
     Self& SetOutputDirectory( const std::string outputDirectory );
-    std::string GetOutputDirectory( void );
-    Self& RemoveOutputDirectory( void );
+    std::string GetOutputDirectory();
+    Self& RemoveOutputDirectory();
 
     Self& SetLogFileName( const std::string logFileName );
-    std::string GetLogFileName( void );
-    Self& RemoveLogFileName( void );
+    std::string GetLogFileName();
+    Self& RemoveLogFileName();
 
     Self& SetLogToFile( const bool logToFile );
-    bool GetLogToFile( void );
-    Self& LogToFileOn( void );
-    Self& LogToFileOff( void );
+    bool GetLogToFile();
+    Self& LogToFileOn();
+    Self& LogToFileOff();
 
     Self& SetLogToConsole( bool );
-    bool GetLogToConsole( void );
+    bool GetLogToConsole();
     Self& LogToConsoleOn();
     Self& LogToConsoleOff();
 
     Self& SetNumberOfThreads( int n );
-    int GetNumberOfThreads( void );
+    int GetNumberOfThreads();
 
     Self& SetParameterMap( const std::string transformName, const unsigned int numberOfResolutions = 4u, const double finalGridSpacingInPhysicalUnits = 10.0 );
     Self& SetParameterMap( const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapVector );
     Self& SetParameterMap( const std::map< std::string, std::vector< std::string > > parameterMap );
     Self& AddParameterMap( const std::map< std::string, std::vector< std::string > > parameterMap );
-    std::vector< std::map< std::string, std::vector< std::string > > > GetParameterMap( void );
+    std::vector< std::map< std::string, std::vector< std::string > > > GetParameterMap();
     std::map< std::string, std::vector< std::string > > GetDefaultParameterMap( const std::string transformName, const unsigned int numberOfResolutions = 4, const double finalGridSpacingInPhysicalUnits = 10.0 );
-    unsigned int GetNumberOfParameterMaps( void );
+    unsigned int GetNumberOfParameterMaps();
 
     Self& SetParameter( const std::string key, const std::string value );
     Self& SetParameter( const std::string key, const std::vector< std::string > value );
@@ -134,18 +134,18 @@ class SITKCommon_EXPORT ElastixImageFilter
     Self& RemoveParameter( const unsigned int index, const std::string key );
 
     Self& SetInitialTransformParameterFileName( const std::string initialTransformParmaterFileName );
-    std::string GetInitialTransformParameterFileName( void );
-    Self& RemoveInitialTransformParameterFileName( void );
+    std::string GetInitialTransformParameterFileName();
+    Self& RemoveInitialTransformParameterFileName();
 
     std::map< std::string, std::vector< std::string > > ReadParameterFile( const std::string filename );
     Self& WriteParameterFile( const std::map< std::string, std::vector< std::string > > parameterMap, const std::string filename );
     
-    Image Execute( void );
-    std::vector< std::map< std::string, std::vector< std::string > > > GetTransformParameterMap( void );
+    Image Execute();
+    std::vector< std::map< std::string, std::vector< std::string > > > GetTransformParameterMap();
     std::map< std::string, std::vector< std::string > > GetTransformParameterMap( const unsigned int index );
-    Image GetResultImage( void );
+    Image GetResultImage();
 
-    Self& PrintParameterMap( void );
+    Self& PrintParameterMap();
     Self& PrintParameterMap( const ParameterMapType parameterMapVector );
     Self& PrintParameterMap( const ParameterMapVectorType parameterMapVector );
 

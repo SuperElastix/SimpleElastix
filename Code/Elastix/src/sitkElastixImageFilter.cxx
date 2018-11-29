@@ -8,12 +8,12 @@ namespace itk {
   namespace simple {
 
 ElastixImageFilter
-::ElastixImageFilter( void ) : m_Pimple( new ElastixImageFilterImpl )
+::ElastixImageFilter() : m_Pimple( new ElastixImageFilterImpl )
 {
 }
 
 ElastixImageFilter
-::~ElastixImageFilter( void )
+::~ElastixImageFilter()
 {
   delete m_Pimple;
   m_Pimple = NULL;
@@ -21,7 +21,7 @@ ElastixImageFilter
 
 const std::string 
 ElastixImageFilter
-::GetName( void )
+::GetName()
 { 
   return this->m_Pimple->GetName();
 }
@@ -59,7 +59,7 @@ ElastixImageFilter
 
 ElastixImageFilter::VectorOfImage&
 ElastixImageFilter
-::GetFixedImage( void )
+::GetFixedImage()
 {
   return this->m_Pimple->GetFixedImage();
 }
@@ -74,7 +74,7 @@ ElastixImageFilter
 
 ElastixImageFilter::Self& 
 ElastixImageFilter
-::RemoveFixedImage( void )
+::RemoveFixedImage()
 {
   this->m_Pimple->RemoveFixedImage();
   return *this;
@@ -82,7 +82,7 @@ ElastixImageFilter
 
 unsigned int
 ElastixImageFilter
-::GetNumberOfFixedImages( void )
+::GetNumberOfFixedImages()
 {
   return this->m_Pimple->GetNumberOfFixedImages();
 }
@@ -120,7 +120,7 @@ ElastixImageFilter
 
 ElastixImageFilter::VectorOfImage&
 ElastixImageFilter
-::GetMovingImage( void )
+::GetMovingImage()
 {
   return this->m_Pimple->GetMovingImage();
 }
@@ -135,7 +135,7 @@ ElastixImageFilter
 
 ElastixImageFilter::Self& 
 ElastixImageFilter
-::RemoveMovingImage( void )
+::RemoveMovingImage()
 {
   this->m_Pimple->RemoveMovingImage();
   return *this;
@@ -143,7 +143,7 @@ ElastixImageFilter
 
 unsigned int
 ElastixImageFilter
-::GetNumberOfMovingImages( void )
+::GetNumberOfMovingImages()
 {
   return this->m_Pimple->GetNumberOfMovingImages();
 }
@@ -181,7 +181,7 @@ ElastixImageFilter
 
 ElastixImageFilter::VectorOfImage&
 ElastixImageFilter
-::GetFixedMask( void )
+::GetFixedMask()
 {
   return this->m_Pimple->GetFixedMask();
 }
@@ -196,7 +196,7 @@ ElastixImageFilter
 
 ElastixImageFilter::Self& 
 ElastixImageFilter
-::RemoveFixedMask( void )
+::RemoveFixedMask()
 {
   this->m_Pimple->RemoveFixedMask();
   return *this;
@@ -204,7 +204,7 @@ ElastixImageFilter
 
 unsigned int
 ElastixImageFilter
-::GetNumberOfFixedMasks( void )
+::GetNumberOfFixedMasks()
 {
   return this->m_Pimple->GetNumberOfFixedMasks();
 }
@@ -242,7 +242,7 @@ ElastixImageFilter
 
 ElastixImageFilter::VectorOfImage&
 ElastixImageFilter
-::GetMovingMask( void )
+::GetMovingMask()
 {
   return this->m_Pimple->GetMovingMask();
 }
@@ -257,7 +257,7 @@ ElastixImageFilter
 
 ElastixImageFilter::Self& 
 ElastixImageFilter
-::RemoveMovingMask( void )
+::RemoveMovingMask()
 {
   this->m_Pimple->RemoveMovingMask();
   return *this;
@@ -265,7 +265,7 @@ ElastixImageFilter
 
 unsigned int
 ElastixImageFilter
-::GetNumberOfMovingMasks( void )
+::GetNumberOfMovingMasks()
 {
   return this->m_Pimple->GetNumberOfMovingMasks();
 }
@@ -280,14 +280,14 @@ ElastixImageFilter
 
 std::string
 ElastixImageFilter
-::GetFixedPointSetFileName( void )
+::GetFixedPointSetFileName()
 {
   return this->m_Pimple->GetFixedPointSetFileName();
 }
 
 ElastixImageFilter::Self& 
 ElastixImageFilter
-::RemoveFixedPointSetFileName( void )
+::RemoveFixedPointSetFileName()
 {
   this->m_Pimple->RemoveFixedPointSetFileName();
   return *this;
@@ -303,14 +303,14 @@ ElastixImageFilter
 
 std::string
 ElastixImageFilter
-::GetMovingPointSetFileName( void )
+::GetMovingPointSetFileName()
 {
   return this->m_Pimple->GetMovingPointSetFileName();
 }
 
 ElastixImageFilter::Self& 
 ElastixImageFilter
-::RemoveMovingPointSetFileName( void )
+::RemoveMovingPointSetFileName()
 {
   this->m_Pimple->RemoveMovingImage();
   return *this;
@@ -326,14 +326,14 @@ ElastixImageFilter
 
 std::string
 ElastixImageFilter
-::GetOutputDirectory( void )
+::GetOutputDirectory()
 {
   return this->m_Pimple->GetOutputDirectory();
 }
 
 ElastixImageFilter::Self& 
 ElastixImageFilter
-::RemoveOutputDirectory( void )
+::RemoveOutputDirectory()
 {
   this->m_Pimple->RemoveOutputDirectory();
   return *this;
@@ -349,14 +349,14 @@ ElastixImageFilter
 
 std::string
 ElastixImageFilter
-::GetLogFileName( void )
+::GetLogFileName()
 {
   return this->m_Pimple->GetLogFileName();
 }
 
 ElastixImageFilter::Self& 
 ElastixImageFilter
-::RemoveLogFileName( void )
+::RemoveLogFileName()
 {
   this->m_Pimple->RemoveLogFileName();
   return *this;
@@ -372,7 +372,7 @@ ElastixImageFilter
 
 bool
 ElastixImageFilter
-::GetLogToFile( void )
+::GetLogToFile()
 {
   return this->m_Pimple->GetLogToFile();
 }
@@ -403,7 +403,7 @@ ElastixImageFilter
 
 bool
 ElastixImageFilter
-::GetLogToConsole( void )
+::GetLogToConsole()
 {
   return this->m_Pimple->GetLogToConsole();
 }
@@ -473,14 +473,14 @@ ElastixImageFilter
 
 ElastixImageFilter::ParameterMapVectorType 
 ElastixImageFilter
-::GetParameterMap( void )
+::GetParameterMap()
 {
   return this->m_Pimple->GetParameterMap();
 }
 
 unsigned int 
 ElastixImageFilter
-::GetNumberOfParameterMaps( void )
+::GetNumberOfParameterMaps()
 {
   return this->m_Pimple->GetNumberOfParameterMaps();
 }
@@ -495,14 +495,14 @@ ElastixImageFilter
 
 std::string
 ElastixImageFilter
-::GetInitialTransformParameterFileName( void )
+::GetInitialTransformParameterFileName()
 {
   return this->m_Pimple->GetInitialTransformParameterFileName();
 }
 
 ElastixImageFilter::Self&
 ElastixImageFilter
-::RemoveInitialTransformParameterFileName( void )
+::RemoveInitialTransformParameterFileName()
 {
   this->m_Pimple->RemoveInitialTransformParameterFileName();
   return *this;
@@ -626,14 +626,14 @@ ElastixImageFilter
 
 Image
 ElastixImageFilter
-::Execute( void )
+::Execute()
 {
   return this->m_Pimple->Execute();
 }
 
 ElastixImageFilter::ParameterMapVectorType 
 ElastixImageFilter
-::GetTransformParameterMap( void )
+::GetTransformParameterMap()
 {
   return this->m_Pimple->GetTransformParameterMap();
 }
@@ -647,14 +647,14 @@ ElastixImageFilter
 
 Image
 ElastixImageFilter
-::GetResultImage( void )
+::GetResultImage()
 {
   return this->m_Pimple->GetResultImage();
 }
 
 ElastixImageFilter::Self&
 ElastixImageFilter
-::PrintParameterMap( void )
+::PrintParameterMap()
 {
   this->m_Pimple->PrintParameterMap();
   return *this;

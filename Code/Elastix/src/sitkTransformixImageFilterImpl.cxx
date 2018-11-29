@@ -9,7 +9,7 @@ namespace itk {
   namespace simple {
 
 TransformixImageFilter::TransformixImageFilterImpl
-::TransformixImageFilterImpl( void )
+::TransformixImageFilterImpl()
 {
   // Register this class with SimpleITK
   this->m_MemberFactory.reset( new detail::MemberFunctionFactory< MemberFunctionType >( this ) );
@@ -22,6 +22,7 @@ TransformixImageFilter::TransformixImageFilterImpl
 
   this->m_MovingImage = Image();
   this->m_ResultImage = Image();
+  this->m_DeformationField = Image();
 
   this->m_TransformParameterMapVector = ParameterMapVectorType();
 
@@ -38,13 +39,13 @@ TransformixImageFilter::TransformixImageFilterImpl
 }
 
 TransformixImageFilter::TransformixImageFilterImpl
-::~TransformixImageFilterImpl( void )
+::~TransformixImageFilterImpl()
 {
 }
 
 Image
 TransformixImageFilter::TransformixImageFilterImpl
-::Execute( void )
+::Execute()
 {
   const PixelIDValueEnum MovingImagePixelEnum = this->m_MovingImage.GetPixelID();
   const unsigned int MovingImageDimension = this->m_MovingImage.GetDimension();
@@ -63,7 +64,7 @@ TransformixImageFilter::TransformixImageFilterImpl
 template< typename TMovingImage >
 Image
 TransformixImageFilter::TransformixImageFilterImpl
-::ExecuteInternal( void )
+::ExecuteInternal()
 {
   typedef elastix::TransformixFilter< TMovingImage > TransformixFilterType;
   typedef typename TransformixFilterType::Pointer TransforimxFilterPointer;
@@ -114,7 +115,7 @@ TransformixImageFilter::TransformixImageFilterImpl
 
 const std::string 
 TransformixImageFilter::TransformixImageFilterImpl
-::GetName( void )
+::GetName()
 { 
   const std::string name = std::string( "TransformixImageFilter" );
   return name;
@@ -129,14 +130,14 @@ TransformixImageFilter::TransformixImageFilterImpl
 
 Image&
 TransformixImageFilter::TransformixImageFilterImpl
-::GetMovingImage( void )
+::GetMovingImage()
 {
   return this->m_MovingImage;
 }
 
 void
 TransformixImageFilter::TransformixImageFilterImpl
-::RemoveMovingImage( void )
+::RemoveMovingImage()
 {
   this->SetMovingImage( Image() );
 }
@@ -150,14 +151,14 @@ TransformixImageFilter::TransformixImageFilterImpl
 
 std::string 
 TransformixImageFilter::TransformixImageFilterImpl
-::GetFixedPointSetFileName( void )
+::GetFixedPointSetFileName()
 {
   return this->m_MovingPointSetFileName;
 }
 
 void
 TransformixImageFilter::TransformixImageFilterImpl
-::RemoveFixedPointSetFileName( void )
+::RemoveFixedPointSetFileName()
 {
   this->m_MovingPointSetFileName = std::string();
 }
@@ -171,14 +172,14 @@ TransformixImageFilter::TransformixImageFilterImpl
 
 bool 
 TransformixImageFilter::TransformixImageFilterImpl
-::GetComputeSpatialJacobian( void )
+::GetComputeSpatialJacobian()
 {
   return this->m_ComputeSpatialJacobian;
 }
 
 void
 TransformixImageFilter::TransformixImageFilterImpl
-::ComputeSpatialJacobianOn( void )
+::ComputeSpatialJacobianOn()
 {
   this->SetComputeSpatialJacobian( true );
   
@@ -186,7 +187,7 @@ TransformixImageFilter::TransformixImageFilterImpl
 
 void
 TransformixImageFilter::TransformixImageFilterImpl
-::ComputeSpatialJacobianOff( void )
+::ComputeSpatialJacobianOff()
 {
   this->SetComputeSpatialJacobian( false );
 }
@@ -200,21 +201,21 @@ TransformixImageFilter::TransformixImageFilterImpl
 
 bool 
 TransformixImageFilter::TransformixImageFilterImpl
-::GetComputeDeterminantOfSpatialJacobian( void )
+::GetComputeDeterminantOfSpatialJacobian()
 {
   return this->m_ComputeDeterminantOfSpatialJacobian;
 }
 
 void
 TransformixImageFilter::TransformixImageFilterImpl
-::ComputeDeterminantOfSpatialJacobianOn( void )
+::ComputeDeterminantOfSpatialJacobianOn()
 {
   this->SetComputeDeterminantOfSpatialJacobian( true );
 }
 
 void
 TransformixImageFilter::TransformixImageFilterImpl
-::ComputeDeterminantOfSpatialJacobianOff( void )
+::ComputeDeterminantOfSpatialJacobianOff()
 {
   this->SetComputeDeterminantOfSpatialJacobian( false );
   
@@ -229,21 +230,21 @@ TransformixImageFilter::TransformixImageFilterImpl
 
 bool
 TransformixImageFilter::TransformixImageFilterImpl
-::GetComputeDeformationField( void )
+::GetComputeDeformationField()
 {
   return this->m_ComputeDeformationField;
 }
 
 void
 TransformixImageFilter::TransformixImageFilterImpl
-::ComputeDeformationFieldOn( void )
+::ComputeDeformationFieldOn()
 {
   this->SetComputeDeformationField( true );
 }
 
 void
 TransformixImageFilter::TransformixImageFilterImpl
-::ComputeDeformationFieldOff( void )
+::ComputeDeformationFieldOff()
 {
   this->SetComputeDeformationField( false );
   
@@ -258,14 +259,14 @@ TransformixImageFilter::TransformixImageFilterImpl
 
 std::string
 TransformixImageFilter::TransformixImageFilterImpl
-::GetOutputDirectory( void )
+::GetOutputDirectory()
 {
   return this->m_OutputDirectory;
 }
 
 void 
 TransformixImageFilter::TransformixImageFilterImpl
-::RemoveOutputDirectory( void )
+::RemoveOutputDirectory()
 {
   this->m_OutputDirectory = std::string();
 }
@@ -279,14 +280,14 @@ TransformixImageFilter::TransformixImageFilterImpl
 
 std::string
 TransformixImageFilter::TransformixImageFilterImpl
-::GetLogFileName( void )
+::GetLogFileName()
 {
   return this->m_LogFileName;
 }
 
 void 
 TransformixImageFilter::TransformixImageFilterImpl
-::RemoveLogFileName( void )
+::RemoveLogFileName()
 {
   this->m_LogFileName = std::string();
 }
@@ -301,7 +302,7 @@ TransformixImageFilter::TransformixImageFilterImpl
 
 bool
 TransformixImageFilter::TransformixImageFilterImpl
-::GetLogToFile( void )
+::GetLogToFile()
 {
   return this->m_LogToFile;
 }
@@ -329,7 +330,7 @@ TransformixImageFilter::TransformixImageFilterImpl
 
 bool
 TransformixImageFilter::TransformixImageFilterImpl
-::GetLogToConsole( void )
+::GetLogToConsole()
 {
   return this->m_LogToConsole;
 }
@@ -374,14 +375,14 @@ TransformixImageFilter::TransformixImageFilterImpl
 
 TransformixImageFilter::TransformixImageFilterImpl::ParameterMapVectorType
 TransformixImageFilter::TransformixImageFilterImpl
-::GetTransformParameterMap( void )
+::GetTransformParameterMap()
 {
   return this->m_TransformParameterMapVector;
 }
 
 unsigned int
 TransformixImageFilter::TransformixImageFilterImpl
-::GetNumberOfTransformParameterMaps( void )
+::GetNumberOfTransformParameterMaps()
 {
   return this->m_TransformParameterMapVector.size();
 }
@@ -533,7 +534,7 @@ TransformixImageFilter::TransformixImageFilterImpl
 
 void
 TransformixImageFilter::TransformixImageFilterImpl
-::PrintParameterMap( void )
+::PrintParameterMap()
 {
   this->PrintParameterMap( this->GetTransformParameterMap() );
 }
@@ -559,11 +560,11 @@ TransformixImageFilter::TransformixImageFilterImpl
 
 Image
 TransformixImageFilter::TransformixImageFilterImpl
-::GetResultImage( void )
+::GetResultImage()
 {
   if( this->IsEmpty( this->m_ResultImage ) )
   {
-    sitkExceptionMacro( "No result image was found. Has transformix run yet?" )
+    sitkExceptionMacro( "No result image found. Has transformix run yet?" )
   }
 
   return this->m_ResultImage;
