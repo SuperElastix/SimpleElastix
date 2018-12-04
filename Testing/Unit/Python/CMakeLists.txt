@@ -48,3 +48,7 @@ sitk_add_python_test( Test.ArrayView
   "${CMAKE_CURRENT_SOURCE_DIR}/sitkGetArrayViewFromImageTest.py"
   )
 
+sitk_add_python_test( Test.TransformixImageFilter
+  "${CMAKE_CURRENT_SOURCE_DIR}/sitkTransformixImageFilterTest.py"
+  )
+

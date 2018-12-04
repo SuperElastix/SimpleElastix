@@ -8,12 +8,12 @@ namespace itk {
   namespace simple {
 
 TransformixImageFilter
-::TransformixImageFilter( void ) : m_Pimple( new TransformixImageFilterImpl )
+::TransformixImageFilter() : m_Pimple( new TransformixImageFilterImpl )
 {
 }
 
 TransformixImageFilter
-::~TransformixImageFilter( void )
+::~TransformixImageFilter()
 {
   delete m_Pimple;
   m_Pimple = NULL;
@@ -21,7 +21,7 @@ TransformixImageFilter
 
 const std::string 
 TransformixImageFilter
-::GetName( void )
+::GetName()
 { 
   return this->m_Pimple->GetName();
 }
@@ -36,14 +36,14 @@ TransformixImageFilter
 
 Image&
 TransformixImageFilter
-::GetMovingImage( void )
+::GetMovingImage()
 {
   return this->m_Pimple->GetMovingImage();
 }
 
 TransformixImageFilter::Self&
 TransformixImageFilter
-::RemoveMovingImage( void )
+::RemoveMovingImage()
 {
   this->m_Pimple->RemoveMovingImage();
   return *this;
@@ -59,14 +59,14 @@ TransformixImageFilter
 
 std::string 
 TransformixImageFilter
-::GetFixedPointSetFileName( void )
+::GetFixedPointSetFileName()
 {
   return this->m_Pimple->GetFixedPointSetFileName();
 }
 
 TransformixImageFilter::Self&
 TransformixImageFilter
-::RemoveFixedPointSetFileName( void )
+::RemoveFixedPointSetFileName()
 {
   this->m_Pimple->RemoveFixedPointSetFileName();
   return *this;
@@ -82,14 +82,14 @@ TransformixImageFilter
 
 bool 
 TransformixImageFilter
-::GetComputeSpatialJacobian( void )
+::GetComputeSpatialJacobian()
 {
   return this->m_Pimple->GetComputeSpatialJacobian();
 }
 
 TransformixImageFilter::Self&
 TransformixImageFilter
-::ComputeSpatialJacobianOn( void )
+::ComputeSpatialJacobianOn()
 {
   this->m_Pimple->SetComputeSpatialJacobian( true );
   return *this;
@@ -97,7 +97,7 @@ TransformixImageFilter
 
 TransformixImageFilter::Self&
 TransformixImageFilter
-::ComputeSpatialJacobianOff( void )
+::ComputeSpatialJacobianOff()
 {
   this->m_Pimple->SetComputeSpatialJacobian( false );
   return *this;
@@ -113,14 +113,14 @@ TransformixImageFilter
 
 bool 
 TransformixImageFilter
-::GetComputeDeterminantOfSpatialJacobian( void )
+::GetComputeDeterminantOfSpatialJacobian()
 {
   return this->m_Pimple->GetComputeDeterminantOfSpatialJacobian();
 }
 
 TransformixImageFilter::Self&
 TransformixImageFilter
-::ComputeDeterminantOfSpatialJacobianOn( void )
+::ComputeDeterminantOfSpatialJacobianOn()
 {
   this->m_Pimple->SetComputeDeterminantOfSpatialJacobian( true );
   return *this;
@@ -128,7 +128,7 @@ TransformixImageFilter
 
 TransformixImageFilter::Self&
 TransformixImageFilter
-::ComputeDeterminantOfSpatialJacobianOff( void )
+::ComputeDeterminantOfSpatialJacobianOff()
 {
   this->m_Pimple->SetComputeDeterminantOfSpatialJacobian( false );
   return *this;
@@ -144,14 +144,14 @@ TransformixImageFilter
 
 bool
 TransformixImageFilter
-::GetComputeDeformationField( void )
+::GetComputeDeformationField()
 {
   return this->m_Pimple->GetComputeDeformationField();
 }
 
 TransformixImageFilter::Self&
 TransformixImageFilter
-::ComputeDeformationFieldOn( void )
+::ComputeDeformationFieldOn()
 {
   this->m_Pimple->SetComputeDeformationField( true );
   return *this;
@@ -159,7 +159,7 @@ TransformixImageFilter
 
 TransformixImageFilter::Self&
 TransformixImageFilter
-::ComputeDeformationFieldOff( void )
+::ComputeDeformationFieldOff()
 {
   this->m_Pimple->SetComputeDeformationField( false );
   return *this;
@@ -175,14 +175,14 @@ TransformixImageFilter
 
 std::string
 TransformixImageFilter
-::GetOutputDirectory( void )
+::GetOutputDirectory()
 {
   return this->m_Pimple->GetOutputDirectory();
 }
 
 TransformixImageFilter::Self& 
 TransformixImageFilter
-::RemoveOutputDirectory( void )
+::RemoveOutputDirectory()
 {
   this->m_Pimple->RemoveOutputDirectory();
   return *this;
@@ -198,14 +198,14 @@ TransformixImageFilter
 
 std::string
 TransformixImageFilter
-::GetLogFileName( void )
+::GetLogFileName()
 {
   return this->m_Pimple->GetLogFileName();
 }
 
 TransformixImageFilter::Self& 
 TransformixImageFilter
-::RemoveLogFileName( void )
+::RemoveLogFileName()
 {
   this->m_Pimple->RemoveLogFileName();
   return *this;
@@ -221,7 +221,7 @@ TransformixImageFilter
 
 bool
 TransformixImageFilter
-::GetLogToFile( void )
+::GetLogToFile()
 {
   return this->m_Pimple->GetLogToFile();
 }
@@ -252,7 +252,7 @@ TransformixImageFilter
 
 bool
 TransformixImageFilter
-::GetLogToConsole( void )
+::GetLogToConsole()
 {
   return this->m_Pimple->GetLogToConsole();
 }
@@ -299,14 +299,14 @@ TransformixImageFilter
 
 TransformixImageFilter::ParameterMapVectorType
 TransformixImageFilter
-::GetTransformParameterMap( void )
+::GetTransformParameterMap()
 {
   return this->m_Pimple->GetTransformParameterMap();
 }
 
 unsigned int
 TransformixImageFilter
-::GetNumberOfTransformParameterMaps( void )
+::GetNumberOfTransformParameterMaps()
 {
   return this->m_Pimple->GetNumberOfTransformParameterMaps();
 }
@@ -406,7 +406,7 @@ TransformixImageFilter
 
 TransformixImageFilter::Self&
 TransformixImageFilter
-::PrintParameterMap( void )
+::PrintParameterMap()
 {
   this->m_Pimple->PrintParameterMap();
   return *this;
@@ -430,16 +430,23 @@ TransformixImageFilter
 
 Image
 TransformixImageFilter
-::Execute( void )
+::Execute()
 {
   return this->m_Pimple->Execute();
 }
 
 Image
 TransformixImageFilter
-::GetResultImage( void )
+::GetResultImage()
 {
   return this->m_Pimple->GetResultImage();
+}
+
+Image
+TransformixImageFilter
+::GetDeformationField()
+{
+  return this->m_Pimple->GetDeformationField();
 }
 
 /**

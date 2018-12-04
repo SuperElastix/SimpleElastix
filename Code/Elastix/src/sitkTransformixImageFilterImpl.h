@@ -12,11 +12,11 @@
 namespace itk { 
   namespace simple {
 
-struct TransformixImageFilter::TransformixImageFilterImpl
+class TransformixImageFilter::TransformixImageFilterImpl
 {
-
-  TransformixImageFilterImpl( void );
-  ~TransformixImageFilterImpl( void );
+public:
+  TransformixImageFilterImpl();
+  ~TransformixImageFilterImpl();
 
   typedef TransformixImageFilterImpl Self;
 
@@ -32,54 +32,54 @@ struct TransformixImageFilter::TransformixImageFilterImpl
   typedef ParameterObjectType::ParameterValueType        ParameterValueType;
   typedef ParameterObjectType::ParameterValueVectorType  ParameterValueVectorType;
 
-  const std::string GetName( void );
+  const std::string GetName();
 
   void SetMovingImage( const Image& movingImage );
-  Image& GetMovingImage( void );
-  void RemoveMovingImage( void );
+  Image& GetMovingImage();
+  void RemoveMovingImage();
 
   void SetFixedPointSetFileName( const std::string movingPointSetFileName );
-  std::string GetFixedPointSetFileName( void );
-  void RemoveFixedPointSetFileName( void );
+  std::string GetFixedPointSetFileName();
+  void RemoveFixedPointSetFileName();
 
   void SetComputeSpatialJacobian( const bool );
-  bool GetComputeSpatialJacobian( void );
-  void ComputeSpatialJacobianOn( void );
-  void ComputeSpatialJacobianOff( void );
+  bool GetComputeSpatialJacobian();
+  void ComputeSpatialJacobianOn();
+  void ComputeSpatialJacobianOff();
 
   void SetComputeDeterminantOfSpatialJacobian( const bool );
-  bool GetComputeDeterminantOfSpatialJacobian( void );
-  void ComputeDeterminantOfSpatialJacobianOn( void );
-  void ComputeDeterminantOfSpatialJacobianOff( void );
+  bool GetComputeDeterminantOfSpatialJacobian();
+  void ComputeDeterminantOfSpatialJacobianOn();
+  void ComputeDeterminantOfSpatialJacobianOff();
 
   void SetComputeDeformationField( bool );
-  bool GetComputeDeformationField( void );
-  void ComputeDeformationFieldOn( void );
-  void ComputeDeformationFieldOff( void );
+  bool GetComputeDeformationField();
+  void ComputeDeformationFieldOn();
+  void ComputeDeformationFieldOff();
 
   void SetOutputDirectory( const std::string outputDirectory );
-  std::string GetOutputDirectory( void );
-  void RemoveOutputDirectory( void );
+  std::string GetOutputDirectory();
+  void RemoveOutputDirectory();
 
   void SetLogFileName( const std::string logFileName );
-  std::string GetLogFileName( void );
-  void RemoveLogFileName( void );
+  std::string GetLogFileName();
+  void RemoveLogFileName();
 
   void SetLogToFile( const bool logToFile );
-  bool GetLogToFile( void );
-  void LogToFileOn( void );
-  void LogToFileOff( void );
+  bool GetLogToFile();
+  void LogToFileOn();
+  void LogToFileOff();
 
   void SetLogToConsole( const bool logToConsole );
-  bool GetLogToConsole( void );
+  bool GetLogToConsole();
   void LogToConsoleOn();
   void LogToConsoleOff();
 
   void SetTransformParameterMap( const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapVector );
   void SetTransformParameterMap( const std::map< std::string, std::vector< std::string > > parameterMap );
   void AddTransformParameterMap( const std::map< std::string, std::vector< std::string > > parameterMap );
-  std::vector< std::map< std::string, std::vector< std::string > > > GetTransformParameterMap( void );
-  unsigned int GetNumberOfTransformParameterMaps( void );
+  std::vector< std::map< std::string, std::vector< std::string > > > GetTransformParameterMap();
+  unsigned int GetNumberOfTransformParameterMaps();
 
   void SetTransformParameter( const std::string key, const std::string value );
   void SetTransformParameter( const std::string key, const std::vector< std::string > value );
@@ -95,24 +95,26 @@ struct TransformixImageFilter::TransformixImageFilterImpl
   std::map< std::string, std::vector< std::string > > ReadParameterFile( const std::string filename );
   void WriteParameterFile( const std::map< std::string, std::vector< std::string > > parameterMap, const std::string parameterFileName );
 
-  void PrintParameterMap( void );
+  void PrintParameterMap();
   void PrintParameterMap( const std::map< std::string, std::vector< std::string > > parameterMap );
   void PrintParameterMap( const std::vector< std::map< std::string, std::vector< std::string > > > parameterMapVector );
 
-  Image Execute( void );
+  Image Execute();
 
-  Image GetResultImage( void );
+  Image GetResultImage();
+  Image GetDeformationField();
 
   bool IsEmpty( const Image& image );
 
   // Definitions for SimpleITK member factory
-  typedef Image ( Self::*MemberFunctionType )( void );
-  template< class TMovingImage > Image ExecuteInternal( void );
+  typedef Image ( Self::*MemberFunctionType )();
+  template< class TMovingImage > Image ExecuteInternal();
   friend struct detail::MemberFunctionAddressor< MemberFunctionType >;
   nsstd::auto_ptr< detail::MemberFunctionFactory< MemberFunctionType > > m_MemberFactory;
 
   Image                   m_MovingImage;
   Image                   m_ResultImage;
+  Image                   m_DeformationField;
 
   ParameterMapVectorType  m_TransformParameterMapVector;
 

@@ -29,7 +29,7 @@ movingLabel = sitk.ReadImage('atlasLabel.hdr')
 # paths to images which we will loop over. 
 population = ['image1.dcm', 'image2.dcm', ... , 'imageN.dcm']
 
-selx = sitk.SimpleElastix()
+selx = sitk.ElastixImageFilter()
 selx.SetMovingImage(movingImage)
 selx.SetParameterMap(selx.GetDefaultParameterMap('nonrigid'))
 
