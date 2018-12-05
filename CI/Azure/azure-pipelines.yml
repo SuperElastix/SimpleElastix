@@ -75,8 +75,8 @@ jobs:
   - task: CMake@1
     displayName: 'CMake Generate'
     inputs:
-      cmakeArgs: '../SuperBuild'
+      cmakeArgs: -G "Visual Studio 15 2017 Win64" '../SuperBuild'
   - task: CMake@1
     displayName: 'CMake Build'
     inputs:
-      cmakeArgs: --build . -G "Visual Studio 15 2017 Win64"
+      cmakeArgs: --build .
