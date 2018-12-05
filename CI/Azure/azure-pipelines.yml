@@ -22,7 +22,7 @@ jobs:
   - task: CMake@1
     displayName: 'CMake Generate'
     inputs:
-      cmakeArgs: ../SuperBuild
+      cmakeArgs: -DCMAKE_BUILD_TYPE=Release ../SuperBuild
   - task: CMake@1
     displayName: 'CMake Build'
     inputs:
@@ -50,7 +50,7 @@ jobs:
   - task: CMake@1
     displayName: 'CMake Generate'
     inputs:
-      cmakeArgs: ../SuperBuild
+      cmakeArgs: -DCMAKE_BUILD_TYPE=Release ../SuperBuild
   - task: CMake@1
     displayName: 'CMake Build'
     inputs:
@@ -78,7 +78,7 @@ jobs:
   - task: CMake@1
     displayName: 'CMake Generate'
     inputs:
-      cmakeArgs: -G "Visual Studio 15 2017 Win64" -T host=x64 ../SuperBuild
+      cmakeArgs: -DCMAKE_BUILD_TYPE=Release -G "Visual Studio 15 2017 Win64" -T host=x64 ../SuperBuild
   - task: CMake@1
     displayName: 'CMake Build'
     inputs:
