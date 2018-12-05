@@ -68,7 +68,6 @@ jobs:
         python.version: '3.7'
     maxParallel: 4
   steps:
-  - script: echo hello from Windows
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '$(python.version)'
@@ -80,4 +79,4 @@ jobs:
   - task: CMake@1
     displayName: 'CMake Build'
     inputs:
-      cmakeArgs: --build . -Thost=x64
+      cmakeArgs: --build . -G "Visual Studio 15 2017 Win64"
