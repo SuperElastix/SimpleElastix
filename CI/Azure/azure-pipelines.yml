@@ -14,7 +14,6 @@ jobs:
         python.version: '3.7'
     maxParallel: 4
   steps:
-  - script: echo hello from Linux
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '$(python.version)'
@@ -81,4 +80,4 @@ jobs:
   - task: CMake@1
     displayName: 'CMake Build'
     inputs:
-      cmakeArgs: --build .
+      cmakeArgs: --build . -Thost=x64
