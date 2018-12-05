@@ -22,11 +22,11 @@ jobs:
   - task: CMake@1
     displayName: 'CMake Generate'
     inputs:
-      cmakeArgs: -DCMAKE_BUILD_TYPE=Release ../SuperBuild
+      cmakeArgs: ../SuperBuild
   - task: CMake@1
     displayName: 'CMake Build'
     inputs:
-      cmakeArgs: --build . -j 4
+      cmakeArgs: --build . --config Release -j 4
 - job: macOS
   timeoutInMinutes: 180
   pool:
@@ -50,11 +50,11 @@ jobs:
   - task: CMake@1
     displayName: 'CMake Generate'
     inputs:
-      cmakeArgs: -DCMAKE_BUILD_TYPE=Release ../SuperBuild
+      cmakeArgs: ../SuperBuild
   - task: CMake@1
     displayName: 'CMake Build'
     inputs:
-      cmakeArgs: --build . -j 4
+      cmakeArgs: --build . --config Release -j 4
 - job: Windows
   timeoutInMinutes: 180
   pool:
@@ -78,8 +78,8 @@ jobs:
   - task: CMake@1
     displayName: 'CMake Generate'
     inputs:
-      cmakeArgs: -DCMAKE_BUILD_TYPE=Release -G "Visual Studio 15 2017 Win64" -T host=x64 ../SuperBuild
+      cmakeArgs: -G "Visual Studio 15 2017 Win64" -T host=x64 ../SuperBuild
   - task: CMake@1
     displayName: 'CMake Build'
     inputs:
-      cmakeArgs: --build . -j 4
+      cmakeArgs: --build . --config Release -j 4
