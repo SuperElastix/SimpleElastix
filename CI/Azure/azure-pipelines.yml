@@ -20,11 +20,13 @@ jobs:
       versionSpec: '$(python.version)'
       architecture: 'x64'
   - task: CMake@1
+    displayName: 'CMake Generate'
     inputs:
       cmakeArgs: '../SuperBuild'
   - task: CMake@1
+    displayName: 'CMake Build'
     inputs:
-      cmakeArgs: --build . 
+      cmakeArgs: --build .
 - job: macOS
   pool:
     vmImage: 'macOS-10.13'
@@ -40,15 +42,16 @@ jobs:
         python.version: '3.7'
     maxParallel: 4
   steps:
-  - script: echo hello from macOS
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '$(python.version)'
       architecture: 'x64'
   - task: CMake@1
+    displayName: 'CMake Generate'
     inputs:
       cmakeArgs: '../SuperBuild'
   - task: CMake@1
+    displayName: 'CMake Build'
     inputs:
       cmakeArgs: --build .
 - job: Windows
@@ -72,8 +75,10 @@ jobs:
       versionSpec: '$(python.version)'
       architecture: 'x64'
   - task: CMake@1
+    displayName: 'CMake Generate'
     inputs:
       cmakeArgs: '../SuperBuild'
   - task: CMake@1
+    displayName: 'CMake Build'
     inputs:
       cmakeArgs: --build .
