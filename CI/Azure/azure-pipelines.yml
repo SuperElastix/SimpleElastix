@@ -1,5 +1,6 @@
 jobs:
 - job: Linux
+  timeoutInMinutes: 180
   pool:
     vmImage: 'ubuntu-16.04'
   strategy:
@@ -27,6 +28,7 @@ jobs:
     inputs:
       cmakeArgs: --build .
 - job: macOS
+  timeoutInMinutes: 180
   pool:
     vmImage: 'macOS-10.13'
   strategy:
@@ -54,6 +56,7 @@ jobs:
     inputs:
       cmakeArgs: --build .
 - job: Windows
+  timeoutInMinutes: 180
   pool:
     vmImage: 'vs2017-win2016'
   strategy:
