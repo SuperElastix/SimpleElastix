@@ -1,4 +1,7 @@
-jobs: 'Build'
+jobs:
+- job: Linux
+  pool:
+    vmImage: 'ubuntu-16.04'
   strategy:
     matrix:
       Python27:
@@ -10,9 +13,6 @@ jobs: 'Build'
       Python37:
         python.version: '3.7'
     maxParallel: 4
-- job: Linux
-  pool:
-    vmImage: 'ubuntu-16.04'
   steps:
   - script: echo hello from Linux
   - task: UsePythonVersion@0
@@ -25,6 +25,17 @@ jobs: 'Build'
 - job: macOS
   pool:
     vmImage: 'macOS-10.13'
+  strategy:
+    matrix:
+      Python27:
+        python.version: '2.7'
+      Python35:
+        python.version: '3.5'
+      Python36:
+        python.version: '3.6'
+      Python37:
+        python.version: '3.7'
+    maxParallel: 4
   steps:
   - script: echo hello from macOS
   - task: UsePythonVersion@0
@@ -37,6 +48,17 @@ jobs: 'Build'
 - job: Windows
   pool:
     vmImage: 'vs2017-win2016'
+  strategy:
+    matrix:
+      Python27:
+        python.version: '2.7'
+      Python35:
+        python.version: '3.5'
+      Python36:
+        python.version: '3.6'
+      Python37:
+        python.version: '3.7'
+    maxParallel: 4
   steps:
   - script: echo hello from Windows
   - task: UsePythonVersion@0
