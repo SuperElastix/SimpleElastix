@@ -21,7 +21,7 @@ jobs:
       architecture: 'x64'
   - task: CMake@1
     inputs:
-      workingDirectory: $(Build.SourcesDirectory)\SuperBuild
+      workingDirectory: $(Build.SourcesDirectory)\build\SuperBuild
 - job: macOS
   pool:
     vmImage: 'macOS-10.13'
@@ -44,7 +44,7 @@ jobs:
       architecture: 'x64'
   - task: CMake@1
     inputs:
-      workingDirectory: $(Build.SourcesDirectory)\SuperBuild
+      workingDirectory: $(Build.SourcesDirectory)\build\SuperBuild
 - job: Windows
   pool:
     vmImage: 'vs2017-win2016'
@@ -67,4 +67,4 @@ jobs:
       architecture: 'x64'
   - task: CMake@1
     inputs:
-      workingDirectory: $(Build.SourcesDirectory)\SuperBuild
+      workingDirectory: $(Build.SourcesDirectory)\build\SuperBuild
