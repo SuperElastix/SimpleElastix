@@ -26,7 +26,7 @@ jobs:
   - task: CMake@1
     displayName: 'CMake Build'
     inputs:
-      cmakeArgs: --build .
+      cmakeArgs: --build . -j 4
 - job: macOS
   timeoutInMinutes: 180
   pool:
@@ -54,7 +54,7 @@ jobs:
   - task: CMake@1
     displayName: 'CMake Build'
     inputs:
-      cmakeArgs: --build .
+      cmakeArgs: --build . -j 4
 - job: Windows
   timeoutInMinutes: 180
   pool:
@@ -82,4 +82,4 @@ jobs:
   - task: CMake@1
     displayName: 'CMake Build'
     inputs:
-      cmakeArgs: --build .
+      cmakeArgs: --build . -j 4
