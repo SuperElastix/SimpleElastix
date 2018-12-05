@@ -77,6 +77,7 @@ set(warning_flags_to_test
   -Wshadow
   -Wwrite-strings
   -Wstrict-null-sentinel
+  -Wno-reserved-user-defined-literal # Needed with gcc-5 for Ruby Wrapping on macOS
 )
 
 # add C++ only flag
