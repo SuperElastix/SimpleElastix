@@ -15,26 +15,9 @@
 *  limitations under the License.
 *
 *=========================================================================*/
+#ifndef __sitkImageViewerTest_h
+#define __sitkImageViewerTest_h
 
-#include "sitkCastImageFilter.hxx"
+#define CMAKE_COMMAND "@CMAKE_COMMAND@"
 
-
-namespace itk
-{
-namespace simple
-{
-
-
-void CastImageFilter::RegisterMemberFactory4l()
-{
-
-  // basic to Label
-  m_DualMemberFactory->RegisterMemberFunctions<IntegerPixelIDTypeList, LabelPixelIDTypeList, 4, ToLabelAddressor<MemberFunctionType> > ();
-
- // Label to basic
-  m_DualMemberFactory->RegisterMemberFunctions<LabelPixelIDTypeList, IntegerPixelIDTypeList, 4, LabelToAddressor<MemberFunctionType> > ();
-
-}
-
-} // end namespace simple
-} // end namespace itk
+#endif

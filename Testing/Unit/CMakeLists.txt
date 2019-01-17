@@ -34,11 +34,16 @@ set ( SimpleITKUnitTestSource
   sitkElastixFilterTests.cxx
   sitkTransformixImageFilterTests.cxx
   sitkTransformixFilterTests.cxx
+  sitkImageViewerTest.cxx
   )
 
 if ( SimpleITK_4D_IMAGES )
   list(APPEND SimpleITKUnitTestSource sitkImage4DTests.cxx )
 endif()
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sitkImageViewerTest.h.in
+               ${CMAKE_CURRENT_BINARY_DIR}/sitkImageViewerTest.h ESCAPE_QUOTES)
+
 
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/CTest)
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/PythonTests)
@@ -50,13 +55,15 @@ file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/JavaTests)
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/CSharpTests)
 
 
-set( ITK_TEST_DRIVER  "$<TARGET_FILE:itkTestDriver>" )
-
 # Adjust Python to run in the virtualenv
 set( PythonVirtualenvHome  ${SimpleITK_BINARY_DIR}/Testing/Installation/PythonVirtualenv )
 
 
 add_executable(SimpleITKUnitTestDriver0 SimpleITKUnitTestDriver.cxx ${SimpleITKUnitTestSource})
+target_include_directories(SimpleITKUnitTestDriver0
+  PRIVATE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+)
 target_link_libraries ( SimpleITKUnitTestDriver0 GTest::GTest SimpleITKUnitTestBase ${SimpleITK_LIBRARIES} ${ITK_LIBRARIES} )
 target_compile_options( SimpleITKUnitTestDriver0
   PRIVATE
@@ -261,8 +268,12 @@ target_compile_options( sitkSystemInformationTest
     ${SimpleITK_PRIVATE_COMPILE_OPTIONS} )
 
 
-
-gtest_add_tests(SimpleITKUnitTestDriver0 "" ${SimpleITKUnitTestSource})
+ # CMake 3.10 added this method, to avoid configure time introspection
+if(NOT CMAKE_CROSSCOMPILING)
+   gtest_discover_tests( SimpleITKUnitTestDriver0 DISCOVERY_TIMEOUT 15 )
+ else()
+   gtest_add_tests(SimpleITKUnitTestDriver0 "" ${SimpleITKUnitTestSource})
+endif()
 
 ExternalData_Expand_Arguments(  SimpleITKData
   unused_argument
@@ -284,12 +295,11 @@ ExternalData_Expand_Arguments(  SimpleITKData
   unused_argument
   DATA{${SimpleITK_DATA_ROOT}/Input/2th_cthead1.mha}
   DATA{${SimpleITK_DATA_ROOT}/Input/2th_cthead1.png}
+  DATA{${SimpleITK_DATA_ROOT}/Input/points_5d.mha}
   DATA{${SimpleITK_DATA_ROOT}/Input/4D.nii.gz}
   DATA{${SimpleITK_DATA_ROOT}/Input/BlackDots.png}
   DATA{${SimpleITK_DATA_ROOT}/Input/BrainProtonDensitySliceBorder20.png}
-  DATA{${SimpleITK_DATA_ROOT}/Input/BrainProtonDensitySliceBorder20Mask.png}
   DATA{${SimpleITK_DATA_ROOT}/Input/BrainProtonDensitySliceShifted13x17y.png}
-  DATA{${SimpleITK_DATA_ROOT}/Input/BrainProtonDensitySliceR10X13Y17.png}
   DATA{${SimpleITK_DATA_ROOT}/Input/cthead1-Float.mha}
   DATA{${SimpleITK_DATA_ROOT}/Input/cthead1.png}
   DATA{${SimpleITK_DATA_ROOT}/Input/RA-Float.nrrd}

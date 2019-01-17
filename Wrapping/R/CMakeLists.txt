@@ -1,4 +1,4 @@
-cmake_minimum_required ( VERSION 3.0 FATAL_ERROR )
+cmake_minimum_required ( VERSION 3.10 FATAL_ERROR )
 
 project( SimpleITK_R )
 
@@ -8,6 +8,7 @@ find_package ( R REQUIRED )
 include_directories ( ${SimpleITK_INCLUDE_DIRS} )
 
 set_source_files_properties ( SimpleITK.i PROPERTIES CPLUSPLUS ON )
+set_source_files_properties ( SimpleITK.i PROPERTIES SWIG_FLAGS "-namespace" )
 
 # Run swig
 set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_GLOBAL_FLAGS})
@@ -73,7 +74,7 @@ configure_file(
 # data store.
 include(sitkExternalData)
 
-file( GLOB_RECURSE image_links RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/Packaging/SimpleITK/data/*.md5" )
+file( GLOB_RECURSE image_links RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/Packaging/SimpleITK/inst/extdata/*.md5" )
 
 foreach(link ${image_links})
   string( REGEX REPLACE "\\.md5$" "" link ${link} )
@@ -81,7 +82,7 @@ foreach(link ${image_links})
     image_location
     DATA{${link}}
     )
-  set( COPY_DATA_COMMAND ${COPY_DATA_COMMAND} COMMAND ${CMAKE_COMMAND} -E copy ${image_location} ${CMAKE_CURRENT_BINARY_DIR}/Packaging/SimpleITK/data/ )
+  set( COPY_DATA_COMMAND ${COPY_DATA_COMMAND} COMMAND ${CMAKE_COMMAND} -E copy ${image_location} ${CMAKE_CURRENT_BINARY_DIR}/Packaging/SimpleITK/inst/extdata/ )
 endforeach()
 
 
@@ -124,8 +125,23 @@ endif()
 add_custom_command( TARGET ${SWIG_MODULE_SimpleITK_TARGET_NAME}
   POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/R_libs
-  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/SimpleITK.R ${CMAKE_CURRENT_BINARY_DIR}/Packaging/SimpleITK/R/
   # install for running tests and create binary package
+  COMMAND ${CMD_PREFIX} ${R_COMMAND} -f ${CMAKE_CURRENT_SOURCE_DIR}/processSwigCode.R --args ${CMAKE_CURRENT_BINARY_DIR}/SimpleITK.R ${CMAKE_CURRENT_BINARY_DIR}/Packaging/SimpleITK/R/SimpleITK.R ${CMAKE_CURRENT_BINARY_DIR}/Packaging/SimpleITK/man/hidden_methods.Rd
+  COMMAND ${CMD_PREFIX} ${R_COMMAND} -f ${CMAKE_CURRENT_SOURCE_DIR}/mkNamespace.R --args ${CMAKE_CURRENT_BINARY_DIR}/NAMESPACE ${CMAKE_CURRENT_BINARY_DIR}/Packaging/SimpleITK/NAMESPACE
   COMMAND ${CMD_PREFIX} ${R_COMMAND} CMD INSTALL --build ${CMAKE_CURRENT_BINARY_DIR}/Packaging/SimpleITK --library=${CMAKE_CURRENT_BINARY_DIR}/R_libs --no-multiarch
   COMMENT "Installing R package for testing and building binary version for distribution"
   )
+
+if (NOT CMAKE_PROJECT_NAME STREQUAL "SimpleITK" AND BUILD_TESTING)
+  set(WRAP_R 1)
+
+  add_subdirectory("${SimpleITK_SOURCE_DIR}/Testing/Unit/R" "${CMAKE_BINARY_DIR}/Testing/Unit")
+
+  if(BUILD_EXAMPLES)
+    add_subdirectory("${SimpleITK_SOURCE_DIR}/Examples" "${CMAKE_BINARY_DIR}/Examples")
+  endif()
+
+  if(COMMAND ExternalData_Add_Target )
+    ExternalData_Add_Target( SimpleITKData )
+  endif()
+endif()

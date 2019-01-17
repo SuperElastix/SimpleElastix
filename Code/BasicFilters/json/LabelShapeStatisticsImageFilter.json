@@ -88,6 +88,20 @@
       "label_map" : true
     },
     {
+      "name" : "Region",
+      "type" : "std::vector<unsigned int>",
+      "no_print" : true,
+      "active" : true,
+      "parameters" : [
+        {
+          "name" : "label",
+          "type" : "int64_t"
+        }
+      ],
+      "custom_cast" : "sitkITKImageRegionToSTL(value)",
+      "label_map" : true
+    },
+    {
       "name" : "Centroid",
       "type" : "std::vector<double>",
       "no_print" : true,
@@ -477,7 +491,7 @@
     }
   ],
   "briefdescription" : "Converts a label image to a label map and valuates the shape attributes.",
-  "detaileddescription" : "A convenient class that converts a label image to a label map and valuates the shape attribute at once.\n\nThis implementation was taken from the Insight Journal paper:\n\nhttps://hdl.handle.net/1926/584 or http://www.insight-journal.org/browse/publication/176 \n\n\\author Gaetan Lehmann. Biologie du Developpement et de la Reproduction, INRA de Jouy-en-Josas, France.\n\n\\see ShapeLabelObject , LabelShapeOpeningImageFilter , LabelStatisticsOpeningImageFilter \n\n\\par Wiki Examples:\n\n\\li All Examples \n\n\\li Convert an itk::Image consisting of labeled regions to a ShapeLabelMap",
+  "detaileddescription" : "A convenient class that converts a label image to a label map and valuates the shape attribute at once.\n\nThis implementation was taken from the Insight Journal paper:\n\nhttps://hdl.handle.net/1926/584 or http://www.insight-journal.org/browse/publication/176 \n\n\\author Gaetan Lehmann. Biologie du Developpement et de la Reproduction, INRA de Jouy-en-Josas, France.\n\n\\see ShapeLabelObject , LabelShapeOpeningImageFilter , LabelStatisticsOpeningImageFilter",
   "itk_module" : "ITKLabelMap",
   "itk_group" : "LabelMap"
 }

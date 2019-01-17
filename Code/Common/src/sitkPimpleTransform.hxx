@@ -94,8 +94,15 @@ public:
       return std::vector< double >( p.begin(), p.end() );
     }
 
+  unsigned int GetNumberOfFixedParameters( void ) const
+  {
+    return this->GetTransformBase()->GetFixedParameters().GetSize();
+  }
 
-  unsigned int GetNumberOfParameters( void ) const { return this->GetTransformBase()->GetNumberOfParameters(); }
+  unsigned int GetNumberOfParameters( void ) const
+  {
+    return this->GetTransformBase()->GetNumberOfParameters();
+  }
 
 
   void SetParameters( const std::vector< double > &inParams )
@@ -130,6 +137,8 @@ public:
 
   virtual void SetIdentity() = 0;
 
+  virtual void FlattenTransform() = 0;
+
   // Tries to construct an inverse of the transform, if true is returned
   // the inverse was successful, and outputTransform is modified to
   // the new class and ownership it passed to the caller.  Otherwise
@@ -155,7 +164,9 @@ public:
   virtual PimpleTransformBase* AddTransform( Transform &t ) = 0;
 
 
-  virtual std::vector< double > TransformPoint( const std::vector< double > &t ) const = 0;
+  virtual std::vector< double > TransformPoint( const std::vector< double > &p ) const = 0;
+  virtual std::vector< double > TransformVector( const std::vector< double > &v,
+                                                 const std::vector< double > &p) const = 0;
 
 protected:
 
@@ -300,6 +311,27 @@ public:
 
 #endif
 
+
+  virtual void FlattenTransform()
+    {
+      this->FlattenTransform(this->m_Transform.GetPointer());
+    }
+
+  template <typename UTransform>
+  void FlattenTransform( UTransform *self)
+    {
+      Unused(self);
+      // nothing to do
+    }
+
+  template <typename UScalar, unsigned int UDimension>
+  void FlattenTransform( itk::CompositeTransform<UScalar, UDimension> *self)
+    {
+      self->FlattenTransformQueue();
+      // TODO: If there is only one transform remove it from the
+      // composite transform.
+    }
+
   virtual bool GetInverse(PimpleTransformBase * &outputTransform) const
     {
       typename itk::LightObject::Pointer light = this->m_Transform->CreateAnother();
@@ -362,13 +394,33 @@ public:
     {
       if (pt.size() != this->GetInputDimension() )
         {
-        sitkExceptionMacro("vector dimension mismatch");
+        sitkExceptionMacro("point dimension mismatch");
         }
 
       typename TransformType::OutputPointType opt =
         this->m_Transform->TransformPoint( sitkSTLVectorToITK< typename TransformType::InputPointType >(pt));
 
       return sitkITKVectorToSTL<double>( opt );
+    }
+
+
+  virtual std::vector< double > TransformVector( const std::vector< double > &vec, const std::vector< double > &pt ) const
+    {
+      if (vec.size() != this->GetInputDimension() )
+        {
+        sitkExceptionMacro("vector dimension mismatch");
+        }
+
+      const typename TransformType::OutputVectorType & itk_vec = sitkSTLVectorToITK< typename TransformType::InputVectorType >(vec);
+
+      if (pt.size() != this->GetInputDimension() )
+        {
+        sitkExceptionMacro("point dimension mismatch");
+        }
+
+      const typename TransformType::OutputPointType &itk_pt = sitkSTLVectorToITK< typename TransformType::InputPointType >(pt);
+
+      return sitkITKVectorToSTL<double>( this->m_Transform->TransformVector( itk_vec, itk_pt ) );
     }
 
 private:

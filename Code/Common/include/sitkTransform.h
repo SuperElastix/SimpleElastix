@@ -168,6 +168,9 @@ public:
   std::vector<double> GetParameters( void ) const;
   /**@}*/
 
+  /** Return the number of optimizable parameters */
+  unsigned int GetNumberOfParameters( void ) const;
+
   /** Set/Get Fixed Transform Parameter
    * @{
    */
@@ -175,10 +178,42 @@ public:
   std::vector<double> GetFixedParameters( void ) const;
   /**@}*/
 
+  /** Get the number of fixed parameters */
+  unsigned int GetNumberOfFixedParameters( void ) const;
+
   // Make composition
   SITK_RETURN_SELF_TYPE_HEADER AddTransform( Transform t );
 
+
+  /** \brief Remove nested composite transforms
+   *
+   * This method has no effect on non-composite transforms.
+   *
+   * If this transform is a composite which contains another nested
+   * composite transform, then the nested composite's transforms are
+   * placed into this transform. Nested composite transform may not be
+   * written to a file.
+   */
+   SITK_RETURN_SELF_TYPE_HEADER FlattenTransform();
+
+  /** Apply transform to a point.
+   *
+   * The dimension of the point must match the transform.
+   */
   std::vector< double > TransformPoint( const std::vector< double > &point ) const;
+
+  /** Apply transform to a vector at a point.
+   *
+   * The ITK concept of a vector is a direction at a specific point,
+   * for example the difference between two points is a vector.
+   *
+   * For linear transforms the point does not matter, in general
+   * the vector is transformed by the Jacobian with respect to point
+   * position.
+   *
+   * The dimension of the vector and point must match the transform.
+   */
+  std::vector< double > TransformVector( const std::vector< double > &vector, const std::vector< double > &point) const;
 
   // write
   void WriteTransform( const std::string &filename ) const;
