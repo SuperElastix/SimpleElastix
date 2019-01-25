@@ -100,11 +100,6 @@ void SetCoefficientImages(TBSplineTransform* bspline, std::vector<Image> coeffic
 
 }
 
-
-BSplineTransform::~BSplineTransform()
-{
-}
-
 BSplineTransform::~BSplineTransform()
 {
 }
