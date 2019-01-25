@@ -72,11 +72,11 @@ TEST( ElastixImageFilter, Registration2D )
 TEST( ElastixImageFilter, Masks )
 {
   Image fixedImage = ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
-  Image fixedMask = Cast( ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20Mask.png" ) ), sitkUInt8 );
-  Image fixedMaskInvalidType = Cast( ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20Mask.png" ) ), sitkFloat32 );
+  Image fixedMask = BinaryThreshold( Cast( fixedImage, sitkUInt8 ) );
+  Image fixedMaskInvalidType = Cast( fixedImage, sitkFloat32 );
   Image movingImage = ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
-  Image movingMask = Cast( ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20Mask.png" ) ), sitkUInt8 );
-  Image movingMaskInvalidType = Cast( ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20Mask.png" ) ), sitkFloat32 );
+  Image movingMask = BinaryThreshold( Cast( movingImage, sitkUInt8 ) );
+  Image movingMaskInvalidType = Cast( movingImage, sitkFloat32 );
   Image resultImage; 
 
   ElastixImageFilter silx;
@@ -101,9 +101,10 @@ TEST( ElastixImageFilter, Masks )
 TEST( ElastixImageFilter, ProceduralInterface )
 {
   Image fixedImage = ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
-  Image fixedMask = Cast( ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20Mask.png" ) ), sitkUInt8 );
-  Image movingMask = Cast( ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20Mask.png" ) ), sitkUInt8 );
+  Image fixedMask = BinaryThreshold( Cast( fixedImage, sitkUInt8 ) );
+  Image fixedMaskInvalidType = Cast( fixedImage, sitkFloat32 );
   Image movingImage = ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
+  Image movingMask = BinaryThreshold( Cast( movingImage, sitkUInt8 ) );
   Image resultImage; 
 
   std::string defaultParameterMapName = "translation";
