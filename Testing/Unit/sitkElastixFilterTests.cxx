@@ -168,6 +168,7 @@ TEST( ElastixFilterTest, BSplineWithFixedMask2D )
 {
   typedef itk::Image< float, 2 > ImageType;
   typedef itk::Image< unsigned char, 2 > MaskType;
+  typedef typename MaskType::Pointer MaskPointer;
   typedef itk::ImageFileReader< ImageType > ImageFileReaderType;
   typedef itk::ImageFileWriter< ImageType > ImageFileWriterType;
   typedef ElastixFilter< ImageType, ImageType > ElastixFilterType;
@@ -185,7 +186,7 @@ TEST( ElastixFilterTest, BSplineWithFixedMask2D )
   parameterObject->SetParameterMap( parameterMap );
 
   fixedImageReader->Update();
-  auto fixedMask = MaskType::New();
+  MaskPointer fixedMask = MaskType::New();
   fixedMask->CopyInformation(fixedImageReader->GetOutput());
   fixedMask->SetRegions(fixedImageReader->GetOutput()->GetLargestPossibleRegion());
   fixedMask->Allocate();
