@@ -80,6 +80,28 @@ TEST( TransformixImageFilter, ProceduralInterface )
   EXPECT_FALSE( stfxIsEmpty( resultImage ) );
 }
 
+TEST( TransformixImageFilter, ComputeDeformationField )
+{
+  Image fixedImage = Cast( ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) ), sitkFloat32 );
+  Image movingImage = Cast( ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) ), sitkFloat32 );
+  Image resultImage;
+
+  ElastixImageFilter silx;
+  silx.SetFixedImage( fixedImage );
+  silx.SetMovingImage( movingImage );
+  silx.SetParameter( "MaximumNumberOfIterations", "1" );
+  silx.Execute();
+
+  TransformixImageFilter stfx;
+  stfx.SetTransformParameterMap(silx.GetTransformParameterMap());
+  stfx.ComputeDeformationFieldOn();
+  stfx.Execute();
+
+  Image deformationField = stfx.GetDeformationField();
+  deformationField.GetPixelAsVectorFloat32( { 0, 0 } );
+  EXPECT_NO_THROW( deformationField.GetPixelAsVectorFloat32( { 0, 0 } ) );
+}
+
 #ifdef SITK_4D_IMAGES
 
 TEST( TransformixImageFilter, Transformation4D )

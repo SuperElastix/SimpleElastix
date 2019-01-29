@@ -143,7 +143,10 @@ TEST( TransformixFilterTest, ComputeDeformationField )
   typedef itk::ImageFileReader< ImageType > ImageFileReaderType;
   typedef ElastixFilter< ImageType, ImageType > ElastixFilterType;
   typedef TransformixFilter< ImageType > TransformixFilterType;
+  typedef typename TransformixFilterType::OutputDeformationFieldType DeformationFieldType;
+  typedef DeformationFieldType::Pointer DeformationFieldPointer;
   typedef itk::ImageFileWriter< typename TransformixFilterType::OutputDeformationFieldType > ImageFileWriterType;
+
 
   ImageFileReaderType::Pointer fixedImageReader = ImageFileReaderType::New();
   fixedImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
@@ -172,6 +175,9 @@ TEST( TransformixFilterTest, ComputeDeformationField )
   EXPECT_NO_THROW( writer->SetFileName( dataFinder.GetOutputFile( "TransformixFilterTest.ComputeDeformationField.nii" ) ) );
   EXPECT_NO_THROW( writer->SetInput( transformixFilter->GetOutputDeformationField() ) );
   EXPECT_NO_THROW( writer->Update() );
+
+  DeformationFieldPointer deformationField = transformixFilter->GetOutputDeformationField();
+  EXPECT_NO_THROW( deformationField->GetPixel( { { 0, 0 } } ) );
 }
 
 TEST( TransformixFilterTest, TransformPointSet )

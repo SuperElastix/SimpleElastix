@@ -214,6 +214,7 @@ TEST( ElastixFilterTest, InitialTransformTestEuler2D )
   ParameterObject::Pointer parameterObject;
   EXPECT_NO_THROW( parameterObject = ParameterObject::New() );
   EXPECT_NO_THROW( parameterObject->SetParameterMap( ParameterObject::GetDefaultParameterMap( "rigid" ) ) );
+  parameterObject->SetParameter( "MaximumNumberOfIterations", "4" );
 
   typedef itk::Image< float, 2 > ImageType;
   typedef itk::ImageFileReader< ImageType > ImageFileReaderType;
@@ -263,6 +264,7 @@ TEST( ElastixFilterTest, SameFixedImageForMultipleRegistrations )
   movingImageReader2->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
 
   ElastixFilterType::Pointer elastixFilter;
+  elastixFilter->GetParameterObject()->SetParameter( "MaximumNumberOfIterations", "4" );
 
   EXPECT_NO_THROW( elastixFilter = ElastixFilterType::New() );
   EXPECT_NO_THROW( elastixFilter->SetFixedImage( fixedImageReader->GetOutput() ) );
@@ -283,6 +285,7 @@ TEST( ElastixFilterTest, BSpline3D )
   ParameterObject::Pointer parameterObject;
   EXPECT_NO_THROW( parameterObject = ParameterObject::New() );
   EXPECT_NO_THROW( parameterObject->SetParameterMap( parameterObject->GetDefaultParameterMap( "nonrigid" ) ) );
+  parameterObject->SetParameter( "MaximumNumberOfIterations", "4" );
 
   ImageFileReaderType::Pointer fixedImageReader = ImageFileReaderType::New();
   fixedImageReader->SetFileName( dataFinder.GetFile( "Input/OAS1_0001_MR1_mpr-1_anon.nrrd" ) );
