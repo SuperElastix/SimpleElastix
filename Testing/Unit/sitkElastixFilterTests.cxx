@@ -263,8 +263,8 @@ TEST( ElastixFilterTest, SameFixedImageForMultipleRegistrations )
   ImageFileReaderType::Pointer movingImageReader2 = ImageFileReaderType::New();
   movingImageReader2->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
 
-  ElastixFilterType::Pointer elastixFilter;
-  elastixFilter->GetParameterObject()->SetParameter( "MaximumNumberOfIterations", "4" );
+  ElastixFilterType::Pointer elastixFilter = ElastixFilterType::New();
+  elastixFilter->GetParameterObject()->SetParameter( "MaximumNumberOfIterations", "1" );
 
   EXPECT_NO_THROW( elastixFilter = ElastixFilterType::New() );
   EXPECT_NO_THROW( elastixFilter->SetFixedImage( fixedImageReader->GetOutput() ) );
