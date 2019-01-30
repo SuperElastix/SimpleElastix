@@ -98,8 +98,10 @@ TEST( TransformixImageFilter, ComputeDeformationField )
   stfx.Execute();
 
   Image deformationField = stfx.GetDeformationField();
-  deformationField.GetPixelAsVectorFloat32( { 0, 0 } );
-  EXPECT_NO_THROW( deformationField.GetPixelAsVectorFloat32( { 0, 0 } ) );
+  std::vector<uint32_t> index;
+  index.push_back(0);
+  index.push_back(0);
+  EXPECT_NO_THROW( deformationField.GetPixelAsVectorFloat32( index ) );
 }
 
 #ifdef SITK_4D_IMAGES
