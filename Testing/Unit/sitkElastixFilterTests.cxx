@@ -31,7 +31,7 @@ TEST( ElastixFilterTest, DefaultParameterObject2D )
   fixedImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
 
   ImageFileReaderType::Pointer movingImageReader = ImageFileReaderType::New();
-  movingImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceR10X13Y17.png" ) );
+  movingImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
 
   ElastixFilterType::Pointer elastixFilter;
   EXPECT_NO_THROW( elastixFilter = ElastixFilterType::New() );
@@ -55,7 +55,7 @@ TEST( ElastixFilterTest, UpdateOnOutputImageDownstreamUpdate )
   fixedImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
 
   ImageFileReaderType::Pointer movingImageReader = ImageFileReaderType::New();
-  movingImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceR10X13Y17.png" ) );
+  movingImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
 
   ElastixFilterType::Pointer elastixFilter;
   EXPECT_NO_THROW( elastixFilter = ElastixFilterType::New() );
@@ -86,10 +86,10 @@ TEST( ElastixFilterTest, UpdateOnTransformParametersDownstreamUpdate )
   fixedImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
 
   ImageFileReaderType::Pointer movingImageReader1 = ImageFileReaderType::New();
-  movingImageReader1->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceR10X13Y17.png" ) );
+  movingImageReader1->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
 
   ImageFileReaderType::Pointer movingImageReader2 = ImageFileReaderType::New();
-  movingImageReader2->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceR10X13Y17.png" ) );
+  movingImageReader2->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
 
   ElastixFilterType::Pointer elastixFilter;
   TransformixFilterType::Pointer transformixFilter;
@@ -119,6 +119,7 @@ TEST( ElastixFilterTest, TranslationWithPointSets2D )
   parameterMap[ "Transform" ] = ElastixFilterType::ParameterValueVectorType( 1, "TranslationTransform" );
   parameterMap[ "Metric" ].push_back( "CorrespondingPointsEuclideanDistanceMetric" );
   parameterMap[ "Metric0Weight"] = ElastixFilterType::ParameterValueVectorType( 1, "0.0" );
+  parameterMap[ "MaximumNumberOfIterations" ] = ElastixFilterType::ParameterValueVectorType( 1, "1" );
 
   ParameterObject::Pointer parameterObject;
   EXPECT_NO_THROW( parameterObject = ParameterObject::New() );
@@ -166,6 +167,8 @@ TEST( ElastixFilterTest, TranslationWithPointSets2D )
 TEST( ElastixFilterTest, BSplineWithFixedMask2D )
 {
   typedef itk::Image< float, 2 > ImageType;
+  typedef itk::Image< unsigned char, 2 > MaskType;
+  typedef typename MaskType::Pointer MaskPointer;
   typedef itk::ImageFileReader< ImageType > ImageFileReaderType;
   typedef itk::ImageFileWriter< ImageType > ImageFileWriterType;
   typedef ElastixFilter< ImageType, ImageType > ElastixFilterType;
@@ -173,32 +176,33 @@ TEST( ElastixFilterTest, BSplineWithFixedMask2D )
   ImageFileReaderType::Pointer fixedImageReader = ImageFileReaderType::New();
   fixedImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
 
-  ImageFileReaderType::Pointer fixedMaskReader = ImageFileReaderType::New();
-  fixedMaskReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20Mask.png" ) );
-
   ImageFileReaderType::Pointer movingImageReader = ImageFileReaderType::New();
-  movingImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceR10X13Y17.png" ) );
-
-  typedef itk::CastImageFilter< ImageType, ElastixFilterType::FixedMaskType > CastMaskFilterType;
-  CastMaskFilterType::Pointer castImageFilter = CastMaskFilterType::New();
-  castImageFilter->SetInput( fixedMaskReader->GetOutput() );
-  EXPECT_NO_THROW( castImageFilter->Update() );
+  movingImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
 
   ParameterObject::Pointer parameterObject = ParameterObject::New();
   ElastixFilterType::ParameterMapType parameterMap = parameterObject->GetDefaultParameterMap( "affine" );
   parameterMap[ "ImageSampler" ] = ElastixFilterType::ParameterValueVectorType( 1, "RandomSparseMask" );
+  parameterMap[ "MaximumNumberOfIterations" ] = ElastixFilterType::ParameterValueVectorType( 1, "1" );
   parameterObject->SetParameterMap( parameterMap );
+
+  fixedImageReader->Update();
+  MaskPointer fixedMask = MaskType::New();
+  fixedMask->CopyInformation(fixedImageReader->GetOutput());
+  fixedMask->SetRegions(fixedImageReader->GetOutput()->GetLargestPossibleRegion());
+  fixedMask->Allocate();
+  fixedMask->FillBuffer(1);
 
   ElastixFilterType::Pointer elastixFilter;
   EXPECT_NO_THROW( elastixFilter = ElastixFilterType::New() );
   EXPECT_NO_THROW( elastixFilter->SetParameterObject( parameterObject ) );
   EXPECT_NO_THROW( elastixFilter->SetFixedImage( fixedImageReader->GetOutput() ) );
-  EXPECT_NO_THROW( elastixFilter->SetFixedMask( castImageFilter->GetOutput() ) );
+  EXPECT_NO_THROW( elastixFilter->SetFixedMask( fixedMask ) );
   EXPECT_NO_THROW( elastixFilter->SetMovingImage( movingImageReader->GetOutput() ) );
+  elastixFilter->LogToConsoleOn();
 
   ImageFileWriterType::Pointer writer = ImageFileWriterType::New();
   EXPECT_NO_THROW( writer->SetFileName( dataFinder.GetOutputFile( "BSplineWithFixedMask2DResultImage.nii" ) ) );
-  EXPECT_NO_THROW( writer->SetInput( elastixFilter->GetOutput() ) );
+  EXPECT_NO_THROW( writer->SetInput( elastixFilter->GetOutput() ) ); writer->Update();
   EXPECT_NO_THROW( writer->Update() );
 
   ParameterObject::Pointer transformParameterObject;
@@ -210,6 +214,7 @@ TEST( ElastixFilterTest, InitialTransformTestEuler2D )
   ParameterObject::Pointer parameterObject;
   EXPECT_NO_THROW( parameterObject = ParameterObject::New() );
   EXPECT_NO_THROW( parameterObject->SetParameterMap( ParameterObject::GetDefaultParameterMap( "rigid" ) ) );
+  parameterObject->SetParameter( "MaximumNumberOfIterations", "4" );
 
   typedef itk::Image< float, 2 > ImageType;
   typedef itk::ImageFileReader< ImageType > ImageFileReaderType;
@@ -220,7 +225,7 @@ TEST( ElastixFilterTest, InitialTransformTestEuler2D )
   fixedImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
 
   ImageFileReaderType::Pointer movingImageReader = ImageFileReaderType::New();
-  movingImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceR10X13Y17.png" ) );
+  movingImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
 
   ElastixFilterType::Pointer initialElastixFilter;
   EXPECT_NO_THROW( initialElastixFilter = ElastixFilterType::New() );
@@ -253,12 +258,13 @@ TEST( ElastixFilterTest, SameFixedImageForMultipleRegistrations )
   fixedImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
 
   ImageFileReaderType::Pointer movingImageReader1 = ImageFileReaderType::New();
-  movingImageReader1->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceR10X13Y17.png" ) );
+  movingImageReader1->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
 
   ImageFileReaderType::Pointer movingImageReader2 = ImageFileReaderType::New();
-  movingImageReader2->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceR10X13Y17.png" ) );
+  movingImageReader2->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
 
-  ElastixFilterType::Pointer elastixFilter;
+  ElastixFilterType::Pointer elastixFilter = ElastixFilterType::New();
+  elastixFilter->GetParameterObject()->SetParameter( "MaximumNumberOfIterations", "1" );
 
   EXPECT_NO_THROW( elastixFilter = ElastixFilterType::New() );
   EXPECT_NO_THROW( elastixFilter->SetFixedImage( fixedImageReader->GetOutput() ) );
@@ -279,6 +285,7 @@ TEST( ElastixFilterTest, BSpline3D )
   ParameterObject::Pointer parameterObject;
   EXPECT_NO_THROW( parameterObject = ParameterObject::New() );
   EXPECT_NO_THROW( parameterObject->SetParameterMap( parameterObject->GetDefaultParameterMap( "nonrigid" ) ) );
+  parameterObject->SetParameter( "MaximumNumberOfIterations", "4" );
 
   ImageFileReaderType::Pointer fixedImageReader = ImageFileReaderType::New();
   fixedImageReader->SetFileName( dataFinder.GetFile( "Input/OAS1_0001_MR1_mpr-1_anon.nrrd" ) );
@@ -309,7 +316,7 @@ TEST( ElastixFilterTest, BSpline4D )
   typedef ElastixFilter< ImageType, ImageType > ElastixFilterType;
 
   ElastixFilterType::ParameterMapType parameterMap = ParameterObject::GetDefaultParameterMap( "groupwise" );
-  parameterMap[ "MaximumNumberOfIterations" ] = ElastixFilterType::ParameterValueVectorType( 1, "4" );
+  parameterMap[ "MaximumNumberOfIterations" ] = ElastixFilterType::ParameterValueVectorType( 1, "1" );
 
   ParameterObject::Pointer parameterObject;
   EXPECT_NO_THROW( parameterObject = ParameterObject::New() );

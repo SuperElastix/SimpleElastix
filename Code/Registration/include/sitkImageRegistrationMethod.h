@@ -61,6 +61,7 @@ class EventObject;
 
 namespace simple
 {
+  class BSplineTransform;
 
   /** \brief An interface method to the modular ITKv4 registration framework.
    *
@@ -143,6 +144,25 @@ namespace simple
     bool GetInitialTransformInPlace() const
     { return this->m_InitialTransformInPlace;}
     /** @} */
+
+    /** \brief Set an initial BSpline transform to optimize.
+      *
+      * A specialization of SetInitialTransform for
+      * BSplineTransforms which can take an additional scaleFactors
+      * parameter. The scaleFactors specifies the a isotropic scaling
+      * factor per level for the BSpline transform mesh size with
+      * respect to the initial transform. For example to double the
+      * BSpline mesh resolution at each of 3 levels the vector
+      * [1,2,4] should be provided.
+      *
+      * If a per level scale factor is 0 or omitted than no transform
+      * adapter will be created for that level.
+      *
+      * \sa itk::BSplineTransformParametersAdaptor
+      **/
+    void SetInitialTransformAsBSpline( BSplineTransform &transform,
+                                       bool inPlace=true,
+                                       const std::vector<unsigned int> &scaleFactors=std::vector<unsigned int>() );
 
     /** \brief Set a fixed transform component towards moving domain.
      *
@@ -452,10 +472,18 @@ namespace simple
 
     /** \brief Set percentage of pixels sampled for metric evaluation.
      *
+     * The percentage is of the number of pixels in the virtual domain
+     * per level after the shrink factor has been applied.
+     *
      * The seed parameter is used to seed the pseudo-random number
      * generator used in generating the sampling set of points. If the
      * seed parameter is 0, then the wall clock is used, otherwise the
      * fixed seed is used for reproducible behavior.
+     *
+     * When providing multiple values the number of entries must match
+     * the number of shrink factors and smoothing sigmas. If a single
+     * value is given, then the same percentage is used for all
+     * levels.
      *
      * \sa itk::ImageRegistrationMethodv4::SetMetricSamplingPercentage
      * @{
@@ -463,6 +491,9 @@ namespace simple
     SITK_RETURN_SELF_TYPE_HEADER SetMetricSamplingPercentage(double percentage, unsigned int seed = sitkWallClock);
     SITK_RETURN_SELF_TYPE_HEADER SetMetricSamplingPercentagePerLevel(const std::vector<double> &percentage, unsigned int seed = sitkWallClock);
     /** @} */
+
+    /** \brief Get the percentage of pixels used for metric evaluation.  */
+    const std::vector<double> &GetMetricSamplingPercentagePerLevel() const;
 
     enum MetricSamplingStrategyType {
       NONE,
@@ -495,7 +526,8 @@ namespace simple
      *
      * By default the image gradient is computed by
      * itk::GradientRecursiveGaussianImageFiter. If disabled then a
-     * central difference function with be computed as needed.
+     * central difference function will be computed for each sample as
+     * needed.
      *
      * \sa itk::ImageToImageMetricv4::SetUseMovingImageGradientFilter
      * @{
@@ -506,15 +538,20 @@ namespace simple
     /** @} */
 
 
-    /** \brief Set the shrink factors for each level where each level
-     * has the same shrink factor for each dimension.
+    /** \brief Set the isotropic shrink factors for each level.
+     *
+     * The virtual domain image is shrunk by this factor relative to
+     * the full size of the original virtual domain.
      *
      * \sa  itk::ImageRegistrationMethodv4::SetShrinkFactorsPerLevel
      */
     SITK_RETURN_SELF_TYPE_HEADER SetShrinkFactorsPerLevel( const std::vector<unsigned int> &shrinkFactors );
 
-    /** \brief Set the sigmas of Gaussian used for smoothing at each
-     * level.
+    /** \brief Set the sigmas of Gaussian used for smoothing.
+     *
+     * The smoothing is applied to both the fixed and the moving
+     * images at each level. The number of smoothing sigmas must match
+     * the number of shrink factors.
      *
      * \sa  itk::ImageRegistrationMethodv4::SetSmoothingSigmasPerLevel
      */
@@ -559,6 +596,16 @@ namespace simple
     double GetOptimizerLearningRate() const;
     double GetOptimizerConvergenceValue() const;
     double GetMetricValue() const;
+
+    /** Current number of points used of metric evaluation
+     *
+     * This is a active measurement connected to the registration
+     * processes during registration. This number is number of point
+     * in the virtual domain which overlap the fixed image and the
+     * moving image. It is valid for sparse or dense sampling. After
+     * execution of registration this will contain the last value.
+     */
+    uint64_t GetMetricNumberOfValidPoints() const;
 
 
     unsigned int GetCurrentLevel() const;
@@ -627,6 +674,7 @@ namespace simple
     nsstd::function<double()> m_pfGetOptimizerLearningRate;
     nsstd::function<double()> m_pfGetOptimizerConvergenceValue;
     nsstd::function<double()> m_pfGetMetricValue;
+    nsstd::function<uint64_t()> m_pfGetMetricNumberOfValidPoints;
     nsstd::function<std::vector<double>()> m_pfGetOptimizerScales;
     nsstd::function<std::string()> m_pfGetOptimizerStopConditionDescription;
 
@@ -721,6 +769,7 @@ namespace simple
     double m_OptimizerLineSearchAccuracy;
 
 
+    std::vector<unsigned int> m_TransformBSplineScaleFactors;
 
     std::vector<double> m_OptimizerWeights;
 
@@ -766,6 +815,7 @@ namespace simple
     std::string m_StopConditionDescription;
     double m_MetricValue;
     unsigned int m_Iteration;
+    uint64_t m_NumberOfValidPoints;
 
     itk::ObjectToObjectOptimizerBaseTemplate<double> *m_ActiveOptimizer;
   };

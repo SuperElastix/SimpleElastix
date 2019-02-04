@@ -30,7 +30,7 @@ TEST( TransformixFilterTest, UpdateOnDownstreamUpdate )
   fixedImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
 
   ImageFileReaderType::Pointer movingImageReader = ImageFileReaderType::New();
-  movingImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceR10X13Y17.png" ) );
+  movingImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
 
   ElastixFilterType::Pointer elastixFilter;
   EXPECT_NO_THROW( elastixFilter = ElastixFilterType::New() );
@@ -62,7 +62,7 @@ TEST( TransformixFilterTest, GetInputImageFromElastixFilter )
   fixedImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
 
   ImageFileReaderType::Pointer movingImageReader = ImageFileReaderType::New();
-  movingImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceR10X13Y17.png" ) );
+  movingImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
 
   ElastixFilterType::Pointer elastixFilter;
   EXPECT_NO_THROW( elastixFilter = ElastixFilterType::New() );
@@ -93,7 +93,7 @@ TEST( TransformixFilterTest, ComputeSpatialJacobian )
   fixedImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
 
   ImageFileReaderType::Pointer movingImageReader = ImageFileReaderType::New();
-  movingImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceR10X13Y17.png" ) );
+  movingImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
 
 
   ElastixFilterType::Pointer elastixFilter;
@@ -121,7 +121,7 @@ TEST( TransformixFilterTest, ComputeDeterminantOfSpatialJacobian )
   fixedImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
 
   ImageFileReaderType::Pointer movingImageReader = ImageFileReaderType::New();
-  movingImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceR10X13Y17.png" ) );
+  movingImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
 
   ElastixFilterType::Pointer elastixFilter;
   EXPECT_NO_THROW( elastixFilter = ElastixFilterType::New() );
@@ -143,13 +143,16 @@ TEST( TransformixFilterTest, ComputeDeformationField )
   typedef itk::ImageFileReader< ImageType > ImageFileReaderType;
   typedef ElastixFilter< ImageType, ImageType > ElastixFilterType;
   typedef TransformixFilter< ImageType > TransformixFilterType;
+  typedef typename TransformixFilterType::OutputDeformationFieldType DeformationFieldType;
+  typedef DeformationFieldType::Pointer DeformationFieldPointer;
   typedef itk::ImageFileWriter< typename TransformixFilterType::OutputDeformationFieldType > ImageFileWriterType;
+
 
   ImageFileReaderType::Pointer fixedImageReader = ImageFileReaderType::New();
   fixedImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
 
   ImageFileReaderType::Pointer movingImageReader = ImageFileReaderType::New();
-  movingImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceR10X13Y17.png" ) );
+  movingImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
 
   ParameterObject::Pointer parameterObject = ParameterObject::New();
   parameterObject->SetParameterMap( parameterObject->GetDefaultParameterMap( "affine" ) );
@@ -172,6 +175,9 @@ TEST( TransformixFilterTest, ComputeDeformationField )
   EXPECT_NO_THROW( writer->SetFileName( dataFinder.GetOutputFile( "TransformixFilterTest.ComputeDeformationField.nii" ) ) );
   EXPECT_NO_THROW( writer->SetInput( transformixFilter->GetOutputDeformationField() ) );
   EXPECT_NO_THROW( writer->Update() );
+
+  DeformationFieldPointer deformationField = transformixFilter->GetOutputDeformationField();
+  EXPECT_NO_THROW( deformationField->GetPixel( { { 0, 0 } } ) );
 }
 
 TEST( TransformixFilterTest, TransformPointSet )
@@ -185,7 +191,7 @@ TEST( TransformixFilterTest, TransformPointSet )
   fixedImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
 
   ImageFileReaderType::Pointer movingImageReader = ImageFileReaderType::New();
-  movingImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceR10X13Y17.png" ) );
+  movingImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
   
   const std::string fixedPointSetFileName = dataFinder.GetOutputFile( "InputPoints.pts" );
   std::ofstream fixedMeshFile;
@@ -220,10 +226,10 @@ TEST( TransformixFilterTest, SameTransformParameterMapForMultipleTransformations
   fixedImageReader->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
 
   ImageFileReaderType::Pointer movingImageReader1 = ImageFileReaderType::New();
-  movingImageReader1->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceR10X13Y17.png" ) );
+  movingImageReader1->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
 
   ImageFileReaderType::Pointer movingImageReader2 = ImageFileReaderType::New();
-  movingImageReader2->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceR10X13Y17.png" ) );
+  movingImageReader2->SetFileName( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
 
   ElastixFilterType::Pointer elastixFilter;
   EXPECT_NO_THROW( elastixFilter = ElastixFilterType::New() );

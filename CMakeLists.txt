@@ -1,4 +1,4 @@
-cmake_minimum_required ( VERSION 3.0 FATAL_ERROR )
+cmake_minimum_required ( VERSION 3.10 FATAL_ERROR )
 
 # Explicitly add INCREMENTAL linking option to command lines.
 # http://www.cmake.org/pipermail/cmake/2010-February/035174.html
@@ -6,12 +6,9 @@ SET(MSVC_INCREMENTAL_DEFAULT ON)
 
 project ( SimpleITK )
 
-cmake_policy( VERSION 3.0 )
+cmake_policy( VERSION 3.10 )
 
 foreach(p
-    CMP0042 # CMake 3.0
-    CMP0063 # CMake 3.3.2
-    CMP0064 # CMake 3.4
     )
   if(POLICY ${p})
     cmake_policy(SET ${p} NEW)
@@ -186,8 +183,8 @@ set ( GENERATED_TEST_SOURCE_LIST "" CACHE INTERNAL "" )
 
 # Create cached list of all template components
 file( GLOB template_components
-      ${SimpleITK_SOURCE_DIR}/ExpandTemplateGenerator/Components/*.h.in
-      ${SimpleITK_SOURCE_DIR}/ExpandTemplateGenerator/Components/*.cxx.in
+      ${SimpleITK_SOURCE_DIR}/ExpandTemplateGenerator/Components/[^.]*.h.in
+      ${SimpleITK_SOURCE_DIR}/ExpandTemplateGenerator/Components/[^.]*.cxx.in
     )
 set ( template_components ${template_components} CACHE INTERNAL "" )
 
@@ -412,15 +409,6 @@ endif()
 
 
 #------------------------------------------------------------------------------
-# Options for documentation
-option ( BUILD_DOCUMENTS "Build the Documentation subdirectory" OFF )
-
-if ( BUILD_DOCUMENTS )
-  add_subdirectory ( Documentation )
-endif()
-
-
-#------------------------------------------------------------------------------
 # Configure SimpleITKConfig.cmake for the build tree.
 set(SimpleITKConfig_TREE "build")
 set(SimpleITKConfig_CODE "")
@@ -472,16 +460,14 @@ install(EXPORT SimpleITKTargets
   COMPONENT Development)
 
 file( GLOB __files
-  ${CMAKE_SOURCE_DIR}/Code/BasicFilters/include/*.h
-  ${CMAKE_SOURCE_DIR}/Code/BasicFilters/include/*.hxx
-  ${CMAKE_SOURCE_DIR}/Code/Common/include/*.h
-  ${CMAKE_SOURCE_DIR}/Code/Common/include/*.hxx
-  ${CMAKE_SOURCE_DIR}/Code/Elastix/include/*.h
-  ${CMAKE_SOURCE_DIR}/Code/Elastix/include/*.hxx
-  ${CMAKE_SOURCE_DIR}/Code/IO/include/*.h
-  ${CMAKE_SOURCE_DIR}/Code/IO/include/*.hxx
-  ${CMAKE_SOURCE_DIR}/Code/Registration/include/*.h
-  ${CMAKE_SOURCE_DIR}/Code/Registration/include/*.hxx
+  ${CMAKE_SOURCE_DIR}/Code/BasicFilters/include/[^.]*.h
+  ${CMAKE_SOURCE_DIR}/Code/BasicFilters/include/[^.]*.hxx
+  ${CMAKE_SOURCE_DIR}/Code/Common/include/[^.]*.h
+  ${CMAKE_SOURCE_DIR}/Code/Common/include/[^.]*.hxx
+  ${CMAKE_SOURCE_DIR}/Code/IO/include/[^.]*.h
+  ${CMAKE_SOURCE_DIR}/Code/IO/include/[^.]*.hxx
+  ${CMAKE_SOURCE_DIR}/Code/Registration/include/[^.]*.h
+  ${CMAKE_SOURCE_DIR}/Code/Registration/include/[^.]*.hxx
   )
 
 install(FILES ${__files}

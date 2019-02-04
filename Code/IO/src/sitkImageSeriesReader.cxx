@@ -30,10 +30,15 @@
 namespace itk {
   namespace simple {
 
-  Image ReadImage ( const std::vector<std::string> &filenames, PixelIDValueEnum outputPixelType )
+  Image ReadImage ( const std::vector<std::string> &filenames,
+                    PixelIDValueEnum outputPixelType,
+                    const std::string &imageIO )
     {
     ImageSeriesReader reader;
-    return reader.SetFileNames ( filenames ).SetOutputPixelType(outputPixelType).Execute();
+    reader.SetFileNames(filenames);
+    reader.SetOutputPixelType(outputPixelType);
+    reader.SetImageIO(imageIO);
+    return reader.Execute();
     }
 
 
@@ -45,9 +50,10 @@ namespace itk {
     {
     GDCMSeriesFileNames::Pointer gdcmSeries = GDCMSeriesFileNames::New();
 
+    // SetRecursive must be called before SetInputDirectory
+    gdcmSeries->SetRecursive( recursive );
     gdcmSeries->SetInputDirectory( directory );
     gdcmSeries->SetUseSeriesDetails( useSeriesDetails );
-    gdcmSeries->SetRecursive( recursive );
     gdcmSeries->SetLoadSequences( loadSequences );
     //Skip private tags. Loading DICOM files is faster when private tags are not needed.
     gdcmSeries->SetLoadPrivateTags( false );

@@ -42,6 +42,16 @@ namespace itk {
      * the underlying itk::ImageIO. This information can be loaded
      * with the ReadImageInformation method.
      *
+     * Reading takes place by the ITK ImageIO factory mechanism. ITK
+     * contains many ImageIO classes which are responsible for reading
+     * separate file formats. By default, each ImageIO is asked if it
+     * "can read" the file, and the first one which "can read" the
+     * format is used. The list of available ImageIOs can be obtained
+     * using the GetRegisteredImageIOs method. The ImageIO used can be
+     * overridden with the SetImageIO method. This is useful in cases
+     * when multiple ImageIOs "can read" the file and the user wants
+     * to select a specific IO (not the first).
+     *
      * \sa itk::simple::ReadImage for the procedural interface
      */
     class SITKIO_EXPORT ImageFileReader
@@ -128,6 +138,46 @@ namespace itk {
        **/
       std::string GetMetaData( const std::string &key ) const;
 
+
+      /** \brief size of image to extract from file.
+       *
+       * By default the reader loads the entire image, this is
+       * specified when the size has zero length.
+       *
+       * If specified, then the image returned from `Execute` will be
+       * of this size. If the ImageIO and file support reading just a
+       * region, then the reader will perform streaming.
+       *
+       * The dimension of the image can be reduced by specifying a
+       * dimension's size as 0. For example a size of $[10,20,30,0,0]$
+       * results in a 3D image with size of $[10,20,30]$. This
+       * enables reading a 5D image into a 3D image. If the length of
+       * the specified size is greater than the dimension of the image
+       * file, an exception will be generated. If the size's length is
+       * less than the image's dimension then the missing values are
+       * assumed to be zero.
+       *
+       * When the dimension of the image is reduced, the direction
+       * cosine matrix will be set to the identity. However, the
+       * spacing for the selected axis will remain. The matrix from
+       * the file can still be obtained by
+       * ImageFileReader::GetDirection.
+       *
+       * /sa ExtractImageFilter
+       */
+      SITK_RETURN_SELF_TYPE_HEADER SetExtractSize( const std::vector<unsigned int> &size);
+      const std::vector<unsigned int> &GetExtractSize( ) const;
+
+
+      /** \brief starting index from the image on disk to extract.
+       *
+       * Missing dimensions are treated the same as 0.
+       *
+       * /sa ExtractImageFilter
+       */
+      SITK_RETURN_SELF_TYPE_HEADER SetExtractIndex( const std::vector<int> &index );
+      const std::vector<int> &GetExtractIndex(  ) const;
+
     protected:
 
       template <class TImageType> Image ExecuteInternal ( itk::ImageIOBase * );
@@ -138,6 +188,10 @@ namespace itk {
       void UpdateImageInformationFromImageIO( const itk::ImageIOBase* iobase );
 
     private:
+
+      // Internal method used implement extracting a region from the reader
+      template <class TImageType, class TInternalImageType>
+        Image ExecuteExtract( TInternalImageType * itkImage );
 
       // function pointer type
       typedef Image (Self::*MemberFunctionType)( itk::ImageIOBase * );
@@ -163,18 +217,25 @@ namespace itk {
       std::vector<double>  m_Spacing;
 
       std::vector<uint64_t> m_Size;
+
+      std::vector<unsigned int> m_ExtractSize;
+      std::vector<int>          m_ExtractIndex;
     };
 
   /**
    * \brief ReadImage is a procedural interface to the ImageFileReader
    *     class which is convenient for most image reading tasks.
    *
-   *     For more complicated use cases such as requiring loading of
-   *     all tags, including private ones, from a DICOM file the
-   *     object oriented interface should be used. The reader can be explicitly
-   *     set to load all tags (LoadPrivateTagsOn()).
+   *  \param filename the filename of an Image e.g. "cthead.mha"
+   *  \param outputPixelType see ImageReaderBase::SetOutputPixelType
+   *  \param imageIO see ImageReaderBase::SetImageIO
+   *
+   * \sa itk::simple::ImageFileReader for reading a single file.
+   * \sa itk::simple::ImageSeriesReader for reading a series and meta-data dictionaries.
    */
-  SITKIO_EXPORT Image ReadImage ( const std::string &filename, PixelIDValueEnum outputPixelType = sitkUnknown );
+  SITKIO_EXPORT Image ReadImage ( const std::string &filename,
+                                  PixelIDValueEnum outputPixelType = sitkUnknown,
+                                  const std::string &imageIO = "");
   }
 }
 

@@ -72,11 +72,11 @@ TEST( ElastixImageFilter, Registration2D )
 TEST( ElastixImageFilter, Masks )
 {
   Image fixedImage = ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
-  Image fixedMask = Cast( ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20Mask.png" ) ), sitkUInt8 );
-  Image fixedMaskInvalidType = Cast( ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20Mask.png" ) ), sitkFloat32 );
+  Image fixedMask = BinaryThreshold( Cast( fixedImage, sitkUInt8 ) );
+  Image fixedMaskInvalidType = Cast( fixedImage, sitkFloat32 );
   Image movingImage = ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
-  Image movingMask = Cast( ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20Mask.png" ) ), sitkUInt8 );
-  Image movingMaskInvalidType = Cast( ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20Mask.png" ) ), sitkFloat32 );
+  Image movingMask = BinaryThreshold( Cast( movingImage, sitkUInt8 ) );
+  Image movingMaskInvalidType = Cast( movingImage, sitkFloat32 );
   Image resultImage; 
 
   ElastixImageFilter silx;
@@ -101,58 +101,16 @@ TEST( ElastixImageFilter, Masks )
 TEST( ElastixImageFilter, ProceduralInterface )
 {
   Image fixedImage = ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20.png" ) );
-  Image fixedMask = Cast( ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20Mask.png" ) ), sitkUInt8 );
-  Image movingMask = Cast( ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceBorder20Mask.png" ) ), sitkUInt8 );
+  Image fixedMask = BinaryThreshold( Cast( fixedImage, sitkUInt8 ) );
+  Image fixedMaskInvalidType = Cast( fixedImage, sitkFloat32 );
   Image movingImage = ReadImage( dataFinder.GetFile( "Input/BrainProtonDensitySliceShifted13x17y.png" ) );
+  Image movingMask = BinaryThreshold( Cast( movingImage, sitkUInt8 ) );
   Image resultImage; 
 
   std::string defaultParameterMapName = "translation";
   std::string outputDirectory = ".";
 
   EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage ) );
-  EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, true ) );
-  EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, false ) );
-  EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, true, true ) );
-  EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, false, false ) );
-  EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, true, false ) );
-  EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, false, true ) );
-  EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, true, true, outputDirectory ) );
-  EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, false, false, outputDirectory ) );
-  EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, true, false, outputDirectory ) );
-  EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, false, true, outputDirectory ) );
-  EXPECT_FALSE( silxIsEmpty( resultImage ) );
-
-  EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, defaultParameterMapName ) );
-  EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, defaultParameterMapName, true ) );
-  EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, defaultParameterMapName, false ) );
-  EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, defaultParameterMapName, true, true ) );
-  EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, defaultParameterMapName, false, false ) );
-  EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, defaultParameterMapName, true, false ) );
-  EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, defaultParameterMapName, false, true ) );
-  EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, defaultParameterMapName, true, true, outputDirectory ) );
-  EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, defaultParameterMapName, false, false, outputDirectory ) );
-  EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, defaultParameterMapName, true, false, outputDirectory ) );
-  EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, defaultParameterMapName, false, true, outputDirectory ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
 
   typedef ElastixImageFilter::ParameterMapVectorType ParameterMapVectorType;
