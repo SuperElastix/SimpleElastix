@@ -13,9 +13,9 @@
 namespace itk { 
   namespace simple {
 
-struct ElastixImageFilter::ElastixImageFilterImpl
+class ElastixImageFilter::ElastixImageFilterImpl
 {
-
+public:
   ElastixImageFilterImpl( void );
   ~ElastixImageFilterImpl( void );
 

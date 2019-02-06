@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.10)
 project(SimpleITKExamples)
 
 foreach(p
@@ -47,6 +47,7 @@ add_subdirectory(ImageRegistrationMethod3)
 add_subdirectory(ImageRegistrationMethod4)
 add_subdirectory(ImageRegistrationMethodBSpline1)
 add_subdirectory(ImageRegistrationMethodBSpline2)
+add_subdirectory(ImageRegistrationMethodBSpline3)
 add_subdirectory(ImageRegistrationMethodDisplacement1)
 add_subdirectory(ImageRegistrationMethodExhaustive)
 add_subdirectory(N4BiasFieldCorrection)

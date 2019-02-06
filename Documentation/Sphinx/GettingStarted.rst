@@ -10,7 +10,7 @@ This page explains how to install SimpleElastix. The process involves compiling 
 Compiling On Linux
 -------------------
 
-SimpleElastix includes a script that automatically downloads and install all dependencies so we don't have to install elastix, ITK, GTest or SWIG manually. This is called a 'SuperBuild' in CMake terms. The only thing we need to compile the SuperBuild is CMake, git and a compiler toolchain. To build SimpleElastix with the SuperBuild, we use the following commands to download the code and start the build:
+SimpleElastix includes a script that automatically downloads and installs all dependencies. This is called a 'SuperBuild' in CMake terms. We only need CMake, git, and a compiler toolchain to compile the SuperBuild. Once these have been installed (e.g. :code:`sudo apt install cmake git build-essential`), we use the following commands to download the code and start the build:
 
 ::
 
@@ -24,13 +24,13 @@ SimpleElastix includes a script that automatically downloads and install all dep
 
     Be careful not to run out of memory during the build. A rule of thumb is that we need 4GB of memory per core. For example, if we compile SimpleElastix with 4 cores (e.g. :code:`make -j4`) we need a machine with at least 16GB of RAM. The full project takes around an hour to compile on a quad-core machine.
 
-SimpleElastix will be compiled for languages that it can automatically detect. The language packages will be built in the :code:`${BUILD_DIRECTORY}/SimpleITK-build/Wrapping` directory. 
-
-We then have to run language-specific install scripts to able to use SimpleElastix in the target language environment. Target language dependencies need to be pre-installed. The relevant :code:`apt-get` packages are  
+SimpleElastix will be compiled for languages that it can automatically detect. Target language dependencies need to be installed before you start compile the SuperBuild. The relevant :code:`apt` packages are  
 
 ::
 
     python python-dev monodevelop r-base r-base-dev ruby ruby-dev tcl tcl-dev tk tk-dev
+
+The language packages will be built in the :code:`${BUILD_DIRECTORY}/SimpleITK-build/Wrapping` directory. We then have to run language-specific install scripts.
 
 Follow the steps below to install SimpleElastix when compilation has finished.
 
@@ -40,15 +40,15 @@ To install the python module onto your system, navigate to
 
 ::
 
-    ${BUILD_DIRECTORY}/SimpleITK-build/Wrapping/Python/Packaging
+    ${BUILD_DIRECTORY}/SimpleITK-build/Wrapping/Python
 
 and run the following command:
 
 ::
 
-    $ sudo python setup.py install
+    $ sudo python Packaging/setup.py install
 
-This will install the SimpleITK python module with SimpleElastix, which can then be imported into scripts like any other python module.  If we want to install SimpleElastix into a virtual environment, activate the virtual environment on beforehand and omit :code:`sudo`. If you don't know what a virtual environment is, don't worry about it, it is entirely optional.
+This will install the SimpleElastix which we can then import into our own scripts. If we want to install SimpleElastix into a virtual environment, activate the virtual environment on beforehand and omit :code:`sudo`. If you don't know what a virtual environment is, don't worry about it, it is entirely optional.
 
 # Java
 TODO: Pull request welcome.
@@ -78,25 +78,7 @@ Compiling On Mac OS X
 
 The Mac OS X compilation procedure is identical to that of Linux, so simply follow the Linux installation steps above to compile SimpleElastix. We need to have CMake git and a compiler installed. We can check for a working compiler by opening the OS X terminal and run :code:`make`. OS X will know if the Xcode Command Line Tools is missing and prompt you to install them if this is the case. 
 
-Mac OS X comes with Python and Tcl preinstalled but other target-language dependencies need to be installed seperately. This can be done with `Macports <https://www.macports.org/>`_ or `Homebrew <http://http://brew.sh/>`_. SimpleElastix will be compiled for languages that it can automatically detect. The language packages will be built in the :code:`${BUILD_DIRECTORY}/SimpleITK-build/Wrapping` directory.
-
-Follow the steps below to install SimpleElastix when compilation has finished.
-
-# Python 
-
-To install the python module onto our system, we navigate to
-
-::
-
-    ${BUILD_DIRECTORY}/SimpleITK-build/Wrapping/Python/Packaging
-
-and run the following command:
-
-::
-
-    $ sudo python setup.py install
-
-This will install the SimpleITK python module with SimpleElastix, which can then be imported into scripts like any other python module.  If we want to install SimpleElastix into a virtual environment, we activate the virtual environment on beforehand and omit :code:`sudo`. If you don't know what a virtual environment is, don't worry about it, it is entirely optional.
+Mac OS X comes with Python and Tcl preinstalled but other target-language dependencies need to be installed seperately. This can be done with `Macports <https://www.macports.org/>`_ or `Homebrew <http://http://brew.sh/>`_. 
 
 # Java
 TODO: Pull request welcome.
@@ -121,12 +103,12 @@ TODO: Pull request welcome.
 Compiling On Windows
 ---------------------
 
-SimpleElastix includes a script that automatically downloads and install all dependencies so we don't have to install elastix, ITK, GTest or SWIG manually. This is called a 'SuperBuild' in CMake terms. The only things needed to compile the SuperBuild is CMake, git and a compiler toolchain. Here, we use the compiler that comes the free `Visual Studio Community 2017 <https://www.visualstudio.com/downloads/>`_ package.
+SimpleElastix includes a script that automatically downloads and install all dependencies. This is called a 'SuperBuild' in CMake terms. The only things needed to compile the SuperBuild is CMake, git and a compiler toolchain. Here, we use the compiler that comes the free `Visual Studio Community 2017 <https://www.visualstudio.com/downloads/>`_ package.
 
 Using Visual Studio
 ~~~~~~~~~~~~~~~~~~~
 
-Will use CMake to generate build files and the Visual Studio compiler to compile the project. 
+We will use CMake to generate build files and the Visual Studio compiler to compile the project. 
 
 1. Download CMake, git and code, and setup directories.
     - Download and install `CMake GUI <http://www.cmake.org/download/>`_.
@@ -148,9 +130,9 @@ Will use CMake to generate build files and the Visual Studio compiler to compile
 
     .. tip::
 
-        - If we need a compiler other than the default system option, we select "Specify native compilers". If we don't know what this means or what we need, we leave the "Use default native compiler" option checked.
-        - If CMake complains that a compiler cannot be found, we install the free `Visual Studio Community Edition <https://www.visualstudio.com/>`_ .
-        - If CMake does not pick up our target language, we can set the paths manually. For example, to manually configure CMake Python paths, tick "Advanced" and specify :code:`PYTHON_EXECUTABLE`, :code:`PYTHON_INCLUDE_DIR` and :code:`PYTHON_LIBRARY`. See Troubleshooting section for details.
+        - If you need a compiler other than the default system option, select "Specify native compilers". Leave the "Use default native compiler" option checked if you don't know what this means.
+        - If CMake complains that a compiler cannot be found, install the free `Visual Studio Community Edition <https://www.visualstudio.com/>`_ .
+        - If CMake does not pick up our target language, check that it has been installed with development libraries, and check if the paths have been set. For example, to manually configure CMake Python paths, tick "Advanced" and specify :code:`PYTHON_EXECUTABLE`, :code:`PYTHON_INCLUDE_DIR` and :code:`PYTHON_LIBRARY`. See Troubleshooting section for details.
 
     .. figure:: _static/WindowsInstallationSelectCompiler.png
         :align: center
@@ -176,7 +158,7 @@ Will use CMake to generate build files and the Visual Studio compiler to compile
         Figure 5: Open the solution in Visual Studio.
 
 
-5. Make sure "Release" build type is selected and build the :code:`ALL_BUILD` project. If the "Debug" build type is used instead of "Release" mode, we will experience a significant performance penalty and may not be able to build language packages that are distributed without development binaries.
+5. Make sure "Release" build type is selected and build the :code:`ALL_BUILD` project. If the "Debug" build type is used instead of "Release" mode, you will experience a significant performance penalty and may not be able to build language packages that are distributed without development binaries.
 
     .. figure:: _static/WindowsInstallationBuildSolution.png
         :align: center
@@ -198,7 +180,7 @@ and run the following command:
 
     $ sudo python setup.py install
 
-This will install the SimpleITK python module with SimpleElastix, which can then be imported into scripts like any other python module.  If we want to install SimpleElastix into a virtual environment, activate the virtual environment on beforehand and omit :code:`sudo`. If you don't know what a virtual environment is, don't worry about it, it is entirely optional.
+This will install the SimpleITK python module with SimpleElastix, which can then be imported into scripts like any other python module.  If you want to install SimpleElastix into a virtual environment, activate the virtual environment on beforehand and omit :code:`sudo`. If you don't know what a virtual environment is, don't worry about it, it is entirely optional.
 
 # Java
 TODO: Pull request welcome.
@@ -221,7 +203,7 @@ TODO: Pull request welcome.
 Using the command line
 ~~~~~~~~~~~~~~~~~~~~~~
 
-SimpleElastix can also be compiled via the Windows shell. We will still use CMake to generate build files and the msbuild.exe program to compile the project (which Visual Studio uses under the hood) but we do not have to use a GUI. 
+SimpleElastix can also be compiled via the Windows shell. You will use CMake to generate build files and the msbuild.exe program to compile the project.
 
 1. Download CMake, git and code, and setup directories. 
     - Download and install `CMake GUI <http://www.cmake.org/download/>`_. Be sure to select `Add CMake to the system PATH` option.

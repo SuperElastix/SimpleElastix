@@ -1,0 +1,124 @@
+variables:
+  PreferredToolArchitecture: x64
+      
+jobs:
+- job: Windows
+  timeoutInMinutes: 0
+  pool:
+    vmImage: 'vs2017-win2016'
+  strategy:
+    matrix:
+      Python27:
+        python.version: '2.7'
+      Python36:
+        python.version: '3.6'
+      Python37:
+        python.version: '3.7'
+  steps:
+  - task: UsePythonVersion@0
+    displayName: Enable Python
+    inputs:
+      versionSpec: '$(python.version)'
+      architecture: 'x64'
+      addToPath: true
+  - script: python -m pip install numpy
+    displayName: 'Install Python dependencies'
+  - task: UseRubyVersion@0
+    displayName: Enable Ruby
+    inputs:
+      addToPath: true
+  - task: DotNetCoreInstaller@0
+    displayName: Enable C#
+    inputs:
+      version: '2.1.300'
+  - task: CMake@1
+    displayName: 'CMake Generate'
+    inputs:
+      cmakeArgs: -G "Visual Studio 15 2017 Win64" -T host=x64 ../SuperBuild
+  - task: CMake@1
+    displayName: 'CMake Build'
+    inputs:
+      cmakeArgs: --build . --config Release -j 1
+  - script: |
+      rm -fr build/ITK-build
+      rm -fr build/Elastix-build
+    displayName: Free space on device
+  - script: ctest -C Release -VV -j 2 -E Python.Test.ConcurrentImageRead
+    displayName: 'CTest'
+    workingDirectory: build/SimpleITK-build
+- job: Linux
+  timeoutInMinutes: 0
+  pool:
+    vmImage: 'ubuntu-16.04'
+  strategy:
+    matrix:
+      Python27:
+        python.version: '2.7'
+      Python36:
+        python.version: '3.6'
+      Python37:
+        python.version: '3.7'
+  steps:
+  - task: UsePythonVersion@0
+    displayName: Enable Python
+    inputs:
+      versionSpec: '$(python.version)'
+      architecture: 'x64'
+      addToPath: true 
+  - script: python -m pip install numpy
+    displayName: 'Install Python dependencies'
+  - task: UseRubyVersion@0
+    displayName: Enable Ruby
+    inputs:
+      addToPath: true
+  - task: DotNetCoreInstaller@0
+    displayName: Enable C#
+    inputs:
+      version: '2.1.300'
+  - task: CMake@1
+    displayName: 'CMake Generate'
+    inputs:
+      cmakeArgs: ../SuperBuild
+  - task: CMake@1
+    displayName: 'CMake Build'
+    inputs:
+      cmakeArgs: --build . --config Release -j 1
+  - script: ctest -C Release -VV -j 2 -E Python.Test.ConcurrentImageRead
+    displayName: 'CTest'
+    workingDirectory: build/SimpleITK-build
+- job: macOS
+  timeoutInMinutes: 0
+  pool:
+    vmImage: 'macOS-10.13'
+  strategy:
+    matrix:
+      Python27:
+        python.version: '2.7'
+      Python36:
+        python.version: '3.6'
+      Python37:
+        python.version: '3.7'
+  steps:
+  - task: UsePythonVersion@0
+    displayName: Enable Python
+    inputs:
+      versionSpec: '$(python.version)'
+      architecture: 'x64'
+      addToPath: true 
+  - script: python -m pip install numpy
+    displayName: 'Install Python dependencies'
+  - task: DotNetCoreInstaller@0
+    displayName: Enable C#
+    inputs:
+      version: '2.1.300'
+  - task: CMake@1
+    displayName: 'CMake Generate'
+    inputs:
+      cmakeArgs:  -DWRAP_RUBY=FALSE ../SuperBuild
+  - task: CMake@1
+    displayName: 'CMake Build'
+    inputs:
+      cmakeArgs: --build . --config Release -j 1
+  - script: ctest -C Release -VV -j 2 -E Python.Test.ConcurrentImageRead
+    displayName: 'CTest'
+    workingDirectory: build/SimpleITK-build

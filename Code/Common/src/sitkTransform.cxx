@@ -529,6 +529,12 @@ void Transform::SetPimpleTransform( PimpleTransformBase *pimpleTransform )
     return this->m_PimpleTransform->GetParameters();
   }
 
+  unsigned int Transform::GetNumberOfParameters( void ) const
+  {
+    assert( m_PimpleTransform );
+    return this->m_PimpleTransform->GetNumberOfParameters();
+  }
+
   void Transform::SetFixedParameters ( const std::vector<double>& parameters )
   {
     assert( m_PimpleTransform );
@@ -540,6 +546,12 @@ void Transform::SetPimpleTransform( PimpleTransformBase *pimpleTransform )
   {
     assert( m_PimpleTransform );
     return this->m_PimpleTransform->GetFixedParameters();
+  }
+
+  unsigned int Transform::GetNumberOfFixedParameters( void ) const
+  {
+    assert( m_PimpleTransform );
+    return this->m_PimpleTransform->GetNumberOfFixedParameters();
   }
 
   Transform &Transform::AddTransform( Transform t )
@@ -559,6 +571,14 @@ void Transform::SetPimpleTransform( PimpleTransformBase *pimpleTransform )
   {
     assert( m_PimpleTransform );
     return this->m_PimpleTransform->TransformPoint( point );
+  }
+
+
+std::vector< double > Transform::TransformVector( const std::vector< double > &vector,
+                                                  const std::vector< double > &point ) const
+  {
+    assert( m_PimpleTransform );
+    return this->m_PimpleTransform->TransformVector( vector, point );
   }
 
 
@@ -603,6 +623,15 @@ void Transform::SetPimpleTransform( PimpleTransformBase *pimpleTransform )
       }
     return tx;
   }
+
+  Transform &Transform::FlattenTransform()
+  {
+    assert( m_PimpleTransform );
+    this->MakeUnique();
+    this->m_PimpleTransform->FlattenTransform();
+    return *this;
+  }
+
 
   std::string Transform::ToString( void ) const
   {
