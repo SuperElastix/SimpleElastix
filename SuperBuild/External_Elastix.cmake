@@ -19,8 +19,8 @@ ExternalProject_Add( ${proj}
   -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON
   -DBUILD_TESTING:BOOL=OFF
   -DELASTIX_BUILD_EXECUTABLE:BOOL=OFF
-  -DELASTIX_USE_OPENMP:BOOL=${OPENMP_FOUND}
-  -DELASTIX_USE_OPENCL:BOOL=OFF
+  -DELASTIX_USE_OPENMP:BOOL=${SimpleITK_ELASTIX_USE_OPENMP}
+  -DELASTIX_USE_OPENCL:BOOL=${SimpleITK_ELASTIX_USE_OPENCL}
   -DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
   -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
   -DITK_DIR:PATH=${ITK_DIR}
@@ -75,8 +75,11 @@ ExternalProject_Add( ${proj}
   -DUSE_MultiResolutionRegistration:BOOL=ON                                           
   -DUSE_MultiResolutionRegistrationWithFeatures:BOOL=ON                                           
   -DUSE_MutualInformationHistogramMetric:BOOL=ON                                           
-  -DUSE_MyStandardResampler:BOOL=ON                                           
-  -DUSE_NearestNeighborInterpolator:BOOL=ON                                           
+  -DUSE_MyStandardResampler:BOOL=ON
+  -DUSE_OpenCLFixedGenericPyramid:BOOL=${SimpleITK_ELASTIX_USE_OPENCL}
+  -DUSE_OpenCLMovingGenericPyramid:BOOL=${SimpleITK_ELASTIX_USE_OPENCL}
+  -DUSE_OpenCLResampler:BOOL=${SimpleITK_ELASTIX_USE_OPENCL}
+  -DUSE_NearestNeighborInterpolator:BOOL=ON
   -DUSE_NearestNeighborResampleInterpolator:BOOL=ON                                           
   -DUSE_NormalizedGradientCorrelationMetric:BOOL=ON                                           
   -DUSE_NormalizedMutualInformationMetric:BOOL=ON
