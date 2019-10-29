@@ -80,7 +80,7 @@ We can apply a transformation computed with SimpleElastix to a point set with Si
 
 .. warning::
 	
-	The input points are specified in the fixed image domain (!) and warped from the fixed image to moving image since the transformation direction is from fixed to moving image. If we want to warp points from the moving image to fixed image, we need the inverse transform. This can be computed manually (see section 6.1.6 in the `elastix manual <http://elastix.isi.uu.nl/download/elastix_manual_v4.8.pdf>`_) or via :code:`elastixImageFilter.ExecuteInverse()`.
+	The input points are specified in the fixed image domain (!) and warped from the fixed image to moving image since the transformation direction is from fixed to moving image. If we want to warp points from the moving image to fixed image, we need the inverse transform. This can be computed manually, see section 6.1.6 and Figure 2.3 in the `elastix manual <http://elastix.isi.uu.nl/download/elastix_manual_v4.8.pdf>`_.
 
 
     
