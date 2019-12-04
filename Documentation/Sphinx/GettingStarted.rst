@@ -51,7 +51,27 @@ and run the following command:
 This will install the SimpleElastix which we can then import into our own scripts. If we want to install SimpleElastix into a virtual environment, activate the virtual environment on beforehand and omit :code:`sudo`. If you don't know what a virtual environment is, don't worry about it, it is entirely optional.
 
 # Java
-TODO: Pull request welcome.
+
+First, ensure the following directory exists after compilation:
+
+::
+
+    ${BUILD_DIRECTORY}/SimpleITK-build/Wrapping/Java
+
+If such a directory does not exist, check the Troubleshooting section below. 
+
+The `visual guide to SimpleITK in Java <https://itk.org/Wiki/SimpleITK/GettingStarted/A_visual_guide_to_SimpleITK_in_Java>`_ shows you how to create a java project in eclipse.  The main steps are:
+
+1. Add the simpleitk jar to classpath (simpleitk-<version>.jar)
+
+2. Set the path to the Native Library
+   In this case `${BUILD_DIRECTORY}/SimpleITK-build/Wrapping/Java/lib`
+
+After a project is set up, the 
+`Java elastix example <https://github.com/SuperElastix/SimpleElastix/blob/master/Examples/Java/SimpleElastix.java>`_ 
+and the `Java transformix example <https://github.com/SuperElastix/SimpleElastix/blob/master/Examples/Java/SimpleTransformix.java>`_
+show how to use the interface.
+
 
 # R
 TODO: Pull request welcome.
