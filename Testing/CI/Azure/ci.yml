@@ -46,6 +46,9 @@ jobs:
   - script: ctest -C Release -VV -j 2 -E Python.Test.ConcurrentImageRead
     displayName: 'CTest'
     workingDirectory: build/SimpleITK-build
+  - script: cmake --build . --target dist
+    displayName: 'Package'
+    workingDirectory: build/SimpleITK-build
 - job: Linux
   timeoutInMinutes: 0
   pool:
@@ -86,6 +89,9 @@ jobs:
   - script: ctest -C Release -VV -j 2 -E Python.Test.ConcurrentImageRead
     displayName: 'CTest'
     workingDirectory: build/SimpleITK-build
+  - script: cmake --build . --target dist
+    displayName: 'Package'
+    workingDirectory: build/SimpleITK-build
 - job: macOS
   timeoutInMinutes: 0
   pool:
@@ -121,4 +127,7 @@ jobs:
       cmakeArgs: --build . --config Release -j 1
   - script: ctest -C Release -VV -j 2 -E Python.Test.ConcurrentImageRead
     displayName: 'CTest'
+    workingDirectory: build/SimpleITK-build
+  - script: cmake --build . --target dist
+    displayName: 'Package'
     workingDirectory: build/SimpleITK-build
