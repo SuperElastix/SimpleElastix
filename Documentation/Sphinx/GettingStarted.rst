@@ -66,10 +66,24 @@ The `visual guide to SimpleITK in Java <https://itk.org/Wiki/SimpleITK/GettingSt
 
 2. Set the path to the Native Library, in this case :code:`${BUILD_DIRECTORY}/SimpleITK-build/Wrapping/Java/lib`
 
+The steps are similiar when using IntelliJ. First add the jar file to the project
+
+.. figure:: _static/IntelliJSetJar.png
+    :align: center
+    :width: 100% 
+
+then set the :code:`java.library.path` in your run configuration.
+
+.. figure:: _static/IntelliJSetLibrary.png
+    :align: center
+    :width: 100% 
+
+
 After a project is set up, the 
 `Java elastix example <https://github.com/SuperElastix/SimpleElastix/blob/master/Examples/Java/SimpleElastix.java>`_ 
 and the `Java transformix example <https://github.com/SuperElastix/SimpleElastix/blob/master/Examples/Java/SimpleTransformix.java>`_
 show how to use the interface.
+
 
 
 # R
