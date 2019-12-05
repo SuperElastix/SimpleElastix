@@ -22,7 +22,7 @@ SimpleElastix includes a script that automatically downloads and installs all de
 
 .. warning::
 
-    Be careful not to run out of memory during the build. A rule of thumb is that we need 4GB of memory per core. For example, if we compile SimpleElastix with 4 cores (e.g. :code:`make -j4`) we need a machine with at least 16GB of RAM. The full project takes around an hour to compile on a quad-core machine.
+    Be careful not to run out of memory during the build. A rule of thumb is that we need 4GB of memory per core. For example, if we compile SimpleElastix with 4 cores (e.g. :code:`make -j4`) we need a machine with at least 16GB of RAM. As well, avoid using more cores than are available on your system. Some errors may be resolved by using only a single core, (i.e. :code:`make -j1`). The full project takes around an hour to compile on a quad-core machine.
 
 SimpleElastix will be compiled for languages that it can automatically detect. Target language dependencies need to be installed before you start compile the SuperBuild. The relevant :code:`apt` packages are  
 
@@ -64,8 +64,7 @@ The `visual guide to SimpleITK in Java <https://itk.org/Wiki/SimpleITK/GettingSt
 
 1. Add the simpleitk jar to classpath (simpleitk-<version>.jar)
 
-2. Set the path to the Native Library
-   In this case `${BUILD_DIRECTORY}/SimpleITK-build/Wrapping/Java/lib`
+2. Set the path to the Native Library, in this case :code:`${BUILD_DIRECTORY}/SimpleITK-build/Wrapping/Java/lib`
 
 After a project is set up, the 
 `Java elastix example <https://github.com/SuperElastix/SimpleElastix/blob/master/Examples/Java/SimpleElastix.java>`_ 
