@@ -94,9 +94,32 @@ The object-oriented interface facilitates reuse of components and dramatically s
 
 In the next section, we will take a closer look at the parameter map interface that configures the registration components.
 
+Java example
+~~~~~~~~~~~~
 
+The object oriented interface is similar in Java.
 
+::
 
+    import org.itk.simple.*;
 
+    public class RunSimpleElastix {
+        public static void main(String[] args) {
 
+            ElastixImageFilter elastixImageFilter = new ElastixImageFilter();
 
+            // Read input images
+            ImageFileReader reader = new ImageFileReader();
+            reader.setFileName("fixedImage.nii");
+            elastixImageFilter.setFixedImage(reader.execute());
+
+            reader.setFileName("movingImage.nii");
+            elastixImageFilter.setMovingImage(reader.execute());
+
+            elastixImageFilter.setParameterMap(elastixImageFilter.getDefaultParameterMap("translation"));
+            elastixImageFilter.execute();
+
+            Image resultImage = elastixImageFilter.getResultImage();
+            VectorOfParameterMap transformParameterMap = elastixImageFilter.getTransformParameterMap();
+        }
+    }
