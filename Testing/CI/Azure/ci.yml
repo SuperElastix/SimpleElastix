@@ -129,5 +129,5 @@ jobs:
     displayName: 'CTest'
     workingDirectory: build/SimpleITK-build
   - script: cmake --build . --target dist
-    displayName: 'Package'
+    displayName: 'Package' 
     workingDirectory: build/SimpleITK-build
