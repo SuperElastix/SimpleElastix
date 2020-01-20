@@ -178,7 +178,7 @@ and run the following command:
 
 ::
 
-    $ sudo python setup.py install
+    $ python Packaging/setup.py install
 
 This will install the SimpleITK python module with SimpleElastix, which can then be imported into scripts like any other python module.  If you want to install SimpleElastix into a virtual environment, activate the virtual environment on beforehand and omit :code:`sudo`. If you don't know what a virtual environment is, don't worry about it, it is entirely optional.
 
