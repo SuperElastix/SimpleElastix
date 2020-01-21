@@ -40,7 +40,6 @@ jobs:
     inputs:
       cmakeArgs: --build . --config Release -j 1
   - script: |
-      rm -fr build/ITK-build
       rm -fr build/Elastix-build
     displayName: Free space on device
   - script: ctest -C Release -VV -j 2 -E Python.Test.ConcurrentImageRead
