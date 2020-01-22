@@ -49,6 +49,16 @@ jobs:
   - script: cmake --build . --target dist
     displayName: 'Package'
     workingDirectory: build/SimpleITK-build
+  - task: CopyFiles@2
+    displayName: 'Stage Artifacts'
+    inputs:
+      SourceFolder: 'build/SimpleITK-build/Wrapping/Python/dist'
+      Contents: '**'
+      TargetFolder: '$(build.artifactstagingdirectory)'
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Artifacts'
+    inputs:
+      PathtoPublish: '$(build.artifactstagingdirectory)'
 - job: Linux
   timeoutInMinutes: 0
   pool:
@@ -92,6 +102,16 @@ jobs:
   - script: cmake --build . --target dist
     displayName: 'Package'
     workingDirectory: build/SimpleITK-build
+  - task: CopyFiles@2
+    displayName: 'Stage Artifacts'
+    inputs:
+      SourceFolder: 'build/SimpleITK-build/Wrapping/Python/dist'
+      Contents: '**'
+      TargetFolder: '$(build.artifactstagingdirectory)'
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Artifacts'
+    inputs:
+      PathtoPublish: '$(build.artifactstagingdirectory)'
 - job: macOS
   timeoutInMinutes: 0
   pool:
@@ -131,3 +151,13 @@ jobs:
   - script: cmake --build . --target dist
     displayName: 'Package' 
     workingDirectory: build/SimpleITK-build
+  - task: CopyFiles@2
+    displayName: 'Stage Artifacts'
+    inputs:
+      SourceFolder: 'build/SimpleITK-build/Wrapping/Python/dist'
+      Contents: '**'
+      TargetFolder: '$(build.artifactstagingdirectory)'
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Artifacts'
+    inputs:
+      PathtoPublish: '$(build.artifactstagingdirectory)'
