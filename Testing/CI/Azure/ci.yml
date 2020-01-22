@@ -34,17 +34,18 @@ jobs:
   - task: CMake@1
     displayName: 'CMake Generate'
     inputs:
-      cmakeArgs: -G "Visual Studio 15 2017 Win64" -T host=x64 ../SuperBuild
+      cmakeArgs: -G "Visual Studio 15 2017 Win64" -T host=x64 -DBUILD_TESTING=OFF ../SuperBuild
   - task: CMake@1
     displayName: 'CMake Build'
     inputs:
       cmakeArgs: --build . --config Release -j 1
   - script: |
       rm -fr build/ITK-build
+#      rm -fr build/Elastix-build
     displayName: Free space on device
-  - script: ctest -C Release -VV -j 2 -E Python.Test.ConcurrentImageRead
-    displayName: 'CTest'
-    workingDirectory: build/SimpleITK-build
+#  - script: ctest -C Release -VV -j 2 -E Python.Test.ConcurrentImageRead
+#    displayName: 'CTest'
+#    workingDirectory: build/SimpleITK-build
   - script: cmake --build . --target dist
     displayName: 'Package'
     workingDirectory: build/SimpleITK-build
