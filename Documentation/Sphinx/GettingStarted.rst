@@ -10,6 +10,10 @@ This page explains how to install SimpleElastix. The process involves compiling 
 Compiling On Linux
 -------------------
 
+.. warning::
+
+    Make sure to have the sudo rights to install SimpleElastix
+
 SimpleElastix includes a script that automatically downloads and installs all dependencies. This is called a 'SuperBuild' in CMake terms. We only need CMake, git, and a compiler toolchain to compile the SuperBuild. Once these have been installed (e.g. :code:`sudo apt install cmake git build-essential`), we use the following commands to download the code and start the build:
 
 ::
@@ -42,15 +46,33 @@ To install the python module onto your system, navigate to
 
     ${BUILD_DIRECTORY}/SimpleITK-build/Wrapping/Python
 
-and run the following command:
+## With virtual environment
+
+First, load the virtual environment and run the following command :
+
+::
+
+    $ python Packaging/setup.py install
+
+This will install the SimpleElastix in your virtual environment which we can then import into our own scripts.
+
+## Without virtual environment
+
+.. warning::
+
+    The following command install by default the SimpleElastix in python2 default environment if we want to install
+    in pyhton3 default environment we will have to :code:`python` to :code:`python3` in the following command
+
+Run the following command :
 
 ::
 
     $ sudo python Packaging/setup.py install
 
-This will install the SimpleElastix which we can then import into our own scripts. If we want to install SimpleElastix into a virtual environment, activate the virtual environment on beforehand and omit :code:`sudo`. If you don't know what a virtual environment is, don't worry about it, it is entirely optional.
+This will install the SimpleElastix in your python default environment which we can then import into our own scripts.
 
 # Java
+
 TODO: Pull request welcome.
 
 # R
