@@ -172,7 +172,7 @@ To install the python module onto your system, navigate to
 
 ::
 
-    ${BUILD_DIRECTORY}/SimpleITK-build/Wrapping/Python/Packaging
+    ${BUILD_DIRECTORY}/SimpleITK-build/Wrapping/Python
 
 and run the following command:
 
@@ -180,7 +180,7 @@ and run the following command:
 
     $ python Packaging/setup.py install
 
-This will install the SimpleITK python module with SimpleElastix, which can then be imported into scripts like any other python module.  If you want to install SimpleElastix into a virtual environment, activate the virtual environment on beforehand and omit :code:`sudo`. If you don't know what a virtual environment is, don't worry about it, it is entirely optional.
+This will install the SimpleITK python module with SimpleElastix, which can then be imported into scripts like any other python module.
 
 # Java
 TODO: Pull request welcome.
