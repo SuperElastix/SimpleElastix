@@ -107,8 +107,11 @@ endif()
 option(BUILD_SHARED_LIBS "Build SimpleITK ITK with shared libraries. This does not effect wrapped languages." OFF)
 set(SITK_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
 
-
-option(SimpleITK_EXPLICIT_INSTANTIATION "Enable an ITK static library of explicitly instantiated templates." ON)
+set(SimpleITK_EXPLICIT_INSTATIATION_DEFAULT OFF)
+if(MSCV)
+  set(SimpleITK_EXPLICIT_INSTATIATION_DEFAULT ON)
+endif()
+option(SimpleITK_EXPLICIT_INSTANTIATION "Enable an ITK static library of explicitly instantiated templates." ${SimpleITK_EXPLICIT_INSTATIATION_DEFAULT})
 sitk_legacy_naming(SimpleITK_EXPLICIT_INSTANTIATION)
 
 if ( MSVC AND SITK_BUILD_SHARED_LIBS )
@@ -269,9 +272,6 @@ endif()
 #-----------------------------------------------------------
 # Place all checks and try compile variable for sitkConfigure.h here
 
-include(sitkCheckCXX11)
-
-
 include(CheckIncludeFileCXX)
 
 
@@ -279,11 +279,7 @@ include(CheckIncludeFileCXX)
 # This generates a configuration error if the compiler is not supported
 check_include_file_cxx( stdint.h SITK_HAS_STDINT_H )
 if(NOT SITK_HAS_STDINT_H)
-    if(MSVC)
-      add_subdirectory("${SimpleITK_SOURCE_DIR}/Utilities/C99")
-    else()
-      message(FATAL_ERROR "Unable to find require \"stdint.h\" header file.")
-    endif()
+  message(FATAL_ERROR "Unable to find require \"stdint.h\" header file.")
 endif()
 
 #------------------------------------------------------------------------------
@@ -477,7 +473,6 @@ install(FILES ${__files}
 install(
   DIRECTORY
     ${CMAKE_SOURCE_DIR}/Code/Common/include/Ancillary
-    ${CMAKE_SOURCE_DIR}/Code/Common/include/nsstd
   DESTINATION
     ${SimpleITK_INSTALL_INCLUDE_DIR}/
   COMPONENT Development

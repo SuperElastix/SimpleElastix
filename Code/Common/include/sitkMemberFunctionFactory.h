@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -127,7 +127,7 @@ public:
   /** \brief Query to determine if an member function has been
     * registered for pixelID and imageDimension
     */
-  bool HasMemberFunction( PixelIDValueType pixelID, unsigned int imageDimension  ) const SITK_NOEXCEPT;
+  bool HasMemberFunction( PixelIDValueType pixelID, unsigned int imageDimension  ) const noexcept;
 
   /** \brief Returns a function object for the PixelIndex, and image
    *  dimension.

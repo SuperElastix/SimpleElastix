@@ -1,6 +1,6 @@
 #=========================================================================
 #
-#  Copyright Insight Software Consortium
+#  Copyright NumFOCUS
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ if (length(args) < 2) {
 inputImage <- ReadImage(args[[1]])
 
 if (length( args ) > 4) {
-    maskImage <- ReadImage( args[[4]] )
+    maskImage <- ReadImage( args[[4]], 'sitkUint8' )
 } else {
     maskImage <- OtsuThreshold( inputImage, 0, 1, 200 )
 }

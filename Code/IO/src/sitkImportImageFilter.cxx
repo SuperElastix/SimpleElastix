@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -535,7 +535,7 @@ Image ImportImageFilter::ExecuteInternal( )
 }
 
 template <class TFilterType>
-typename EnableIf<IsVector<TFilterType>::Value>::Type
+typename std::enable_if<IsVector<TFilterType>::Value>::type
 ImportImageFilter::SetNumberOfComponentsOnImage ( TFilterType*image )
 {
   image->SetNumberOfComponentsPerPixel( m_NumberOfComponentsPerPixel );

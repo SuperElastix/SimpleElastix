@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -261,19 +261,19 @@ void DisplacementFieldTransform::InternalInitialization(itk::TransformBase *tran
   typelist::Visit<TransformTypeList> callInternalInitialization;
 
   // explicitly remove all function pointer with reference to prior transform
-  m_pfSetDisplacementField = SITK_NULLPTR;
-  m_pfGetDisplacementField = SITK_NULLPTR;
-  m_pfSetInverseDisplacementField = SITK_NULLPTR;
-  m_pfGetInverseDisplacementField = SITK_NULLPTR;
-  m_pfSetInterpolator = SITK_NULLPTR;
-  m_pfGetInterpolator = SITK_NULLPTR;
-  m_pfSetSmoothingOff = SITK_NULLPTR;
-  m_pfSetSmoothingGaussianOnUpdate = SITK_NULLPTR;
-  m_pfSetSmoothingBSplineOnUpdate = SITK_NULLPTR;
+  m_pfSetDisplacementField = nullptr;
+  m_pfGetDisplacementField = nullptr;
+  m_pfSetInverseDisplacementField = nullptr;
+  m_pfGetInverseDisplacementField = nullptr;
+  m_pfSetInterpolator = nullptr;
+  m_pfGetInterpolator = nullptr;
+  m_pfSetSmoothingOff = nullptr;
+  m_pfSetSmoothingGaussianOnUpdate = nullptr;
+  m_pfSetSmoothingBSplineOnUpdate = nullptr;
 
   callInternalInitialization(visitor);
 
-  if ( this->m_pfSetDisplacementField == SITK_NULLPTR )
+  if ( this->m_pfSetDisplacementField == nullptr )
     {
     sitkExceptionMacro("Transform is not of type " << this->GetName() << "!" );
     }
@@ -283,27 +283,27 @@ void DisplacementFieldTransform::InternalInitialization(itk::TransformBase *tran
 template<class TransformType>
 void DisplacementFieldTransform::InternalInitialization(TransformType *t)
 {
-  this->m_pfSetDisplacementField = nsstd::bind(&InternalSetDisplacementField<TransformType>, t, nsstd::placeholders::_1);
-  this->m_pfGetDisplacementField = nsstd::bind(&DisplacementFieldTransform::InternalGetDisplacementField<TransformType>, t);
+  this->m_pfSetDisplacementField = std::bind(&InternalSetDisplacementField<TransformType>, t, std::placeholders::_1);
+  this->m_pfGetDisplacementField = std::bind(&DisplacementFieldTransform::InternalGetDisplacementField<TransformType>, t);
 
-  this->m_pfSetInverseDisplacementField = nsstd::bind(&InternalSetInverseDisplacementField<TransformType>, t, nsstd::placeholders::_1);
-  this->m_pfGetInverseDisplacementField = nsstd::bind(&DisplacementFieldTransform::InternalGetInverseDisplacementField<TransformType>, t);
+  this->m_pfSetInverseDisplacementField = std::bind(&InternalSetInverseDisplacementField<TransformType>, t, std::placeholders::_1);
+  this->m_pfGetInverseDisplacementField = std::bind(&DisplacementFieldTransform::InternalGetInverseDisplacementField<TransformType>, t);
 
-  this->m_pfSetInterpolator = nsstd::bind(&InternalSetInterpolator<TransformType>, t, nsstd::placeholders::_1);
+  this->m_pfSetInterpolator = std::bind(&InternalSetInterpolator<TransformType>, t, std::placeholders::_1);
 
-  m_pfSetSmoothingOff = nsstd::bind(&Self::InternalSetSmoothingOff<TransformType>, this, t);
-  m_pfSetSmoothingGaussianOnUpdate = nsstd::bind(&Self::InternalSetSmoothingGaussianOnUpdate<TransformType>,
+  m_pfSetSmoothingOff = std::bind(&Self::InternalSetSmoothingOff<TransformType>, this, t);
+  m_pfSetSmoothingGaussianOnUpdate = std::bind(&Self::InternalSetSmoothingGaussianOnUpdate<TransformType>,
                                                  this,
                                                  t,
-                                                 nsstd::placeholders::_1,
-                                                 nsstd::placeholders::_2 );
-  m_pfSetSmoothingBSplineOnUpdate = nsstd::bind(&Self::InternalSetSmoothingBSplineOnUpdate<TransformType>,
+                                                 std::placeholders::_1,
+                                                 std::placeholders::_2 );
+  m_pfSetSmoothingBSplineOnUpdate = std::bind(&Self::InternalSetSmoothingBSplineOnUpdate<TransformType>,
                                                 this,
                                                 t,
-                                                nsstd::placeholders::_1,
-                                                nsstd::placeholders::_2,
-                                                nsstd::placeholders::_3,
-                                                nsstd::placeholders::_4 );
+                                                std::placeholders::_1,
+                                                std::placeholders::_2,
+                                                std::placeholders::_3,
+                                                std::placeholders::_4 );
 }
 
 PimpleTransformBase *DisplacementFieldTransform::CreateDisplacementFieldPimpleTransform(unsigned int dimension)
@@ -327,7 +327,7 @@ Image DisplacementFieldTransform::InternalGetDisplacementField( const TDisplacem
   // field, but it does not have the correct reference count.
   typedef typename TDisplacementFieldTransform::DisplacementFieldType DisplacementFieldType;
   DisplacementFieldType *itkDisplacement = const_cast<DisplacementFieldType*>(itkDisplacementTx->GetDisplacementField());
-  if (itkDisplacement != SITK_NULLPTR)
+  if (itkDisplacement != nullptr)
     {
     return Image(GetVectorImageFromImage(itkDisplacement));
     }
@@ -339,7 +339,7 @@ Image DisplacementFieldTransform::InternalGetInverseDisplacementField( const TDi
 {
   typedef typename TDisplacementFieldTransform::DisplacementFieldType DisplacementFieldType;
   DisplacementFieldType *itkDisplacement = const_cast<DisplacementFieldType*>(itkDisplacementTx->GetInverseDisplacementField());
-  if (itkDisplacement != SITK_NULLPTR)
+  if (itkDisplacement != nullptr)
     {
     return Image(GetVectorImageFromImage(itkDisplacement));
     }
@@ -357,7 +357,7 @@ void DisplacementFieldTransform::InternalSetSmoothingOff( TDisplacementFieldTran
   typedef itk::DisplacementFieldTransform<ScalarType,Dimension> NewTransformType;
 
   // already off don't need to create a new transform
-  if (!nsstd::is_same<TDisplacementFieldTransform, NewTransformType>::value)
+  if (!std::is_same<TDisplacementFieldTransform, NewTransformType>::value)
     {
     typename NewTransformType::Pointer itkNewDisplacement = NewTransformType::New();
 
@@ -384,7 +384,7 @@ void DisplacementFieldTransform::InternalSetSmoothingGaussianOnUpdate( TDisplace
   typename NewTransformType::Pointer itkNewDisplacement;
 
   // change the type of the current displace field for the correct update
-  if (!nsstd::is_same<TDisplacementFieldTransform, NewTransformType>::value)
+  if (!std::is_same<TDisplacementFieldTransform, NewTransformType>::value)
     {
     itkNewDisplacement = NewTransformType::New();
 
@@ -422,7 +422,7 @@ void DisplacementFieldTransform::InternalSetSmoothingBSplineOnUpdate( TDisplacem
   typename NewTransformType::Pointer itkNewDisplacement;
 
   // change the type of the current displace field for the correct update
-  if (!nsstd::is_same<TDisplacementFieldTransform, NewTransformType>::value)
+  if (!std::is_same<TDisplacementFieldTransform, NewTransformType>::value)
     {
     itkNewDisplacement = NewTransformType::New();
 

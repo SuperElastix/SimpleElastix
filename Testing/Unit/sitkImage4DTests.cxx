@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -41,8 +41,6 @@
 #include "itkVectorImage.h"
 #include "itkMetaDataObject.h"
 
-namespace nsstd = itk::simple::nsstd;
-
 const double adir[] = { 0.0,  0.0,  0.0, 1.0,
                        -1.0,  0.0,  0.0, 0.0,
                         0.0, -1.0,  0.0, 0.0,
@@ -52,7 +50,7 @@ using  itk::simple::InstantiatedPixelIDTypeList;
 
 class Image4D : public ::testing::Test {
 public:
-  typedef itk::simple::nsstd::auto_ptr<itk::simple::Image> sitkAutoImagePointer;
+  typedef std::unique_ptr<itk::simple::Image> sitkAutoImagePointer;
 
   virtual void SetUp() {
     itk::ImageBase<4>::IndexType index;

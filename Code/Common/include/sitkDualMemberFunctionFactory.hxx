@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -46,9 +46,10 @@ struct DualMemberFunctionInstantiater
     : m_Factory( factory )
     {}
   template <class TPixelIDType1, class TPixelIDType2>
-  typename EnableIf< IsInstantiated<TPixelIDType1,VImageDimension>::Value &&
-                     IsInstantiated<TPixelIDType2,VImageDimension>::Value >::Type
-  operator()( TPixelIDType1* t1=SITK_NULLPTR, TPixelIDType2*t2=SITK_NULLPTR ) const
+
+  typename std::enable_if< IsInstantiated<TPixelIDType1,VImageDimension>::Value &&
+                              IsInstantiated<TPixelIDType2,VImageDimension>::Value >::type
+  operator()( TPixelIDType1* t1=nullptr, TPixelIDType2*t2=nullptr ) const
     {
       (void)t1;
       (void)t2;
@@ -57,15 +58,15 @@ struct DualMemberFunctionInstantiater
       typedef TAddressor                                                             AddressorType;
 
       AddressorType addressor;
-      m_Factory.Register(addressor.CLANG_TEMPLATE operator()<ImageType1, ImageType2>(), (ImageType1*)(SITK_NULLPTR), (ImageType2*)(SITK_NULLPTR) );
+      m_Factory.Register(addressor.CLANG_TEMPLATE operator()<ImageType1, ImageType2>(), (ImageType1*)(nullptr), (ImageType2*)(nullptr) );
 
     }
 
   // this methods is conditionally enabled when the PixelID is not instantiated
   template <class TPixelIDType1, class TPixelIDType2>
-  typename DisableIf< IsInstantiated<TPixelIDType1,VImageDimension>::Value &&
-                     IsInstantiated<TPixelIDType2,VImageDimension>::Value >::Type
-  operator()( TPixelIDType1*t1=SITK_NULLPTR, TPixelIDType2*t2=SITK_NULLPTR ) const
+  typename std::enable_if< ! (IsInstantiated<TPixelIDType1,VImageDimension>::Value &&
+                              IsInstantiated<TPixelIDType2,VImageDimension>::Value) >::type
+  operator()( TPixelIDType1*t1=nullptr, TPixelIDType2*t2=nullptr ) const
     {
       (void)t1;
       (void)t2;
@@ -97,13 +98,13 @@ DualMemberFunctionFactory< TMemberFunctionPointer >
   assert( pixelID1 >= 0 && pixelID1 < typelist::Length< InstantiatedPixelIDTypeList >::Result );
   assert( pixelID2 >= 0 && pixelID2 < typelist::Length< InstantiatedPixelIDTypeList >::Result );
 
-  sitkStaticAssert( TImageType1::ImageDimension == 2 || TImageType1::ImageDimension == 3 || TImageType1::ImageDimension == 4,
+  static_assert( TImageType1::ImageDimension == 2 || TImageType1::ImageDimension == 3,
                     "Image Dimension out of range" );
-  sitkStaticAssert( int(TImageType1::ImageDimension) == int(TImageType2::ImageDimension),
+  static_assert( int(TImageType1::ImageDimension) == int(TImageType2::ImageDimension),
                     "Image Dimensions do not match" );
-  sitkStaticAssert( IsInstantiated<TImageType1>::Value,
+  static_assert( IsInstantiated<TImageType1>::Value,
                     "invalid pixel type for argument one");
-  sitkStaticAssert( IsInstantiated<TImageType2>::Value,
+  static_assert( IsInstantiated<TImageType2>::Value,
                     "invalid pixel type for argument two");
 
   if ( pixelID1 >= 0 && pixelID1 < typelist::Length< InstantiatedPixelIDTypeList >::Result &&
@@ -145,7 +146,7 @@ DualMemberFunctionFactory< TMemberFunctionPointer >
 template <typename TMemberFunctionPointer>
 bool
 DualMemberFunctionFactory< TMemberFunctionPointer >
-::HasMemberFunction( PixelIDValueType pixelID1, PixelIDValueType pixelID2, unsigned int imageDimension  ) const SITK_NOEXCEPT
+::HasMemberFunction( PixelIDValueType pixelID1, PixelIDValueType pixelID2, unsigned int imageDimension  ) const noexcept
 {
   try
     {

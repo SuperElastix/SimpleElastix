@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -51,23 +51,6 @@
   #endif
 #endif
 
-
-#if __cplusplus >= 201103L
-// In c++11 the override keyword allows you to explicitly define that a function
-// is intended to override the base-class version.  This makes the code more
-// manageable and fixes a set of common hard-to-find bugs.
-#define SITK_OVERRIDE override
-// In C++11 the throw-list specification has been deprecated,
-// replaced with the noexcept specifier. Using this function
-// specification adds the run-time check that the method does not
-// throw. If it does throw then std::terminate will be called.
-// Use cautiously.
-#define SITK_NOEXCEPT noexcept
-#else
-#define SITK_OVERRIDE
-#define SITK_NOEXCEPT throw()
-#endif
-
 #if defined(SITK_HAS_TEMPLATE_DISAMBIGUATOR_DEPENDENT_NAME)
 #define CLANG_TEMPLATE template
 #else
@@ -104,29 +87,10 @@ class GenericException;
       }                                                                 \
   }
 
-#if defined(SITK_HAS_CXX11_NULLPTR)
-#define SITK_NULLPTR nullptr
-#else
-#define SITK_NULLPTR NULL
-#endif
-
-
 #define sitkMacroJoin( X, Y ) sitkDoMacroJoin( X, Y )
 #define sitkDoMacroJoin( X, Y ) sitkDoMacroJoin2(X,Y)
 #define sitkDoMacroJoin2( X, Y ) X##Y
 
-#ifdef SITK_HAS_CXX11_STATIC_ASSERT
-// utilize the c++11 static_assert if available
-#define sitkStaticAssert( expr, str) static_assert( expr, str )
-#else
-
-template<bool> struct StaticAssertFailure;
-template<> struct StaticAssertFailure<true>{ enum { Value = 1 }; };
-
-#define sitkStaticAssert( expr, str ) enum { sitkMacroJoin( static_assert_typedef, __LINE__) = sizeof( itk::simple::StaticAssertFailure<((expr) == 0 ? false : true )> ) };
-
-
-#endif
 }
 }
 

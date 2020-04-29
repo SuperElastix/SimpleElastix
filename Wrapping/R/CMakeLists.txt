@@ -48,7 +48,7 @@ endif()
 # copy the R files a binary package
 file( COPY "${CMAKE_CURRENT_SOURCE_DIR}/Packaging"
   DESTINATION "${CMAKE_CURRENT_BINARY_DIR}"
-  REGEX "(.*\\.in)|(.*\\.md5)" EXCLUDE )
+  REGEX "(.*\\.in$)|(.*\\.md5$)|(.*\\.sha512$)" EXCLUDE )
 
 
 set(SimpleITKR_VERSION "${SimpleITK_VERSION_MAJOR}.${SimpleITK_VERSION_MINOR}")
@@ -74,10 +74,13 @@ configure_file(
 # data store.
 include(sitkExternalData)
 
-file( GLOB_RECURSE image_links RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/Packaging/SimpleITK/inst/extdata/*.md5" )
+
+set(_algo "sha512")
+
+file( GLOB_RECURSE image_links RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/Packaging/SimpleITK/inst/extdata/*.${_algo}" )
 
 foreach(link ${image_links})
-  string( REGEX REPLACE "\\.md5$" "" link ${link} )
+  string( REGEX REPLACE "\\.${_algo}$" "" link ${link} )
   ExternalData_Expand_Arguments(  SimpleITKRpackageData
     image_location
     DATA{${link}}
@@ -89,14 +92,15 @@ endforeach()
 # The downloaded tar ball of documentation has been generated with
 # the "Utilities/GenerateDocs/SwigDocUpdate.sh". This documentation
 # should be generated for each release.
-file( GLOB_RECURSE doc_links RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/Packaging/SimpleITK/man/*.md5" )
+file( GLOB_RECURSE doc_links RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/Packaging/SimpleITK/man/*.${_algo}" )
 
 foreach(link ${doc_links})
-  string( REGEX REPLACE "\\.md5$" "" link ${link} )
+  string( REGEX REPLACE "\\.${_algo}$" "" link ${link} )
   ExternalData_Expand_Arguments(  SimpleITKRpackageData
     doc_location
     DATA{${link}}
     )
+  file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/Packaging/SimpleITK/man/")
   set( EXTRACT_RMAN_COMMAND  ${EXTRACT_RMAN_COMMAND} COMMAND ${CMAKE_COMMAND} -E tar xzf ${doc_location}
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/Packaging/SimpleITK/man/" )
 endforeach()
@@ -110,6 +114,7 @@ add_dependencies( ${SWIG_MODULE_SimpleITK_TARGET_NAME} SimpleITKRpackageData )
 # copy sample images and extract documentation - used in vignette
 add_custom_command( TARGET ${SWIG_MODULE_SimpleITK_TARGET_NAME}
   PRE_BUILD
+  COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/Packaging/SimpleITK/inst/extdata/"
   ${COPY_DATA_COMMAND}
   ${EXTRACT_RMAN_COMMAND}
   )

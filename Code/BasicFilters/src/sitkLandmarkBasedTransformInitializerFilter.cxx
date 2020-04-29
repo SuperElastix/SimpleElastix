@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -181,8 +181,9 @@ Transform LandmarkBasedTransformInitializerFilter::ExecuteInternal ( const Trans
 
   filter->SetLandmarkWeight ( this->m_LandmarkWeight );
 
+  typedef typename FilterType::TransformType::TransformCategoryEnum TransformCategoryEnum;
   // BSpline specific setup
-  if( itkTx->GetTransformCategory() == itkTx->BSpline )
+  if( itkTx->GetTransformCategory() == TransformCategoryEnum::BSpline )
     {
     if ( this->m_ReferenceImage.GetSize() == std::vector<unsigned int>(this->m_ReferenceImage.GetDimension(), 0u) )
       {

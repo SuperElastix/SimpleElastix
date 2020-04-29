@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -949,9 +949,9 @@ Transform ImageRegistrationMethod::ExecuteInternal ( const Image &inFixed, const
                  << *registration->GetOptimizer()
                  << *registration->GetMetric());
 
-  m_pfGetOptimizerStopConditionDescription =  nsstd::bind(&_OptimizerType::GetStopConditionDescription, optimizer.GetPointer());
+  m_pfGetOptimizerStopConditionDescription =  std::bind(&_OptimizerType::GetStopConditionDescription, optimizer.GetPointer());
 
-  m_pfGetCurrentLevel = nsstd::bind(&CurrentLevelCustomCast::CustomCast<RegistrationType>,registration.GetPointer());
+  m_pfGetCurrentLevel = std::bind(&CurrentLevelCustomCast::CustomCast<RegistrationType>,registration.GetPointer());
 
 
   try
@@ -1202,25 +1202,25 @@ void ImageRegistrationMethod::RemoveITKObserver( EventCommand &e )
   return Superclass::RemoveITKObserver(e);
 }
 
-void ImageRegistrationMethod::OnActiveProcessDelete( ) SITK_NOEXCEPT
+void ImageRegistrationMethod::OnActiveProcessDelete( ) noexcept
 {
   Superclass::OnActiveProcessDelete( );
 
   // clean up all pointer functions here
-  this->m_pfGetOptimizerIteration = SITK_NULLPTR;
-  this->m_pfGetOptimizerPosition = SITK_NULLPTR;
-  this->m_pfGetOptimizerLearningRate = SITK_NULLPTR;
-  this->m_pfGetOptimizerConvergenceValue = SITK_NULLPTR;
-  this->m_pfGetMetricValue = SITK_NULLPTR;
-  this->m_pfGetMetricNumberOfValidPoints = SITK_NULLPTR;
-  this->m_pfGetOptimizerScales = SITK_NULLPTR;
-  this->m_pfGetOptimizerStopConditionDescription = SITK_NULLPTR;
+  this->m_pfGetOptimizerIteration = nullptr;
+  this->m_pfGetOptimizerPosition = nullptr;
+  this->m_pfGetOptimizerLearningRate = nullptr;
+  this->m_pfGetOptimizerConvergenceValue = nullptr;
+  this->m_pfGetMetricValue = nullptr;
+  this->m_pfGetMetricNumberOfValidPoints = nullptr;
+  this->m_pfGetOptimizerScales = nullptr;
+  this->m_pfGetOptimizerStopConditionDescription = nullptr;
 
-  this->m_pfUpdateWithBestValue = SITK_NULLPTR;
+  this->m_pfUpdateWithBestValue = nullptr;
 
-  this->m_pfGetCurrentLevel = SITK_NULLPTR;
+  this->m_pfGetCurrentLevel = nullptr;
 
-  this->m_ActiveOptimizer = SITK_NULLPTR;
+  this->m_ActiveOptimizer = nullptr;
 }
 
 
