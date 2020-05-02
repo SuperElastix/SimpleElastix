@@ -11,9 +11,7 @@ jobs:
   - job: Linux
     timeoutInMinutes: 0
     pool:
-      name: 'Default'
-      demands:
-      - Agent.OS -equals Linux
+      vmImage: 'ubuntu-16.04'
     variables:
       PYTHONUSERBASE: $(Agent.BuildDirectory)/.pypkgs
     workspace:
