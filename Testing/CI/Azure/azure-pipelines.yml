@@ -20,7 +20,8 @@ jobs:
           python -m site --user-site
           python -m pip install --upgrade --user pip
           python -m pip install --user setuptools
-          python -m pip install --user numpy ninja scikit-ci-addons
+          python -m pip install --user numpy scikit-ci-addons
+          apt install ninja-build
         displayName: 'Install python tools and dependency'
       - bash: |
           set -x
