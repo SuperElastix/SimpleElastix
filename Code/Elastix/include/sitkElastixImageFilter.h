@@ -1,6 +1,8 @@
 #ifndef __sitkelastiximagefilter_h_
 #define __sitkelastiximagefilter_h_
 
+#include <map>
+
 #include "sitkCommon.h"
 #include "sitkImage.h"
 

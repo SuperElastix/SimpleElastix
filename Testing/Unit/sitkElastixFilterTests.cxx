@@ -70,7 +70,7 @@ TEST( ElastixFilterTest, UpdateOnOutputImageDownstreamUpdate )
 }
 
 /*
-TEST( ElastixFilterTest, UpdateOnTransformParametersDownstreamUpdate )
+TEST( ElastixFilterTest, UpdateOnTransformParametersOnDownstreamUpdate )
 {
   ParameterObject::Pointer parameterObject;
   EXPECT_NO_THROW( parameterObject = ParameterObject::New() );
@@ -317,6 +317,7 @@ TEST( ElastixFilterTest, BSpline4D )
 
   ElastixFilterType::ParameterMapType parameterMap = ParameterObject::GetDefaultParameterMap( "groupwise" );
   parameterMap[ "MaximumNumberOfIterations" ] = ElastixFilterType::ParameterValueVectorType( 1, "1" );
+  parameterMap[ "FinalGridSpacingInPhysicalUnits", "32.0" ];
 
   ParameterObject::Pointer parameterObject;
   EXPECT_NO_THROW( parameterObject = ParameterObject::New() );

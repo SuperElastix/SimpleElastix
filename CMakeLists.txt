@@ -460,6 +460,8 @@ file( GLOB __files
   ${CMAKE_SOURCE_DIR}/Code/BasicFilters/include/[^.]*.hxx
   ${CMAKE_SOURCE_DIR}/Code/Common/include/[^.]*.h
   ${CMAKE_SOURCE_DIR}/Code/Common/include/[^.]*.hxx
+  ${CMAKE_SOURCE_DIR}/Code/Elastix/include/[^.]*.h
+  ${CMAKE_SOURCE_DIR}/Code/Elastix/include/[^.]*.hxx
   ${CMAKE_SOURCE_DIR}/Code/IO/include/[^.]*.h
   ${CMAKE_SOURCE_DIR}/Code/IO/include/[^.]*.hxx
   ${CMAKE_SOURCE_DIR}/Code/Registration/include/[^.]*.h

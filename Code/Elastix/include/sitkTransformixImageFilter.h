@@ -1,6 +1,8 @@
 #ifndef __sitktransformiximagefilter_h_
 #define __sitktransformiximagefilter_h_
 
+#include <map>
+
 #include "sitkCommon.h"
 #include "sitkImage.h"
 

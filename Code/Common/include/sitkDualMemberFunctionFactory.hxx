@@ -98,7 +98,7 @@ DualMemberFunctionFactory< TMemberFunctionPointer >
   assert( pixelID1 >= 0 && pixelID1 < typelist::Length< InstantiatedPixelIDTypeList >::Result );
   assert( pixelID2 >= 0 && pixelID2 < typelist::Length< InstantiatedPixelIDTypeList >::Result );
 
-  static_assert( TImageType1::ImageDimension == 2 || TImageType1::ImageDimension == 3,
+  static_assert( TImageType1::ImageDimension == 2 || TImageType1::ImageDimension == 3 || TImageType1::ImageDimension == 4,
                     "Image Dimension out of range" );
   static_assert( int(TImageType1::ImageDimension) == int(TImageType2::ImageDimension),
                     "Image Dimensions do not match" );
