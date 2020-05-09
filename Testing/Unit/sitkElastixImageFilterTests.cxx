@@ -350,25 +350,5 @@ TEST( ElastixImageFilter, SetNumberOfThreads )
   EXPECT_NO_THROW( silx.Execute() );
 }
 
-#ifdef SITK_4D_IMAGES
-
-TEST( ElastixImageFilter, Registration4D )
-{
-  Image fixedImage = ReadImage( dataFinder.GetFile( "Input/4D.nii.gz" ) );
-  Image movingImage = ReadImage( dataFinder.GetFile( "Input/4D.nii.gz" ) );
-  Image resultImage; 
-
-  ElastixImageFilter silx;
-  silx.SetParameterMap( "groupwise" );
-  silx.SetParameter("MaximumNumberOfIterations", "1");
-  silx.SetParameter("FinalGridSpacingInPhysicalUnits", "32.0");
-  EXPECT_NO_THROW( silx.SetFixedImage( fixedImage ) );
-  EXPECT_NO_THROW( silx.SetMovingImage( movingImage ) );
-  EXPECT_NO_THROW( resultImage = silx.Execute() );
-  EXPECT_FALSE( silxIsEmpty( resultImage ) );
-}
-
-#endif // SITK_4D_IMAGES
-
 } // namespace simple
 } // namesapce itk
