@@ -46,7 +46,7 @@ CastImageFilter::CastImageFilter()
   this->RegisterMemberFactory3();
   this->RegisterMemberFactory3v();
   this->RegisterMemberFactory3l();
-#ifdef SIMPLEITK_4D_IMAGES
+#ifdef SITK_4D_IMAGES
   this->RegisterMemberFactory4();
   this->RegisterMemberFactory4v();
   this->RegisterMemberFactory4l();
