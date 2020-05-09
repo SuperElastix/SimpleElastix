@@ -167,10 +167,12 @@ private:
   void RegisterMemberFactory3();
   void RegisterMemberFactory3v();
   void RegisterMemberFactory3l();
+#ifdef SIMPLEITK_4D_IMAGES
   void RegisterMemberFactory4();
   void RegisterMemberFactory4v();
   void RegisterMemberFactory4l();
-  /** @} */
+#endif
+/** @} */
 
   typedef Image (Self::*MemberFunctionType)( const Image& );
   std::unique_ptr<detail::DualMemberFunctionFactory<MemberFunctionType> > m_DualMemberFactory;
