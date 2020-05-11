@@ -12,7 +12,6 @@ schedules:
   displayName: Daily build
   branches:
     include:
-    - master
     - develop
   always: false
 
