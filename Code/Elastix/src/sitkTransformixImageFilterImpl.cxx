@@ -107,7 +107,7 @@ TransformixImageFilter::TransformixImageFilterImpl
     }
 
     if( this->GetComputeDeformationField() ) {
-      this->m_DeformationField = Image( itk::simple::GetVectorImageFromImage( transformixFilter->GetOutputDeformationField() ) );
+      this->m_DeformationField = Image( itk::simple::GetVectorImageFromImage( transformixFilter->GetOutputDeformationField(), true ) );
       this->m_DeformationField.MakeUnique();
     }
   }

@@ -1,19 +1,13 @@
 # These pipelines are executed on every PR, and merge. They should provide quick
 # coverage for the common wrapped language and the SimpleITK core and examples.
 
-trigger:
-  - master
-  - next
-  - release
 variables:
   ExternalDataVersion: 1.2.0
 jobs:
   - job: Linux
     timeoutInMinutes: 0
     pool:
-      name: 'Default'
-      demands:
-      - Agent.OS -equals Linux
+      vmImage: 'ubuntu-16.04'
     variables:
       PYTHONUSERBASE: $(Agent.BuildDirectory)/.pypkgs
     workspace:
@@ -27,6 +21,7 @@ jobs:
           python -m pip install --upgrade --user pip
           python -m pip install --user setuptools
           python -m pip install --user numpy scikit-ci-addons
+          sudo apt install ninja-build
         displayName: 'Install python tools and dependency'
       - bash: |
           set -x
@@ -148,12 +143,12 @@ jobs:
           CFLAGS: /MP
           CTEST_CACHE: |
             BUILD_DOCUMENTS:BOOL=OFF
-            BUILD_EXAMPLES:BOOL=ON
+            BUILD_EXAMPLES:BOOL=OFF
             BUILD_SHARED_LIBS:BOOL=OFF
             BUILD_TESTING:BOOL=ON
             WRAP_DEFAULT:BOOL=OFF
             WRAP_CSHARP:BOOL=OFF
-            WRAP_PYTHON:BOOL=ON
+            WRAP_PYTHON:BOOL=OFF
         workingDirectory: $(Agent.BuildDirectory)
       - script: |
           python -m ci_addons ctest_junit_formatter $(Build.SourcesDirectory)-build > $(Agent.BuildDirectory)/JUnitTestResults.xml

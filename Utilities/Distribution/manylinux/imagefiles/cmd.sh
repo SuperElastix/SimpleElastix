@@ -18,7 +18,7 @@ function build_simpleitk {
 
     echo "SIMPLEITK_GIT_TAG: ${SIMPLEITK_GIT_TAG}"
 
-    git clone https://github.com/SimpleITK/SimpleITK.git ${SRC_DIR} &&
+    git clone https://github.com/SuperElastix/SimpleElastix.git ${SRC_DIR} &&
     (cd ${SRC_DIR}  && git checkout ${SIMPLEITK_GIT_TAG}  ) &&
     rm -rf ${BLD_DIR} &&
     mkdir -p ${BLD_DIR} && cd ${BLD_DIR} &&
