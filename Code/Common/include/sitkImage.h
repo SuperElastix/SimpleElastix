@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -22,18 +22,15 @@
 #include "sitkTemplateFunctions.h"
 #include "sitkDetail.h"
 #include "sitkPixelIDTokens.h"
-#include "sitkEnableIf.h"
-
-#include "nsstd/type_traits.h"
-#include "nsstd/auto_ptr.h"
 
 #include <vector>
 #include <memory>
+#include <type_traits>
 
 namespace itk
 {
 
-// Forward decalaration for pointer
+// Forward declaration for pointer
 class DataObject;
 
 template<class T>
@@ -87,7 +84,20 @@ namespace simple
 
     // copy constructor
     Image( const Image &img );
+
     Image& operator=( const Image &img );
+
+#ifndef SWIG
+    /** \brief Move constructor and assignment.
+     *
+     * @param img After the operation img is valid only for
+     * destructing and assignment; all other operations have undefined
+     * behavior.
+     */
+    Image( Image &&img );
+    Image& operator=( Image &&img );
+#endif
+
 
     /** \brief Constructors for 2D, 3D an optionally 4D images where
      * pixel type and number of components can be specified.
@@ -128,17 +138,17 @@ namespace simple
      */
     template <typename TImageType>
     explicit Image( itk::SmartPointer<TImageType> image )
-      : m_PimpleImage( SITK_NULLPTR )
+      : m_PimpleImage( nullptr )
       {
-        sitkStaticAssert( ImageTypeToPixelIDValue<TImageType>::Result != (int)sitkUnknown,
+        static_assert( ImageTypeToPixelIDValue<TImageType>::Result != (int)sitkUnknown,
                           "invalid pixel type" );
         this->InternalInitialization<ImageTypeToPixelIDValue<TImageType>::Result, TImageType::ImageDimension>( image.GetPointer() );
       }
     template <typename TImageType>
     explicit Image( TImageType* image )
-      : m_PimpleImage( SITK_NULLPTR )
+      : m_PimpleImage( nullptr )
       {
-        sitkStaticAssert( ImageTypeToPixelIDValue<TImageType>::Result != (int)sitkUnknown,
+        static_assert( ImageTypeToPixelIDValue<TImageType>::Result != (int)sitkUnknown,
                           "invalid pixel type" );
         this->InternalInitialization<ImageTypeToPixelIDValue<TImageType>::Result, TImageType::ImageDimension>( image );
       }
@@ -153,6 +163,8 @@ namespace simple
      * the actual image type. The GetPixelIDValue() method should
      * return an PixelID which identifies the image type which the
      * DataObject points to.
+     *
+     * If this object has been moved, then nullptr is returned.
      *
      * @{
      */
@@ -400,8 +412,11 @@ namespace simple
      *
      * The pointer to the buffer is not referenced
      * counted. Additionally, while this image is made unique before
-     * returnign the pointer, additional copying and usage may
-     * introduce unexpected aliasing.
+     * returning the pointer, additional copying and usage may
+     * introduce unexpected aliasing of the image's buffer.
+     *
+     * Vector and Complex pixel types are both accessed via the
+     * appropriate component type method.
      *
      * The correct method for the current pixel type of the image must
      * be called or else an exception will be generated. For vector
@@ -420,6 +435,7 @@ namespace simple
     uint64_t *GetBufferAsUInt64( );
     float    *GetBufferAsFloat( );
     double   *GetBufferAsDouble( );
+    void     *GetBufferAsVoid();
 
     const int8_t   *GetBufferAsInt8( ) const;
     const uint8_t  *GetBufferAsUInt8( ) const;
@@ -431,6 +447,7 @@ namespace simple
     const uint64_t *GetBufferAsUInt64( ) const;
     const float    *GetBufferAsFloat( ) const;
     const double   *GetBufferAsDouble( ) const;
+    const void     *GetBufferAsVoid() const;
     /** @} */
 
 
@@ -460,15 +477,15 @@ namespace simple
      * @{
      */
     template<class TImageType>
-    typename EnableIf<IsBasic<TImageType>::Value>::Type
+    typename std::enable_if<IsBasic<TImageType>::Value>::type
     AllocateInternal ( unsigned int width, unsigned int height, unsigned int depth, unsigned int dim4, unsigned int numberOfComponents );
 
     template<class TImageType>
-    typename EnableIf<IsVector<TImageType>::Value>::Type
+    typename std::enable_if<IsVector<TImageType>::Value>::type
     AllocateInternal ( unsigned int width, unsigned int height, unsigned int depth, unsigned int dim4, unsigned int numberOfComponents );
 
     template<class TImageType>
-    typename EnableIf<IsLabel<TImageType>::Value>::Type
+    typename std::enable_if<IsLabel<TImageType>::Value>::type
     AllocateInternal ( unsigned int width, unsigned int height, unsigned int depth, unsigned int dim4, unsigned int numberOfComponents );
     /**@}*/
 
@@ -496,11 +513,11 @@ namespace simple
      * @{
      */
     template<int VPixelIDValue, typename TImageType>
-    typename DisableIf<nsstd::is_same<TImageType, void>::value>::Type
+      typename std::enable_if<!std::is_same<TImageType, void>::value>::type
     ConditionalInternalInitialization( TImageType *i);
 
     template<int VPixelIDValue, typename TImageType>
-    typename EnableIf<nsstd::is_same<TImageType, void>::value>::Type
+    typename std::enable_if<std::is_same<TImageType, void>::value>::type
     ConditionalInternalInitialization( TImageType *) { assert( false ); }
      /**@}*/
 

@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -20,14 +20,14 @@
 
 #include "itkProcessObject.h"
 #include "itkCommand.h"
+#include "sitkFunctionCommand.h"
 #include "itkImageToImageFilter.h"
 #include "itkTextOutput.h"
 
 #include <iostream>
 #include <algorithm>
 #include <cstring>
-
-#include "nsstd/functional.h"
+#include <functional>
 
 namespace itk {
 namespace simple {
@@ -68,7 +68,7 @@ public:
     }
 
   /**  Invoke the member function. */
-  virtual void Execute(Object *, const EventObject & ) SITK_OVERRIDE
+  virtual void Execute(Object *, const EventObject & ) override
   {
     if (m_That)
       {
@@ -77,7 +77,7 @@ public:
   }
 
   /**  Invoke the member function with a const object */
-  virtual void Execute(const Object *, const EventObject & ) SITK_OVERRIDE
+  virtual void Execute(const Object *, const EventObject & ) override
   {
     if ( m_That )
       {
@@ -85,14 +85,13 @@ public:
       }
   }
 
+  SimpleAdaptorCommand(const Self &) = delete;
+  void operator=(const Self &) = delete;
+
 protected:
   itk::simple::Command *                    m_That;
   SimpleAdaptorCommand():m_That(0) {}
   virtual ~SimpleAdaptorCommand() {}
-
-private:
-  SimpleAdaptorCommand(const Self &); //purposely not implemented
-  void operator=(const Self &);        //purposely not implemented
 };
 
 } // end anonymous namespace
@@ -105,7 +104,7 @@ private:
 ProcessObject::ProcessObject ()
   : m_Debug(ProcessObject::GetGlobalDefaultDebug()),
     m_NumberOfThreads(ProcessObject::GetGlobalDefaultNumberOfThreads()),
-    m_ActiveProcess(SITK_NULLPTR),
+    m_ActiveProcess(nullptr),
     m_ProgressMeasurement(0.0)
 {
   static bool firstTime=true;
@@ -320,6 +319,17 @@ int ProcessObject::AddCommand(EventEnum event, Command &cmd)
   return 0;
 }
 
+int ProcessObject::AddCommand(itk::simple::EventEnum event, const std::function<void()> &func)
+{
+  std::unique_ptr<FunctionCommand> cmd(new FunctionCommand());
+  cmd->SetCallbackFunction(func);
+
+  int id = this->AddCommand(event, *cmd.get());
+  cmd->OwnedByProcessObjectsOn();
+  cmd.release();
+  return id;
+}
+
 
 void ProcessObject::RemoveAllCommands()
 {
@@ -415,7 +425,7 @@ void ProcessObject::PreUpdate(itk::ProcessObject *p)
     }
   catch (...)
     {
-    this->m_ActiveProcess = SITK_NULLPTR;
+    this->m_ActiveProcess = nullptr;
     throw;
     }
 
@@ -496,11 +506,11 @@ void ProcessObject::OnActiveProcessDelete( )
       i->m_ITKTag = std::numeric_limits<unsigned long>::max();
       }
 
-  this->m_ActiveProcess = SITK_NULLPTR;
+  this->m_ActiveProcess = nullptr;
 }
 
 
-void ProcessObject::onCommandDelete(const itk::simple::Command *cmd) SITK_NOEXCEPT
+void ProcessObject::onCommandDelete(const itk::simple::Command *cmd) noexcept
 {
   // remove command from m_Command book keeping list, and remove it
   // from the  ITK ProcessObject

@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -41,6 +41,8 @@
 #include "itkBSplineSmoothingOnUpdateDisplacementFieldTransform.h"
 #include "itkGaussianSmoothingOnUpdateDisplacementFieldTransform.h"
 #include "itkBSplineTransform.h"
+
+#include <type_traits>
 
 namespace itk
 {
@@ -147,7 +149,8 @@ public:
 
   virtual bool IsLinear() const
     {
-      return (this->GetTransformBase()->GetTransformCategory() == TransformBase::Linear);
+      typedef itk::TransformBaseTemplate<double>::TransformCategoryEnum TransformCategoryEnum;
+      return (this->GetTransformBase()->GetTransformCategory() == TransformCategoryEnum::Linear);
     }
 
 
@@ -355,16 +358,16 @@ public:
       if ( t.GetDimension() != TransformType::InputSpaceDimension )
         {
         sitkExceptionMacro( "Transform argument has dimension " << t.GetDimension()
-                            << " does not match this dimesion of " << TransformType::InputSpaceDimension );
+                            << " does not match this dimension of " << TransformType::InputSpaceDimension );
         }
 
       typename CompositeTransformType::TransformType* base =
         dynamic_cast< typename CompositeTransformType::TransformType*>( t.GetITKBase() );
 
-      return this->AddTransform( base, typename nsstd::is_same<TTransformType, CompositeTransformType>::type() );
+      return this->AddTransform( base, typename std::is_same<TTransformType, CompositeTransformType>::type() );
     }
 
-  PimpleTransformBase* AddTransform( typename CompositeTransformType::TransformType* t, nsstd::true_type isCompositeTransform )
+  PimpleTransformBase* AddTransform( typename CompositeTransformType::TransformType* t, std::true_type isCompositeTransform )
     {
       Unused( isCompositeTransform );
       assert( t->GetInputSpaceDimension() == TransformType::InputSpaceDimension );
@@ -376,7 +379,7 @@ public:
       return this;
     }
 
-  PimpleTransformBase* AddTransform( typename CompositeTransformType::TransformType* t, nsstd::false_type isNotCompositeTransform )
+  PimpleTransformBase* AddTransform( typename CompositeTransformType::TransformType* t, std::false_type isNotCompositeTransform )
     {
       Unused( isNotCompositeTransform );
 

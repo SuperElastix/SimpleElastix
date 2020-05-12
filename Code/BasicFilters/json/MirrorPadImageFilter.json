@@ -21,6 +21,15 @@
       "doc" : "\todo what does this itk_type attribute do?",
       "dim_vec" : 1,
       "itk_type" : "typename InputImageType::SizeType"
+    },
+    {
+      "name" : "DecayBase",
+      "type" : "double",
+      "default" : "1.0",
+      "briefdescriptionSet" : "",
+      "detaileddescriptionSet" : "Get/Set the base for exponential decay in mirrored region.",
+      "briefdescriptionGet" : "",
+      "detaileddescriptionGet" : "Get/Set the base for exponential decay in mirrored region."
     }
   ],
   "tests" : [
@@ -62,10 +71,38 @@
       "inputs" : [
         "Input/Ramp-Down-Short.nrrd"
       ]
+    },
+    {
+      "tag" : "decay",
+      "description" : "Test with decay parameter",
+      "settings" : [
+        {
+          "parameter" : "PadLowerBound",
+          "type" : "unsigned int",
+          "dim_vec" : 1,
+          "value" : [
+            10,
+            11
+          ]
+        },
+        {
+          "parameter" : "PadUpperBound",
+          "type" : "unsigned int",
+          "dim_vec" : 1,
+          "value" : [
+            12,
+            13
+          ]
+        }
+      ],
+      "tolerance" : 1e-08,
+      "inputs" : [
+        "Input/BrainProtonDensitySlice.png"
+      ]
     }
   ],
   "briefdescription" : "Increase the image size by padding with replicants of the input image value.",
-  "detaileddescription" : "MirrorPadImageFilter changes the image bounds of an image. Any added pixels are filled in with a mirrored replica of the input image. For instance, if the output image needs a pixel that is two pixels to the left of the LargestPossibleRegion of the input image, the value assigned will be from the pixel two pixels inside the left boundary of the LargestPossibleRegion. The image bounds of the output must be specified.\n\nVisual explanation of padding regions.\n This filter is implemented as a multithreaded filter. It provides a ThreadedGenerateData() method for its implementation.\n\n\\see WrapPadImageFilter , ConstantPadImageFilter",
+  "detaileddescription" : "MirrorPadImageFilter changes the image bounds of an image. Any added pixels are filled in with a mirrored replica of the input image. For instance, if the output image needs a pixel that is two pixels to the left of the LargestPossibleRegion of the input image, the value assigned will be from the pixel two pixels inside the left boundary of the LargestPossibleRegion. The image bounds of the output must be specified.\n\nVisual explanation of padding regions.\n\n\nThis filter is implemented as a multithreaded filter. It provides a DynamicThreadedGenerateData() method for its implementation.\n\nExponential decay in the bounds is enabled when DecayBase has to be in the range (0.0, 1.0]. When it is 1.0 it is disabled. The decay rate is based on the Manhattan distance.\n\n\\see WrapPadImageFilter , ConstantPadImageFilter",
   "itk_module" : "ITKImageGrid",
   "itk_group" : "ImageGrid"
 }

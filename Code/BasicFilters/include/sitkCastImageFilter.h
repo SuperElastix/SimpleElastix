@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -167,13 +167,15 @@ private:
   void RegisterMemberFactory3();
   void RegisterMemberFactory3v();
   void RegisterMemberFactory3l();
+#ifdef SITK_4D_IMAGES
   void RegisterMemberFactory4();
   void RegisterMemberFactory4v();
   void RegisterMemberFactory4l();
-  /** @} */
+#endif
+/** @} */
 
   typedef Image (Self::*MemberFunctionType)( const Image& );
-  nsstd::auto_ptr<detail::DualMemberFunctionFactory<MemberFunctionType> > m_DualMemberFactory;
+  std::unique_ptr<detail::DualMemberFunctionFactory<MemberFunctionType> > m_DualMemberFactory;
 
 };
 

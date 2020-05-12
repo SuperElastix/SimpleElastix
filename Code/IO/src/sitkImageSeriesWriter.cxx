@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -32,10 +32,10 @@
 namespace itk {
   namespace simple {
 
-  void WriteImage ( const Image& inImage, const std::vector<std::string> &filenames, bool useCompression )
+  void WriteImage ( const Image& inImage, const std::vector<std::string> &filenames, bool useCompression, int compressionLevel )
   {
     ImageSeriesWriter writer;
-    writer.Execute( inImage, filenames, useCompression );
+    writer.Execute( inImage, filenames, useCompression, compressionLevel );
   }
 
   ImageSeriesWriter::~ImageSeriesWriter()
@@ -46,6 +46,7 @@ namespace itk {
   {
 
     this->m_UseCompression = false;
+    this->m_CompressionLevel = -1;
 
     // list of pixel types supported
     typedef NonLabelPixelIDTypeList PixelIDTypeList;
@@ -65,6 +66,14 @@ namespace itk {
 
     out << "  UseCompression: ";
     this->ToStringHelper(out, this->m_UseCompression);
+    out << std::endl;
+
+    out << "  CompressionLevel: ";
+    this->ToStringHelper( out, this->m_CompressionLevel);
+    out << std::endl;
+
+    out << "  Compressor: ";
+    this->ToStringHelper( out, this->m_Compressor);
     out << std::endl;
 
     out << "  FileNames:" << std::endl;
@@ -116,7 +125,7 @@ namespace itk {
     itk::ImageIOBase::Pointer iobase;
     if (this->m_ImageIOName == "")
       {
-      iobase = itk::ImageIOFactory::CreateImageIO( fileName.c_str(), itk::ImageIOFactory::WriteMode);
+      iobase = itk::ImageIOFactory::CreateImageIO( fileName.c_str(), itk::ImageIOFactory::FileModeEnum::WriteMode);
       }
     else
       {
@@ -144,6 +153,32 @@ namespace itk {
     return this->m_UseCompression;
   }
 
+  ImageSeriesWriter::Self &
+  ImageSeriesWriter::SetCompressionLevel(int CompressionLevel)
+  {
+    this->m_CompressionLevel = CompressionLevel;
+    return *this;
+  }
+
+  int
+  ImageSeriesWriter::GetCompressionLevel(void) const
+  {
+    return m_CompressionLevel;
+  }
+
+  ImageSeriesWriter::Self &
+  ImageSeriesWriter::SetCompressor(const std::string &Compressor)
+  {
+    this->m_Compressor = Compressor;
+    return *this;
+  }
+
+  std::string
+  ImageSeriesWriter::GetCompressor(void)
+  {
+    return m_Compressor;
+  }
+
 
   ImageSeriesWriter& ImageSeriesWriter::SetFileNames ( const std::vector<std::string> &filenames )
   {
@@ -157,10 +192,11 @@ namespace itk {
   }
 
 
-  ImageSeriesWriter& ImageSeriesWriter::Execute ( const Image& image, const std::vector<std::string> &inFileNames, bool useCompression )
+  ImageSeriesWriter& ImageSeriesWriter::Execute ( const Image& image, const std::vector<std::string> &inFileNames, bool useCompression, int compressionLevel )
   {
     this->SetFileNames( inFileNames );
     this->SetUseCompression( useCompression );
+    this->SetCompressionLevel( compressionLevel );
     return this->Execute( image );
   }
 
@@ -212,6 +248,16 @@ namespace itk {
     writer->SetInput( image );
 
     itk::ImageIOBase::Pointer imageio = this->GetImageIOBase( this->m_FileNames[0] );
+
+    if (this->m_Compressor != "")
+    {
+      imageio->SetCompressor(this->m_Compressor);
+    }
+
+    if (this->m_CompressionLevel != -1)
+    {
+     imageio->SetCompressionLevel(this->m_CompressionLevel);
+    }
 
     sitkDebugMacro( "ImageIO: " << imageio->GetNameOfClass() );
 

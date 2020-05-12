@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -663,25 +663,25 @@ namespace simple
         TRegistrationMethod* method);
 
     virtual void PreUpdate( itk::ProcessObject *p );
-    virtual void OnActiveProcessDelete( ) SITK_NOEXCEPT;
+    virtual void OnActiveProcessDelete( ) noexcept;
     virtual unsigned long AddITKObserver(const itk::EventObject &, itk::Command *);
     virtual void RemoveITKObserver( EventCommand &e );
 
   private:
 
-    nsstd::function<unsigned int()> m_pfGetOptimizerIteration;
-    nsstd::function<std::vector<double>()> m_pfGetOptimizerPosition;
-    nsstd::function<double()> m_pfGetOptimizerLearningRate;
-    nsstd::function<double()> m_pfGetOptimizerConvergenceValue;
-    nsstd::function<double()> m_pfGetMetricValue;
-    nsstd::function<uint64_t()> m_pfGetMetricNumberOfValidPoints;
-    nsstd::function<std::vector<double>()> m_pfGetOptimizerScales;
-    nsstd::function<std::string()> m_pfGetOptimizerStopConditionDescription;
+    std::function<unsigned int()> m_pfGetOptimizerIteration;
+    std::function<std::vector<double>()> m_pfGetOptimizerPosition;
+    std::function<double()> m_pfGetOptimizerLearningRate;
+    std::function<double()> m_pfGetOptimizerConvergenceValue;
+    std::function<double()> m_pfGetMetricValue;
+    std::function<uint64_t()> m_pfGetMetricNumberOfValidPoints;
+    std::function<std::vector<double>()> m_pfGetOptimizerScales;
+    std::function<std::string()> m_pfGetOptimizerStopConditionDescription;
 
 
-    nsstd::function<unsigned int()> m_pfGetCurrentLevel;
+    std::function<unsigned int()> m_pfGetCurrentLevel;
 
-    nsstd::function<void (itk::TransformBase *outTransform)> m_pfUpdateWithBestValue;
+    std::function<void (itk::TransformBase *outTransform)> m_pfUpdateWithBestValue;
 
     template < class TMemberFunctionPointer >
       struct EvaluateMemberFunctionAddressor
@@ -698,8 +698,8 @@ namespace simple
     typedef Transform (ImageRegistrationMethod::*MemberFunctionType)( const Image &fixed, const Image &moving );
     typedef double (ImageRegistrationMethod::*EvaluateMemberFunctionType)( const Image &fixed, const Image &moving );
     friend struct detail::MemberFunctionAddressor<MemberFunctionType>;
-    nsstd::auto_ptr<detail::MemberFunctionFactory<MemberFunctionType> > m_MemberFactory;
-    nsstd::auto_ptr<detail::MemberFunctionFactory<EvaluateMemberFunctionType> > m_EvaluateMemberFactory;
+    std::unique_ptr<detail::MemberFunctionFactory<MemberFunctionType> > m_MemberFactory;
+    std::unique_ptr<detail::MemberFunctionFactory<EvaluateMemberFunctionType> > m_EvaluateMemberFactory;
 
     InterpolatorEnum  m_Interpolator;
     Transform  m_InitialTransform;

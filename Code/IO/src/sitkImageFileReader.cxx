@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 *  limitations under the License.
 *
 *=========================================================================*/
-#ifdef _MFC_VER
+#ifdef _MSC_VER
 #pragma warning(disable:4996)
 #endif
 
@@ -35,7 +35,7 @@ namespace itk {
       template< class TImageType>
       static void FixNonZeroIndex( TImageType * img )
       {
-        assert( img != SITK_NULLPTR );
+        assert( img != nullptr );
 
         typename TImageType::RegionType r = img->GetLargestPossibleRegion();
         typename TImageType::IndexType idx = r.GetIndex();
@@ -134,9 +134,7 @@ namespace itk {
       PixelIDValueType pixelType;
       this->GetPixelIDFromImageIO(iobase, pixelType, m_Dimension);
 
-      std::vector<double> direction;
-
-      direction.reserve(m_Dimension*m_Dimension);
+      std::vector<double> direction(m_Dimension*m_Dimension);
 
       std::vector<double> origin(m_Dimension);
       std::vector<double> spacing(m_Dimension);
@@ -146,16 +144,18 @@ namespace itk {
         origin[i] = iobase->GetOrigin(i);
         spacing[i] = iobase->GetSpacing(i);
         size[i] = iobase->GetDimensions(i);
-        const  std::vector< double > temp_direction = iobase->GetDirection(i);
-        direction.insert(direction.end(), temp_direction.begin(), temp_direction.end());
+        for( unsigned int col = 0; col < m_Dimension; ++col)
+          {
+          direction[i*m_Dimension+col] = iobase->GetDirection(col)[i];
+          }
         }
 
       // release functions bound to old meta data dictionary
       if (m_MetaDataDictionary.get())
         {
-        this->m_pfGetMetaDataKeys = SITK_NULLPTR;
-        this->m_pfHasMetaDataKey = SITK_NULLPTR;
-        this->m_pfGetMetaData =  SITK_NULLPTR;
+        this->m_pfGetMetaDataKeys = nullptr;
+        this->m_pfHasMetaDataKey = nullptr;
+        this->m_pfGetMetaData =  nullptr;
         }
 
       this->m_MetaDataDictionary.reset(new MetaDataDictionary(iobase->GetMetaDataDictionary()));
@@ -171,9 +171,9 @@ namespace itk {
       swap(spacing, m_Spacing);
       swap(size, m_Size);
 
-      this->m_pfGetMetaDataKeys = nsstd::bind(&MetaDataDictionary::GetKeys, this->m_MetaDataDictionary.get());
-      this->m_pfHasMetaDataKey = nsstd::bind(&MetaDataDictionary::HasKey, this->m_MetaDataDictionary.get(), nsstd::placeholders::_1);
-      this->m_pfGetMetaData = nsstd::bind(&GetMetaDataDictionaryCustomCast::CustomCast, this->m_MetaDataDictionary.get(), nsstd::placeholders::_1);
+      this->m_pfGetMetaDataKeys = std::bind(&MetaDataDictionary::GetKeys, this->m_MetaDataDictionary.get());
+      this->m_pfHasMetaDataKey = std::bind(&MetaDataDictionary::HasKey, this->m_MetaDataDictionary.get(), std::placeholders::_1);
+      this->m_pfGetMetaData = std::bind(&GetMetaDataDictionaryCustomCast::CustomCast, this->m_MetaDataDictionary.get(), std::placeholders::_1);
     }
 
     PixelIDValueEnum
@@ -351,7 +351,7 @@ namespace itk {
     // if the InstantiatedToken is correctly implemented this should
     // not occur
     assert( ImageTypeToPixelIDValue<ImageType>::Result != (int)sitkUnknown );
-    assert( imageio != SITK_NULLPTR );
+    assert( imageio != nullptr );
 
 
     if ( m_ExtractSize.empty() || m_ExtractSize.size() == ImageType::ImageDimension)
@@ -442,7 +442,7 @@ namespace itk {
                           << itkImage->GetLargestPossibleRegion() );
       }
 
-    assert(itkImage->GetSource() != SITK_NULLPTR);
+    assert(itkImage->GetSource() != nullptr);
     this->PreUpdate( itkImage->GetSource().GetPointer() );
 
     extractor->Update();

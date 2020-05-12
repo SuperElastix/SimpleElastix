@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@
 #include <sitkVersionConfig.h>
 #include <itkConfigure.h>
 
-namespace nsstd = itk::simple::nsstd;
 
 TEST( VersionTest, VersoinTest)
 {
@@ -49,20 +48,6 @@ TEST( VersionTest, VersoinTest)
   std::vector<std::string> itk_modules = Version::ITKModulesEnabled();
   EXPECT_NE( std::find( itk_modules.begin(), itk_modules.end(), "ITKCommon" ), itk_modules.end());
   EXPECT_NE( std::find( itk_modules.begin(), itk_modules.end(), "ITKIOImageBase" ), itk_modules.end());
-}
-
-TEST( ConditionalTest, ConditionalTest1 ) {
-
-  // a quick check to make sure the conditional works
-  typedef itk::simple::Conditional<true, int, float>::Type IntType;
-  typedef itk::simple::Conditional<false, int, float>::Type FloatType;
-
-
-  EXPECT_EQ ( typeid( IntType ).name(), typeid( int ).name() );
-  EXPECT_EQ ( typeid( FloatType ).name(), typeid( float ).name() );
-
-  return;
-
 }
 
 
@@ -128,8 +113,8 @@ TEST( ProcessObject, Command_Register ) {
 
   // Case 1a: single command, command deleted first
   {
-  nsstd::auto_ptr<sitk::CastImageFilter> po1(new sitk::CastImageFilter());
-  nsstd::auto_ptr<sitk::Command> cmd(new sitk::Command());
+  std::unique_ptr<sitk::CastImageFilter> po1(new sitk::CastImageFilter());
+  std::unique_ptr<sitk::Command> cmd(new sitk::Command());
   po1->AddCommand(sitk::sitkAnyEvent, *cmd);
 
   EXPECT_TRUE(po1->HasCommand(sitk::sitkAnyEvent));
@@ -139,19 +124,19 @@ TEST( ProcessObject, Command_Register ) {
 
   // Case 1b: single command, process deleted first
   {
-  nsstd::auto_ptr<sitk::CastImageFilter> po1( new sitk::CastImageFilter());
-  nsstd::auto_ptr<sitk::Command> cmd(new sitk::Command());
+  std::unique_ptr<sitk::CastImageFilter> po1( new sitk::CastImageFilter());
+  std::unique_ptr<sitk::Command> cmd(new sitk::Command());
   po1->AddCommand(sitk::sitkAnyEvent, *cmd);
   po1.reset();
   }
 
   // Case 2a: single command, multiple processes, command deleted first
   {
-  nsstd::auto_ptr<sitk::CastImageFilter> po1(new sitk::CastImageFilter());
-  nsstd::auto_ptr<sitk::CastImageFilter> po2(new sitk::CastImageFilter());
-  nsstd::auto_ptr<sitk::CastImageFilter> po3(new sitk::CastImageFilter());
+  std::unique_ptr<sitk::CastImageFilter> po1(new sitk::CastImageFilter());
+  std::unique_ptr<sitk::CastImageFilter> po2(new sitk::CastImageFilter());
+  std::unique_ptr<sitk::CastImageFilter> po3(new sitk::CastImageFilter());
 
-  nsstd::auto_ptr<sitk::Command> cmd(new sitk::Command());
+  std::unique_ptr<sitk::Command> cmd(new sitk::Command());
   po1->AddCommand(sitk::sitkAnyEvent, *cmd);
   po2->AddCommand(sitk::sitkStartEvent, *cmd);
   po3->AddCommand(sitk::sitkEndEvent, *cmd);
@@ -160,11 +145,11 @@ TEST( ProcessObject, Command_Register ) {
 
   // Case 2b: single command, multiple processes, processes mostly deleted first
   {
-  nsstd::auto_ptr<sitk::CastImageFilter> po1(new sitk::CastImageFilter());
-  nsstd::auto_ptr<sitk::CastImageFilter> po2(new sitk::CastImageFilter());
-  nsstd::auto_ptr<sitk::CastImageFilter> po3(new sitk::CastImageFilter());
+  std::unique_ptr<sitk::CastImageFilter> po1(new sitk::CastImageFilter());
+  std::unique_ptr<sitk::CastImageFilter> po2(new sitk::CastImageFilter());
+  std::unique_ptr<sitk::CastImageFilter> po3(new sitk::CastImageFilter());
 
-  nsstd::auto_ptr<sitk::Command> cmd(new sitk::Command());
+  std::unique_ptr<sitk::Command> cmd(new sitk::Command());
   po1->AddCommand(sitk::sitkAnyEvent, *cmd);
   po2->AddCommand(sitk::sitkStartEvent, *cmd);
   po3->AddCommand(sitk::sitkEndEvent, *cmd);
@@ -184,10 +169,10 @@ TEST( ProcessObject, Command_Register ) {
 
   // Case 3a: multiple commands, command deleted mostly first
   {
-  nsstd::auto_ptr<sitk::CastImageFilter> po1(new sitk::CastImageFilter());
-  nsstd::auto_ptr<sitk::Command> cmd1(new sitk::Command());
-  nsstd::auto_ptr<sitk::Command> cmd2(new sitk::Command());
-  nsstd::auto_ptr<sitk::Command> cmd3(new sitk::Command());
+  std::unique_ptr<sitk::CastImageFilter> po1(new sitk::CastImageFilter());
+  std::unique_ptr<sitk::Command> cmd1(new sitk::Command());
+  std::unique_ptr<sitk::Command> cmd2(new sitk::Command());
+  std::unique_ptr<sitk::Command> cmd3(new sitk::Command());
 
   po1->AddCommand(sitk::sitkAnyEvent, *cmd1);
   po1->AddCommand(sitk::sitkStartEvent, *cmd2);
@@ -210,10 +195,10 @@ TEST( ProcessObject, Command_Register ) {
 
   // Case 3b: multiple commands, process object deleted first
   {
-  nsstd::auto_ptr<sitk::CastImageFilter> po1(new sitk::CastImageFilter());
-  nsstd::auto_ptr<sitk::Command> cmd1(new sitk::Command());
-  nsstd::auto_ptr<sitk::Command> cmd2(new sitk::Command());
-  nsstd::auto_ptr<sitk::Command> cmd3(new sitk::Command());
+  std::unique_ptr<sitk::CastImageFilter> po1(new sitk::CastImageFilter());
+  std::unique_ptr<sitk::Command> cmd1(new sitk::Command());
+  std::unique_ptr<sitk::Command> cmd2(new sitk::Command());
+  std::unique_ptr<sitk::Command> cmd3(new sitk::Command());
   po1->AddCommand(sitk::sitkAnyEvent, *cmd1);
   po1->AddCommand(sitk::sitkStartEvent, *cmd2);
   po1->AddCommand(sitk::sitkEndEvent, *cmd3);
@@ -286,6 +271,70 @@ TEST( ProcessObject, Command_Add ) {
   EXPECT_TRUE(po1.HasCommand(sitk::sitkMultiResolutionIterationEvent));
 }
 
+
+
+TEST( ProcessObject, Command_Add_lambda ) {
+  // Add command for events and verifies the state
+
+  namespace sitk = itk::simple;
+
+  sitk::CastImageFilter po1;
+
+  // check initial state
+  EXPECT_FALSE(po1.HasCommand(sitk::sitkAnyEvent));
+  EXPECT_FALSE(po1.HasCommand(sitk::sitkAbortEvent));
+  EXPECT_FALSE(po1.HasCommand(sitk::sitkDeleteEvent));
+  EXPECT_FALSE(po1.HasCommand(sitk::sitkEndEvent));
+  EXPECT_FALSE(po1.HasCommand(sitk::sitkIterationEvent));
+  EXPECT_FALSE(po1.HasCommand(sitk::sitkProgressEvent));
+  EXPECT_FALSE(po1.HasCommand(sitk::sitkStartEvent));
+  EXPECT_FALSE(po1.HasCommand(sitk::sitkUserEvent));
+  EXPECT_FALSE(po1.HasCommand(sitk::sitkMultiResolutionIterationEvent));
+
+  po1.AddCommand(sitk::sitkAnyEvent, []{std::cout << "command\n";});
+  EXPECT_TRUE(po1.HasCommand(sitk::sitkAnyEvent));
+  EXPECT_FALSE(po1.HasCommand(sitk::sitkAbortEvent));
+  EXPECT_FALSE(po1.HasCommand(sitk::sitkDeleteEvent));
+  EXPECT_FALSE(po1.HasCommand(sitk::sitkEndEvent));
+  EXPECT_FALSE(po1.HasCommand(sitk::sitkIterationEvent));
+  EXPECT_FALSE(po1.HasCommand(sitk::sitkProgressEvent));
+  EXPECT_FALSE(po1.HasCommand(sitk::sitkStartEvent));
+  EXPECT_FALSE(po1.HasCommand(sitk::sitkUserEvent));
+  EXPECT_FALSE(po1.HasCommand(sitk::sitkMultiResolutionIterationEvent));
+
+  po1.RemoveAllCommands();
+  EXPECT_FALSE(po1.HasCommand(sitk::sitkAnyEvent));
+  EXPECT_FALSE(po1.HasCommand(sitk::sitkAbortEvent));
+  EXPECT_FALSE(po1.HasCommand(sitk::sitkDeleteEvent));
+  EXPECT_FALSE(po1.HasCommand(sitk::sitkEndEvent));
+  EXPECT_FALSE(po1.HasCommand(sitk::sitkIterationEvent));
+  EXPECT_FALSE(po1.HasCommand(sitk::sitkProgressEvent));
+  EXPECT_FALSE(po1.HasCommand(sitk::sitkStartEvent));
+  EXPECT_FALSE(po1.HasCommand(sitk::sitkUserEvent));
+  EXPECT_FALSE(po1.HasCommand(sitk::sitkMultiResolutionIterationEvent));
+
+  po1.AddCommand(sitk::sitkAnyEvent, []{std::cout << "command\n";});
+  po1.AddCommand(sitk::sitkAbortEvent, []{std::cout << "command\n";});
+  po1.AddCommand(sitk::sitkDeleteEvent, []{std::cout << "command\n";});
+  po1.AddCommand(sitk::sitkEndEvent, []{std::cout << "command\n";});
+  po1.AddCommand(sitk::sitkIterationEvent, []{std::cout << "command\n";});
+  po1.AddCommand(sitk::sitkProgressEvent, []{std::cout << "command\n";});
+  po1.AddCommand(sitk::sitkStartEvent, []{std::cout << "command\n";});
+  po1.AddCommand(sitk::sitkUserEvent, []{std::cout << "command\n";});
+  po1.AddCommand(sitk::sitkMultiResolutionIterationEvent, []{std::cout << "command\n";});
+
+  EXPECT_TRUE(po1.HasCommand(sitk::sitkAnyEvent));
+  EXPECT_TRUE(po1.HasCommand(sitk::sitkAbortEvent));
+  EXPECT_TRUE(po1.HasCommand(sitk::sitkDeleteEvent));
+  EXPECT_TRUE(po1.HasCommand(sitk::sitkEndEvent));
+  EXPECT_TRUE(po1.HasCommand(sitk::sitkIterationEvent));
+  EXPECT_TRUE(po1.HasCommand(sitk::sitkProgressEvent));
+  EXPECT_TRUE(po1.HasCommand(sitk::sitkStartEvent));
+  EXPECT_TRUE(po1.HasCommand(sitk::sitkUserEvent));
+  EXPECT_TRUE(po1.HasCommand(sitk::sitkMultiResolutionIterationEvent));
+}
+
+
 TEST( ProcessObject, DeleteCommandActiveProcess )
 {
   // Test the case of deleting the command while the process is active.
@@ -307,7 +356,7 @@ TEST( ProcessObject, DeleteCommandActiveProcess )
         if ( m_Process.GetProgress() >= m_AbortAt )
           {
           delete m_Cmd;
-          m_Cmd = SITK_NULLPTR;
+          m_Cmd = nullptr;
           }
       }
 
@@ -506,8 +555,8 @@ TEST( ProcessObject, Command_Ownership ) {
   // case 2
   // cmd registered to multiple PO
   {
-  nsstd::auto_ptr<sitk::CastImageFilter> po1(new sitk::CastImageFilter());
-  nsstd::auto_ptr<sitk::CastImageFilter> po2(new sitk::CastImageFilter());
+  std::unique_ptr<sitk::CastImageFilter> po1(new sitk::CastImageFilter());
+  std::unique_ptr<sitk::CastImageFilter> po2(new sitk::CastImageFilter());
 
   HeapCommand *cmd = new HeapCommand();
   cmd->OwnedByProcessObjectsOn();

@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -83,7 +83,7 @@ struct ImageTypeToPixelIDValue< itk::ImageBase<VImageDimension> >
  *     ...
  *     break;
  *   default:
- *      // handle another exceptoinal case
+ *      // handle another exceptional case
  *     }
  * \endcode
  */
@@ -131,7 +131,7 @@ const std::string SITKCommon_EXPORT GetPixelIDValueAsElastixParameter( PixelIDVa
  * val = GetPixelIDValueFromString("sitkInt32")
  *
  * If the pixel type has not been instantiated then the sitkUnknown value (-1) will
- * be returned. If the pixel type string is not recognised (i.e. is not in the
+ * be returned. If the pixel type string is not recognized (i.e. is not in the
  * set of tested names) then the return value is -99. The idea is to provide
  * a warning (via the R package) if this function needs to be updated to match
  * changes to PixelIDValueEnum - i.e. if a new pixel type is added.

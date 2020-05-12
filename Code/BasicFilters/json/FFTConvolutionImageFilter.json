@@ -39,7 +39,7 @@
         "PERIODIC_PAD"
       ],
       "default" : "itk::simple::FFTConvolutionImageFilter::ZERO_FLUX_NEUMANN_PAD",
-      "custom_itk_cast" : "nsstd::auto_ptr< ImageBoundaryCondition< InputImageType > > bc( CreateNewBoundaryConditionInstance< Self, FilterType >( m_BoundaryCondition ) ); filter->SetBoundaryCondition( bc.get() );\n"
+      "custom_itk_cast" : "std::unique_ptr< ImageBoundaryCondition< InputImageType > > bc( CreateNewBoundaryConditionInstance< Self, FilterType >( m_BoundaryCondition ) ); filter->SetBoundaryCondition( bc.get() );\n"
     },
     {
       "name" : "OutputRegionMode",
@@ -48,7 +48,7 @@
         "VALID"
       ],
       "default" : "itk::simple::FFTConvolutionImageFilter::SAME",
-      "itk_type" : "typename FilterType::OutputRegionModeType"
+      "itk_type" : "typename FilterType::OutputRegionModeEnum"
     }
   ],
   "tests" : [
@@ -64,7 +64,7 @@
     }
   ],
   "briefdescription" : "Convolve a given image with an arbitrary image kernel using multiplication in the Fourier domain.",
-  "detaileddescription" : "This filter produces output equivalent to the output of the ConvolutionImageFilter . However, it takes advantage of the convolution theorem to accelerate the convolution computation when the kernel is large.\n\n\\warning This filter ignores the spacing, origin, and orientation of the kernel image and treats them as identical to those in the input image.\n\nThis code was adapted from the Insight Journal contribution:\n\n\"FFT Based Convolution\" by Gaetan Lehmann https://hdl.handle.net/10380/3154 \n\n\\see ConvolutionImageFilter",
+  "detaileddescription" : "This filter produces output equivalent to the output of the ConvolutionImageFilter . However, it takes advantage of the convolution theorem to accelerate the convolution computation when the kernel is large.\n\n\\warning This filter ignores the spacing, origin, and orientation of the kernel image and treats them as identical to those in the input image.\n\n\nThis code was adapted from the Insight Journal contribution:\n\n\"FFT Based Convolution\" by Gaetan Lehmann https://hdl.handle.net/10380/3154 \n\n\\see ConvolutionImageFilter",
   "itk_module" : "ITKConvolution",
   "itk_group" : "Convolution"
 }

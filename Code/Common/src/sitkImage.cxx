@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@
 #include "sitkPimpleImageBase.h"
 #include "sitkPixelIDTypeLists.h"
 
+#include <utility>
+
 
 namespace itk
 {
@@ -33,44 +35,54 @@ namespace itk
   Image::~Image( )
   {
     delete this->m_PimpleImage;
-    this->m_PimpleImage = SITK_NULLPTR;
+    this->m_PimpleImage = nullptr;
   }
 
   Image::Image( )
-    : m_PimpleImage( SITK_NULLPTR )
+    : m_PimpleImage( nullptr )
   {
     Allocate ( 0, 0, 0, 0, sitkUInt8, 1 );
   }
 
   Image::Image( const Image &img )
+  : m_PimpleImage( img.m_PimpleImage->ShallowCopy())
   {
-    this->m_PimpleImage = img.m_PimpleImage->ShallowCopy();
+  }
+
+  Image::Image( Image && img )
+  : m_PimpleImage( nullptr )
+  {
+    using std::swap;
+    swap(m_PimpleImage, img.m_PimpleImage);
   }
 
   Image& Image::operator=( const Image &img )
   {
-    // note: If img and this are this same, the following statement
-    // will still be safe. It is also exception safe.
-    nsstd::auto_ptr<PimpleImageBase> temp( img.m_PimpleImage->ShallowCopy() );
-    delete this->m_PimpleImage;
-    this->m_PimpleImage = temp.release();
+    // follow the Rule of Five
+    return *this = Image(img);
+  }
+
+  Image &Image::operator=(Image && img)
+  {
+    using std::swap;
+    swap(m_PimpleImage, img.m_PimpleImage);
     return *this;
   }
 
     Image::Image( unsigned int Width, unsigned int Height, PixelIDValueEnum ValueEnum )
-      : m_PimpleImage( SITK_NULLPTR )
+      : m_PimpleImage( nullptr )
     {
       Allocate ( Width, Height, 0, 0, ValueEnum, 0 );
     }
 
     Image::Image( unsigned int Width, unsigned int Height, unsigned int Depth, PixelIDValueEnum ValueEnum )
-      : m_PimpleImage( SITK_NULLPTR )
+      : m_PimpleImage( nullptr )
     {
       Allocate ( Width, Height, Depth, 0, ValueEnum, 0 );
     }
 
     Image::Image( const std::vector< unsigned int > &size, PixelIDValueEnum ValueEnum, unsigned int numberOfComponents )
-      : m_PimpleImage( SITK_NULLPTR )
+      : m_PimpleImage( nullptr )
     {
       if ( size.size() == 2 )
         {
@@ -92,15 +104,27 @@ namespace itk
 
     itk::DataObject* Image::GetITKBase( void )
     {
-      assert( m_PimpleImage );
-      this->MakeUnique();
-      return m_PimpleImage->GetDataBase();
+      if ( m_PimpleImage )
+        {
+        this->MakeUnique();
+        return m_PimpleImage->GetDataBase();
+        }
+      else
+        {
+        return nullptr;
+        }
     }
 
     const itk::DataObject* Image::GetITKBase( void ) const
     {
-      assert( m_PimpleImage );
-      return m_PimpleImage->GetDataBase();
+      if ( m_PimpleImage )
+        {
+        return m_PimpleImage->GetDataBase();
+        }
+      else
+        {
+        return nullptr;
+        }
     }
 
     PixelIDValueType Image::GetPixelIDValue( void ) const
@@ -507,6 +531,13 @@ namespace itk
       return this->m_PimpleImage->GetBufferAsDouble( );
     }
 
+    void *Image::GetBufferAsVoid( )
+    {
+      assert( m_PimpleImage );
+      this->MakeUnique();
+      return this->m_PimpleImage->GetBufferAsVoid( );
+    }
+
     const int8_t *Image::GetBufferAsInt8( ) const
     {
       assert( m_PimpleImage );
@@ -565,6 +596,12 @@ namespace itk
     {
       assert( m_PimpleImage );
       return this->m_PimpleImage->GetBufferAsDouble( );
+    }
+
+    const void *Image::GetBufferAsVoid ( ) const
+    {
+      assert( m_PimpleImage );
+      return this->m_PimpleImage->GetBufferAsVoid( );
     }
 
     void Image::SetPixelAsInt8( const std::vector<uint32_t> &idx, int8_t v )
@@ -727,7 +764,7 @@ namespace itk
       if ( this->m_PimpleImage->GetReferenceCountOfImage() > 1 )
         {
         // note: care is take here to be exception safe with memory allocation
-        nsstd::auto_ptr<PimpleImageBase> temp( this->m_PimpleImage->DeepCopy() );
+        std::unique_ptr<PimpleImageBase> temp( this->m_PimpleImage->DeepCopy() );
         delete this->m_PimpleImage;
         this->m_PimpleImage = temp.release();
         }

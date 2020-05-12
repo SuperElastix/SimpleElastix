@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -59,19 +59,19 @@ namespace itk
   }
 
   template<int VPixelIDValue, typename TImageType>
-  typename DisableIf<nsstd::is_same<TImageType, void>::value>::Type
+  typename std::enable_if<!std::is_same<TImageType, void>::value>::type
   Image::ConditionalInternalInitialization( TImageType *image )
   {
     // no need to check if null
     delete this->m_PimpleImage;
-    this->m_PimpleImage = SITK_NULLPTR;
+    this->m_PimpleImage = nullptr;
 
     this->m_PimpleImage = new PimpleImage<TImageType>( image );
   }
 
 
   template<class TImageType>
-  typename EnableIf<IsBasic<TImageType>::Value>::Type
+  typename std::enable_if<IsBasic<TImageType>::Value>::type
   Image::AllocateInternal ( unsigned int Width, unsigned int Height, unsigned int Depth, unsigned int dim4, unsigned int numberOfComponents )
   {
     if ( numberOfComponents != 1  && numberOfComponents != 0 )
@@ -107,15 +107,15 @@ namespace itk
     typename TImageType::Pointer image = TImageType::New();
     image->SetRegions ( region );
     image->Allocate();
-    image->FillBuffer ( itk::NumericTraits<typename TImageType::PixelType>::Zero );
+    image->FillBuffer ( itk::NumericTraits<typename TImageType::PixelType>::ZeroValue() );
 
     delete this->m_PimpleImage;
-    this->m_PimpleImage = SITK_NULLPTR;
+    this->m_PimpleImage = nullptr;
     m_PimpleImage =  new PimpleImage<TImageType>( image );
   }
 
   template<class TImageType>
-  typename EnableIf<IsVector<TImageType>::Value>::Type
+  typename std::enable_if<IsVector<TImageType>::Value>::type
   Image::AllocateInternal ( unsigned int Width, unsigned int Height, unsigned int Depth, unsigned int dim4, unsigned int numberOfComponents )
   {
     if ( numberOfComponents == 0 )
@@ -158,13 +158,13 @@ namespace itk
     image->FillBuffer ( zero );
 
     delete this->m_PimpleImage;
-    this->m_PimpleImage = SITK_NULLPTR;
+    this->m_PimpleImage = nullptr;
 
     m_PimpleImage = new PimpleImage<TImageType>( image );
   }
 
   template<class TImageType>
-  typename EnableIf<IsLabel<TImageType>::Value>::Type
+  typename std::enable_if<IsLabel<TImageType>::Value>::type
   Image::AllocateInternal ( unsigned int Width, unsigned int Height, unsigned int Depth, unsigned int dim4, unsigned int numberOfComponents )
   {
     if ( numberOfComponents != 1 && numberOfComponents != 0 )
@@ -203,7 +203,7 @@ namespace itk
     image->SetBackgroundValue( 0 );
 
     delete this->m_PimpleImage;
-    this->m_PimpleImage = SITK_NULLPTR;
+    this->m_PimpleImage = nullptr;
 
     m_PimpleImage = new PimpleImage<TImageType>( image );
   }

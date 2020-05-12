@@ -52,6 +52,7 @@ TEST( TransformixImageFilter, ProceduralInterface )
   ElastixImageFilter silx;
   silx.SetFixedImage( fixedImage );
   silx.SetMovingImage( movingImage );
+  silx.SetParameter( "MaximumNumberOfIterations", "8.0" );
   silx.Execute();
 
   std::string outputDirectory = ".";
@@ -89,7 +90,7 @@ TEST( TransformixImageFilter, ComputeDeformationField )
   ElastixImageFilter silx;
   silx.SetFixedImage( fixedImage );
   silx.SetMovingImage( movingImage );
-  silx.SetParameter( "MaximumNumberOfIterations", "1" );
+  silx.SetParameter( "MaximumNumberOfIterations", "20" );
   silx.Execute();
 
   TransformixImageFilter stfx;
@@ -99,9 +100,13 @@ TEST( TransformixImageFilter, ComputeDeformationField )
 
   Image deformationField = stfx.GetDeformationField();
   std::vector<uint32_t> index;
-  index.push_back(0);
-  index.push_back(0);
-  EXPECT_NO_THROW( deformationField.GetPixelAsVectorFloat32( index ) );
+  index.push_back(10);
+  index.push_back(10);
+  auto deformationVector = deformationField.GetPixelAsVectorFloat32( index );
+
+  // Check that deformation field is non-zero
+  EXPECT_GT( deformationVector[0], 1.0);
+  EXPECT_GT( deformationVector[1], 1.0);
 }
 
 #ifdef SITK_4D_IMAGES

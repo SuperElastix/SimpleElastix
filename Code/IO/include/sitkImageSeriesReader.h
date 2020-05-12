@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -157,12 +157,12 @@ namespace itk {
 
       // friend to get access to executeInternal member
       friend struct detail::MemberFunctionAddressor<MemberFunctionType>;
-      nsstd::auto_ptr<detail::MemberFunctionFactory<MemberFunctionType> > m_MemberFactory;
+      std::unique_ptr<detail::MemberFunctionFactory<MemberFunctionType> > m_MemberFactory;
 
 
-      nsstd::function<std::vector<std::string>(int)> m_pfGetMetaDataKeys;
-      nsstd::function<bool(int, const std::string &)> m_pfHasMetaDataKey;
-      nsstd::function<std::string(int, const std::string &)> m_pfGetMetaData;
+      std::function<std::vector<std::string>(int)> m_pfGetMetaDataKeys;
+      std::function<bool(int, const std::string &)> m_pfHasMetaDataKey;
+      std::function<std::string(int, const std::string &)> m_pfGetMetaData;
 
       // Holder of process object for active measurements
       itk::ProcessObject *m_Filter;

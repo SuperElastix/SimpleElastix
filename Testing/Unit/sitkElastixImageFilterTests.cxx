@@ -168,27 +168,7 @@ TEST( ElastixImageFilter, ProceduralInterface )
   EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMapVector, false, true, outputDirectory ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
 
-  EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, defaultParameterMapName, fixedMask, movingMask ) );
-  EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, defaultParameterMapName, fixedMask, movingMask, true ) );
-  EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, defaultParameterMapName, fixedMask, movingMask, false ) );
-  EXPECT_FALSE( silxIsEmpty( resultImage ) );
   EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, defaultParameterMapName, fixedMask, movingMask, true, true ) );
-  EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, defaultParameterMapName, fixedMask, movingMask, false, false ) );
-  EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, defaultParameterMapName, fixedMask, movingMask, true, false ) );
-  EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, defaultParameterMapName, fixedMask, movingMask, false, true ) );
-  EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, defaultParameterMapName, fixedMask, movingMask, true, true, outputDirectory ) );
-  EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, defaultParameterMapName, fixedMask, movingMask, false, false, outputDirectory ) );
-  EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, defaultParameterMapName, fixedMask, movingMask, true, false, outputDirectory ) );
-  EXPECT_FALSE( silxIsEmpty( resultImage ) );
-  EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, defaultParameterMapName, fixedMask, movingMask, false, true, outputDirectory ) );
   EXPECT_FALSE( silxIsEmpty( resultImage ) );
 
   EXPECT_NO_THROW( resultImage = Elastix( fixedImage, movingImage, parameterMap ) );
@@ -369,26 +349,6 @@ TEST( ElastixImageFilter, SetNumberOfThreads )
   EXPECT_NO_THROW( silx.SetNumberOfThreads( 1 ) );
   EXPECT_NO_THROW( silx.Execute() );
 }
-
-#ifdef SITK_4D_IMAGES
-
-TEST( ElastixImageFilter, Registration4D )
-{
-  Image fixedImage = ReadImage( dataFinder.GetFile( "Input/4D.nii.gz" ) );
-  Image movingImage = ReadImage( dataFinder.GetFile( "Input/4D.nii.gz" ) );
-  Image resultImage; 
-
-  ElastixImageFilter silx;
-  silx.SetParameterMap( "groupwise" );
-  silx.SetParameter("MaximumNumberOfIterations", "1");
-  silx.SetParameter("FinalGridSpacingInPhysicalUnits", "32.0");
-  EXPECT_NO_THROW( silx.SetFixedImage( fixedImage ) );
-  EXPECT_NO_THROW( silx.SetMovingImage( movingImage ) );
-  EXPECT_NO_THROW( resultImage = silx.Execute() );
-  EXPECT_FALSE( silxIsEmpty( resultImage ) );
-}
-
-#endif // SITK_4D_IMAGES
 
 } // namespace simple
 } // namesapce itk

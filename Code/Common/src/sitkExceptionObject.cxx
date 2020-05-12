@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -29,28 +29,28 @@ namespace itk
 namespace simple
 {
 
-GenericException::GenericException() SITK_NOEXCEPT
-  : m_PimpleException( SITK_NULLPTR )
+GenericException::GenericException() noexcept
+  : m_PimpleException( nullptr )
 {}
 
-GenericException::GenericException( const GenericException &e ) SITK_NOEXCEPT
+GenericException::GenericException( const GenericException &e ) noexcept
 
   : std::exception( e )
 {
   try
     {
-    if ( e.m_PimpleException != SITK_NULLPTR )
+    if ( e.m_PimpleException != nullptr )
       {
       m_PimpleException =  new itk::ExceptionObject( *e.m_PimpleException );
       }
     }
   catch(...) // prevent exception from leaving constructor
     {
-    this->m_PimpleException = SITK_NULLPTR;
+    this->m_PimpleException = nullptr;
     }
 }
 
-GenericException::GenericException(const char *file, unsigned int lineNumber) SITK_NOEXCEPT
+GenericException::GenericException(const char *file, unsigned int lineNumber) noexcept
 {
   try
     {
@@ -58,12 +58,12 @@ GenericException::GenericException(const char *file, unsigned int lineNumber) SI
     }
   catch(...) // prevent exception from leaving constructor
     {
-    this->m_PimpleException = SITK_NULLPTR;
+    this->m_PimpleException = nullptr;
     }
 }
 
 /** Constructor. Needed to ensure the exception object can be copied. */
-GenericException::GenericException(const std::string & file, unsigned int lineNumber) SITK_NOEXCEPT
+GenericException::GenericException(const std::string & file, unsigned int lineNumber) noexcept
 {
   try
     {
@@ -71,14 +71,14 @@ GenericException::GenericException(const std::string & file, unsigned int lineNu
     }
   catch(...) // prevent exception from leaving constructor
     {
-    this->m_PimpleException = SITK_NULLPTR;
+    this->m_PimpleException = nullptr;
     }
 }
 
 /** Constructor. Needed to ensure the exception object can be copied. */
 GenericException::GenericException(const std::string & file,
                                    unsigned int lineNumber,
-                                   const std::string & desc) SITK_NOEXCEPT
+                                   const std::string & desc) noexcept
 {
   try
     {
@@ -86,11 +86,11 @@ GenericException::GenericException(const std::string & file,
     }
   catch(...) // prevent exception from leaving constructor
     {
-    this->m_PimpleException = SITK_NULLPTR;
+    this->m_PimpleException = nullptr;
     }
 }
 
-GenericException::~GenericException() SITK_NOEXCEPT
+GenericException::~GenericException() noexcept
 {
   delete this->m_PimpleException;
 }
@@ -109,8 +109,8 @@ bool GenericException::operator==(const GenericException & orig) const
     {
     return this->m_PimpleException == orig.m_PimpleException;
     }
-  else if (  this->m_PimpleException == SITK_NULLPTR &&
-             orig.m_PimpleException == SITK_NULLPTR )
+  else if (  this->m_PimpleException == nullptr &&
+             orig.m_PimpleException == nullptr )
     {
     return true;
     }
@@ -130,7 +130,7 @@ std::string GenericException::ToString() const
   return std::string("No pimple exception");
 }
 
-const char * GenericException::what() const SITK_NOEXCEPT
+const char * GenericException::what() const noexcept
 {
   if ( this->m_PimpleException )
     return this->m_PimpleException->what();

@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -178,6 +178,15 @@ namespace itk {
        */
       virtual int AddCommand(itk::simple::EventEnum event, itk::simple::Command &cmd);
 
+      #ifndef SWIG
+      /** \brief Directly add a callback to observe an event.
+       *
+       * This overloaded method can take a C++ lambda function as a
+       * second argument.
+       */
+      virtual int AddCommand(itk::simple::EventEnum event, const std::function<void()> &func);
+      #endif
+
       /** \brief Remove all registered commands.
        *
        * Calling when this object is invoking anther command will
@@ -262,7 +271,7 @@ namespace itk {
       friend class itk::simple::Command;
       // method call by command when it's deleted, maintains internal
       // references between command and process objects.
-      virtual void onCommandDelete(const itk::simple::Command *cmd) SITK_NOEXCEPT;
+      virtual void onCommandDelete(const itk::simple::Command *cmd) noexcept;
       #endif
 
 

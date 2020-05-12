@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -46,9 +46,11 @@ CastImageFilter::CastImageFilter()
   this->RegisterMemberFactory3();
   this->RegisterMemberFactory3v();
   this->RegisterMemberFactory3l();
+#ifdef SITK_4D_IMAGES
   this->RegisterMemberFactory4();
   this->RegisterMemberFactory4v();
   this->RegisterMemberFactory4l();
+#endif
 
 }
 

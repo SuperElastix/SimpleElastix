@@ -18,7 +18,7 @@ function build_simpleitk {
 
     echo "SIMPLEITK_GIT_TAG: ${SIMPLEITK_GIT_TAG}"
 
-    git clone https://github.com/SimpleITK/SimpleITK.git ${SRC_DIR} &&
+    git clone https://github.com/SuperElastix/SimpleElastix.git ${SRC_DIR} &&
     (cd ${SRC_DIR}  && git checkout ${SIMPLEITK_GIT_TAG}  ) &&
     rm -rf ${BLD_DIR} &&
     mkdir -p ${BLD_DIR} && cd ${BLD_DIR} &&
@@ -31,6 +31,8 @@ function build_simpleitk {
         -DBUILD_SHARED_LIBS:BOOL=OFF \
         -DWRAP_DEFAULT:BOOL=OFF \
         -DITK_GIT_REPOSITORY:STRING="https://github.com/InsightSoftwareConsortium/ITK.git" \
+        -DITK_C_OPTIMIZATION_FLAGS:STRING="" \
+        -DITK_CXX_OPTIMIZATION_FLAGS:STRING="" \
         ${SRC_DIR}/SuperBuild &&
     make  &&
     find ./ -name \*.o -delete
@@ -82,6 +84,6 @@ for PYTHON in ${PYTHON_VERSIONS}; do
     PYTHON_EXECUTABLE=/opt/python/${PYTHON}/bin/python
     PLATFORM=$(${PYTHON_EXECUTABLE} -c "import distutils.util; print(distutils.util.get_platform())")
     build_simpleitk_python &&
-    ( ctest -j ${NPROC} -LE UNSTABLE | tee ${OUT_DIR}/ctest_${PLATFORM}_${PYTHON}.log ||
+    ( ctest -j ${NPROC} -LE UNSTABLE | tee ${OUT_DIR}/ctest_${PLATFORM}_${PYTHON}.log;
     auditwheel repair $(find ${BLD_DIR}-${PYTHON}/ -name SimpleITK*.whl) -w ${OUT_DIR}/wheelhouse/ )
 done

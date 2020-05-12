@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@
 #include "sitkMemberFunctionFactory.h"
 #include "sitkDetail.h"
 #include "sitkPixelIDTokens.h"
-#include "sitkEnableIf.h"
 #include "sitkExceptionObject.h"
 
 namespace itk
@@ -48,22 +47,22 @@ struct MemberFunctionInstantiater
     {}
 
   template <class TPixelIDType>
-  typename EnableIf< IsInstantiated<TPixelIDType, VImageDimension >::Value >::Type
-  operator()( TPixelIDType*id=SITK_NULLPTR ) const
+  typename std::enable_if< IsInstantiated<TPixelIDType, VImageDimension >::Value >::type
+  operator()( TPixelIDType*id=nullptr ) const
     {
       Unused( id );
       typedef typename PixelIDToImageType<TPixelIDType, VImageDimension>::ImageType ImageType;
       typedef TAddressor                                                            AddressorType;
 
       AddressorType addressor;
-      m_Factory.Register(addressor.CLANG_TEMPLATE operator()<ImageType>(), (ImageType*)(SITK_NULLPTR));
+      m_Factory.Register(addressor.CLANG_TEMPLATE operator()<ImageType>(), (ImageType*)(nullptr));
 
     }
 
   // this methods is conditionally enabled when the PixelID is not instantiated
   template <class TPixelIDType>
-  typename DisableIf< IsInstantiated<TPixelIDType, VImageDimension>::Value >::Type
-  operator()( TPixelIDType*id=SITK_NULLPTR ) const
+  typename std::enable_if< !IsInstantiated<TPixelIDType, VImageDimension>::Value >::type
+  operator()( TPixelIDType*id=nullptr ) const
   {
     Unused( id );
   }
@@ -91,7 +90,7 @@ void MemberFunctionFactory<TMemberFunctionPointer>
   // this shouldn't occur, just may be useful for debugging
   assert( pixelID >= 0 && pixelID < typelist::Length< InstantiatedPixelIDTypeList >::Result );
 
-  sitkStaticAssert( IsInstantiated<TImageType>::Value,
+  static_assert( IsInstantiated<TImageType>::Value,
                     "UnInstantiated ImageType or dimension");
 
   if ( pixelID >= 0 && pixelID < typelist::Length< InstantiatedPixelIDTypeList >::Result )
@@ -131,7 +130,7 @@ void MemberFunctionFactory<TMemberFunctionPointer>
 template <typename TMemberFunctionPointer>
 bool
 MemberFunctionFactory< TMemberFunctionPointer >
-::HasMemberFunction( PixelIDValueType pixelID, unsigned int imageDimension  ) const SITK_NOEXCEPT
+::HasMemberFunction( PixelIDValueType pixelID, unsigned int imageDimension  ) const noexcept
 {
 
   try

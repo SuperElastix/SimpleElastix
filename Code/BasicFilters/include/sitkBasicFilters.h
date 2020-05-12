@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 
 // todo this should be moved to a more local place
 #include "sitkTransform.h"
+#include <map>
 
 #if defined( SITKDLL )
   #ifdef SimpleITKBasicFilters0_EXPORTS

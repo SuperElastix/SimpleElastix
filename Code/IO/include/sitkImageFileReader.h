@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -40,7 +40,10 @@ namespace itk {
      *
      * An interface is also provided to access the information from
      * the underlying itk::ImageIO. This information can be loaded
-     * with the ReadImageInformation method.
+     * with the ReadImageInformation method. The information is from
+     * the itk::ImageIO interface. In some degenerate cases reading
+     * the bulk data may produce different results. Please see
+     * itk::ImageFileReader for more details.
      *
      * Reading takes place by the ITK ImageIO factory mechanism. ITK
      * contains many ImageIO classes which are responsible for reading
@@ -198,16 +201,16 @@ namespace itk {
 
       // friend to get access to executeInternal member
       friend struct detail::MemberFunctionAddressor<MemberFunctionType>;
-      nsstd::auto_ptr<detail::MemberFunctionFactory<MemberFunctionType> > m_MemberFactory;
+      std::unique_ptr<detail::MemberFunctionFactory<MemberFunctionType> > m_MemberFactory;
 
 
-      nsstd::function<std::vector<std::string>()> m_pfGetMetaDataKeys;
-      nsstd::function<bool(const std::string &)> m_pfHasMetaDataKey;
-      nsstd::function<std::string(const std::string &)> m_pfGetMetaData;
+      std::function<std::vector<std::string>()> m_pfGetMetaDataKeys;
+      std::function<bool(const std::string &)> m_pfHasMetaDataKey;
+      std::function<std::string(const std::string &)> m_pfGetMetaData;
 
       std::string m_FileName;
 
-      nsstd::auto_ptr<MetaDataDictionary> m_MetaDataDictionary;
+      std::unique_ptr<MetaDataDictionary> m_MetaDataDictionary;
 
       PixelIDValueEnum     m_PixelType;
       unsigned int         m_Dimension;

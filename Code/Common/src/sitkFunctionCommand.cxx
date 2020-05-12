@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -47,9 +47,13 @@ void FunctionCommand::SetCallbackFunction ( void(* pFunction )() )
 
 void FunctionCommand::SetCallbackFunction( void(* pFunction )(void *), void *clientData )
 {
-  m_Function = nsstd::bind(pFunction, clientData);
+  m_Function = std::bind(pFunction, clientData);
 }
 
+void FunctionCommand::SetCallbackFunction(const std::function<void()> &func)
+{
+  m_Function = func;
+}
 
 } // end namespace simple
 } // end namespace itk

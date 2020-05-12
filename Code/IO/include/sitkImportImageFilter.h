@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -91,12 +91,12 @@ namespace itk {
 
       // If the output image type is a VectorImage then the number of
       // components per pixel needs to be set, otherwise the method
-      // does not exist. This is done with the EnableIf Idiom.
+      // does not exist. This is done with the enable if idiom.
       template <class TImageType>
-      typename DisableIf<IsVector<TImageType>::Value>::Type
+        typename std::enable_if<!IsVector<TImageType>::Value>::type
       SetNumberOfComponentsOnImage( TImageType* ) {}
       template <class TImageType>
-      typename EnableIf<IsVector<TImageType>::Value>::Type
+        typename std::enable_if<IsVector<TImageType>::Value>::type
       SetNumberOfComponentsOnImage( TImageType* );
 
     private:
@@ -106,7 +106,7 @@ namespace itk {
 
       // friend to get access to executeInternal member
       friend struct detail::MemberFunctionAddressor<MemberFunctionType>;
-      nsstd::auto_ptr<detail::MemberFunctionFactory<MemberFunctionType> > m_MemberFactory;
+      std::unique_ptr<detail::MemberFunctionFactory<MemberFunctionType> > m_MemberFactory;
 
       unsigned int     m_NumberOfComponentsPerPixel;
       PixelIDValueType m_PixelIDValue;

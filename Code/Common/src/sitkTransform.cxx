@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -53,8 +53,6 @@
 #include "itkCommand.h"
 
 #include <memory>
-
-#include "nsstd/type_traits.h"
 
 namespace itk
 {
@@ -141,14 +139,14 @@ public:
   void Execute(itk::Object*, const itk::EventObject&) {}
   void Execute(const itk::Object*, const itk::EventObject&) {}
 
+  void operator=(const HolderCommand&) = delete;
+  HolderCommand(const HolderCommand&) = delete;
+
 protected:
   HolderCommand() {};
   ~HolderCommand() {};
 
 private:
-  void operator=(const HolderCommand&); // not implemented
-  HolderCommand(const HolderCommand&); // not implemented
-
   ObjectType m_Object;
 
 };
@@ -172,11 +170,11 @@ public:
   ObjectType *Get() {return this->m_Object;}
   const ObjectType *Get() const {return this->m_Object;}
 
-  void Execute(itk::Object*, const itk::EventObject&) SITK_OVERRIDE {}
-  void Execute(const itk::Object*, const itk::EventObject&) SITK_OVERRIDE {}
+  void Execute(itk::Object*, const itk::EventObject&) override {}
+  void Execute(const itk::Object*, const itk::EventObject&) override {}
 
 protected:
-  HolderCommand() : m_Object(SITK_NULLPTR) {};
+  HolderCommand() : m_Object(nullptr) {};
   ~HolderCommand() { delete m_Object;}
 
 private:
@@ -195,19 +193,19 @@ private:
 //
 
 Transform::Transform( )
-  : m_PimpleTransform( SITK_NULLPTR )
+  : m_PimpleTransform( nullptr )
   {
     m_PimpleTransform = new PimpleTransform<itk::IdentityTransform< double, 3 > >();
   }
 
 Transform::Transform( itk::TransformBase *transformBase )
-  : m_PimpleTransform( SITK_NULLPTR )
+  : m_PimpleTransform( nullptr )
 {
   this->InternalInitialization( transformBase );
 }
 
   Transform::Transform( unsigned int dimensions, TransformEnum type)
-    : m_PimpleTransform( SITK_NULLPTR )
+    : m_PimpleTransform( nullptr )
   {
     if ( dimensions == 2 )
       {
@@ -227,11 +225,11 @@ Transform::Transform( itk::TransformBase *transformBase )
   Transform::~Transform()
   {
     delete m_PimpleTransform;
-    this->m_PimpleTransform = SITK_NULLPTR;
+    this->m_PimpleTransform = nullptr;
   }
 
   Transform::Transform( const Transform &txf )
-    : m_PimpleTransform( SITK_NULLPTR )
+    : m_PimpleTransform( nullptr )
   {
     Self::SetPimpleTransform( txf.m_PimpleTransform->ShallowCopy() );
   }
@@ -246,7 +244,7 @@ Transform::Transform( itk::TransformBase *transformBase )
 
 
 Transform::Transform( Image &image, TransformEnum txType )
-    : m_PimpleTransform( SITK_NULLPTR )
+    : m_PimpleTransform( nullptr )
   {
 
 
@@ -372,7 +370,7 @@ void Transform::MakeUnique( void )
 Transform::Transform( PimpleTransformBase *pimpleTransform )
     : m_PimpleTransform( pimpleTransform )
   {
-    if ( pimpleTransform == SITK_NULLPTR )
+    if ( pimpleTransform == nullptr )
       {
       sitkExceptionMacro("Invalid NULL PimpleTransform!");
       }
@@ -598,10 +596,10 @@ std::vector< double > Transform::TransformVector( const std::vector< double > &v
   bool Transform::SetInverse()
   {
     assert( m_PimpleTransform );
-    nsstd::auto_ptr<PimpleTransformBase> temp;
+    std::unique_ptr<PimpleTransformBase> temp;
     {
     // See if a new pimple transform can be created
-    PimpleTransformBase *p = SITK_NULLPTR;
+    PimpleTransformBase *p = nullptr;
     if (!this->m_PimpleTransform->GetInverse(p))
       {
       return false;
