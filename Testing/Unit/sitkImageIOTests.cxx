@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -126,7 +126,7 @@ TEST(IO, ReadWriteInt64){
   const char *extension_list[] = {"mha",
                                   "nii",
                                   "nrrd",
-                                  SITK_NULLPTR};
+                                  nullptr};
 
   for (unsigned int i = 0; extension_list[i]; ++i)
     {
@@ -197,6 +197,58 @@ TEST(IO,ImageFileWriter) {
   EXPECT_NO_THROW( ios = writer.GetRegisteredImageIOs() );
   EXPECT_TRUE( std::find( ios.begin(), ios.end(), "GDCMImageIO") != ios.end() );
 
+}
+
+TEST(IO,ImageFileWriter_Compression)
+{
+  namespace sitk = itk::simple;
+
+  sitk::Image generatedImage = sitk::Image(10, 10, sitk::sitkUInt8);
+
+  generatedImage = sitk::AdditiveGaussianNoise(generatedImage, 32.0, 0.0, 99u);
+  const std::string expectedHash = sitk::Hash(generatedImage);
+
+  std::string filename = dataFinder.GetOutputFile("IO.ImageFileWriter_Compression.nrrd");
+
+  sitk::ImageFileWriter writer;
+
+  EXPECT_EQ(writer.GetCompressor(), "");
+  EXPECT_EQ(writer.GetCompressionLevel(), -1);
+
+  writer.UseCompressionOn();
+
+  writer.SetFileName(filename);
+  writer.SetCompressor("does_not_exist");
+  writer.SetCompressionLevel(10);
+  EXPECT_NO_THROW(writer.Execute(generatedImage));
+  EXPECT_EQ(expectedHash, sitk::Hash(sitk::ReadImage(filename)));
+  EXPECT_EQ("does_not_exist", writer.GetCompressor());
+  EXPECT_EQ(10, writer.GetCompressionLevel());
+
+  writer.SetCompressor("gzip");
+  writer.SetCompressionLevel(9);
+  EXPECT_NO_THROW(writer.Execute(generatedImage));
+  EXPECT_EQ(expectedHash, sitk::Hash(sitk::ReadImage(filename)));
+
+  writer.SetCompressor("gzip");
+  writer.SetCompressionLevel(1);
+  EXPECT_NO_THROW(writer.Execute(generatedImage));
+  EXPECT_EQ(expectedHash, sitk::Hash(sitk::ReadImage(filename)));
+
+  filename = dataFinder.GetOutputFile("IO.ImageFileWriter_Compression.tiff");
+
+  writer.SetFileName(filename);
+
+  writer.SetCompressor("JPEG");
+  writer.SetCompressionLevel(50);
+  EXPECT_NO_THROW(writer.Execute(generatedImage));
+  // No hash comparison due to lossy compression
+  // EXPECT_EQ(expectedHash, sitk::Hash(sitk::ReadImage(filename)));
+
+  writer.SetCompressor("packbits");
+  writer.SetCompressionLevel(1);
+  EXPECT_NO_THROW(writer.Execute(generatedImage));
+  EXPECT_EQ(expectedHash, sitk::Hash(sitk::ReadImage(filename)));
 }
 
 TEST(IO,ReadWrite) {
@@ -429,7 +481,7 @@ TEST(IO, DicomSeriesReader) {
   for (unsigned int i = 0; i <  image.GetSize()[2]; ++i)
     {
       std::vector<std::string> keys = reader.GetMetaDataKeys(0);
-      EXPECT_EQ( 93u, keys.size() );
+      EXPECT_EQ( 95u, keys.size() );
 
       for(unsigned int j = 0; j < keys.size(); ++j )
         {
@@ -454,6 +506,9 @@ TEST(IO, ImageSeriesWriter )
   EXPECT_TRUE(writer.GetUseCompression());
   writer.UseCompressionOff();
   EXPECT_FALSE(writer.GetUseCompression());
+
+  EXPECT_EQ(writer.GetCompressor(), "");
+  EXPECT_EQ(writer.GetCompressionLevel(), -1);
 
   EXPECT_NO_THROW ( writer.ToString() );
 
@@ -563,23 +618,32 @@ TEST(IO, ImageFileReader_ImageInformation )
   EXPECT_ANY_THROW( reader.GetMetaData("nothing") );
 
 
+  sitk::Image image = sitk::ReadImage(dicomFile1);
   reader.ReadImageInformation();
 
   EXPECT_EQ(reader.GetPixelID(), sitk::sitkInt16);
+  EXPECT_EQ(reader.GetPixelID(), image.GetPixelID());
   EXPECT_EQ(reader.GetPixelIDValue(), sitk::sitkInt16);
+  EXPECT_EQ(reader.GetPixelIDValue(), image.GetPixelIDValue());
   EXPECT_EQ(reader.GetDimension(), 3u);
+  EXPECT_EQ(reader.GetDimension(), image.GetDimension());
   EXPECT_EQ(reader.GetNumberOfComponents(), 1u);
+  EXPECT_EQ(reader.GetNumberOfComponents(), image.GetNumberOfComponentsPerPixel());
   EXPECT_VECTOR_DOUBLE_NEAR(reader.GetOrigin(), v3(-112, -21.687999, 126.894000 ), 1e-6);
+  EXPECT_VECTOR_DOUBLE_NEAR(reader.GetOrigin(), image.GetOrigin(), 1e-6);
   EXPECT_VECTOR_DOUBLE_NEAR(reader.GetSpacing(), v3(0.859375, 0.8593899, 1.600000 ), 1e-6);
-  EXPECT_VECTOR_DOUBLE_NEAR(reader.GetDirection(), v9(1, 0, 0,
-                                                      0, 0.46665081166793676, -0.88444164305490258,
-                                                      -0, 0.88444164305490258, 0.46665081166793676 ), 1e-8);
+  EXPECT_VECTOR_DOUBLE_NEAR(reader.GetSpacing(), image.GetSpacing(), 1e-6);
+  EXPECT_VECTOR_DOUBLE_NEAR(reader.GetDirection(), v9(1, 0, -0,
+                                                      0,  0.46665081166793676, 0.88444164305490258,
+                                                      0, -0.88444164305490258, 0.46665081166793676 ), 1e-8);
+  EXPECT_VECTOR_DOUBLE_NEAR(reader.GetDirection(), image.GetDirection(), 1e-16);
   EXPECT_VECTOR_NEAR(reader.GetSize(), v3(256.0, 256.0, 1.0), 1e-10);
 
   std::vector<std::string> keys = reader.GetMetaDataKeys();
   for(unsigned int i = 0; i < keys.size(); ++i )
     {
     EXPECT_TRUE( reader.HasMetaDataKey(keys[i]) );
+    EXPECT_TRUE( image.HasMetaDataKey(keys[i]) );
     EXPECT_NO_THROW( reader.GetMetaData( keys[i]) );
     }
   EXPECT_EQ(reader.GetMetaData( "0008|0031"), "153128");

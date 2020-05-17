@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -81,8 +81,8 @@ void InternalInitialization(itk::TransformBase *transform);
 template <typename TransformType>
 void InternalInitialization(TransformType *transform);
 
-nsstd::function<void(const std::vector<double> &)> m_pfSetOffset;
-nsstd::function<std::vector<double>()> m_pfGetOffset;
+std::function<void(const std::vector<double> &)> m_pfSetOffset;
+std::function<std::vector<double>()> m_pfGetOffset;
 
 };
 

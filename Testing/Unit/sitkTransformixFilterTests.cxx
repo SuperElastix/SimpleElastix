@@ -247,6 +247,8 @@ TEST( TransformixFilterTest, SameTransformParameterMapForMultipleTransformations
   EXPECT_NO_THROW( transformixFilter->Update() );
 }
 
+#ifdef SITK_4D_IMAGES
+
 TEST( TransformixFilterTest, BSpline4D )
 {
   typedef itk::Image< float, 4 > ImageType;
@@ -280,3 +282,5 @@ TEST( TransformixFilterTest, BSpline4D )
   EXPECT_NO_THROW( writer->SetInput( transformixFilter->GetOutput() ) );
   EXPECT_NO_THROW( writer->Update() );
 }
+
+#endif // SITK_4D_IMAGES

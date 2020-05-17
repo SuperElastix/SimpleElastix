@@ -47,13 +47,15 @@ include(sitkPreventInBuildInstalls)
 include(VariableList)
 include(sitkExternalData)
 include( sitkSITKLegacyNaming )
+include(sitkUseCCache)
+include(sitkUseGoldLinker)
 
 
 
 add_custom_target( SuperBuildSimpleITKSource )
 
 #
-# sitkSourceDownload( <output variable> <filename> <md5 hash> )
+# sitkSourceDownload( <output variable> <filename> )
 #
 # A function to get a filename for an ExternalData source file used in
 # a superbuild. Adds a target which downloads all source code
@@ -61,17 +63,27 @@ add_custom_target( SuperBuildSimpleITKSource )
 # the build tree, and can be locally cache with other ExternalData
 # controlled environment variables.
 #
+# <output variable> is set to the downloaded file.
+# <output variable>_HASH is set to a hash of the file of the form ALGO=HASH_VALUE
+#
 # The "SuperBuildSimpleITKSource" target needs to be manually added as
 # a dependencies to the ExternalProject.
 #
 #   add_dependencies( PROJ "SuperBuildSimpleITKSource" )
 #
-# Note: Hash files are created under the SOURCE directory in the
-# .ExternalSource sub-directory during configuration.
-#
-function(sitkSourceDownload outVar filename hash)
-  set(link_file "${CMAKE_CURRENT_SOURCE_DIR}/.ExternalSource/${filename}")
-  file(WRITE  "${link_file}.md5" ${hash} )
+function(sitkSourceDownload outVar filename)
+
+  set(algo "SHA512")
+  set(algo_extension ".sha512")
+  set(link_file "${CMAKE_CURRENT_SOURCE_DIR}/ExternalSource/${filename}")
+  if( NOT EXISTS "${link_file}${algo_extension}")
+    message(FATALERROR "The source download file: \"${link_file}${algo_extension}\" does not exists.")
+  endif()
+
+  file(READ "${link_file}${algo_extension}" _HASH)
+  string(STRIP "${_HASH}" _HASH)
+  set(${outVar}_HASH "${algo}=${_HASH}" PARENT_SCOPE)
+
   ExternalData_Expand_arguments(
     SuperBuildSimpleITKSourceReal
     link
@@ -221,7 +233,24 @@ list( APPEND ep_common_list
   CMAKE_STRIP_FLAGS
 
   CMAKE_PREFIX_PATH
+  CMAKE_INCLUDE_PATH
+  CMAKE_LIBRARY_PATH
+  CMAKE_PROGRAM_PATH
+  CMAKE_IGNORE_PATH
+
+  CMAKE_FIND_FRAMEWORK
   CMAKE_FRAMEWORK_PATH
+  CMAKE_SYSTEM_FRAMEWORK_PATH
+
+  CMAKE_APPBUNDLE_PATH
+  CMAKE_FIND_APPBUNDLE
+  CMAKE_SYSTEM_APPBUNDLE_PATH
+
+  CMAKE_FIND_ROOT_PATH
+  CMAKE_FIND_ROOT_PATH_MODE_INCLUDE
+  CMAKE_FIND_ROOT_PATH_MODE_LIBRARY
+  CMAKE_FIND_ROOT_PATH_MODE_PROGRAM
+  CMAKE_FIND_ROOT_PATH_MODE_PACKAGE
 
   CMAKE_DL_LIBS
   CMAKE_THREAD_LIBS_INIT
@@ -236,7 +265,17 @@ list( APPEND ep_common_list
   CMAKE_JOB_POOL_LINK
   CMAKE_JOB_POOL_COMPILE
 
+  CMAKE_C_VISIBILITY_PRESET
+  CMAKE_CXX_VISIBILITY_PRESET
+  CMAKE_VISIBILITY_INLINES_HIDDEN
+
   CMAKE_GENERATOR
+  CMAKE_GENERATOR_INSTANCE
+  CMAKE_GENERATOR_PLATFORM
+  CMAKE_GENERATOR_TOOLSET
+  CMAKE_VS_PLATFORM_TOOLSET_HOST_ARCHITECTURE
+  CMAKE_VS_PLATFORM_TOOLSET_VERSION
+  CMAKE_VS_PLATFORM_TOOLSET
   CMAKE_EXTRA_GENERATOR
   MEMORYCHECK_COMMAND_OPTIONS
   MEMORYCHECK_SUPPRESSIONS_FILE
@@ -277,11 +316,11 @@ include(ExternalProject)
 #------------------------------------------------------------------------------
 # Lua
 #------------------------------------------------------------------------------
-option ( SimpleITK_USE_SYSTEM_LUA "Use a pre-compiled version of LUA 5.1 previously configured for your system" OFF )
+option ( SimpleITK_USE_SYSTEM_LUA "Use a pre-compiled version of LUA 5.3 previously configured for your system" OFF )
 sitk_legacy_naming( SimpleITK_USE_SYSTEM_LUA USE_SYSTEM_LUA)
 mark_as_advanced(SimpleITK_USE_SYSTEM_LUA)
 if ( SimpleITK_USE_SYSTEM_LUA )
-  find_package( LuaInterp REQUIRED 5.1 )
+  find_package( LuaInterp 5.3 REQUIRED )
   set( SimpleITK_LUA_EXECUTABLE ${LUA_EXECUTABLE} CACHE PATH "Lua executable used for code generation." )
   mark_as_advanced( SimpleITK_LUA_EXECUTABLE )
   unset( LUA_EXECUTABLE CACHE )
@@ -497,6 +536,17 @@ ExternalProject_Add_Step(${proj} doc
 # adds superbuild level target "SimpleITK-documentation" etc..
 ExternalProject_Add_StepTargets(${proj} configure build test forcebuild doc)
 
+
+
+# Load the SimpleITK version variables, scope isolated in a function.
+function(_set_simpleitk_install_path outVar)
+  include(../Version.cmake)
+  ExternalProject_Get_Property(${proj} install_dir)
+  set(${outVar}
+     "${install_dir}/lib/cmake/SimpleITK-${SimpleITK_VERSION_MAJOR}.${SimpleITK_VERSION_MINOR}"
+     PARENT_SCOPE)
+endfunction()
+_set_simpleitk_install_path(SIMPLEITK_DIR)
 
 #------------------------------------------------------------------------------
 # SimpleITKExamples

@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -48,14 +48,16 @@ SITKBasicFilters_EXPORT Image Resample ( const Image& image1,
                                          Transform transform = itk::simple::Transform(),
                                          InterpolatorEnum interpolator = itk::simple::sitkLinear,
                                          double defaultPixelValue = 0.0,
-                                         PixelIDValueEnum outputPixelType = sitkUnknown );
+                                         PixelIDValueEnum outputPixelType = sitkUnknown,
+                                         bool useNearestNeighborExtrapolator = false);
 
 SITKBasicFilters_EXPORT Image Resample ( const Image& image1,
                                          const Image& referenceImage,
                                          Transform transform = itk::simple::Transform(),
                                          InterpolatorEnum interpolator = itk::simple::sitkLinear,
                                          double defaultPixelValue = 0.0,
-                                         PixelIDValueEnum outputPixelType = sitkUnknown );
+                                         PixelIDValueEnum outputPixelType = sitkUnknown,
+                                         bool useNearestNeighborExtrapolator = false);
 
 SITKBasicFilters_EXPORT Image Resample ( const Image& image1,
                                          std::vector<uint32_t> size,
@@ -65,7 +67,8 @@ SITKBasicFilters_EXPORT Image Resample ( const Image& image1,
                                          std::vector<double> outputSpacing = std::vector<double>(3, 1.0),
                                          std::vector<double> outputDirection = std::vector<double>(),
                                          double defaultPixelValue = 0.0,
-                                         PixelIDValueEnum outputPixelType = sitkUnknown );
+                                         PixelIDValueEnum outputPixelType = sitkUnknown,
+                                         bool useNearestNeighborExtrapolator = false);
     /**@}*/
 
 

@@ -22,7 +22,7 @@ SimpleElastix includes a script that automatically downloads and installs all de
 
 .. warning::
 
-    Be careful not to run out of memory during the build. A rule of thumb is that we need 4GB of memory per core. For example, if we compile SimpleElastix with 4 cores (e.g. :code:`make -j4`) we need a machine with at least 16GB of RAM. The full project takes around an hour to compile on a quad-core machine.
+    Be careful not to run out of memory during the build. A rule of thumb is that we need 4GB of memory per core. For example, if we compile SimpleElastix with 4 cores (e.g. :code:`make -j4`) we need a machine with at least 16GB of RAM. As well, avoid using more cores than are available on your system. Some errors may be resolved by using only a single core, (i.e. :code:`make -j1`). The full project takes around an hour to compile on a quad-core machine.
 
 SimpleElastix will be compiled for languages that it can automatically detect. Target language dependencies need to be installed before you start compile the SuperBuild. The relevant :code:`apt` packages are  
 
@@ -51,7 +51,40 @@ and run the following command:
 This will install the SimpleElastix which we can then import into our own scripts. If we want to install SimpleElastix into a virtual environment, activate the virtual environment on beforehand and omit :code:`sudo`. If you don't know what a virtual environment is, don't worry about it, it is entirely optional.
 
 # Java
-TODO: Pull request welcome.
+
+First, ensure the following directory exists after compilation:
+
+::
+
+    ${BUILD_DIRECTORY}/SimpleITK-build/Wrapping/Java
+
+If such a directory does not exist, check the Troubleshooting section below. 
+
+The `visual guide to SimpleITK in Java <https://itk.org/Wiki/SimpleITK/GettingStarted/A_visual_guide_to_SimpleITK_in_Java>`_ shows you how to create a java project in eclipse.  The main steps are:
+
+1. Add the simpleitk jar to classpath (simpleitk-<version>.jar)
+
+2. Set the path to the Native Library, in this case :code:`${BUILD_DIRECTORY}/SimpleITK-build/Wrapping/Java/lib`
+
+The steps are similiar when using IntelliJ. First add the jar file to the project
+
+.. figure:: _static/IntelliJSetJar.png
+    :align: center
+    :width: 100% 
+
+then set the :code:`java.library.path` in your run configuration.
+
+.. figure:: _static/IntelliJSetLibrary.png
+    :align: center
+    :width: 100% 
+
+
+After a project is set up, the 
+`Java elastix example <https://github.com/SuperElastix/SimpleElastix/blob/master/Examples/Java/SimpleElastix.java>`_ 
+and the `Java transformix example <https://github.com/SuperElastix/SimpleElastix/blob/master/Examples/Java/SimpleTransformix.java>`_
+show how to use the interface.
+
+
 
 # R
 TODO: Pull request welcome.

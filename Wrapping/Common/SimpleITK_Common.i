@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -69,6 +69,7 @@
 %ignore itk::simple::Image::GetBufferAsUInt64;
 %ignore itk::simple::Image::GetBufferAsFloat;
 %ignore itk::simple::Image::GetBufferAsDouble;
+%ignore itk::simple::Image::GetBufferAsVoid;
 #endif
 
 
@@ -127,10 +128,6 @@ namespace std
 
 #ifndef SITK_RETURN_SELF_TYPE_HEADER
 #define SITK_RETURN_SELF_TYPE_HEADER void
-#endif
-
-#ifndef SITK_NOEXCEPT
-#define SITK_NOEXCEPT
 #endif
 
 

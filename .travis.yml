@@ -33,9 +33,11 @@ matrix:
       compiler: gcc
 
 before_script:
-  - mkdir -p ${SIMPLEELASTIX_BUILD_DIR}
-  - pwd
-  - ls -lR
+  - sudo apt-get remove cmake && sudo apt-get install swig lua5.3 libinsighttoolkit4-dev doxygen graphviz
+  - cd ${ExternalData_OBJECT_STORES} && if [[ ! -e ${CMAKE_DOWNLOAD_FILE} ]]; then curl -sSO https://cmake.org/files/v3.6/${CMAKE_DOWNLOAD_FILE}; fi
+  - echo "y\n" | sudo bash "${ExternalData_OBJECT_STORES}/${CMAKE_DOWNLOAD_FILE}" --prefix=/usr/local --exclude-subdir
+  - cmake --version
+  - mkdir -p ${SIMPLEITK_BUILD_DIR}
 
 script:
   - if [[ ! -e ${ITK_BUILD_DIR}/ITKConfig.cmake ]]; then

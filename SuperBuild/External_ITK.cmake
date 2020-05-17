@@ -31,6 +31,7 @@ foreach (_varName ${_varNames})
       OR _varName MATCHES "^ITKV3"
       OR _varName MATCHES "^ITKV4"
       OR _varName MATCHES "FFTW"
+      OR _varName MATCHES "^GDCM_"
       OR _varName MATCHES "^Module_")
     message( STATUS "Passing variable \"${_varName}=${${_varName}}\" to ITK external project.")
     list(APPEND ITK_VARS ${_varName})
@@ -52,8 +53,8 @@ set(ITK_GIT_REPOSITORY "${git_protocol}://github.com/InsightSoftwareConsortium/I
 mark_as_advanced(ITK_GIT_REPOSITORY)
 sitk_legacy_naming(ITK_GIT_REPOSITORY ITK_REPOSITORY)
 
-set(ITK_GIT_TAG "4a6e8c84198a741d18a2a39e616c26dda09b6686" CACHE
-  STRING "Tag in ITK git repo") # release-4.13
+set(_DEFAULT_ITK_GIT_TAG "v5.1rc02")
+set(ITK_GIT_TAG "${_DEFAULT_ITK_GIT_TAG}" CACHE STRING "Tag in ITK git repo")
 mark_as_advanced(ITK_GIT_TAG)
 set(ITK_TAG_COMMAND GIT_TAG "${ITK_GIT_TAG}")
 
@@ -73,6 +74,12 @@ else()
     "-DITK_TEMPLATE_VISIBILITY_DEFAULT:BOOL=OFF" )
 endif()
 
+
+if( ITK_GIT_TAG STREQUAL _DEFAULT_ITK_GIT_TAG )
+  # Unable to use ITK_LEGACY_REMOVE due to change in the enum types.
+  # list( APPEND ep_itk_args "-DITK_LEGACY_REMOVE:BOOL=ON" )
+endif()
+
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${proj}-build/CMakeCacheInit.txt" "${ep_itk_cache}\n${ep_common_cache}" )
 
 ExternalProject_Add(${proj}
@@ -86,7 +93,6 @@ ExternalProject_Add(${proj}
   -DCMAKE_TOOLCHAIN_FILE:FILEPATH=${CMAKE_TOOLCHAIN_FILE}
   --no-warn-unused-cli
   -C "${CMAKE_CURRENT_BINARY_DIR}/${proj}-build/CMakeCacheInit.txt"
-  -DITK_LEGACY_REMOVE:BOOL=ON
   ${ep_itk_args}
   ${ep_common_args}
   -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON

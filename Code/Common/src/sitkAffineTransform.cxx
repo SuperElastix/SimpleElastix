@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -159,21 +159,21 @@ void AffineTransform::InternalInitialization(itk::TransformBase *transform)
   typelist::Visit<TransformTypeList> callInternalInitialization;
 
   // explicitly remove all function pointer with reference to prior transform
-  this->m_pfSetCenter = SITK_NULLPTR;
-  this->m_pfGetCenter = SITK_NULLPTR;
-  this->m_pfSetTranslation = SITK_NULLPTR;
-  this->m_pfGetTranslation = SITK_NULLPTR;
-  this->m_pfSetMatrix = SITK_NULLPTR;
-  this->m_pfGetMatrix = SITK_NULLPTR;
-  this->m_pfScale1 = SITK_NULLPTR;
-  this->m_pfScale2 = SITK_NULLPTR;
-  this->m_pfShear = SITK_NULLPTR;
-  this->m_pfTranslate = SITK_NULLPTR;
-  this->m_pfRotate = SITK_NULLPTR;
+  this->m_pfSetCenter = nullptr;
+  this->m_pfGetCenter = nullptr;
+  this->m_pfSetTranslation = nullptr;
+  this->m_pfGetTranslation = nullptr;
+  this->m_pfSetMatrix = nullptr;
+  this->m_pfGetMatrix = nullptr;
+  this->m_pfScale1 = nullptr;
+  this->m_pfScale2 = nullptr;
+  this->m_pfShear = nullptr;
+  this->m_pfTranslate = nullptr;
+  this->m_pfRotate = nullptr;
 
   callInternalInitialization(visitor);
 
-  if ( this->m_pfSetCenter == SITK_NULLPTR )
+  if ( this->m_pfSetCenter == nullptr )
     {
     sitkExceptionMacro("Transform is not of type " << this->GetName() << "!" );
     }
@@ -186,20 +186,26 @@ void AffineTransform::InternalInitialization(TransformType *t)
   SITK_TRANSFORM_SET_MPF(Center, typename TransformType::InputPointType, double);
   SITK_TRANSFORM_SET_MPF(Translation, typename TransformType::OutputVectorType, double);
 
-  typename TransformType::MatrixType (*pfSTLToITKDirection)(const std::vector<double> &) = &sitkSTLToITKDirection<typename TransformType::MatrixType>;
-  this->m_pfSetMatrix = nsstd::bind(&TransformType::SetMatrix, t, nsstd::bind(pfSTLToITKDirection, nsstd::placeholders::_1));
+  this->m_pfSetMatrix = [t](const std::vector<double> &arg)
+    {
+      t->SetMatrix(sitkSTLToITKDirection<typename TransformType::MatrixType>(arg));
+    };
+
 
   SITK_TRANSFORM_SET_MPF_GetMatrix();
 
-  typename TransformType::OutputVectorType (*pfSTLVectorToITK)(const std::vector<double> &) = &sitkSTLVectorToITK<typename TransformType::OutputVectorType, double>;
-  void  (TransformType::*pfScale1) (const typename TransformType::OutputVectorType &, bool) = &TransformType::Scale;
-  this->m_pfScale1 = nsstd::bind(pfScale1,t,nsstd::bind(pfSTLVectorToITK,nsstd::placeholders::_1),nsstd::placeholders::_2);
+  this->m_pfScale1 = [t](const std::vector<double> v, bool b)
+    {
+      t->Scale(sitkSTLVectorToITK<typename TransformType::OutputVectorType>(v), b);
+    };
 
-  void  (TransformType::*pfScale2) (const double &, bool) = &TransformType::Scale;
-  this->m_pfScale2 = nsstd::bind(pfScale2,t,nsstd::placeholders::_1,nsstd::placeholders::_2);
-  this->m_pfShear = nsstd::bind(&TransformType::Shear,t,nsstd::placeholders::_1,nsstd::placeholders::_2,nsstd::placeholders::_3,nsstd::placeholders::_4);
-  this->m_pfTranslate = nsstd::bind(&TransformType::Translate,t,nsstd::bind(pfSTLVectorToITK,nsstd::placeholders::_1),nsstd::placeholders::_2);
-  this->m_pfRotate = nsstd::bind(&TransformType::Rotate,t,nsstd::placeholders::_1,nsstd::placeholders::_2,nsstd::placeholders::_3,nsstd::placeholders::_4);
+  this->m_pfScale2 = [t](double v, bool b) { t->Scale(v, b); };
+
+  this->m_pfShear = std::bind(&TransformType::Shear,t,std::placeholders::_1,std::placeholders::_2,std::placeholders::_3,std::placeholders::_4);
+  this->m_pfTranslate = [t] (const std::vector<double> &v, bool b) {
+    t->Translate(sitkSTLVectorToITK<typename TransformType::OutputVectorType>(v),b);
+  };
+  this->m_pfRotate = std::bind(&TransformType::Rotate,t,std::placeholders::_1,std::placeholders::_2,std::placeholders::_3,std::placeholders::_4);
 }
 
 }

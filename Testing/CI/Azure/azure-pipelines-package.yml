@@ -1,0 +1,38 @@
+
+trigger:
+   tags:
+     include:
+       - '*'
+   branches:
+     exclude:
+       - '*'
+pr: none
+schedules:
+- cron: "0 3 * * *" # 10 pm EST->UTC
+  displayName: Daily build
+  branches:
+    include:
+    - develop
+  always: false
+
+variables:
+  ExternalDataVersion: 1.2.0
+jobs:
+  - job: Configure
+    displayName: Configure Variables
+    pool:
+      vmImage: 'Ubuntu-16.04'
+    steps:
+      - checkout: none
+      - bash: |
+          echo "##vso[task.setvariable variable=BuildHash;isOutput=true]${CONFIGURE_BUILDHASH:-release}"
+        name: configure
+  - template: templates/package-linux-job.yml
+    parameters:
+      ARCH: x86_64
+  - template: templates/package-mac-job.yml
+  - template: templates/package-win-job.yml
+    parameters:
+      PYTHON_ARCH: x64
+      CMAKE_PLATFORM: x64
+      VCVAR_OPTIONS: amd64

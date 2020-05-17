@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -155,18 +155,18 @@ void Euler3DTransform::InternalInitialization(itk::TransformBase *transform)
   TransformType *t = dynamic_cast<TransformType*>(transform);
 
   // explicitly remove all function pointer with reference to prior transform
-  this->m_pfSetCenter = SITK_NULLPTR;
-  this->m_pfGetCenter = SITK_NULLPTR;
-  this->m_pfSetTranslation = SITK_NULLPTR;
-  this->m_pfGetTranslation = SITK_NULLPTR;
-  this->m_pfSetRotation = SITK_NULLPTR;
-  this->m_pfGetAngleX = SITK_NULLPTR;
-  this->m_pfGetAngleY = SITK_NULLPTR;
-  this->m_pfGetAngleZ = SITK_NULLPTR;
-  this->m_pfSetComputeZYX = SITK_NULLPTR;
-  this->m_pfGetComputeZYX = SITK_NULLPTR;
-  this->m_pfGetMatrix = SITK_NULLPTR;
-  this->m_pfSetMatrix = SITK_NULLPTR;
+  this->m_pfSetCenter = nullptr;
+  this->m_pfGetCenter = nullptr;
+  this->m_pfSetTranslation = nullptr;
+  this->m_pfGetTranslation = nullptr;
+  this->m_pfSetRotation = nullptr;
+  this->m_pfGetAngleX = nullptr;
+  this->m_pfGetAngleY = nullptr;
+  this->m_pfGetAngleZ = nullptr;
+  this->m_pfSetComputeZYX = nullptr;
+  this->m_pfGetComputeZYX = nullptr;
+  this->m_pfGetMatrix = nullptr;
+  this->m_pfSetMatrix = nullptr;
 
   if (t && (typeid(*t) == typeid(TransformType)))
     {
@@ -189,12 +189,12 @@ void Euler3DTransform::InternalInitialization(TransformType *t)
   SITK_TRANSFORM_SET_MPF_GetMatrix();
   SITK_TRANSFORM_SET_MPF_SetMatrix();
 
-  this->m_pfSetRotation = nsstd::bind(&TransformType::SetRotation,t,nsstd::placeholders::_1,nsstd::placeholders::_2,nsstd::placeholders::_3);
-  this->m_pfGetAngleX = nsstd::bind(&TransformType::GetAngleX,t);
-  this->m_pfGetAngleY = nsstd::bind(&TransformType::GetAngleY,t);
-  this->m_pfGetAngleZ = nsstd::bind(&TransformType::GetAngleZ,t);
-  this->m_pfSetComputeZYX = nsstd::bind(&TransformType::SetComputeZYX,t,nsstd::placeholders::_1);
-  this->m_pfGetComputeZYX = nsstd::bind(&TransformType::GetComputeZYX,t);
+  this->m_pfSetRotation = std::bind(&TransformType::SetRotation,t,std::placeholders::_1,std::placeholders::_2,std::placeholders::_3);
+  this->m_pfGetAngleX = std::bind(&TransformType::GetAngleX,t);
+  this->m_pfGetAngleY = std::bind(&TransformType::GetAngleY,t);
+  this->m_pfGetAngleZ = std::bind(&TransformType::GetAngleZ,t);
+  this->m_pfSetComputeZYX = std::bind(&TransformType::SetComputeZYX,t,std::placeholders::_1);
+  this->m_pfGetComputeZYX = std::bind(&TransformType::GetComputeZYX,t);
 
 }
 

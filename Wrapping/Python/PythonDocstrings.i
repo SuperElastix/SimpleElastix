@@ -11732,7 +11732,7 @@ Return a description of the error
 %feature("docstring")  itk::simple::GenericException::~GenericException "
 
 Virtual destructor needed for subclasses. Has to have empty
-SITK_NOEXCEPT.
+noexcept.
 
 ";
 

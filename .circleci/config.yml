@@ -1,20 +1,20 @@
 referenced:
   defaults: &defaults
     docker:
-     - image: circleci/python:2.7-stretch
+     - image: circleci/python:3.5-stretch
     working_directory: ~/
-    resource_class: large
+    resource_class: medium
   default_environment_keys:  &default_environment
     <<: &default_environment_keys
       CTEST_DASHBOARD_ROOT: /home/circleci
       CTEST_SOURCE_DIRECTORY: /home/circleci/SimpleITK
       CTEST_BINARY_DIRECTORY: /home/circleci/SimpleITK-build
       ROOT_BINARY_DIRECTORY: /home/circleci/SimpleITK-build
-      CTEST_BUILD_FLAGS: "-j 4"
-      CTEST_CONFIGURATION_TYPE: "Release"
+      CTEST_BUILD_FLAGS: "-j 1"
+      CTEST_CONFIGURATION_TYPE: "MinSizeRel"
       CTEST_OUTPUT_ON_FAILURE: 1
       ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS: 2
-      PARALLEL_LEVEL: 4
+      PARALLEL_LEVEL: 2
       DASHBOARD_BRANCH_DIRECTORY: /home/circleci/dashboard
       ExternalData_OBJECT_STORES: /home/circleci/.ExternalData
       CCACHE_NODIRECT: 1
@@ -22,10 +22,10 @@ referenced:
     run:
       name: Dependencies
       command: |
-        sudo apt-get install -y rsync lua5.1 ccache kwstyle
+        sudo apt-get install -y rsync lua5.3 ccache
         sudo python -m pip install --upgrade pip
         sudo python -m pip install scikit-ci-addons # Provides "ctest_junit_formatter" add-on
-        sudo python -m pip install cmake==3.10.3
+        sudo python -m pip install cmake==3.13.3
   generate-hash-step: &generate-hash-step
     run:
       name: Generate external data hash
@@ -42,6 +42,7 @@ referenced:
       keys:
         - ccache-{{ arch }}-{{ .Branch }}
         - ccache-{{ arch }}-master
+        - ccache-{{ arch }}
   clone-dashboard-step: &clone-dashboard-step
      run:
        name: Cloning dashboard branch
@@ -58,7 +59,6 @@ referenced:
        name: Formatting CTest for JUnit
        when: always
        command: |
-         env
          mkdir -p /tmp/test-results
          ci_addons ctest_junit_formatter ${CTEST_BINARY_DIRECTORY} > /tmp/test-results/JUnit-${CIRCLE_NODE_INDEX}.xml
   junit-store-test-results: &junit-store-test-results
@@ -123,7 +123,7 @@ jobs:
           root: /home/circleci/SimpleITK-build
           paths:
             - "*"
-  python2.7-and-test:
+  python3.5-and-test:
     <<: *defaults
     environment:
       <<: *default_environment_keys
@@ -159,10 +159,10 @@ jobs:
             ctest -V -Ddashboard_source_config_dir:PATH="Wrapping/Python" -S "${CTEST_SOURCE_DIRECTORY}/.circleci/circleci.cmake"
       - *junit-fotmatting
       - *junit-store-test-results
-  python3.6-and-test:
+  python3.7-and-test:
     <<: *defaults
     docker:
-     - image: circleci/python:3.6-stretch
+     - image: circleci/python:3.7-stretch
     environment:
       <<: *default_environment_keys
       CTEST_BUILD_FLAGS: "-j 2"
@@ -255,6 +255,7 @@ jobs:
       - run:
           name: Prerequisite Dependencies
           command: |
+            sudo apt-get update -y
             sudo apt-get install -y python-pip
       - *dependencies
       - *env-step
@@ -324,27 +325,18 @@ workflows:
                  - gh-pages
                  - dashboard
                  - hooks
-      - python2.7-and-test:
+      - python3.5-and-test:
           requires:
             - build-and-test
-          filters:
-            branches:
-               ignore: next
-      - python3.6-and-test:
+      - python3.7-and-test:
           requires:
             - build-and-test
       - r-and-test:
           requires:
             - build-and-test
-          filters:
-            branches:
-               ignore: next
       - java-and-test:
           requires:
             - build-and-test
-          filters:
-            branches:
-               ignore: next
 
   nightly:
     triggers:

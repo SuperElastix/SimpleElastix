@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -411,6 +411,12 @@ namespace itk
   paths.push_back( "/Developer" );
   paths.push_back( "/opt/" + directory );
   paths.push_back( "/usr/local/" + directory );
+  std::string homedir;
+  if ( itksys::SystemTools::GetEnv ( "HOME", homedir ) )
+    {
+    paths.push_back( homedir + "/Applications/" + directory );
+    }
+
 
   ExecutableName = itksys::SystemTools::FindDirectory( name.c_str(), paths );
 
@@ -592,8 +598,6 @@ namespace itk
         itksysProcess_Delete( kp );
         sitkExceptionMacro (  << "Unexpected process state!" << "\nCommand line: " << cmdstream.str() );
       }
-
-    itksysProcess_Delete( kp );
   }
 
   void Show( const Image &image, const std::string& title, const bool debugOn)

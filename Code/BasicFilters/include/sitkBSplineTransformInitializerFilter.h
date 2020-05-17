@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -103,7 +103,7 @@ SetTransformDomainMeshSize()before calling InitializeTransform().
 
       friend struct detail::MemberFunctionAddressor<MemberFunctionType>;
 
-      nsstd::auto_ptr<detail::MemberFunctionFactory<MemberFunctionType> > m_MemberFactory;
+      std::unique_ptr<detail::MemberFunctionFactory<MemberFunctionType> > m_MemberFactory;
 
 
       std::vector<uint32_t>  m_TransformDomainMeshSize;

@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ TEST(LabelStatistics,Simple) {
 
   try {
     lsFilter.Execute ( intensityImage, labelImage );
-  } catch ( itk::ExceptionObject e ) {
+  } catch ( itk::ExceptionObject &e ) {
     std::cout << "LabelStatistics failed: " << e.what() << std::endl;
   }
 
@@ -194,14 +194,66 @@ TEST(LabelStatistics,Shape_OBB) {
   EXPECT_VECTOR_DOUBLE_NEAR( v4(0.713199, -0.700961, 0.700961, 0.713199), lssFilter.GetOrientedBoundingBoxDirection(100), 1e-6 );
   std::vector<double> verticesExpected = v9( -86.190355427717947,
                                              83.719933383265925,
-                                             -86.190355427717947,
-                                             377.31123819498737,
-                                             140.63830354316519,
-                                             83.719933383265925,
-                                             140.63830354316519,
-                                             377.31123819498737,
+                                             119.60574447063291,
+                                             293.10909147813277,
+                                             75.583720150438126,
+                                             -75.278145225760852,
+                                             281.37982004878904,
+                                             134.11101286910596,
                                              0.0);
   verticesExpected.pop_back();
   EXPECT_VECTOR_DOUBLE_NEAR( verticesExpected, lssFilter.GetOrientedBoundingBoxVertices(100), 1e-4);
 
+}
+
+
+
+
+
+TEST(LabelStatistics,Shape_GetIndexes) {
+
+  namespace sitk = itk::simple;
+
+  //By using the same image, the label min/max values should equal the label itself.
+  itk::simple::Image labelImage     = sitk::ReadImage( dataFinder.GetFile ( "Input/2th_cthead1.png" ), sitk::sitkUInt8 );
+
+  itk::simple::LabelShapeStatisticsImageFilter lssFilter;
+
+  EXPECT_NO_THROW(lssFilter.Execute ( labelImage ));
+
+  EXPECT_EQ(2, lssFilter.GetNumberOfLabels());
+  ASSERT_TRUE( lssFilter.HasLabel(100) );
+  ASSERT_TRUE( lssFilter.HasLabel(200) );
+  EXPECT_EQ( 23061, lssFilter.GetNumberOfPixels(100) );
+  EXPECT_EQ( 9085, lssFilter.GetNumberOfPixels(200) );
+
+  ASSERT_EQ( 2, labelImage.GetDimension() );
+
+  for (auto l : lssFilter.GetLabels())
+    {
+    std::vector<unsigned int> idxs = lssFilter.GetIndexes(l);
+
+    EXPECT_EQ(lssFilter.GetNumberOfPixels(l)*labelImage.GetDimension(),
+             idxs.size());
+
+    for (auto iter = idxs.cbegin(); iter != idxs.cend();)
+      {
+      std::vector<unsigned int> idx{*iter++, *iter++};
+      EXPECT_EQ(l, labelImage.GetPixelAsUInt8(idx));
+      }
+    std::vector<unsigned int> rle = lssFilter.GetRLEIndexes(l);
+
+    EXPECT_EQ(0, rle.size()%(labelImage.GetDimension()+1));
+
+    for (auto iter = rle.cbegin(); iter != rle.cend();)
+      {
+      std::vector<unsigned int>  idx{*iter++, *iter++};
+      unsigned int length = *iter++;
+      while (length--)
+        {
+        EXPECT_EQ(l, labelImage.GetPixelAsUInt8(idx));
+        ++idx[0];
+        }
+      }
+    }
 }

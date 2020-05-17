@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -37,19 +37,19 @@
 #include "itkImage.h"
 #include "itkVectorImage.h"
 #include "itkMetaDataObject.h"
+#include <type_traits>
 
 const double adir[] = {0.0, 0.0, 1.0,
                        -1.0, 0.0, 0.0,
                        0.0, -1.0, 0.0};
 
 using  itk::simple::InstantiatedPixelIDTypeList;
-namespace nsstd = itk::simple::nsstd;
 
 
 
 class Image : public ::testing::Test {
 public:
-  typedef nsstd::auto_ptr<itk::simple::Image> sitkAutoImagePointer;
+  typedef std::unique_ptr<itk::simple::Image> sitkAutoImagePointer;
 
   virtual void SetUp() {
     itk::ImageBase<3>::IndexType index;
@@ -131,7 +131,7 @@ public:
 
 
 TEST_F(Image,Create) {
-  ASSERT_TRUE ( shortImage->GetITKBase() != NULL );
+  ASSERT_TRUE ( shortImage->GetITKBase() != nullptr );
   EXPECT_EQ ( shortImage->GetWidth(), itkShortImage->GetLargestPossibleRegion().GetSize()[0] ) << " Checking image width";
   EXPECT_EQ ( shortImage->GetHeight(), itkShortImage->GetLargestPossibleRegion().GetSize()[1] ) << " Checking image height";
   EXPECT_EQ ( shortImage->GetDepth(), itkShortImage->GetLargestPossibleRegion().GetSize()[2] ) << " Checking image depth";
@@ -461,6 +461,8 @@ TEST_F(Image, CopyInformation)
   EXPECT_EQ( img1.GetNumberOfPixels(), img2.GetNumberOfPixels() );
 }
 
+sitkClangDiagnosticPush();
+sitkClangWarningIgnore("-Wself-assign-overloaded");
 TEST_F(Image, CopyOnWrite)
 {
   // test that a just constructed image only have 1 referecne
@@ -634,6 +636,7 @@ TEST_F(Image,Operators)
   v =  dynamic_cast<itk::Image<short,3>*>( imgA.GetITKBase() )->GetPixel( idx);
   EXPECT_EQ( 0, v ) << "value check 8";
 }
+sitkClangDiagnosticPop();
 
 TEST_F(Image,SetPixel)
 {
@@ -1432,21 +1435,17 @@ TEST_F(Image, GetBuffer)
   ASSERT_ANY_THROW( img.GetBufferAsDouble() ) << " Get with wrong type";
 
 
-  // currently Int64 pixel types are instantiated yet,
-  // so an exception will be thrown.
-  try
+  // Int64 pixel types might not be instantiated
+  if ( sitk::sitkUInt64 != sitk::sitkUnknown )
     {
     img = sitk::Image( 10, 10, sitk::sitkUInt64 );
     EXPECT_EQ( img.GetBufferAsUInt64()[99], 0u ) << " Get last element in buffer ";
-
+    }
+  if ( sitk::sitkInt64 != sitk::sitkUnknown )
+    {
     img = sitk::Image( 10, 10, sitk::sitkInt64 );
     EXPECT_EQ( img.GetBufferAsInt64()[99], 0u ) << " Get last element in buffer ";
     }
-  catch ( std::exception &e)
-    {
-    std::cout << "Exception: " << e.what() << std::endl;
-    }
-
   img = sitk::Image( 10, 10, sitk::sitkFloat32 );
   EXPECT_EQ( img.GetBufferAsFloat()[99], 0u ) << " Get last element in buffer ";
   ASSERT_ANY_THROW( img.GetBufferAsInt16() ) << " Get with wrong type";
@@ -1456,6 +1455,22 @@ TEST_F(Image, GetBuffer)
 
   img = sitk::Image( 10, 10, sitk::sitkFloat64 );
   EXPECT_EQ( img.GetBufferAsDouble()[99], 0 ) << " Get last element in buffer ";
+  ASSERT_ANY_THROW( img.GetBufferAsUInt8() ) << " Get with wrong type";
+  ASSERT_ANY_THROW( img.GetBufferAsInt16() ) << " Get with wrong type";
+  ASSERT_ANY_THROW( img.GetBufferAsUInt16() ) << " Get with wrong type";
+  ASSERT_ANY_THROW( img.GetBufferAsInt32() ) << " Get with wrong type";
+  ASSERT_ANY_THROW( img.GetBufferAsUInt32() ) << " Get with wrong type";
+  ASSERT_ANY_THROW( img.GetBufferAsFloat() ) << " Get with wrong type";
+
+  img = sitk::Image( 10, 10, sitk::sitkComplexFloat32 );
+  EXPECT_EQ( img.GetBufferAsFloat()[199], 0.0f ) << " Get last element in buffer ";
+  ASSERT_ANY_THROW( img.GetBufferAsInt16() ) << " Get with wrong type";
+  ASSERT_ANY_THROW( img.GetBufferAsUInt16() ) << " Get with wrong type";
+  ASSERT_ANY_THROW( img.GetBufferAsInt32() ) << " Get with wrong type";
+  ASSERT_ANY_THROW( img.GetBufferAsDouble() ) << " Get with wrong type";
+
+  img = sitk::Image( 10, 10, sitk::sitkComplexFloat64 );
+  EXPECT_EQ( img.GetBufferAsDouble()[199], 0.0 ) << " Get last element in buffer ";
   ASSERT_ANY_THROW( img.GetBufferAsUInt8() ) << " Get with wrong type";
   ASSERT_ANY_THROW( img.GetBufferAsInt16() ) << " Get with wrong type";
   ASSERT_ANY_THROW( img.GetBufferAsUInt16() ) << " Get with wrong type";
@@ -1540,20 +1555,16 @@ TEST_F(Image, GetBufferVector)
   ASSERT_ANY_THROW( img.GetBufferAsFloat() ) << " Get with wrong type";
   ASSERT_ANY_THROW( img.GetBufferAsDouble() ) << " Get with wrong type";
 
-
-  // currently Int64 pixel types are instantiated yet,
-  // so an exception will be thrown.
-  try
+  // Int64 pixel types might not be instantiated
+  if ( sitk::sitkVectorUInt64 != sitk::sitkUnknown )
     {
     img = sitk::Image( 10, 10, sitk::sitkVectorUInt64 );
     EXPECT_EQ( img.GetBufferAsUInt64()[99], 0u ) << " Get last element in buffer ";
-
+    }
+  if ( sitk::sitkVectorInt64 != sitk::sitkUnknown )
+    {
     img = sitk::Image( 10, 10, sitk::sitkVectorInt64 );
     EXPECT_EQ( img.GetBufferAsInt64()[99], 0u ) << " Get last element in buffer ";
-    }
-  catch ( std::exception &e)
-    {
-    std::cout << "Exception: " << e.what() << std::endl;
     }
 
   img = sitk::Image( 10, 10, sitk::sitkVectorFloat32 );
@@ -1624,6 +1635,57 @@ TEST_F(Image,MetaDataDictionary)
   EXPECT_EQ( 0u, img.GetMetaDataKeys().size() );
 
   EXPECT_FALSE( img.EraseMetaData("k1") );
+
+}
+
+TEST_F(Image, MoveOperations)
+{
+  sitk::Image img;
+
+  static_assert(std::is_move_constructible<sitk::Image>::value, "Verify method availability");
+  static_assert(std::is_move_assignable<sitk::Image>::value, "Verify method availability");
+
+  img = sitk::Image(10,10,  sitk::sitkUInt8);
+
+  EXPECT_EQ(img.GetSize()[0], 10);
+
+  sitk::Image img2(5, 6, sitk::sitkUInt8);
+
+  // The details of when an image has a nullptr for the ITKBase are
+  // not specified, so that part of the tests are to verify the
+  // internal implementation details
+  auto itkBasePtr = img2.GetITKBase();
+
+  img = std::move(img2);
+
+  EXPECT_EQ(img.GetSize()[1], 6);
+  EXPECT_EQ(static_cast<const sitk::Image&>(img).GetITKBase(), itkBasePtr);
+
+  sitk::Image img3(std::move(img));
+
+  EXPECT_EQ(img3.GetSize()[0], 5);
+  EXPECT_EQ(static_cast<const sitk::Image&>(img3).GetITKBase(), itkBasePtr);
+  EXPECT_EQ(static_cast<const sitk::Image&>(img).GetITKBase(), nullptr);
+
+  img = std::move(img3);
+
+  EXPECT_EQ(img.GetSize()[0], 5);
+  EXPECT_EQ(static_cast<const sitk::Image&>(img).GetITKBase(), itkBasePtr);
+  EXPECT_EQ(static_cast<const sitk::Image&>(img3).GetITKBase(), nullptr);
+
+  img2 = img;
+
+
+  EXPECT_EQ(img2.GetSize()[0], 5);
+  EXPECT_EQ(static_cast<const sitk::Image&>(img2).GetITKBase(), itkBasePtr);
+  EXPECT_EQ(static_cast<const sitk::Image&>(img).GetITKBase(), itkBasePtr);
+
+  const sitk::Image img4(std::move(img2));
+
+  EXPECT_EQ(img4.GetSize()[0], 5);
+  EXPECT_EQ(img4.GetITKBase(), itkBasePtr);
+  EXPECT_EQ(static_cast<const sitk::Image&>(img).GetITKBase(), itkBasePtr);
+  EXPECT_EQ(static_cast<const sitk::Image&>(img2).GetITKBase(), nullptr);
 
 }
 

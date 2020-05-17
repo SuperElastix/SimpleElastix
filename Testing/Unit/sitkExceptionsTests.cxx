@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ TEST_F(sitkExceptionsTest, Test1) {
 TEST_F(sitkExceptionsTest, Test2) {
 
   // this can only be tested when true, if it was false the file won't compile
-  sitkStaticAssert( true, "this is just a test" );
+  static_assert( true, "this is just a test" );
 
   SUCCEED();
 }
@@ -82,9 +82,12 @@ TEST_F(sitkExceptionsTest, Test3) {
   e0 = e1;
   e0 = empty;
 
+
+  sitkClangDiagnosticPush();
+  sitkClangWarningIgnore("-Wself-assign-overloaded");
   // test self assignment too
   e0 = e0;
-
+  sitkClangDiagnosticPop();
 
   EXPECT_TRUE( e1 == e1 );
   EXPECT_TRUE( empty == empty );

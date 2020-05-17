@@ -1,6 +1,6 @@
 /*=========================================================================
 *
-*  Copyright Insight Software Consortium
+*  Copyright NumFOCUS
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -83,12 +83,64 @@
 %pythoncode %{
    import operator
    import sys
+   from collections import namedtuple
 %}
 
 %extend itk::simple::Image {
 
-
         %pythoncode %{
+
+        def __copy__(self):
+          """Create a SimpleITK shallow copy, where the internal image share is shared with copy on write implementation."""
+          return Image(self)
+
+        def __deepcopy__(self, memo):
+          """Create a new copy of the data and image class."""
+          dc = Image(self)
+          dc.MakeUnique()
+          return dc
+
+        def __setstate__(self, args):
+          if args[0] != 0:
+            raise ValueError("Unable to handle SimpleITK.Image pickle version {0}".args[0])
+
+          state = namedtuple('state_tuple_0', "version buffer origin spacing direction metadata")(*args)
+
+          _SetImageFromArray(state.buffer, self)
+          self.SetOrigin(state.origin)
+          self.SetSpacing(state.spacing)
+          self.SetDirection(state.direction)
+          for k,v in state.metadata.items():
+            self.SetMetaData(k,v)
+
+        def __reduce_ex__(self, protocol ):
+          version = 0
+          size = tuple(self.GetSize())
+          t = int(self.GetPixelIDValue())
+          ncomponents = int(self.GetNumberOfComponentsPerPixel())
+
+          mv = _GetMemoryViewFromImage(self)
+          origin = tuple(self.GetOrigin())
+          spacing = tuple(self.GetSpacing())
+          direction = tuple(self.GetDirection())
+          metadata = {k:self.GetMetaData(k) for k in self.GetMetaDataKeys()}
+
+          if protocol >= 5:
+            import sys
+            if sys.hexversion >= 0x03080000:
+              import pickle
+            elif sys.hexversion >= 0x03060000:
+              try:
+                import pickle5 as pickle
+              except ImportError:
+                raise ImportError("Pickle protocol 5 requires the pickle5 module for Python 3.6, 3.7")
+            P = (version, pickle.PickleBuffer(mv), origin, spacing, direction, metadata)
+          else:
+            P = (version, mv.tobytes(), origin, spacing, direction, metadata)
+
+          return self.__class__, (size, t, ncomponents), P
+
+
 
         # mathematical operators
 
@@ -378,8 +430,8 @@
 
             # If we have a 3D image, we can extract 2D image if one index is an int and the reset are slices
             slice_dim = -1
-            if ( dim == 3 ):
-              # find only a single dimension with has an integer index
+            if ( dim > 2 ):
+              # find only a single dimension which has an integer index
               for i in range(len(idx)):
                 if type(idx[i]) is slice:
                   continue
@@ -601,6 +653,53 @@
 
 }
 
+
+%extend itk::simple::Transform {
+   %pythoncode %{
+
+        def __copy__(self):
+          """Create a SimpleITK shallow copy, where the internal transform is shared with a copy on write implementation."""
+          return self.__class__(self)
+
+        def __deepcopy__(self, memo):
+          """Create a new copy of the data and internal ITK Transform object."""
+          dc = self.__class__(self)
+          dc.MakeUnique()
+          return dc
+
+        def __setstate__(self, args):
+          if args[0] != 0:
+            raise ValueError("Unable to handle SimpleITK.Transform pickle version {0}".args[0])
+
+          if len(args) == 1:
+            return
+
+          state = namedtuple('state_tuple_0', "version fixed_parameters parameters")(*args)
+
+          self.SetFixedParameters(state.fixed_parameters)
+          self.SetParameters(state.parameters)
+
+
+        def __reduce_ex__(self, protocol ):
+          version = 0
+
+          if self.__class__ is DisplacementFieldTransform:
+            args = (self.GetDisplacementField(), )
+            S = (version, )
+          if self.__class__ is BSplineTransform:
+            args = (tuple(self.GetCoefficientImages()), self.GetOrder())
+            S = (version, )
+          else:
+            args = (self.GetDimension(),)
+            S = (version, self.GetFixedParameters(), self.GetParameters())
+
+          return self.__class__, args, S
+
+          %}
+
+};
+
+
 // This is included inline because SwigMethods (SimpleITKPYTHON_wrap.cxx)
 // is declared static.
 %{
@@ -714,7 +813,7 @@ def _get_sitk_vector_pixelid(numpy_array_type):
         for key in _np_sitk:
             if numpy.issubdtype(numpy_array_type.dtype, key):
                 return _np_sitk[key]
-        raise TypeError('dtype: {0} is not supported.'.format(numpy_array_type.dtype))
+        raise TypeError('dtype: {0} is not supported as an array.'.format(numpy_array_type.dtype))
 
 
 # SimplyITK <-> Numpy Array conversion support.
@@ -762,7 +861,7 @@ def GetArrayFromImage(image):
 
 
 def GetImageFromArray( arr, isVector=None):
-    """Get a SimpleITK Image from a numpy array. If isVector is True, then the Image will have a Vector pixel type, and the last dimension of the array will be considered the component index. By default when isVector is None, 4D images are automatically considered 3D vector images."""
+    """Get a SimpleITK Image from a numpy array. If isVector is True, then the Image will have a Vector pixel type, and the last dimension of the array will be considered the component index. By default when isVector is None, 4D arrays are automatically considered 3D vector images, but 3D arrays are 3D images."""
 
     if not HAVE_NUMPY:
         raise ImportError('Numpy not available.')
@@ -770,7 +869,7 @@ def GetImageFromArray( arr, isVector=None):
     z = numpy.asarray( arr )
 
     if isVector is None:
-      if z.ndim == 4:
+      if z.ndim == 4 and z.dtype != numpy.complex64 and z.dtype != numpy.complex128:
         isVector = True
 
     if isVector:
