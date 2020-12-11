@@ -28,7 +28,7 @@ jobs:
     - name: Run SuperBuild
       run: |
         cd ..
-        mkdir buid
+        mkdir build
         cd build
         cmake ../SimpleElastix/SuperBuild
         make -j4
