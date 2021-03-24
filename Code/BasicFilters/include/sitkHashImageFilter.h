@@ -36,7 +36,7 @@ namespace itk {
     class SITKBasicFilters_EXPORT HashImageFilter
       : public ProcessObject {
     public:
-      typedef HashImageFilter Self;
+      using Self = HashImageFilter;
 
       // function pointer type
       typedef std::string (Self::*MemberFunctionType)( const Image& );
@@ -46,7 +46,7 @@ namespace itk {
         typelist::Append< BasicPixelIDTypeList, ComplexPixelIDTypeList>::Type,
         VectorPixelIDTypeList >::Type PixelIDTypeList;
 
-      virtual ~HashImageFilter();
+      ~HashImageFilter() override;
 
       HashImageFilter();
 
@@ -55,10 +55,10 @@ namespace itk {
       HashFunction GetHashFunction () const;
 
       /** Name of this class */
-      std::string GetName() const { return std::string ( "Hash"); }
+      std::string GetName() const override { return std::string ( "Hash"); }
 
       // Print ourselves out
-      std::string ToString() const;
+      std::string ToString() const override;
 
       std::string Execute ( const Image& );
 

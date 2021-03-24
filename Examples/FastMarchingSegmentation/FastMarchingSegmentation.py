@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#=========================================================================
+# =========================================================================
 #
 #  Copyright NumFOCUS
 #
@@ -15,16 +15,17 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-#=========================================================================
+# =========================================================================
 
 from __future__ import print_function
 
 import SimpleITK as sitk
 import sys
-import os
 
 if len(sys.argv) < 10:
-    print("Usage: {0} <inputImage> <outputImage> <seedX> <seedY> <Sigma> <SigmoidAlpha> <SigmoidBeta> <TimeThreshold>".format(sys.argv[0]))
+    print("Usage:", sys.argv[0],
+          " <inputImage> <outputImage> <seedX> <seedY> <Sigma>",
+          "<SigmoidAlpha> <SigmoidBeta> <TimeThreshold>")
     sys.exit(1)
 
 inputFilename = sys.argv[1]
@@ -60,19 +61,16 @@ sigmoid.SetBeta(beta)
 sigmoid.DebugOn()
 sigmoidOutput = sigmoid.Execute(gradientMagnitudeOutput)
 
-
 fastMarching = sitk.FastMarchingImageFilter()
 
 seedValue = 0
 trialPoint = (seedPosition[0], seedPosition[1], seedValue)
-
 
 fastMarching.AddTrialPoint(trialPoint)
 
 fastMarching.SetStoppingValue(stoppingTime)
 
 fastMarchingOutput = fastMarching.Execute(sigmoidOutput)
-
 
 thresholder = sitk.BinaryThresholdImageFilter()
 thresholder.SetLowerThreshold(0.0)

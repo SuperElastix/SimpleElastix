@@ -49,9 +49,9 @@ using  itk::simple::InstantiatedPixelIDTypeList;
 
 class Image : public ::testing::Test {
 public:
-  typedef std::unique_ptr<itk::simple::Image> sitkAutoImagePointer;
+  using sitkAutoImagePointer = std::unique_ptr<itk::simple::Image>;
 
-  virtual void SetUp() {
+  void SetUp() override {
     itk::ImageBase<3>::IndexType index;
     itk::ImageBase<3>::SizeType size;
     itk::ImageBase<3>::RegionType region;
@@ -105,18 +105,18 @@ public:
 
   itk::ImageBase<3>::Pointer itkShortImage;
 
-  typedef itk::Image<short,3> ShortImageType;
+  using ShortImageType = itk::Image<short,3>;
   sitkAutoImagePointer shortImage;
 
-  typedef itk::Image<float,3> FloatImageType;
+  using FloatImageType = itk::Image<float,3>;
   sitkAutoImagePointer floatImage;
   FloatImageType::Pointer itkFloatImage;
 
-  typedef itk::VectorImage<float,3> FloatVectorImageType;
+  using FloatVectorImageType = itk::VectorImage<float,3>;
   sitkAutoImagePointer floatVectorImage;
   FloatVectorImageType::Pointer itkFloatVectorImage;
 
-  typedef itk::VectorImage<float,2> FloatVector2DImageType;
+  using FloatVector2DImageType = itk::VectorImage<float,2>;
   sitkAutoImagePointer floatVector2DImage;
   FloatVector2DImageType::Pointer itkFloatVector2DImage;
 
@@ -282,7 +282,7 @@ TEST_F(Image,Constructors) {
 
   // check for error when incorrect number of dimensions are requested
   std::vector<unsigned int> s1d(1, 100);
-  std::vector<unsigned int> s5d(5, 100);
+  std::vector<unsigned int> s5d(SITK_MAX_DIMENSION+1, 100);
   ASSERT_ANY_THROW( itk::simple::Image( s1d, itk::simple::sitkVectorFloat64 ) );
   ASSERT_ANY_THROW( itk::simple::Image( s5d, itk::simple::sitkVectorFloat64 ) );
 
@@ -420,7 +420,7 @@ TEST_F(Image,Properties) {
   // SetDirection
   std::vector<double> vdir( adir, adir+9);
   shortImage->SetDirection( vdir );
-  for( unsigned int i = 0 ; i < 9; ++i )
+  for( unsigned int i = 0; i < 9; ++i )
     {
     EXPECT_EQ ( shortImage->GetDirection()[i], vdir[i] ) << " Checking Direction matrix at index " << i;
     }
@@ -465,42 +465,63 @@ sitkClangDiagnosticPush();
 sitkClangWarningIgnore("-Wself-assign-overloaded");
 TEST_F(Image, CopyOnWrite)
 {
-  // test that a just constructed image only have 1 referecne
+  // test that a just constructed image only have 1 reference
   sitk::Image img( 10, 10, sitk::sitkInt16 );
   EXPECT_EQ(static_cast<const sitk::Image *>(&img)->GetITKBase()->GetReferenceCount(), 1 )
     << " Reference Count for just constructed Image";
+  EXPECT_TRUE(img.IsUnique());
 
   // use the image from the fixture to test some copy constructor
   EXPECT_EQ(static_cast<const sitk::Image *>(shortImage.get())->GetITKBase()->GetReferenceCount(), 2 )
     << " Reference Count for shared shortImage initial";
+  EXPECT_FALSE(shortImage->IsUnique());
   sitk::Image img0 = *shortImage;
   EXPECT_EQ(static_cast<const sitk::Image *>(shortImage.get())->GetITKBase()->GetReferenceCount(), 3 )
     << " Reference Count for shared shortImage copy";
+  EXPECT_FALSE(shortImage->IsUnique());
   sitk::Image imgCopy = img0;
   EXPECT_EQ(static_cast<const sitk::Image *>(shortImage.get())->GetITKBase()->GetReferenceCount(), 4 )
     << " Reference Count for shared shortImage second copy";
+  EXPECT_FALSE(shortImage->IsUnique());
 
   // check set origin for copy on write
   imgCopy.SetOrigin( std::vector<double>( 3, 2.123 ) );
   EXPECT_EQ(static_cast<const sitk::Image *>(&imgCopy)->GetITKBase()->GetReferenceCount(), 1 )
     << " Reference Count for copy after set origin";
+  EXPECT_TRUE(imgCopy.IsUnique());
   EXPECT_EQ(static_cast<const sitk::Image *>(&img0)->GetITKBase()->GetReferenceCount(), 3 )
     << " Reference Count for shared after set origin";
+  EXPECT_FALSE(img0.IsUnique());
 
   // check shallow copy on assignment
   imgCopy = img0;
   EXPECT_EQ(static_cast<const sitk::Image *>(&imgCopy)->GetITKBase()->GetReferenceCount(), 4 )
     << " Reference Count for copy after assigment";
+  EXPECT_FALSE(imgCopy.IsUnique());
   EXPECT_EQ(static_cast<const sitk::Image *>(&img0)->GetITKBase()->GetReferenceCount(), 4 )
     << " Reference Count for shared after assignment";
+  EXPECT_FALSE(img0.IsUnique());
 
   // check copy on write with set spacing
   imgCopy.SetSpacing( std::vector<double>( 3, 3.45 ) );
   EXPECT_EQ(static_cast<const sitk::Image *>(&imgCopy)->GetITKBase()->GetReferenceCount(), 1 )
     << " Reference Count for copy after set spacing";
+  EXPECT_TRUE(imgCopy.IsUnique());
   EXPECT_EQ(static_cast<const sitk::Image *>(&img0)->GetITKBase()->GetReferenceCount(), 3 )
     << " Reference Count for shared after set spacing";
+  EXPECT_FALSE(img0.IsUnique());
   EXPECT_EQ( sitk::Hash( imgCopy ), sitk::Hash( img0 ) ) << "Hash for shared and copy after set spacing";
+
+  sitk::Image labelImage1(10, 10, sitk::sitkLabelUInt8);
+  EXPECT_TRUE(labelImage1.IsUnique());
+  sitk::Image labelImage2(labelImage1);
+  EXPECT_FALSE(labelImage1.IsUnique());
+  EXPECT_FALSE(labelImage2.IsUnique());
+
+  // copy on write
+  labelImage2.SetSpacing( std::vector<double>( {1.2, 3.4} ));
+  EXPECT_TRUE(labelImage1.IsUnique());
+  EXPECT_TRUE(labelImage2.IsUnique());
 }
 
 TEST_F(Image,Operators)
@@ -758,6 +779,39 @@ TEST_F(Image,SetPixel)
   ASSERT_NO_THROW( img.SetPixelAsDouble(  std::vector<uint32_t>( zOOB, zOOB+3 ), 0.0 ) ) << "z out of bounds, expect truncation of z-dim";
 
 }
+
+
+sitkClangDiagnosticPush();
+sitkClangWarningIgnore("-Wself-assign-overloaded");
+TEST_F(Image,Operators_InPlace)
+{
+  sitk::Image img(10, 10, sitk::sitkUInt16);
+
+  img += img;
+  img -= img;
+  img *= img;
+
+  img += 1;
+  img /= img;
+  img %= img;
+  img &= img;
+  img |= img;
+  img ^= img;
+
+  img += 2.0;
+  img -= 2.0;
+  img *= 1.0;
+
+  img /= 1.0;
+  img %= 2;
+  img &= 1;
+  img |= 1;
+  img ^= 0;
+
+  img = ( img *= 0 ) + 5;
+  EXPECT_EQ( img.GetPixelAsUInt16({1,1}), 5);
+}
+sitkClangDiagnosticPop();
 
 
 TEST_F(Image,GetPixel)

@@ -38,6 +38,15 @@ class ExceptionObject;
 namespace simple
 {
 
+#ifdef _MSC_VER
+// Ignore the following warning:
+// sitkExceptionObject.h(46,1): warning C4275: non dll-interface class
+// 'std::exception' used as base for dll-interface class
+// 'itk::simple::GenericException'
+#pragma warning( push )
+#pragma warning(disable:4275)
+#endif
+
 /** \class GenericException
  * \brief The base SimpleITK exception class
  */
@@ -62,7 +71,7 @@ public:
                    const std::string & desc) noexcept;
 
   /** Virtual destructor needed for subclasses. Has to have empty noexcept. */
-  virtual ~GenericException() noexcept;
+  ~GenericException() noexcept override;
 
   /** Assignment operator. */
   GenericException & operator=(const GenericException & orig);
@@ -74,7 +83,7 @@ public:
   /** Return a description of the error */
   std::string ToString() const;
 
-  const char * what() const noexcept;
+  const char * what() const noexcept override;
 
   virtual const char * GetNameOfClass() const;
 
@@ -91,6 +100,10 @@ public:
 private:
   const ExceptionObject *m_PimpleException;
 };
+
+#ifdef _MSC_VER
+#pragma warning( pop )
+#endif
 
 }
 }

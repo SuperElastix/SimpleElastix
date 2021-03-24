@@ -1,8 +1,10 @@
 # These pipelines are executed on every PR, and merge. They should provide quick
 # coverage for the common wrapped language and the SimpleITK core and examples.
 
-variables:
-  ExternalDataVersion: 1.2.0
+trigger:
+  - master
+  - next
+  - release
 jobs:
   - job: Linux
     timeoutInMinutes: 0

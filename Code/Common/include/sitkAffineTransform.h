@@ -36,10 +36,10 @@ class SITKCommon_EXPORT AffineTransform
   : public Transform
 {
 public:
-  typedef AffineTransform Self;
-  typedef Transform       Superclass;
+  using Self = AffineTransform;
+  using Superclass = Transform;
 
-  virtual ~AffineTransform();
+  ~AffineTransform() override;
 
   explicit AffineTransform(unsigned int dimensions);
 
@@ -55,7 +55,7 @@ public:
   AffineTransform &operator=( const AffineTransform & );
 
   /** Name of this class */
-  std::string GetName() const { return std::string ("AffineTransform"); }
+  std::string GetName() const override { return std::string ("AffineTransform"); }
 
   /** parameters */
   std::vector<double> GetTranslation( ) const;
@@ -80,18 +80,16 @@ public:
 
 protected:
 
-  virtual void SetPimpleTransform( PimpleTransformBase *pimpleTransform );
+  void SetPimpleTransform( PimpleTransformBase *pimpleTransform ) override;
 
 private:
-
-  using Superclass::AddTransform;
 
   struct MyVisitor
   {
     itk::TransformBase *transform;
     AffineTransform *that;
     template< typename TransformType >
-    void operator() ( void ) const
+    void operator() ( ) const
       {
         TransformType *t = dynamic_cast<TransformType*>(transform);
         if (t && (typeid(*t) == typeid(TransformType)))

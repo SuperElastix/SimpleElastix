@@ -9,7 +9,8 @@ Images
 There are numerous file formats support by SimpleITK's image readers and writers.
 Support for a particular format is handled by a specific ITK
 `ImageIO <https://itk.org/Doxygen/html/classitk_1_1ImageIOBase.html>`_ class.
-By default, the ImageIO is automatically determined for a particular file.
+By default, the ImageIO is automatically determined for a particular file based
+on the file name suffix and/or the contents of the file's header.
 Advanced SimpleITK installations can configure or extend which file formats
 are supported by SimpleITK. A list of registered ImageIO's can be found using the
 ``GetRegisteredImageIOs()`` method, but is posted here:
@@ -35,7 +36,7 @@ are supported by SimpleITK. A list of registered ImageIO's can be found using th
     - `VTKImageIO <https://itk.org/Doxygen/html/classitk_1_1VTKImageIO.html>`_ ( \*.vtk )
 
 
-Example read and write:
+A read and write example using SimpleITK's ImageFileReader and ImageFileWriter classes:
 
 .. code-block :: python
 
@@ -50,6 +51,19 @@ Example read and write:
         writer.SetFileName(outputImageFileName)
         writer.Execute(image)
 
+The above example specifies using the BMPImageIO to read the file.
+If that line is omitted, SimpleITK would determine which IO to use automatically,
+based on the file name's suffix and/or the file's header.
+
+A more compact example using SimpleITK's procedural interface:
+
+.. code-block :: python
+
+        import SimpleITK as sitk
+
+        image = sitk.ReadImage(inputImagefileName, imageIO="BMPImageIO")
+        sitk.WriteImage(image, outputImagefileName)
+
 
 .. _transformation-io:
 
@@ -60,11 +74,16 @@ In SimpleITK, transformation files can be written in several different formats.
 Just like there are numerous IOs for images, there are several for transforms,
 including TxtTransformIO, MINCTransformIO, HDF5TransformIO, and MatlabTransformIO
 (although this list can be extended as well). These support a variety of file
-formats, including .txt, .tfm, .mat, and .xfm. A displacement field, such as one
-stored in a DisplacementFieldTransform object, can also be saved as an image
+formats, including .txt, .tfm, .xfm, .hdf and .mat.
+
+Because of their size, displacement fields may require more careful attention.
+To save a displacement field we recommend using one of the binary transformation
+file formats (e.g. .hdf, .mat). Saving it in a text based format results in
+significantly larger files and longer IO runtimes. Another option is to save
+the displacement field found in a DisplacementFieldTransform object as an image
 (.nrrd, .nhdr, .mha, .mhd, .nii, .nii.gz).
 
-Take an example of a transformation written to and read from a file in Python:
+Take for example of a transformation written to and read from a file in Python:
 
 .. code-block :: python
 

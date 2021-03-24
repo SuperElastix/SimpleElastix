@@ -36,10 +36,10 @@ class SITKCommon_EXPORT Similarity3DTransform
   : public Transform
 {
 public:
-typedef Similarity3DTransform Self;
-typedef Transform             Superclass;
+using Self = Similarity3DTransform;
+using Superclass = Transform;
 
-virtual ~Similarity3DTransform();
+~Similarity3DTransform() override;
 
 // construct identity
 Similarity3DTransform();
@@ -59,7 +59,7 @@ Similarity3DTransform( double scaleFactor, const std::vector< double > &axis, do
 Similarity3DTransform &operator=( const Similarity3DTransform & );
 
 /** Name of this class */
-std::string GetName() const { return std::string ("Similarity3DTransform"); }
+std::string GetName() const override { return std::string ("Similarity3DTransform"); }
 
 /** fixed parameter */
 SITK_RETURN_SELF_TYPE_HEADER SetCenter(const std::vector<double> &params);
@@ -85,11 +85,9 @@ SITK_RETURN_SELF_TYPE_HEADER SetMatrix(const std::vector<double> &matrix, double
 
 protected:
 
-virtual void SetPimpleTransform( PimpleTransformBase *pimpleTransform );
+void SetPimpleTransform( PimpleTransformBase *pimpleTransform ) override;
 
 private:
-
-using Superclass::AddTransform;
 
 void InternalInitialization(itk::TransformBase *transform);
 

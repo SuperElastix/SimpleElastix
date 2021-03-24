@@ -28,19 +28,20 @@ $(include DoNotEditWarning.h.in)
 namespace itk {
   namespace simple {
 
-$(include ClassDeclaration.h.in)
-$(include PublicDeclarations.h.in)
+$(include ClassDeclaration.h.in)$(include PublicDeclarations.h.in)
 $(include MemberGetSetDeclarations.h.in)
 $(include ClassNameAndPrint.h.in)
 
-$(include ExecuteMethodNoParameters.h.in)$(include ExecuteMethodWithParameters.h.in)$(include CustomMethods.h.in)
+$(include ExecuteMethodNoParameters.h.in)$(include CustomMethods.h.in)
 $(include ExecuteInternalMethod.h.in)
 
 $(include MemberFunctionDispatch.h.in)
 
 $(include PrivateMemberDeclarations.h.in)$(include ClassEnd.h.in)
 
-$(include FunctionalAPI.h.in)
+$(if (not no_procedure) or (no_procedure == 1) then
+OUT=[[$(include ProceduralAPI.h.in)]]
+end)
   }
 }
 #endif

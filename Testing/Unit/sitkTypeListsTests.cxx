@@ -22,31 +22,31 @@ class TypeListTest
   : public ::testing::Test
 {
 public:
-  TypeListTest() {};
+  TypeListTest() = default;;
   struct CountPredicate
   {
-    CountPredicate( void ) : count(0) {}
+    CountPredicate( ) : count(0) {}
 
     template<class TType>
-    void operator()( void )
+    void operator()( )
       {
         ++count;
       }
 
     template<class TType1, class TType2>
-    void operator()( void )
+    void operator()( )
       {
         ++count;
       }
 
     template<class TType>
-    void operator()( void ) const
+    void operator()( ) const
       {
         ++count;
       }
 
     template<class TType1, class TType2>
-    void operator()( void ) const
+    void operator()( ) const
       {
         ++count;
         std::cout << typeid(TType1).name() << " " << typeid( TType2 ).name() << std::endl;
@@ -62,7 +62,7 @@ public:
 
 TEST_F(TypeListTest, Visit) {
 
-  typedef typelist::MakeTypeList<int, char, void>::Type MyTypeList;
+  using MyTypeList = typelist::MakeTypeList<int, char, void>::Type;
 
   typelist::Visit<MyTypeList> ListVisitor;
   ListVisitor( pred );
@@ -75,7 +75,7 @@ TEST_F(TypeListTest, Visit) {
 
 TEST_F(TypeListTest, DualVisit) {
 
-  typedef typelist::MakeTypeList<int, char, short>::Type MyTypeList;
+  using MyTypeList = typelist::MakeTypeList<int, char, short>::Type;
 
   typelist::DualVisit<MyTypeList,MyTypeList> ListVisitor;
   ListVisitor( pred );

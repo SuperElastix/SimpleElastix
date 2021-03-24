@@ -23,7 +23,7 @@
 class Import
   : public ::testing::Test {
 public:
-  virtual void SetUp() {
+  void SetUp() override {
     spacing1 = std::vector<double>( 3, 1.0 );
     spacing2.push_back( 1.1 );
     spacing2.push_back( 1.2 );
@@ -69,7 +69,7 @@ TEST_F(Import,Required) {
   // methods, and to imporve coverage
 
   // Check has Self
-  typedef itk::simple::ImportImageFilter::Self ImportFilterType;
+  using ImportFilterType = itk::simple::ImportImageFilter::Self;
 
   // default constructable
   ImportFilterType  importer;

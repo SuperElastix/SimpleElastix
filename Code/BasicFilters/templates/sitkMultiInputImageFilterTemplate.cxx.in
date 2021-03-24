@@ -30,7 +30,6 @@ namespace simple {
 //
 $(include ConstructorSignature.cxx.in)
 {
-$(include ConstructorInitializeMembers.cxx.in)
 $(include ConstructorMemberFunctionSetup.cxx.in)
 
 $(include ConstructorVectorPixels.cxx.in)
@@ -48,47 +47,6 @@ $(include ToStringReturn.cxx.in)
 }
 
 //-----------------------------------------------------------------------------
-
-//
-// Execute with paramters
-//
-$(if members and #members > 0 then
-OUT = [[
-Image ${name}::Execute ( const std::vector<Image> &images$(include MemberParameters.in) )
-{
-$(foreach members
-$(if (not no_set_method) or (no_set_method == 0) then
-OUT = '  this->Set${name} ( ${name:sub(1,1):lower() .. name:sub(2,-1)} );'
-end)
-)
-  return this->Execute ( images );
-}
-]]
-for inum=1,5 do
-  OUT=OUT .. [[
-Image ${name}::Execute ( const Image& image1]]
-
-  for jnum=2,inum do
-    OUT=OUT .. ', const Image& image' .. jnum
-  end
-  OUT=OUT .. [[$(include MemberParameters.in) )
-{
-  std::vector<Image> images;
-]]
-
-  for jnum=1,inum do
-    OUT=OUT .. [[
-  images.push_back( image]]..jnum..[[ );
-]]
-  end
-
-  OUT=OUT .. [[
-  return this->Execute( images$(for i = 1,#members do
-                        OUT= OUT .. ', ' .. members[i].name:sub(1,1):lower() .. members[i].name:sub(2,-1)
-                          end) );
-}
-
-]] end end)
 
 //
 // Execute no paramters
@@ -127,13 +85,12 @@ Image ${name}::Execute ( const std::vector<Image> &images )
   PixelIDValueEnum type = images.front().GetPixelID();
   unsigned int dimension = images.front().GetDimension();
 
+  unsigned int inputIndex = 1;
   for( std::vector<Image>::const_iterator i = images.begin(); i != images.end(); ++i )
     {
-    if ( type != i->GetPixelIDValue() ||
-         dimension != i->GetDimension() )
-      {
-      sitkExceptionMacro ( "An image for ${name} doesn\'t match type or dimension!" );
-      }
+    CheckImageMatchingDimension(images.front(), *i, "image" + std::to_string(inputIndex));
+    CheckImageMatchingPixelType(images.front(), *i, "image" + std::to_string(inputIndex));
+    ++inputIndex;
     }
 
     return this->m_MemberFactory->GetMemberFunction( type, dimension )( images );
@@ -182,9 +139,11 @@ sitkClangDiagnosticPop();
 Image ${name:gsub("ImageFilter$", ""):gsub("Filter$", "")} ( const std::vector<Image> & images$(include MemberParameters.in) )
 {
   ${name} filter;
-  return filter.Execute ( images$(for i = 1,#members do
-                          OUT= OUT .. ', ' .. members[i].name:sub(1,1):lower() .. members[i].name:sub(2,-1)
-                          end) );
+$(for i = 1,#members do
+  OUT=OUT .. [[  filter.Set]] ..members[i].name..[[( ]] .. members[i].name:sub(1,1):lower() .. members[i].name:sub(2,-1) .. [[ );
+]]
+end)
+  return filter.Execute ( images );
 }
 $(for inum=1,5 do
   OUT=OUT .. [[
@@ -198,14 +157,16 @@ Image ${name:gsub("ImageFilter$", ""):gsub("Filter$", "")} ( const Image& image1
 
   OUT=OUT .. [[
   ${name} filter;
+]]
+for i = 1,#members do
+  OUT=OUT .. [[  filter.Set]] ..members[i].name..[[( ]] .. members[i].name:sub(1,1):lower() .. members[i].name:sub(2,-1) .. [[ );
+]]
+end
+OUT=OUT .. [[
   return filter.Execute ( image1]]
 
   for jnum=2,inum do
     OUT=OUT .. ', image' .. jnum
-  end
-
-  for i = 1,#members do
-    OUT= OUT .. ', ' .. members[i].name:sub(1,1):lower() .. members[i].name:sub(2,-1)
   end
 
   OUT=OUT..[[ );

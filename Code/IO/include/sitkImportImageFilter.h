@@ -47,17 +47,17 @@ namespace itk {
     class SITKIO_EXPORT ImportImageFilter
       : public ImageReaderBase {
     public:
-      typedef ImportImageFilter Self;
+      using Self = ImportImageFilter;
 
-      virtual ~ImportImageFilter();
+      ~ImportImageFilter() override;
 
       ImportImageFilter();
 
       /** Print ourselves to string */
-      virtual std::string ToString() const;
+      std::string ToString() const override;
 
       /** return user readable name of the filter */
-      virtual std::string GetName() const { return std::string("ImportImageFilter"); }
+      std::string GetName() const override { return std::string("ImportImageFilter"); }
 
       SITK_RETURN_SELF_TYPE_HEADER SetSize( const std::vector< unsigned int > &size );
       const std::vector< unsigned int > &GetSize( ) const;
@@ -82,12 +82,12 @@ namespace itk {
       SITK_RETURN_SELF_TYPE_HEADER SetBufferAsFloat( float * buffer, unsigned int numberOfComponents = 1 );
       SITK_RETURN_SELF_TYPE_HEADER SetBufferAsDouble( double * buffer, unsigned int numberOfComponents = 1 );
 
-      Image Execute();
+      Image Execute() override;
 
     protected:
 
       // Internal method called by the template dispatch system
-      template <class TImageType> Image ExecuteInternal ( void );
+      template <class TImageType> Image ExecuteInternal ( );
 
       // If the output image type is a VectorImage then the number of
       // components per pixel needs to be set, otherwise the method
@@ -102,7 +102,7 @@ namespace itk {
     private:
 
       // function pointer type
-      typedef Image (Self::*MemberFunctionType)( void );
+      typedef Image (Self::*MemberFunctionType)( );
 
       // friend to get access to executeInternal member
       friend struct detail::MemberFunctionAddressor<MemberFunctionType>;

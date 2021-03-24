@@ -23,16 +23,14 @@ namespace itk
 namespace simple
 {
 
-FunctionCommand::~FunctionCommand( )
-{
-}
+FunctionCommand::~FunctionCommand( ) = default;
 
 FunctionCommand::FunctionCommand( )
 {
   Command::SetName("FunctionCommand");
 }
 
-void FunctionCommand::Execute(void)
+void FunctionCommand::Execute()
 {
   if (bool(this->m_Function))
     {
