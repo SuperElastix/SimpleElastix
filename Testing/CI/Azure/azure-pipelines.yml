@@ -26,6 +26,7 @@ jobs:
         displayName: 'Install python tools and dependency'
       - bash: |
           set -x
+          sudo apt install ninja-build -y
           c++ --version
           cmake --version
           ninja --version
