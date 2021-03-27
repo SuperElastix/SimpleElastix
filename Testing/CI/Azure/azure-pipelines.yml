@@ -23,6 +23,7 @@ jobs:
           python -m pip install --upgrade --user pip
           python -m pip install --user setuptools
           python -m pip install --user scikit-ci-addons
+          python -m pip install --user numpy
         displayName: 'Install python tools and dependency'
       - bash: |
           set -x
