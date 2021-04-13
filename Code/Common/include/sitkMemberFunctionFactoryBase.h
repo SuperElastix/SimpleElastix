@@ -29,6 +29,7 @@
 
 #include <unordered_map>
 #include <functional>
+#include <tuple>
 
 namespace itk
 {
@@ -38,18 +39,62 @@ namespace simple
 // this namespace is internal and not part of the external simple ITK interface
 namespace detail {
 
+// make hash function available in current name space to take priority
+
 template <typename T> struct hash : public std::hash<T>{};
 
-/** \brief A specialization of the hash function.
- */
-template <>
-struct hash< std::pair<int, int> >
-  : public std::unary_function<std::pair<int,int>, std::size_t> {
-  std::size_t operator()( const std::pair<int, int > &p ) const
-    { return std::hash<size_t>()( size_t(p.first) * prime + p.second ); }
-private:
-  static const std::size_t prime = 16777619u;
+/** A utility function to chain hashes */
+template<typename T>
+inline void hash_combine(std::size_t& seed, const T& val)
+{
+  // Code from boost
+  // Reciprocal of the golden ratio helps spread entropy
+  //     and handles duplicates.
+  std::hash<T> hasher;
+  seed ^= hasher(val) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+}
+
+template<typename S, typename T>
+struct hash<std::pair<S, T>>
+{
+  inline size_t operator()(const std::pair<S, T>& val) const
+    {
+      size_t seed = 0;
+      hash_combine(seed, val.first);
+      hash_combine(seed, val.second);
+      return seed;
+    }
 };
+
+template<class... TupleArgs>
+struct hash<std::tuple<TupleArgs...>>
+{
+private:
+  // recursive hashing of std::tuple from Sarang Baheti's blog
+  // https://www.variadic.xyz/2018/01/15/hashing-stdpair-and-stdtuple/
+  template<size_t Idx, typename... TupleTypes>
+  inline typename std::enable_if<Idx == sizeof...(TupleTypes), void>::type
+  hash_combine_tup(size_t&, const std::tuple<TupleTypes...>&) const {}
+
+  template<size_t Idx, typename... TupleTypes>
+  inline typename std::enable_if<Idx < sizeof...(TupleTypes), void>::type
+  hash_combine_tup(size_t& seed, const std::tuple<TupleTypes...>& tup) const
+    {
+      hash_combine(seed, std::get<Idx>(tup));
+
+      //  on to next element
+      hash_combine_tup<Idx+1>(seed, tup);
+    }
+
+public:
+  size_t operator()(std::tuple<TupleArgs...> tupleValue) const
+    {
+      size_t seed = 0;
+      hash_combine_tup<0>(seed, tupleValue);
+      return seed;
+    }
+};
+
 
 template< typename TMemberFunctionPointer,
           typename TKey,
@@ -69,27 +114,25 @@ class MemberFunctionFactoryBase<TMemberFunctionPointer, TKey, 0> :
 {
 protected:
 
-  typedef TMemberFunctionPointer                                               MemberFunctionType;
-  typedef typename ::detail::FunctionTraits<MemberFunctionType>::ClassType     ObjectType;
-  typedef typename ::detail::FunctionTraits<MemberFunctionType>::ResultType    MemberFunctionResultType;
+  using MemberFunctionType = TMemberFunctionPointer;
+  using ObjectType = typename ::detail::FunctionTraits<MemberFunctionType>::ClassType;
+  using MemberFunctionResultType = typename ::detail::FunctionTraits<MemberFunctionType>::ResultType;
 
 
-  MemberFunctionFactoryBase( void )
-    :  m_PFunction4( typelist::Length<InstantiatedPixelIDTypeList>::Result ),
-       m_PFunction3( typelist::Length<InstantiatedPixelIDTypeList>::Result ),
-       m_PFunction2( typelist::Length<InstantiatedPixelIDTypeList>::Result )
+  MemberFunctionFactoryBase( )
+    :  m_PFunction( 3*typelist::Length<InstantiatedPixelIDTypeList>::Result )
     { }
 
 public:
 
   /**  the pointer MemberFunctionType redefined ad a tr1::function
    * object */
-  typedef std::function< MemberFunctionResultType ( ) > FunctionObjectType;
+  using FunctionObjectType = std::function< MemberFunctionResultType ( ) >;
 
 
 protected:
 
-  typedef TKey KeyType;
+  using KeyType = TKey;
 
   /** A function which binds the objectPointer to the calling object
    *  argument in the member function pointer, and returns a function
@@ -104,10 +147,10 @@ protected:
       return std::bind( pfunc,objectPointer );
     }
 
+  using FunctionMapType = std::unordered_map< TKey, FunctionObjectType, hash<TKey> >;
+
   // maps of Keys to pointers to member functions
-  std::unordered_map< TKey, FunctionObjectType, hash<TKey> > m_PFunction4;
-  std::unordered_map< TKey, FunctionObjectType, hash<TKey> > m_PFunction3;
-  std::unordered_map< TKey, FunctionObjectType, hash<TKey> > m_PFunction2;
+  FunctionMapType m_PFunction;
 
 
 };
@@ -125,28 +168,26 @@ class MemberFunctionFactoryBase<TMemberFunctionPointer, TKey, 1> :
 {
 protected:
 
-  typedef TMemberFunctionPointer                                               MemberFunctionType;
-  typedef typename ::detail::FunctionTraits<MemberFunctionType>::ClassType     ObjectType;
-  typedef typename ::detail::FunctionTraits<MemberFunctionType>::ResultType    MemberFunctionResultType;
-  typedef typename ::detail::FunctionTraits<MemberFunctionType>::Argument0Type MemberFunctionArgumentType;
+  using MemberFunctionType = TMemberFunctionPointer;
+  using ObjectType = typename ::detail::FunctionTraits<MemberFunctionType>::ClassType;
+  using MemberFunctionResultType = typename ::detail::FunctionTraits<MemberFunctionType>::ResultType;
+  using MemberFunctionArgumentType = typename ::detail::FunctionTraits<MemberFunctionType>::Argument0Type;
 
 
-  MemberFunctionFactoryBase( void )
-    :  m_PFunction4( typelist::Length<InstantiatedPixelIDTypeList>::Result ),
-       m_PFunction3( typelist::Length<InstantiatedPixelIDTypeList>::Result ),
-       m_PFunction2( typelist::Length<InstantiatedPixelIDTypeList>::Result )
+  MemberFunctionFactoryBase( )
+    :  m_PFunction( 3 * typelist::Length<InstantiatedPixelIDTypeList>::Result )
     { }
 
 public:
 
   /**  the pointer MemberFunctionType redefined ad a tr1::function
    * object */
-  typedef std::function< MemberFunctionResultType ( MemberFunctionArgumentType ) > FunctionObjectType;
+  using FunctionObjectType = std::function< MemberFunctionResultType ( MemberFunctionArgumentType ) >;
 
 
 protected:
 
-  typedef TKey KeyType;
+  using KeyType = TKey;
 
   /** A function which binds the objectPointer to the calling object
    *  argument in the member function pointer, and returns a function
@@ -164,10 +205,10 @@ protected:
     }
 
 
+  using FunctionMapType = std::unordered_map< TKey, FunctionObjectType, hash<TKey> >;
+
   // maps of Keys to pointers to member functions
-  std::unordered_map< TKey, FunctionObjectType, hash<TKey> > m_PFunction4;
-  std::unordered_map< TKey, FunctionObjectType, hash<TKey> > m_PFunction3;
-  std::unordered_map< TKey, FunctionObjectType, hash<TKey> > m_PFunction2;
+  FunctionMapType m_PFunction;
 
 };
 
@@ -178,17 +219,15 @@ class MemberFunctionFactoryBase<TMemberFunctionPointer, TKey, 2> :
 {
 protected:
 
-  typedef TMemberFunctionPointer                                               MemberFunctionType;
-  typedef typename ::detail::FunctionTraits<MemberFunctionType>::ResultType    MemberFunctionResultType;
-  typedef typename ::detail::FunctionTraits<MemberFunctionType>::Argument0Type MemberFunctionArgument0Type;
-  typedef typename ::detail::FunctionTraits<MemberFunctionType>::Argument1Type MemberFunctionArgument1Type;
-  typedef typename ::detail::FunctionTraits<MemberFunctionType>::ClassType     ObjectType;
+  using MemberFunctionType = TMemberFunctionPointer;
+  using MemberFunctionResultType = typename ::detail::FunctionTraits<MemberFunctionType>::ResultType;
+  using MemberFunctionArgument0Type = typename ::detail::FunctionTraits<MemberFunctionType>::Argument0Type;
+  using MemberFunctionArgument1Type = typename ::detail::FunctionTraits<MemberFunctionType>::Argument1Type;
+  using ObjectType = typename ::detail::FunctionTraits<MemberFunctionType>::ClassType;
 
 
-  MemberFunctionFactoryBase( void )
-    :  m_PFunction4( typelist::Length<InstantiatedPixelIDTypeList>::Result ),
-       m_PFunction3( typelist::Length<InstantiatedPixelIDTypeList>::Result ),
-       m_PFunction2( typelist::Length<InstantiatedPixelIDTypeList>::Result )
+  MemberFunctionFactoryBase( )
+    :  m_PFunction( 3 * typelist::Length<InstantiatedPixelIDTypeList>::Result )
     { }
 
 public:
@@ -196,12 +235,12 @@ public:
   /**  the pointer MemberFunctionType redefined ad a tr1::function
    * object
    */
-  typedef std::function< MemberFunctionResultType ( MemberFunctionArgument0Type,  MemberFunctionArgument1Type) > FunctionObjectType;
+  using FunctionObjectType = std::function< MemberFunctionResultType ( MemberFunctionArgument0Type,  MemberFunctionArgument1Type) >;
 
 
 protected:
 
-  typedef TKey KeyType;
+  using KeyType = TKey;
 
   /** A function which binds the objectPointer to the calling object
    *  argument in the member function pointer, and returns a function
@@ -218,11 +257,10 @@ protected:
       return std::bind( pfunc, objectPointer, _1, _2 );
     }
 
+  using FunctionMapType = std::unordered_map< TKey, FunctionObjectType, hash<TKey> >;
 
   // maps of Keys to pointers to member functions
-  std::unordered_map< TKey, FunctionObjectType, hash<TKey> > m_PFunction4;
-  std::unordered_map< TKey, FunctionObjectType, hash<TKey> > m_PFunction3;
-  std::unordered_map< TKey, FunctionObjectType, hash<TKey> > m_PFunction2;
+  FunctionMapType m_PFunction;
 
 };
 
@@ -233,30 +271,28 @@ class MemberFunctionFactoryBase<TMemberFunctionPointer, TKey, 3> :
 {
 protected:
 
-  typedef TMemberFunctionPointer                                               MemberFunctionType;
-  typedef typename ::detail::FunctionTraits<MemberFunctionType>::ResultType    MemberFunctionResultType;
-  typedef typename ::detail::FunctionTraits<MemberFunctionType>::Argument0Type MemberFunctionArgument0Type;
-  typedef typename ::detail::FunctionTraits<MemberFunctionType>::Argument1Type MemberFunctionArgument1Type;
-  typedef typename ::detail::FunctionTraits<MemberFunctionType>::Argument2Type MemberFunctionArgument2Type;
-  typedef typename ::detail::FunctionTraits<MemberFunctionType>::ClassType     ObjectType;
+  using MemberFunctionType = TMemberFunctionPointer;
+  using MemberFunctionResultType = typename ::detail::FunctionTraits<MemberFunctionType>::ResultType;
+  using MemberFunctionArgument0Type = typename ::detail::FunctionTraits<MemberFunctionType>::Argument0Type;
+  using MemberFunctionArgument1Type = typename ::detail::FunctionTraits<MemberFunctionType>::Argument1Type;
+  using MemberFunctionArgument2Type = typename ::detail::FunctionTraits<MemberFunctionType>::Argument2Type;
+  using ObjectType = typename ::detail::FunctionTraits<MemberFunctionType>::ClassType;
 
 
-  MemberFunctionFactoryBase( void )
-    :  m_PFunction4( typelist::Length<InstantiatedPixelIDTypeList>::Result ),
-       m_PFunction3( typelist::Length<InstantiatedPixelIDTypeList>::Result ),
-       m_PFunction2( typelist::Length<InstantiatedPixelIDTypeList>::Result )
+  MemberFunctionFactoryBase( )
+    :  m_PFunction( 3 * typelist::Length<InstantiatedPixelIDTypeList>::Result )
     { }
 
 public:
 
   /**  the pointer MemberFunctionType redefined ad a tr1::function
    * object */
-  typedef std::function< MemberFunctionResultType ( MemberFunctionArgument0Type, MemberFunctionArgument1Type,  MemberFunctionArgument2Type) > FunctionObjectType;
+  using FunctionObjectType = std::function< MemberFunctionResultType ( MemberFunctionArgument0Type, MemberFunctionArgument1Type,  MemberFunctionArgument2Type) >;
 
 
 protected:
 
-  typedef TKey KeyType;
+  using KeyType = TKey;
 
   /** A function which binds the objectPointer to the calling object
    *  argument in the member function pointer, and returns a function
@@ -273,11 +309,10 @@ protected:
       return std::bind( pfunc, objectPointer, _1, _2, _3 );
     }
 
+  using FunctionMapType = std::unordered_map< TKey, FunctionObjectType, hash<TKey> >;
 
   // maps of Keys to pointers to member functions
-  std::unordered_map< TKey, FunctionObjectType, hash<TKey> > m_PFunction4;
-  std::unordered_map< TKey, FunctionObjectType, hash<TKey> > m_PFunction3;
-  std::unordered_map< TKey, FunctionObjectType, hash<TKey> > m_PFunction2;
+  FunctionMapType m_PFunction;
 
 };
 
@@ -288,31 +323,29 @@ class MemberFunctionFactoryBase<TMemberFunctionPointer, TKey, 4> :
 {
 protected:
 
-  typedef TMemberFunctionPointer                                               MemberFunctionType;
-  typedef typename ::detail::FunctionTraits<MemberFunctionType>::ResultType    MemberFunctionResultType;
-  typedef typename ::detail::FunctionTraits<MemberFunctionType>::Argument0Type MemberFunctionArgument0Type;
-  typedef typename ::detail::FunctionTraits<MemberFunctionType>::Argument1Type MemberFunctionArgument1Type;
-  typedef typename ::detail::FunctionTraits<MemberFunctionType>::Argument2Type MemberFunctionArgument2Type;
-  typedef typename ::detail::FunctionTraits<MemberFunctionType>::Argument3Type MemberFunctionArgument3Type;
-  typedef typename ::detail::FunctionTraits<MemberFunctionType>::ClassType     ObjectType;
+  using MemberFunctionType = TMemberFunctionPointer;
+  using MemberFunctionResultType = typename ::detail::FunctionTraits<MemberFunctionType>::ResultType;
+  using MemberFunctionArgument0Type = typename ::detail::FunctionTraits<MemberFunctionType>::Argument0Type;
+  using MemberFunctionArgument1Type = typename ::detail::FunctionTraits<MemberFunctionType>::Argument1Type;
+  using MemberFunctionArgument2Type = typename ::detail::FunctionTraits<MemberFunctionType>::Argument2Type;
+  using MemberFunctionArgument3Type = typename ::detail::FunctionTraits<MemberFunctionType>::Argument3Type;
+  using ObjectType = typename ::detail::FunctionTraits<MemberFunctionType>::ClassType;
 
 
-  MemberFunctionFactoryBase( void )
-    :  m_PFunction4( typelist::Length<InstantiatedPixelIDTypeList>::Result ),
-       m_PFunction3( typelist::Length<InstantiatedPixelIDTypeList>::Result ),
-       m_PFunction2( typelist::Length<InstantiatedPixelIDTypeList>::Result )
+  MemberFunctionFactoryBase( )
+    :  m_PFunction( 3 * typelist::Length<InstantiatedPixelIDTypeList>::Result )
     { }
 
 public:
 
   /**  the pointer MemberFunctionType redefined ad a tr1::function
    * object */
-  typedef std::function< MemberFunctionResultType ( MemberFunctionArgument0Type, MemberFunctionArgument1Type, MemberFunctionArgument2Type,  MemberFunctionArgument3Type) > FunctionObjectType;
+  using FunctionObjectType = std::function< MemberFunctionResultType ( MemberFunctionArgument0Type, MemberFunctionArgument1Type, MemberFunctionArgument2Type,  MemberFunctionArgument3Type) >;
 
 
 protected:
 
-  typedef TKey KeyType;
+  using KeyType = TKey;
 
   /** A function which binds the objectPointer to the calling object
    *  argument in the member function pointer, and returns a function
@@ -329,11 +362,10 @@ protected:
       return std::bind( pfunc, objectPointer, _1, _2, _3, _4 );
     }
 
+  using FunctionMapType = std::unordered_map< TKey, FunctionObjectType, hash<TKey> >;
 
   // maps of Keys to pointers to member functions
-  std::unordered_map< TKey, FunctionObjectType, hash<TKey> > m_PFunction4;
-  std::unordered_map< TKey, FunctionObjectType, hash<TKey> > m_PFunction3;
-  std::unordered_map< TKey, FunctionObjectType, hash<TKey> > m_PFunction2;
+  FunctionMapType m_PFunction;
 
 };
 
@@ -343,20 +375,18 @@ class MemberFunctionFactoryBase<TMemberFunctionPointer, TKey, 5> :
 {
 protected:
 
-  typedef TMemberFunctionPointer                                               MemberFunctionType;
-  typedef typename ::detail::FunctionTraits<MemberFunctionType>::ResultType    MemberFunctionResultType;
-  typedef typename ::detail::FunctionTraits<MemberFunctionType>::Argument0Type MemberFunctionArgument0Type;
-  typedef typename ::detail::FunctionTraits<MemberFunctionType>::Argument1Type MemberFunctionArgument1Type;
-  typedef typename ::detail::FunctionTraits<MemberFunctionType>::Argument2Type MemberFunctionArgument2Type;
-  typedef typename ::detail::FunctionTraits<MemberFunctionType>::Argument3Type MemberFunctionArgument3Type;
-  typedef typename ::detail::FunctionTraits<MemberFunctionType>::Argument4Type MemberFunctionArgument4Type;
-  typedef typename ::detail::FunctionTraits<MemberFunctionType>::ClassType     ObjectType;
+  using MemberFunctionType = TMemberFunctionPointer;
+  using MemberFunctionResultType = typename ::detail::FunctionTraits<MemberFunctionType>::ResultType;
+  using MemberFunctionArgument0Type = typename ::detail::FunctionTraits<MemberFunctionType>::Argument0Type;
+  using MemberFunctionArgument1Type = typename ::detail::FunctionTraits<MemberFunctionType>::Argument1Type;
+  using MemberFunctionArgument2Type = typename ::detail::FunctionTraits<MemberFunctionType>::Argument2Type;
+  using MemberFunctionArgument3Type = typename ::detail::FunctionTraits<MemberFunctionType>::Argument3Type;
+  using MemberFunctionArgument4Type = typename ::detail::FunctionTraits<MemberFunctionType>::Argument4Type;
+  using ObjectType = typename ::detail::FunctionTraits<MemberFunctionType>::ClassType;
 
 
-  MemberFunctionFactoryBase( void )
-    :  m_PFunction4( typelist::Length<InstantiatedPixelIDTypeList>::Result ),
-       m_PFunction3( typelist::Length<InstantiatedPixelIDTypeList>::Result ),
-       m_PFunction2( typelist::Length<InstantiatedPixelIDTypeList>::Result )
+  MemberFunctionFactoryBase( )
+    :  m_PFunction( 3 * typelist::Length<InstantiatedPixelIDTypeList>::Result )
     { }
 
 public:
@@ -374,7 +404,7 @@ public:
 
 protected:
 
-  typedef TKey KeyType;
+  using KeyType = TKey;
 
   /** A function which binds the objectPointer to the calling object
    *  argument in the member function pointer, and returns a function
@@ -392,10 +422,11 @@ protected:
     }
 
 
+  using FunctionMapType = std::unordered_map< TKey, FunctionObjectType, hash<TKey> >;
+
   // maps of Keys to pointers to member functions
-  std::unordered_map< TKey, FunctionObjectType, hash<TKey> > m_PFunction4;
-  std::unordered_map< TKey, FunctionObjectType, hash<TKey> > m_PFunction3;
-  std::unordered_map< TKey, FunctionObjectType, hash<TKey> > m_PFunction2;
+  FunctionMapType m_PFunction;
+
 
 };
 

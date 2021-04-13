@@ -78,12 +78,11 @@ namespace itk {
     {
 
     // list of pixel types supported
-    typedef NonLabelPixelIDTypeList PixelIDTypeList;
+    using PixelIDTypeList = NonLabelPixelIDTypeList;
 
     this->m_MemberFactory.reset( new detail::MemberFunctionFactory<MemberFunctionType>( this ) );
 
-    this->m_MemberFactory->RegisterMemberFunctions< PixelIDTypeList, 3 > ();
-    this->m_MemberFactory->RegisterMemberFunctions< PixelIDTypeList, 2 > ();
+    this->m_MemberFactory->RegisterMemberFunctions< PixelIDTypeList, 2, SITK_MAX_DIMENSION > ();
     }
 
   ImageSeriesReader::~ImageSeriesReader()
@@ -158,7 +157,7 @@ namespace itk {
         }
       }
 
-    if ( dimension != 2 && dimension != 3 )
+    if ( dimension < 2 || dimension > SITK_MAX_DIMENSION )
       {
       sitkExceptionMacro( "The file in the series have unsupported " << dimension - 1 << " dimensions." );
       }
@@ -179,8 +178,8 @@ namespace itk {
   ImageSeriesReader::ExecuteInternal( itk::ImageIOBase* imageio )
     {
 
-    typedef TImageType                        ImageType;
-    typedef itk::ImageSeriesReader<ImageType> Reader;
+    using ImageType = TImageType;
+    using Reader = itk::ImageSeriesReader<ImageType>;
 
     // if the IsInstantiated is correctly implemented this should
     // not occur

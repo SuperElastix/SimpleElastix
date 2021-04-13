@@ -32,6 +32,7 @@
 #include "sitkSimilarity3DTransform.h"
 #include "sitkVersorRigid3DTransform.h"
 #include "sitkVersorTransform.h"
+#include "sitkCompositeTransform.h"
 #include "sitkAdditionalProcedures.h"
 #include "sitkResampleImageFilter.h"
 #include "sitkHashImageFilter.h"
@@ -50,60 +51,80 @@ TEST(TransformTest, Construction) {
 
   sitk::Transform tx0( 2, sitk::sitkIdentity);
   std::cout << tx0.ToString() << std::endl;
+  EXPECT_EQ(sitk::sitkIdentity, tx0.GetTransformEnum());
   sitk::Transform tx1( 3, sitk::sitkIdentity);
   std::cout << tx1.ToString() << std::endl;
+  EXPECT_EQ(sitk::sitkIdentity, tx1.GetTransformEnum());
 
   sitk::Transform tx2( 2, sitk::sitkTranslation);
   std::cout << tx2.ToString() << std::endl;
+  EXPECT_EQ(sitk::sitkTranslation, tx2.GetTransformEnum());
   sitk::Transform tx3( 3, sitk::sitkTranslation);
   std::cout << tx3.ToString() << std::endl;
+  EXPECT_EQ(sitk::sitkTranslation, tx3.GetTransformEnum());
 
   sitk::Transform tx4( 2, sitk::sitkScale);
   std::cout << tx4.ToString() << std::endl;
+  EXPECT_EQ(sitk::sitkScale, tx4.GetTransformEnum());
   sitk::Transform tx5( 3, sitk::sitkScale);
   std::cout << tx5.ToString() << std::endl;
+  EXPECT_EQ(sitk::sitkScale, tx5.GetTransformEnum());
 
   sitk::Transform tx6( 2, sitk::sitkScaleLogarithmic);
   std::cout << tx6.ToString() << std::endl;
+  EXPECT_EQ(sitk::sitkScaleLogarithmic, tx6.GetTransformEnum());
   sitk::Transform tx7( 3, sitk::sitkScaleLogarithmic);
   std::cout << tx7.ToString() << std::endl;
+  EXPECT_EQ(sitk::sitkScaleLogarithmic, tx7.GetTransformEnum());
 
   sitk::Transform tx_0( 2, sitk::sitkEuler);
   std::cout << tx_0.ToString() << std::endl;
+  EXPECT_EQ(sitk::sitkEuler, tx_0.GetTransformEnum());
   sitk::Transform tx_1( 3, sitk::sitkEuler);
   std::cout << tx_1.ToString() << std::endl;
+  EXPECT_EQ(sitk::sitkEuler, tx_1.GetTransformEnum());
 
   sitk::Transform tx_2( 2, sitk::sitkSimilarity);
   std::cout << tx_2.ToString() << std::endl;
+  EXPECT_EQ(sitk::sitkSimilarity, tx_2.GetTransformEnum());
   sitk::Transform tx_3( 3, sitk::sitkSimilarity);
   std::cout << tx_3.ToString() << std::endl;
+  EXPECT_EQ(sitk::sitkSimilarity, tx_3.GetTransformEnum());
 
   EXPECT_ANY_THROW( sitk::Transform tx8( 2, sitk::sitkQuaternionRigid) );
   sitk::Transform tx9( 3, sitk::sitkQuaternionRigid);
   std::cout << tx9.ToString() << std::endl;
+  EXPECT_EQ(sitk::sitkQuaternionRigid, tx9.GetTransformEnum());
 
   EXPECT_ANY_THROW( sitk::Transform tx10( 2, sitk::sitkVersor) );
   sitk::Transform tx11( 3, sitk::sitkVersor);
   std::cout << tx11.ToString() << std::endl;
+  EXPECT_EQ(sitk::sitkVersor, tx11.GetTransformEnum());
 
   EXPECT_ANY_THROW( sitk::Transform tx12( 2, sitk::sitkVersorRigid) );
   sitk::Transform tx13( 3, sitk::sitkVersorRigid);
   std::cout << tx13.ToString() << std::endl;
+  EXPECT_EQ(sitk::sitkVersorRigid, tx13.GetTransformEnum());
 
   sitk::Transform tx14( 2, sitk::sitkAffine);
   std::cout << tx14.ToString() << std::endl;
+  EXPECT_EQ(sitk::sitkAffine, tx14.GetTransformEnum());
   sitk::Transform tx15( 3, sitk::sitkAffine);
   std::cout << tx15.ToString() << std::endl;
+  EXPECT_EQ(sitk::sitkAffine, tx15.GetTransformEnum());
 
   sitk::Transform tx16( 2, sitk::sitkAffine);
   std::cout << tx16.ToString() << std::endl;
+  EXPECT_EQ(sitk::sitkAffine, tx16.GetTransformEnum());
   sitk::Transform tx17( 3, sitk::sitkAffine);
   std::cout << tx17.ToString() << std::endl;
+  EXPECT_EQ(sitk::sitkAffine, tx17.GetTransformEnum());
 
 
   // default constructable
   sitk::Transform tx18;
   std::cout << tx18.ToString() << std::endl;
+
 
   // displacement fields
   sitk::Image displacement = sitk::Image( 100, 100, sitk::sitkVectorFloat64 );
@@ -112,12 +133,14 @@ TEST(TransformTest, Construction) {
   std::cout <<  tx19.ToString() << std::endl;
   EXPECT_EQ( displacement.GetSize()[0], 0u );
   EXPECT_EQ( displacement.GetSize()[1], 0u );
+  EXPECT_EQ(sitk::sitkDisplacementField, tx19.GetTransformEnum());
 
   displacement = sitk::Image( 100,100, 100, sitk::sitkVectorFloat64 );
   sitk::Transform tx20( displacement );
   std::cout << tx20.ToString() << std::endl;
   EXPECT_EQ( displacement.GetSize()[0], 0u );
   EXPECT_EQ( displacement.GetSize()[1], 0u );
+  EXPECT_EQ(sitk::sitkDisplacementField, tx20.GetTransformEnum());
 
   ASSERT_THROW( sitk::Transform( 3, sitk::sitkDisplacementField ), sitk::GenericException );
   ASSERT_THROW( sitk::Transform( 2, sitk::sitkDisplacementField ), sitk::GenericException );
@@ -125,9 +148,11 @@ TEST(TransformTest, Construction) {
 
   sitk::Image bsplineReference = sitk::Image(10,10, sitk::sitkUInt8);
   sitk::Transform tx21( bsplineReference, sitk::sitkBSplineTransform );
+  EXPECT_EQ(sitk::sitkBSplineTransform, tx21.GetTransformEnum());
 
   bsplineReference = sitk::Image(10,10, 10, sitk::sitkUInt8);
   sitk::Transform tx22( bsplineReference, sitk::sitkBSplineTransform );
+  EXPECT_EQ(sitk::sitkBSplineTransform, tx22.GetTransformEnum());
 
   ASSERT_THROW( sitk::Transform( 3, sitk::sitkBSplineTransform ), sitk::GenericException );
   ASSERT_THROW( sitk::Transform( 2, sitk::sitkBSplineTransform ), sitk::GenericException );
@@ -230,6 +255,13 @@ TEST(TransformTest, SetGetParameters) {
   EXPECT_EQ( tx.GetNumberOfFixedParameters(), 3u );
   EXPECT_TRUE(tx.IsLinear());
 
+  tx = sitk::Transform( 3, sitk::sitkScaleVersor );
+  EXPECT_EQ( tx.GetParameters().size(), 9u );
+  EXPECT_EQ( tx.GetNumberOfParameters(), 9u );
+  EXPECT_EQ( tx.GetFixedParameters().size(), 3u );
+  EXPECT_EQ( tx.GetNumberOfFixedParameters(), 3u );
+  EXPECT_TRUE(tx.IsLinear());
+
   tx = sitk::Transform( 3, sitk::sitkVersorRigid );
   EXPECT_EQ( tx.GetParameters().size(), 6u );
   EXPECT_EQ( tx.GetNumberOfParameters(), 6u );
@@ -266,6 +298,7 @@ TEST(TransformTest, SetGetParameters) {
   tx.SetParameters(std::vector<double>());
   tx.SetIdentity();
 }
+
 
 TEST(TransformTest, CopyOnWrite) {
 
@@ -326,73 +359,6 @@ TEST(TransformTest, CopyOnWrite) {
 }
 
 
-
-TEST(TransformTest, AddTransform) {
-
-  sitk::Transform tx1 = sitk::Transform( 2, sitk::sitkAffine );
-  tx1.AddTransform( sitk::Transform( 2, sitk::sitkAffine ) );
-  // check we can't add miss match dimension
-  ASSERT_ANY_THROW( tx1.AddTransform( sitk::Transform( 3, sitk::sitkAffine ) ) );
-
-
-  sitk::Transform tx2 = tx1;
-  tx1.AddTransform( sitk::Transform( 2, sitk::sitkIdentity ) );
-
-
-  sitk::Transform tx3( 3, sitk::sitkComposite );
-  tx1 = tx3;
-  tx3.AddTransform( sitk::Transform( 3, sitk::sitkAffine ) );
-
-}
-
-
-TEST(TransformTest, FlattenTransform) {
-
-  sitk::Transform tx1 = sitk::Transform( 2, sitk::sitkAffine );
-
-  EXPECT_EQ( tx1.GetNumberOfParameters(), 6u );
-  EXPECT_EQ( tx1.GetFixedParameters().size(), 2u);
-
-  EXPECT_NO_THROW( tx1.FlattenTransform() );
-
-  EXPECT_EQ( tx1.GetNumberOfParameters(), 6u );
-  EXPECT_EQ( tx1.GetFixedParameters().size(), 2u);
-
-  sitk::Transform tx2 = sitk::Transform( 2, sitk::sitkScale);
-  EXPECT_EQ( tx2.GetNumberOfParameters(), 2u );
-  EXPECT_EQ( tx2.GetFixedParameters().size(), 2u);
-
-  // create composite transform
-  tx2.AddTransform(sitk::TranslationTransform(2));
-  EXPECT_EQ( tx2.GetNumberOfParameters(), 2u );
-  EXPECT_EQ( tx2.GetFixedParameters().size(), 0u);
-
-  // add composite to existing transform to create nested composites
-  tx1.AddTransform(tx2);
-
-  // There should be nested composite transforms here
-  std::cout << tx1.ToString() << std::endl;
-
-  EXPECT_EQ( tx1.GetNumberOfParameters(), 2u );
-  EXPECT_EQ( tx1.GetFixedParameters().size(), 0u);
-
-  const ::testing::TestInfo *info = ::testing::UnitTest::GetInstance()->current_test_info();
-  std::string filename = std::string(info->test_case_name()) + "." + info->name() + ".txt";
-
-  filename = dataFinder.GetOutputFile(filename);
-
-  EXPECT_ANY_THROW(sitk::WriteTransform(tx1, filename));
-
-  // Can not write nested composite transforms
-  EXPECT_NO_THROW(tx1.FlattenTransform());
-
-  EXPECT_EQ( tx1.GetNumberOfParameters(), 2u );
-  EXPECT_EQ( tx1.GetFixedParameters().size(), 0u);
-
-  EXPECT_NO_THROW(sitk::WriteTransform(tx1, filename));
-}
-
-
 TEST(TransformTest, ReadTransformResample) {
 
   const char *txFiles[] = {
@@ -433,7 +399,7 @@ TEST(TransformTest, ReadTransformResample) {
 TEST(TransformTest, ReadTransformConvert) {
 
   EXPECT_NO_THROW(sitk::AffineTransform(sitk::ReadTransform( dataFinder.GetFile( "Input/xforms/affine_i_3.txt" ) ) ) );
-  EXPECT_NO_THROW(sitk::Transform(sitk::ReadTransform( dataFinder.GetFile( "Input/xforms/composite_i_3.txt" ) ) ) );
+  EXPECT_NO_THROW(sitk::CompositeTransform(sitk::ReadTransform( dataFinder.GetFile( "Input/xforms/composite_i_3.txt" ) ) ) );
   EXPECT_NO_THROW(sitk::Transform(sitk::ReadTransform( dataFinder.GetFile( "Input/xforms/i_3.txt" ) ) ) );
   EXPECT_NO_THROW(sitk::ScaleTransform(sitk::ReadTransform( dataFinder.GetFile( "Input/xforms/scale_i_3.txt" ) ) ) );
   EXPECT_NO_THROW(sitk::TranslationTransform(sitk::ReadTransform( dataFinder.GetFile( "Input/xforms/translation_i_3.txt" ) ) ) );
@@ -447,72 +413,84 @@ TEST(TransformTest, ReadTransformConvert) {
   sitk::WriteTransform(tx, filename);
   EXPECT_NO_THROW(tx = sitk::AffineTransform( sitk::ReadTransform(filename) ) );
   EXPECT_EQ(tx.GetDimension(), 2u);
+  EXPECT_EQ(sitk::sitkAffine, tx.GetTransformEnum());
   }
   {
   sitk::Euler2DTransform tx;
   sitk::WriteTransform(tx, filename);
   EXPECT_NO_THROW(tx = sitk::Euler2DTransform( sitk::ReadTransform(filename) ) );
   EXPECT_EQ(tx.GetDimension(), 2u);
+  EXPECT_EQ(sitk::sitkEuler, tx.GetTransformEnum());
   }
   {
   sitk::Euler3DTransform tx;
   sitk::WriteTransform(tx, filename);
   EXPECT_NO_THROW(tx = sitk::Euler3DTransform( sitk::ReadTransform(filename) ) );
   EXPECT_EQ(tx.GetDimension(), 3u);
+  EXPECT_EQ(sitk::sitkEuler, tx.GetTransformEnum());
   }
   {
   sitk::ScaleSkewVersor3DTransform tx;
   sitk::WriteTransform(tx, filename);
   EXPECT_NO_THROW(tx = sitk::ScaleSkewVersor3DTransform( sitk::ReadTransform(filename) ) );
   EXPECT_EQ(tx.GetDimension(), 3u);
+  EXPECT_EQ(sitk::sitkScaleSkewVersor, tx.GetTransformEnum());
   }
   {
   sitk::ScaleTransform tx(2);
   sitk::WriteTransform(tx, filename);
   EXPECT_NO_THROW( tx = sitk::ScaleTransform( sitk::ReadTransform(filename) ) );
   EXPECT_EQ(tx.GetDimension(), 2u);
+  EXPECT_EQ(sitk::sitkScale, tx.GetTransformEnum());
   }
   {
   sitk::ScaleVersor3DTransform tx;
   sitk::WriteTransform(tx, filename);
   EXPECT_NO_THROW(tx = sitk::ScaleVersor3DTransform( sitk::ReadTransform(filename) ) );
   EXPECT_EQ(tx.GetDimension(), 3u);
+  EXPECT_EQ(sitk::sitkScaleVersor, tx.GetTransformEnum());
   }
   {
   sitk::Similarity2DTransform tx;
   sitk::WriteTransform(tx, filename);
   EXPECT_NO_THROW(tx = sitk::Similarity2DTransform( sitk::ReadTransform(filename) ) );
   EXPECT_EQ(tx.GetDimension(), 2u);
+  EXPECT_EQ(sitk::sitkSimilarity, tx.GetTransformEnum());
   }
   {
   sitk::Similarity3DTransform tx;
   sitk::WriteTransform(tx, filename);
   EXPECT_NO_THROW(tx = sitk::Similarity3DTransform( sitk::ReadTransform(filename) ) );
   EXPECT_EQ(tx.GetDimension(), 3u);
+  EXPECT_EQ(sitk::sitkSimilarity, tx.GetTransformEnum());
   }
   {
   sitk::TranslationTransform tx(3);
   sitk::WriteTransform(tx, filename);
   EXPECT_NO_THROW(tx = sitk::TranslationTransform( sitk::ReadTransform(filename) ) );
   EXPECT_EQ(tx.GetDimension(), 3u);
+  EXPECT_EQ(sitk::sitkTranslation, tx.GetTransformEnum());
   }
   {
   sitk::VersorRigid3DTransform tx;
   sitk::WriteTransform(tx, filename);
   EXPECT_NO_THROW(tx = sitk::VersorRigid3DTransform( sitk::ReadTransform(filename) ) );
   EXPECT_EQ(tx.GetDimension(), 3u);
+  EXPECT_EQ(sitk::sitkVersorRigid, tx.GetTransformEnum());
   }
   {
   sitk::VersorTransform tx;
   sitk::WriteTransform(tx, filename);
   EXPECT_NO_THROW(tx = sitk::VersorTransform( sitk::ReadTransform(filename) ) );
   EXPECT_EQ(tx.GetDimension(), 3u);
+  EXPECT_EQ(sitk::sitkVersor, tx.GetTransformEnum());
   }
   {
   sitk::DisplacementFieldTransform tx(2);
   sitk::WriteTransform(tx, filename);
   EXPECT_NO_THROW( tx = sitk::DisplacementFieldTransform( sitk::ReadTransform(filename) ) );
   EXPECT_EQ(tx.GetDimension(), 2u);
+  EXPECT_EQ(sitk::sitkDisplacementField, tx.GetTransformEnum());
   }
   {
   sitk::DisplacementFieldTransform tx(2);
@@ -520,6 +498,8 @@ TEST(TransformTest, ReadTransformConvert) {
   sitk::WriteTransform(tx, filename);
   EXPECT_NO_THROW( tx = sitk::DisplacementFieldTransform( sitk::ReadTransform(filename) ) );
   EXPECT_EQ(tx.GetDimension(), 2u);
+  EXPECT_EQ(sitk::sitkDisplacementField, tx.GetTransformEnum());
+  EXPECT_EQ(sitk::sitkDisplacementField, sitk::Transform(tx).GetTransformEnum());
   }
   {
   sitk::BSplineTransform tx(2);
@@ -527,6 +507,7 @@ TEST(TransformTest, ReadTransformConvert) {
   EXPECT_NO_THROW( tx = sitk::BSplineTransform( sitk::ReadTransform(filename) ) );
   EXPECT_EQ(tx.GetDimension(), 2u);
   EXPECT_EQ(tx.GetOrder(), 3u);
+  EXPECT_EQ(sitk::sitkBSplineTransform, tx.GetTransformEnum());
   }
   {
   sitk::BSplineTransform tx(3);
@@ -534,6 +515,16 @@ TEST(TransformTest, ReadTransformConvert) {
   EXPECT_NO_THROW( tx = sitk::BSplineTransform( sitk::ReadTransform(filename) ) );
   EXPECT_EQ(tx.GetDimension(), 3u);
   EXPECT_EQ(tx.GetOrder(), 3u);
+  EXPECT_EQ(sitk::sitkBSplineTransform, tx.GetTransformEnum());
+  }
+  {
+  sitk::BSplineTransform tx(3,2);
+  EXPECT_EQ(sitk::sitkBSplineTransform, tx.GetTransformEnum());
+  sitk::WriteTransform(tx, filename);
+  EXPECT_NO_THROW( tx = sitk::BSplineTransform( sitk::ReadTransform(filename) ) );
+  EXPECT_EQ(tx.GetDimension(), 3u);
+  EXPECT_EQ(tx.GetOrder(), 2u);
+  EXPECT_EQ(sitk::sitkBSplineTransform, tx.GetTransformEnum());
   }
 
 }
@@ -1131,7 +1122,7 @@ TEST(BasicFilters, DisplacementField_GetDisplacementField)
 
     sitk::Image displacementImage = displacementField.GetDisplacementField();
 
-    typedef itk::VectorImage<double, 2> ImageBaseType;
+    using ImageBaseType = itk::VectorImage<double, 2>;
     ImageBaseType *imageBase = dynamic_cast<ImageBaseType*>(displacementImage.GetITKBase());
     ASSERT_TRUE(imageBase != nullptr);
     EXPECT_FALSE(imageBase->GetPixelContainer()->GetContainerManageMemory());
@@ -2427,4 +2418,197 @@ TEST(TransformTest,VersorTransform_NoPolymorphicCast)
 //  EXPECT_THROW( sitk::VersorTransform( sv3dt), sitk::GenericException );
   EXPECT_THROW( tx = sitk::VersorTransform( s3dt), sitk::GenericException );
   EXPECT_THROW( tx = sitk::VersorTransform( vr3dt), sitk::GenericException );
+}
+
+TEST(TransformTest, CompositeTransform) {
+
+  sitk::CompositeTransform tx(2);
+  EXPECT_EQ(tx.GetName(), "CompositeTransform");
+  EXPECT_EQ(0, tx.GetNumberOfTransforms() );
+  EXPECT_EQ(0, tx.GetNumberOfParameters());
+  EXPECT_EQ(0, tx.GetNumberOfFixedParameters());
+
+  EXPECT_EQ(sitk::sitkComposite, tx.GetTransformEnum());
+
+  EXPECT_NO_THROW(tx.FlattenTransform());
+  EXPECT_THROW( tx.GetBackTransform(), sitk::GenericException );
+  EXPECT_THROW( tx.RemoveTransform(), sitk::GenericException );
+  EXPECT_ANY_THROW( tx.GetNthTransform(0) );
+  EXPECT_NO_THROW(tx.ClearTransforms());
+
+  sitk::CompositeTransform tx1(sitk::Transform(2, sitk::sitkIdentity));
+  EXPECT_EQ(tx1.GetName(), "CompositeTransform");
+  EXPECT_EQ(1, tx1.GetNumberOfTransforms() );
+  EXPECT_EQ(0, tx1.GetNumberOfParameters());
+  EXPECT_EQ(0, tx1.GetNumberOfFixedParameters());
+  EXPECT_EQ(sitk::sitkComposite, tx1.GetTransformEnum());
+  EXPECT_NO_THROW(tx1.FlattenTransform());
+  EXPECT_EQ( tx1.GetBackTransform().GetTransformEnum(), sitk::sitkIdentity);
+  EXPECT_NO_THROW( tx1.RemoveTransform() );
+  EXPECT_EQ(0, tx1.GetNumberOfTransforms() );
+
+  tx1 = sitk::Transform(3, sitk::sitkAffine);
+
+  std::cout << tx1.ToString() << std::endl;
+
+  EXPECT_EQ(tx1.GetName(), "CompositeTransform");
+  EXPECT_EQ(1, tx1.GetNumberOfTransforms() );
+  EXPECT_EQ(12, tx1.GetNumberOfParameters());
+  EXPECT_EQ(3, tx1.GetNumberOfFixedParameters());
+  EXPECT_EQ(sitk::sitkComposite, tx1.GetTransformEnum());
+  EXPECT_NO_THROW(tx1.FlattenTransform());
+  EXPECT_EQ( tx1.GetBackTransform().GetTransformEnum(), sitk::sitkAffine);
+  EXPECT_NO_THROW( tx1.ClearTransforms() );
+  EXPECT_EQ(0, tx1.GetNumberOfTransforms() );
+
+
+  sitk::CompositeTransform ctx2( { sitk::AffineTransform(2),
+                                   sitk::TranslationTransform(2),
+                                   sitk::ScaleTransform(2) } );
+
+  EXPECT_EQ(2, ctx2.GetDimension());
+  EXPECT_EQ( 3, ctx2.GetNumberOfTransforms());
+  EXPECT_EQ( 2, ctx2.GetNumberOfParameters());
+  EXPECT_EQ(0, tx1.GetNumberOfFixedParameters());
+
+  sitk::Transform ntx = ctx2.GetBackTransform();
+
+  EXPECT_EQ(sitk::sitkScale, ntx.GetTransformEnum());
+  EXPECT_NO_THROW(sitk::ScaleTransform(ctx2.GetBackTransform()) );
+  EXPECT_EQ(3, ctx2.GetNumberOfTransforms());
+  EXPECT_EQ(2, ctx2.GetNumberOfParameters());
+  EXPECT_EQ(0, tx1.GetNumberOfFixedParameters());
+  ntx.SetParameters(std::vector<double>(ntx.GetNumberOfParameters(), 2.0));
+  EXPECT_NE(ntx.GetParameters(), ctx2.GetParameters());
+
+  ntx = ctx2.GetNthTransform(0);
+  EXPECT_EQ( sitk::sitkAffine, ntx.GetTransformEnum());
+  EXPECT_NO_THROW( sitk::AffineTransform{ntx});
+
+  ntx = ctx2.GetNthTransform(1);
+  EXPECT_EQ(sitk::sitkTranslation, ntx.GetTransformEnum());
+  EXPECT_NO_THROW(sitk::TranslationTransform{ntx});
+
+  ntx = ctx2.GetNthTransform(2);
+  EXPECT_EQ(sitk::sitkScale, ntx.GetTransformEnum());
+  EXPECT_NO_THROW(sitk::ScaleTransform(ctx2.GetBackTransform()) );
+  EXPECT_EQ(3, ctx2.GetNumberOfTransforms());
+  EXPECT_EQ(2, ctx2.GetNumberOfParameters());
+  EXPECT_EQ(0, tx1.GetNumberOfFixedParameters());
+  EXPECT_EQ(ctx2.GetParameters(), ntx.GetParameters());
+  ntx.SetParameters(std::vector<double>(ntx.GetNumberOfParameters(), 3.0));
+  EXPECT_NE(ntx.GetParameters(), ctx2.GetParameters());
+
+  EXPECT_ANY_THROW( ctx2.GetNthTransform(3) );
+}
+
+
+TEST(TransformTest, Composite_AddTransform) {
+
+  sitk::Transform tx1 = sitk::Transform( 2, sitk::sitkAffine );
+  EXPECT_EQ(sitk::sitkAffine, tx1.GetTransformEnum());
+
+  sitk::CompositeTransform ctx(tx1);
+  ctx.AddTransform( sitk::Transform( 2, sitk::sitkAffine ) );
+  EXPECT_EQ(sitk::sitkComposite, ctx.GetTransformEnum());
+  EXPECT_EQ(2, ctx.GetNumberOfTransforms());
+  EXPECT_EQ( 6u, ctx.GetNumberOfParameters());
+  EXPECT_EQ( 2u, ctx.GetNumberOfFixedParameters());
+
+  // check we can't add miss match dimension
+  ASSERT_ANY_THROW( ctx.AddTransform( sitk::Transform( 3, sitk::sitkAffine ) ) );
+
+
+  sitk::CompositeTransform ctx2 = ctx;
+  EXPECT_EQ(2, ctx.GetNumberOfTransforms());
+  EXPECT_EQ(2, ctx2.GetNumberOfTransforms());
+  ctx.AddTransform( sitk::Transform( 2, sitk::sitkIdentity ) );
+
+  EXPECT_EQ(3, ctx.GetNumberOfTransforms());
+  EXPECT_EQ(2, ctx2.GetNumberOfTransforms());
+
+  sitk::Transform tx3( 3, sitk::sitkComposite );
+  ctx = tx3;
+  EXPECT_EQ(0, ctx.GetNumberOfTransforms());
+  ctx.AddTransform( sitk::Transform( 3, sitk::sitkAffine ) );
+  EXPECT_EQ(1, ctx.GetNumberOfTransforms());
+
+  EXPECT_EQ(2, ctx2.GetNumberOfTransforms());
+
+  sitk::ScaleTransform stx{3, {2.1, 2.2, 2.3}};
+  ctx.AddTransform(stx);
+  EXPECT_EQ(2, ctx.GetNumberOfTransforms());
+  EXPECT_EQ(3, ctx.GetNumberOfParameters());
+  EXPECT_EQ( std::vector<double>({2.1, 2.2, 2.3}), ctx.GetParameters());
+
+}
+
+
+TEST(TransformTest, Composite_FlattenTransform) {
+
+  sitk::CompositeTransform ctx1(2);
+  ctx1.FlattenTransform();
+  EXPECT_EQ(ctx1.GetNumberOfParameters(), 0u);
+  EXPECT_EQ(ctx1.GetFixedParameters().size(), 0u);
+  sitk::Transform tx1 = sitk::Transform(2, sitk::sitkAffine);
+  ctx1.AddTransform(tx1);
+  std::cout << ctx1.ToString() << std::endl;
+  std::cout << "Number Of Transforms: " << ctx1.GetNumberOfTransforms()
+            << std::endl;
+  EXPECT_EQ(ctx1.GetNumberOfParameters(), 6u);
+  EXPECT_EQ(ctx1.GetFixedParameters().size(), 2u);
+  ctx1.FlattenTransform();
+
+  sitk::CompositeTransform ctx2(2);
+  ctx2.AddTransform(sitk::TranslationTransform(2));
+  EXPECT_EQ(ctx2.GetNumberOfParameters(), 2u);
+  EXPECT_EQ(ctx2.GetFixedParameters().size(), 0u);
+
+  // add composite to existing transform to create nested composites
+  ctx2.AddTransform(ctx1);
+
+  EXPECT_EQ(ctx2.GetNumberOfParameters(), 6u);
+  EXPECT_EQ(ctx2.GetFixedParameters().size(), 2u);
+
+  // There should be nested composite transforms here
+  std::cout << ctx2.ToString() << std::endl;
+
+  const ::testing::TestInfo *info =
+      ::testing::UnitTest::GetInstance()->current_test_info();
+  std::string filename =
+      std::string(info->test_case_name()) + "." + info->name() + ".txt";
+
+  filename = dataFinder.GetOutputFile(filename);
+
+  // Can not write nested composite transforms
+  EXPECT_ANY_THROW(sitk::WriteTransform(ctx2, filename));
+
+  EXPECT_NO_THROW(ctx2.FlattenTransform());
+
+  EXPECT_EQ(ctx2.GetNumberOfParameters(), 6u);
+  EXPECT_EQ(ctx2.GetFixedParameters().size(), 2u);
+
+  EXPECT_NO_THROW(sitk::WriteTransform(tx1, filename));
+}
+
+TEST(TransformTest, CompositeTransform_Nested) {
+
+  sitk::CompositeTransform ctx1( {
+    sitk::ScaleTransform( 3, {1.0, 1.1, 1.2} ),
+      sitk::TranslationTransform( 3, {2.2, 2.1, 2.0})
+      } );
+
+  EXPECT_EQ(2, ctx1.GetNumberOfTransforms());
+
+
+  sitk::CompositeTransform ctx2( { sitk::TranslationTransform( 3, {3.5, 3.6, 3.7} ), ctx1 } );
+  EXPECT_EQ(2, ctx2.GetNumberOfTransforms());
+
+  EXPECT_NO_THROW(ctx2.SetParameters({-1.0,-2.0, -3.0}));
+  EXPECT_EQ( std::vector<double>({-1.0, -2.0, -3.0}), ctx2.GetParameters());
+  EXPECT_EQ( std::vector<double>({2.2, 2.1, 2.0}), ctx1.GetParameters());
+
+  EXPECT_NO_THROW(ctx2.FlattenTransform());
+  EXPECT_EQ(3, ctx2.GetNumberOfTransforms());
+
 }
