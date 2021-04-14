@@ -13,7 +13,7 @@ elastixImageFilter.Execute()
 transformixImageFilter = sitk.TransformixImageFilter()
 
 # Read Input
-transformixImageFilter.SetInputImage(sitk.ReadImage(str(sys.argv[4])))
+transformixImageFilter.SetMovingImage(sitk.ReadImage(str(sys.argv[4])))
 transformixImageFilter.SetParameterMap(elastixImageFilter.GetTransformParameterMap())
 
 # Perform warp
