@@ -65,7 +65,7 @@ template< typename TITKPointVector, typename TType>
 TITKPointVector SITKCommon_HIDDEN sitkSTLVectorToITKPointVector( const std::vector< TType > & in )
 {
 
-  typedef TITKPointVector itkPointVectorType;
+  using itkPointVectorType = TITKPointVector;
   itkPointVectorType out;
 
   unsigned int Dimension = itkPointVectorType::value_type::GetPointDimension();
@@ -88,7 +88,7 @@ TITKPointVector SITKCommon_HIDDEN sitkSTLVectorToITKPointVector( const std::vect
 template< typename TITKVector, typename TType>
 TITKVector SITKCommon_HIDDEN sitkSTLVectorToITK( const std::vector< TType > & in )
 {
-  typedef TITKVector itkVectorType;
+  using itkVectorType = TITKVector;
   if ( in.size() < itkVectorType::Dimension )
     {
     sitkExceptionMacro(<<"Unable to convert vector to ITK type\n"
@@ -123,7 +123,7 @@ std::vector<TType> SITKCommon_HIDDEN sitkITKVectorToSTL( const TITKVector & in )
 template<typename TType,  typename TVectorOfITKVector>
 std::vector<TType> SITKCommon_HIDDEN sitkVectorOfITKVectorToSTL( const TVectorOfITKVector & in )
 {
-  typedef typename TVectorOfITKVector::ValueType ITKVectorType;
+  using ITKVectorType = typename TVectorOfITKVector::ValueType;
   std::vector<TType> out;
   out.reserve( in.Size()*ITKVectorType::Dimension );
   for( unsigned int i = 0; i < in.Size(); ++i )
@@ -178,7 +178,7 @@ TDirectionType SITKCommon_HIDDEN  sitkSTLToITKDirection( const std::vector<doubl
 {
   TDirectionType itkDirection;
 
-  if ( direction.size() == 0 )
+  if ( direction.empty() )
     {
     itkDirection.SetIdentity();
     }
@@ -205,7 +205,7 @@ std::vector<double> SITKCommon_HIDDEN  sitkITKDirectionToSTL( const TDirectionTy
 template< typename T, typename TType>
 itk::Versor<T> SITKCommon_HIDDEN  sitkSTLVectorToITKVersor( const std::vector< TType > & in )
 {
-  typedef itk::Versor<T> itkVectorType;
+  using itkVectorType = itk::Versor<T>;
   if ( in.size() != 4 )
     {
     sitkExceptionMacro(<<"Unable to convert vector to ITK Versor type\n"
@@ -227,6 +227,32 @@ std::vector<TType> SITKCommon_HIDDEN  sitkITKVersorToSTL( const itk::Versor<T> &
   out[2] = in.GetZ();
   out[3] = in.GetW();
   return out;
+}
+
+// Based on p0052r8 : Generic Scope Guard and RAII Wrapper for the
+// Standard Library
+// by Peter Sommerlad and Andrew L. Sandoval
+template <typename F>
+struct scope_exit {
+  F f_;
+  bool run_;
+  explicit scope_exit(F f) noexcept : f_(std::move(f)), run_(true) {}
+  scope_exit(scope_exit&& rhs) noexcept : f_((rhs.run_ = false, std::move(rhs.f_))), run_(true) {}
+  ~scope_exit()
+  {
+    if (run_)
+      f_();
+  }
+
+  scope_exit& operator=(scope_exit&& rhs) = delete;
+  scope_exit(scope_exit const&) = delete;
+  scope_exit& operator=(scope_exit const&) = delete;
+};
+
+template <typename F>
+scope_exit<F> make_scope_exit(F&& f) noexcept
+{
+  return scope_exit<F>{ std::forward<F>(f) };
 }
 
 

@@ -47,7 +47,7 @@ TEST(IO,ImageFileReader) {
   reader.SetLoadPrivateTags(false);
   EXPECT_EQ( reader.GetLoadPrivateTags(), false );
 
-  typedef std::map<std::string,std::string> MapType;
+  using MapType = std::map<std::string,std::string>;
   MapType mapping;
 
   // Configure the mapping between filename and MD5 hash
@@ -68,7 +68,7 @@ TEST(IO,ImageFileReader) {
     reader.SetFileName ( dataFinder.GetFile ( it->first ) );
     EXPECT_EQ ( reader.GetFileName(), dataFinder.GetFile ( it->first ) );
     sitk::Image image = reader.Execute();
-    ASSERT_TRUE ( image.GetITKBase() != NULL );
+    ASSERT_NE ( image.GetITKBase(), nullptr );
     hasher.SetHashFunction ( sitk::HashImageFilter::MD5 );
     EXPECT_EQ ( it->second, hasher.Execute ( image ) ) << " reading " << it->first;
     // Try the functional interface
@@ -285,7 +285,7 @@ TEST(IO,ReadWrite) {
 
 
   sitk::Image image = reader.SetFileName ( dataFinder.GetFile ( "Input/RA-Short.nrrd" ) ).Execute();
-  ASSERT_TRUE ( image.GetITKBase() != NULL );
+  ASSERT_NE ( image.GetITKBase(), nullptr );
   hasher.SetHashFunction ( sitk::HashImageFilter::MD5 );
   EXPECT_EQ ( md5, hasher.Execute ( image ) );
   hasher.SetHashFunction ( sitk::HashImageFilter::SHA1 );
@@ -306,7 +306,7 @@ TEST(IO,ReadWrite) {
   ASSERT_TRUE ( dataFinder.FileExists ( filename ) );
 
   image = reader.SetFileName ( filename ).Execute();
-  ASSERT_TRUE ( image.GetITKBase() != NULL );
+  ASSERT_NE ( image.GetITKBase(), nullptr );
 
   // Make sure we wrote and read the file correctly
   hasher.SetHashFunction ( sitk::HashImageFilter::MD5 );
@@ -320,7 +320,7 @@ TEST(IO,ReadWrite) {
   ASSERT_TRUE ( dataFinder.FileExists ( filename ) );
 
   image = reader.SetFileName ( filename ).Execute();
-  ASSERT_TRUE ( image.GetITKBase() != NULL );
+  ASSERT_NE ( image.GetITKBase(), nullptr );
 
   // Make sure we wrote and read the file correctly
   hasher.SetHashFunction ( sitk::HashImageFilter::MD5 );
@@ -336,7 +336,7 @@ TEST(IO,2DFormats) {
   itk::simple::ImageFileReader reader;
 
   itk::simple::Image image = reader.SetFileName ( dataFinder.GetFile ( "Input/RA-Slice-Short.png" ) ).Execute();
-  ASSERT_TRUE ( image.GetITKBase() != NULL );
+  ASSERT_NE ( image.GetITKBase(), nullptr );
   hasher.SetHashFunction ( itk::simple::HashImageFilter::SHA1 );
   EXPECT_EQ ( "bf0f7bae60b0322222e224941c31f37a981901aa", hasher.Execute ( image ) );
   ASSERT_EQ ( 2u, image.GetDimension() );
@@ -700,12 +700,29 @@ TEST(IO, ImageFileReader_SetImageIO )
   EXPECT_EQ ( "bf0f7bae60b0322222e224941c31f37a981901aa", hasher.Execute ( image ) );
 
 
-  ASSERT_TRUE ( image.GetITKBase() != NULL );
+  ASSERT_NE ( image.GetITKBase(), nullptr );
   EXPECT_EQ ( 2u, image.GetDimension() );
   EXPECT_EQ ( 64u, image.GetWidth() );
   EXPECT_EQ ( 64u, image.GetHeight() );
   EXPECT_EQ ( 0u, image.GetDepth() );
 
+}
+
+
+TEST(IO, ImageFileReader_GetImageIOFromFileName )
+{
+  namespace sitk = itk::simple;
+
+  std::string imageio;
+
+  const std::string filename1 = dataFinder.GetFile ( "Input/RA-Slice-Short.png" );
+  EXPECT_EQ( "PNGImageIO" , sitk::ImageFileReader::GetImageIOFromFileName( filename1 ) );
+
+  const std::string filename2 =  dataFinder.GetFile( "Input/cthead1-Float.mha" );
+  EXPECT_EQ( "MetaImageIO" , sitk::ImageFileReader::GetImageIOFromFileName( filename2 ) );
+
+  EXPECT_NO_THROW( imageio = sitk::ImageFileReader::GetImageIOFromFileName( "file_does_not_exist" ) );
+  EXPECT_EQ( "", imageio);
 }
 
 
@@ -833,7 +850,7 @@ TEST(IO, ImageFileReader_Extract2 )
   EXPECT_EQ( "my_value", result.GetMetaData("MyKey") );
   EXPECT_EQ( generatedImage.GetSpacing(), result.GetSpacing() );
   EXPECT_EQ( v3(3.0, 8.0, 15.0), result.GetOrigin() );
-  EXPECT_EQ( 3, result.GetDimension() );
+  EXPECT_EQ( 3u, result.GetDimension() );
   EXPECT_EQ( extractSize, result.GetSize() );
 
 
@@ -950,8 +967,18 @@ TEST(IO, ImageFileReader_5DExtract )
   EXPECT_VECTOR_DOUBLE_NEAR(reader.GetDirection(), direction_i5, 1e-8);
   EXPECT_VECTOR_NEAR(reader.GetSize(), v5(5.0, 5.0, 5.0, 5.0, 5.0), 1e-10);
 
-
-  EXPECT_ANY_THROW(reader.Execute());
+  if ( SITK_MAX_DIMENSION < 5 )
+    {
+    EXPECT_ANY_THROW(reader.Execute());
+    }
+  else
+    {
+    sitk::Image output;
+    EXPECT_NO_THROW(output = reader.Execute());
+    EXPECT_VECTOR_DOUBLE_NEAR(output.GetOrigin(), reader.GetOrigin(), 1e-10);
+    EXPECT_VECTOR_DOUBLE_NEAR(output.GetSpacing(), reader.GetSpacing(), 1e-10);
+    EXPECT_VECTOR_DOUBLE_NEAR(output.GetDirection(), reader.GetDirection(), 1e-8);
+    }
 
   std::vector<unsigned int> extractSize(5);
   std::vector<int> extractIndex(5, 0);

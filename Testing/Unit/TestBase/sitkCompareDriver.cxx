@@ -50,9 +50,9 @@ struct CompareType
   float tolerance;
 };
 
-typedef std::pair< const char *, std::vector<std::string> > HashPairType;
-typedef std::vector< char * > ArgumentsList;
-typedef char ** ArgumentStringType;
+using HashPairType = std::pair< const char *, std::vector<std::string> >;
+using ArgumentsList = std::vector< char * >;
+using ArgumentStringType = char **;
 
 // A structure to hold regression test parameters
 typedef struct
@@ -316,12 +316,12 @@ int ProcessArguments(int *ac, ArgumentStringType *av, ProcessedOutputType * proc
        }
 
        std::cout << "Image Hash: " << filename;
-       for(unsigned int j = 0 ; j < hashVector.size(); ++j)
+       for(unsigned int j = 0; j < hashVector.size(); ++j)
          {
          std::cout << " " << hashVector[j];
          }
        std::cout << std::endl;
-       regressionTestParameters.hashTestList.push_back( HashPairType( filename, hashVector )  );
+       regressionTestParameters.hashTestList.emplace_back( filename, hashVector  );
 
       }
     else if ( !skip && strcmp((*av)[i], "--") == 0 )

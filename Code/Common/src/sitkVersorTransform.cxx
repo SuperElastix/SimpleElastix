@@ -25,9 +25,7 @@ namespace itk
 namespace simple
 {
 
-VersorTransform::~VersorTransform()
-{
-}
+VersorTransform::~VersorTransform() = default;
 
 // construct identity
 VersorTransform::VersorTransform()
@@ -130,7 +128,7 @@ void VersorTransform::SetPimpleTransform( PimpleTransformBase *pimpleTransform )
 void VersorTransform::InternalInitialization(itk::TransformBase *transform)
 {
 
-  typedef itk::VersorTransform<double> TransformType;
+  using TransformType = itk::VersorTransform<double>;
   TransformType *t = dynamic_cast<TransformType*>(transform);
 
   // explicitly remove all function pointer with reference to prior transform

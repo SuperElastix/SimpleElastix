@@ -8,7 +8,7 @@
   "output_image_type" : "itk::Image< Vector<double, TImageType::ImageDimension>, TImageType::ImageDimension >",
   "filter_type" : "itk::DiffeomorphicDemonsRegistrationFilter<TImageType, TImageType, OutputImageType>",
   "include_files" : [
-    "sitkImageConvert.h"
+    "sitkImageConvert.hxx"
   ],
   "inputs" : [
     {
@@ -24,7 +24,7 @@
       "name" : "InitialDisplacementField",
       "type" : "Image",
       "optional" : true,
-      "custom_itk_cast" : "  typedef itk::VectorImage<double, FilterType::DisplacementFieldType::ImageDimension> VectorImageType;\n      filter->SetInitialDisplacementField( GetImageFromVectorImage(const_cast<VectorImageType*>(CastImageToITK<VectorImageType>(*inInitialDisplacementField).GetPointer()) ) );"
+      "custom_itk_cast" : "  using VectorImageType = itk::VectorImage<double, FilterType::DisplacementFieldType::ImageDimension>;\n      filter->SetInitialDisplacementField( GetImageFromVectorImage(const_cast<VectorImageType*>(CastImageToITK<VectorImageType>(*inInitialDisplacementField).GetPointer()) ) );"
     }
   ],
   "members" : [
@@ -68,7 +68,7 @@
     {
       "name" : "UseFirstOrderExp",
       "type" : "bool",
-      "default" : false,
+      "default" : "false",
       "briefdescriptionSet" : "",
       "detaileddescriptionSet" : "Use a first-order approximation of the exponential. This amounts to using an update rule of the type s <- s o (Id + u) instead of s <- s o exp(u)",
       "briefdescriptionGet" : "",
@@ -86,14 +86,14 @@
     {
       "name" : "SmoothDisplacementField",
       "type" : "bool",
-      "default" : true,
+      "default" : "true",
       "detaileddescriptionSet" : "Set/Get whether the displacement field is smoothed (regularized). Smoothing the displacement yields a solution elastic in nature. If SmoothDisplacementField is on, then the displacement field is smoothed with a Gaussian whose standard deviations are specified with SetStandardDeviations()",
       "detaileddescriptionGet" : "Set/Get whether the displacement field is smoothed (regularized). Smoothing the displacement yields a solution elastic in nature. If SmoothDisplacementField is on, then the displacement field is smoothed with a Gaussian whose standard deviations are specified with SetStandardDeviations()"
     },
     {
       "name" : "SmoothUpdateField",
       "type" : "bool",
-      "default" : false,
+      "default" : "false",
       "detaileddescriptionSet" : "Set/Get whether the update field is smoothed (regularized). Smoothing the update field yields a solution viscous in nature. If SmoothUpdateField is on, then the update field is smoothed with a Gaussian whose standard deviations are specified with SetUpdateFieldStandardDeviations()",
       "detaileddescriptionGet" : "Set/Get whether the update field is smoothed (regularized). Smoothing the update field yields a solution viscous in nature. If SmoothUpdateField is on, then the update field is smoothed with a Gaussian whose standard deviations are specified with SetUpdateFieldStandardDeviations()"
     },
@@ -133,7 +133,7 @@
     {
       "name" : "UseImageSpacing",
       "type" : "bool",
-      "default" : true
+      "default" : "true"
     }
   ],
   "measurements" : [
@@ -218,5 +218,6 @@
   "briefdescription" : "Deformably register two images using a diffeomorphic demons algorithm.",
   "detaileddescription" : "This class was contributed by Tom Vercauteren, INRIA & Mauna Kea Technologies, based on a variation of the DemonsRegistrationFilter . The basic modification is to use diffeomorphism exponentials.\n\nSee T. Vercauteren, X. Pennec, A. Perchant and N. Ayache, \"Non-parametric Diffeomorphic Image Registration with the Demons Algorithm\", Proc. of MICCAI 2007.\n\nDiffeomorphicDemonsRegistrationFilter implements the demons deformable algorithm that register two images by computing the deformation field which will map a moving image onto a fixed image.\n\nA deformation field is represented as a image whose pixel type is some vector type with at least N elements, where N is the dimension of the fixed image. The vector type must support element access via operator []. It is assumed that the vector elements behave like floating point scalars.\n\nThis class is templated over the fixed image type, moving image type and the deformation field type.\n\nThe input fixed and moving images are set via methods SetFixedImage and SetMovingImage respectively. An initial deformation field maybe set via SetInitialDisplacementField or SetInput. If no initial field is set, a zero field is used as the initial condition.\n\nThe output deformation field can be obtained via methods GetOutput or GetDisplacementField.\n\nThis class make use of the finite difference solver hierarchy. Update for each iteration is computed in DemonsRegistrationFunction .\n\n\\author Tom Vercauteren, INRIA & Mauna Kea Technologies\n\n\n\\warning This filter assumes that the fixed image type, moving image type and deformation field type all have the same number of dimensions.\n\n\nThis implementation was taken from the Insight Journal paper: https://hdl.handle.net/1926/510 \n\n\\see DemonsRegistrationFilter \n\n\n\\see DemonsRegistrationFunction",
   "itk_module" : "ITKPDEDeformableRegistration",
-  "itk_group" : "PDEDeformable"
+  "itk_group" : "PDEDeformable",
+  "in_place" : false
 }

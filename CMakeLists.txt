@@ -134,18 +134,7 @@ option( SimpleITK_INT64_PIXELIDS "Instantiate 64-bit integer pixels, including u
   ${SimpleITK_INT64_PIXELIDS_DEFAULT} )
 sitk_legacy_naming(SimpleITK_INT64_PIXELIDS)
 
-
-
-set(SimpleITK_4D_IMAGES_DEFAULT ON)
-# 1900 = VS 14.0 (Visual Studio 2015)
-if(MSVC AND MSVC_VERSION VERSION_LESS 1900)
-  set( SimpleITK_4D_IMAGES_DEFAULT OFF )
-  message("disable")
-endif()
-option( SimpleITK_4D_IMAGES "Add Image and I/O support for four spatial dimensions." ${SimpleITK_4D_IMAGES_DEFAULT} )
-mark_as_advanced( SimpleITK_4D_IMAGES )
-sitk_legacy_naming( SimpleITK_4D_IMAGES )
-
+include(sitkMaxDimensionOption)
 
 # Setup build locations.
 if(NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
@@ -340,17 +329,16 @@ foreach(_f IN LISTS ITK_DOC_FILES)
   list( APPEND SimpleITK_DOC_FILES "${_o}" )
 endforeach()
 
-
-#------------------------------------------------------------------------------
-# Set up Documentation
-include(${SimpleITK_SOURCE_DIR}/Utilities/Doxygen/Doxygen.cmake)
-
 #------------------------------------------------------------------------------
 # Set up wrapping.
 #
 # Use CMake file which present options for wrapped languages, and finds languages as needed
 #
 include(sitkLanguageOptions)
+
+#------------------------------------------------------------------------------
+# Set up Documentation
+include(${SimpleITK_SOURCE_DIR}/Utilities/Doxygen/Doxygen.cmake)
 
 #------------------------------------------------------------------------------
 # Ensure that development strips have been setup

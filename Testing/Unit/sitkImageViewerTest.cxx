@@ -73,9 +73,9 @@ TEST(ImageViewerTest,Methods)
   delay = iv.GetProcessDelay();
 
 #ifdef _WIN32
-  EXPECT_EQ( delay, 1 );
+  EXPECT_EQ( delay, 1u );
 #else
-  EXPECT_EQ( delay, 500 );
+  EXPECT_EQ( delay, 500u );
 #endif
   iv.SetProcessDelay( delay );
   }
@@ -85,8 +85,8 @@ TEST(ImageViewerTest,GlobalDefaults)
   itk::simple::ImageViewer iv;
 
   std::vector<std::string> words;
-  words.push_back( std::string("alpha") );
-  words.push_back( std::string("beta") );
+  words.emplace_back("alpha" );
+  words.emplace_back("beta" );
 
   std::vector<std::string> path;
   iv.SetGlobalDefaultSearchPath( words );

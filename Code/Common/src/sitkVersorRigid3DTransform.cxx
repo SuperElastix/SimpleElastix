@@ -25,9 +25,7 @@ namespace itk
 namespace simple
 {
 
-VersorRigid3DTransform::~VersorRigid3DTransform()
-{
-}
+VersorRigid3DTransform::~VersorRigid3DTransform() = default;
 
 // construct identity
 VersorRigid3DTransform::VersorRigid3DTransform()
@@ -152,7 +150,7 @@ void VersorRigid3DTransform::SetPimpleTransform( PimpleTransformBase *pimpleTran
 void VersorRigid3DTransform::InternalInitialization(itk::TransformBase *transform)
 {
 
-  typedef itk::VersorRigid3DTransform<double> TransformType;
+  using TransformType = itk::VersorRigid3DTransform<double>;
   TransformType *t = dynamic_cast<TransformType*>(transform);
 
   // explicitly remove all function pointer with reference to prior transform

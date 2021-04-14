@@ -50,9 +50,9 @@ using  itk::simple::InstantiatedPixelIDTypeList;
 
 class Image4D : public ::testing::Test {
 public:
-  typedef std::unique_ptr<itk::simple::Image> sitkAutoImagePointer;
+  using sitkAutoImagePointer = std::unique_ptr<itk::simple::Image>;
 
-  virtual void SetUp() {
+  void SetUp() override {
     itk::ImageBase<4>::IndexType index;
     itk::ImageBase<4>::SizeType size;
     itk::ImageBase<4>::RegionType region;
@@ -106,14 +106,14 @@ public:
 
   itk::ImageBase< 4 >::Pointer itkShortImage;
 
-  typedef itk::Image< short, 4 > ShortImageType;
+  using ShortImageType = itk::Image< short, 4 >;
   sitkAutoImagePointer shortImage;
 
-  typedef itk::Image< float, 4 > FloatImageType;
+  using FloatImageType = itk::Image< float, 4 >;
   sitkAutoImagePointer floatImage;
   FloatImageType::Pointer itkFloatImage;
 
-  typedef itk::VectorImage<float, 4 > FloatVectorImageType;
+  using FloatVectorImageType = itk::VectorImage<float, 4 >;
   sitkAutoImagePointer floatVectorImage;
   FloatVectorImageType::Pointer itkFloatVectorImage;
 
@@ -124,8 +124,8 @@ public:
 
 };
 
-TEST_F( Image4D, Create ) {
-  ASSERT_TRUE ( shortImage->GetITKBase() != NULL );
+TEST_F(Image4D,Create) {
+  ASSERT_NE ( shortImage->GetITKBase(), nullptr );
   EXPECT_EQ ( shortImage->GetWidth(), itkShortImage->GetLargestPossibleRegion().GetSize()[0] ) << " Checking image width";
   EXPECT_EQ ( shortImage->GetHeight(), itkShortImage->GetLargestPossibleRegion().GetSize()[1] ) << " Checking image height";
   EXPECT_EQ ( shortImage->GetDepth(), itkShortImage->GetLargestPossibleRegion().GetSize()[2] ) << " Checking image depth";
@@ -247,7 +247,7 @@ TEST_F( Image4D, Constructors ) {
   EXPECT_EQ ( 10u, image.GetNumberOfComponentsPerPixel() );
 
   // check for error when incorrect number of dimensions are requested
-  std::vector<unsigned int> s5d(5, 100);
+  std::vector<unsigned int> s5d(SITK_MAX_DIMENSION+1, 100);
   ASSERT_ANY_THROW( itk::simple::Image( s5d, itk::simple::sitkVectorFloat64 ) );
 
   // check for error with bad pixelID
@@ -379,7 +379,7 @@ TEST_F( Image4D,Properties ) {
   // SetDirection
   std::vector<double> vdir( adir, adir+16 );
   shortImage->SetDirection( vdir );
-  for( unsigned int i = 0 ; i < 16; ++i )
+  for( unsigned int i = 0; i < 16; ++i )
   {
     EXPECT_EQ ( shortImage->GetDirection()[i], vdir[i] ) << " Checking Direction matrix at index " << i;
    }

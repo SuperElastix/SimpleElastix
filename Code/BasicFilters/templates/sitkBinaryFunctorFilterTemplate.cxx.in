@@ -32,7 +32,6 @@ namespace simple {
 //
 $(include ConstructorSignature.cxx.in)
 {
-$(include ConstructorInitializeMembers.cxx.in)
 $(include ConstructorMemberFunctionSetup.cxx.in)
 
 $(include ConstructorVectorPixels.cxx.in)
@@ -63,7 +62,7 @@ $(include ToStringReturn.cxx.in)
 
 //
 // Execute
-//$(include ExecuteWithParameters.cxx.in)
+//
 $(if members and #members > 0 then
 OUT = [[
 
@@ -112,6 +111,20 @@ Image ${name}::Execute ( const Image& image1, ${constant_type} constant )
 
   return this->m_MemberFactory2->GetMemberFunction( type, dimension )( image1, constant );
 }
+
+
+Image ${name}::Execute ( Image&& image1, ${constant_type} constant )
+{
+  const Image temp(std::move(image1));
+  auto autoResetInPlace = make_scope_exit([this]{this->m_InPlace=false;});
+  if (temp.IsUnique())
+    {
+    m_InPlace = true;
+    }
+  return this->Execute( temp, constant );
+
+}
+
 
 //-----------------------------------------------------------------------------
 
@@ -177,12 +190,27 @@ $(include ExecuteInternalUpdateAndReturn.cxx.in)
 //-----------------------------------------------------------------------------
 
 $(include ExecuteInternalVectorImages.cxx.in)
-$(include FunctionalAPI.cxx.in)
+$(if (not no_procedure) or (no_procedure == 1) then
+OUT=[[$(include ProceduralAPI.cxx.in)]]
+end)
 
 Image ${name:gsub("ImageFilter$", ""):gsub("Filter$", "")} ( const Image& image1, ${constant_type} constant$(include MemberParameters.in) )
 {
   ${name} filter;
+
   return filter.Execute ( image1, constant$(for i = 1,#members do
+                            if (number_of_inputs > 0 or i > 1) then
+                              OUT = OUT .. ", "
+                            end
+                            OUT= OUT .. members[i].name:sub(1,1):lower() .. members[i].name:sub(2,-1)
+                            end) );
+}
+
+
+Image ${name:gsub("ImageFilter$", ""):gsub("Filter$", "")} ( Image&& image1, ${constant_type} constant$(include MemberParameters.in) )
+{
+  ${name} filter;
+  return filter.Execute ( std::move(image1), constant$(for i = 1,#members do
                             if (number_of_inputs > 0 or i > 1) then
                               OUT = OUT .. ", "
                             end
@@ -200,6 +228,6 @@ Image ${name:gsub("ImageFilter$", ""):gsub("Filter$", "")} ( ${constant_type} co
                             OUT= OUT .. members[i].name:sub(1,1):lower() .. members[i].name:sub(2,-1)
                             end) );
 }
-
+$(if not #members==0 then OUT=[[#error BinaryFunctorTemplate does not support members, yet]]end)
 } // end namespace simple
 } // end namespace itk

@@ -144,14 +144,8 @@ option(BUILD_SHARED_LIBS "Build SimpleITK ITK with shared libraries. This does n
 # as this option does not robustly work across platforms it will be marked as advanced
 mark_as_advanced( FORCE BUILD_SHARED_LIBS )
 
-set(SimpleITK_4D_IMAGES_DEFAULT ON)
-# 1900 = VS 14.0 (Visual Studio 2015)
-if(MSVC AND MSVC_VERSION VERSION_LESS 1900)
-  set( SimpleITK_4D_IMAGES_DEFAULT OFF )
-endif()
-option( SimpleITK_4D_IMAGES "Add Image and I/O support for four spatial dimensions." ${SimpleITK_4D_IMAGES_DEFAULT} )
-mark_as_advanced( SimpleITK_4D_IMAGES )
-unset(SimpleITK_4D_IMAGES_DEFAULT)
+include(sitkMaxDimensionOption)
+
 
 #-----------------------------------------------------------------------------
 # Setup build type
@@ -448,6 +442,8 @@ foreach (_varName ${_varNames})
         NOT _varName MATCHES "^SimpleITK_USE_SYSTEM"
           AND
         NOT _varName MATCHES "^SimpleITK_.*_COMPILE_OPTIONS"
+           AND
+        NOT _varName MATCHES "^SimpleITK_.*_DEFAULT"
           AND
         NOT _varName MATCHES "^SITK_UNDEFINED_SYMBOLS_ALLOWED")
       message( STATUS "Passing variable \"${_varName}=${${_varName}}\" to SimpleITK external project.")

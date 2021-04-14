@@ -46,17 +46,17 @@ namespace itk {
       : public ImageReaderBase
     {
     public:
-      typedef ImageSeriesReader Self;
+      using Self = ImageSeriesReader;
 
-      virtual ~ImageSeriesReader();
+      ~ImageSeriesReader() override;
 
       ImageSeriesReader();
 
       /** Print ourselves to string */
-      virtual std::string ToString() const;
+      std::string ToString() const override;
 
       /** return user readable name of the filter */
-      virtual std::string GetName() const { return std::string("ImageSeriesReader"); }
+      std::string GetName() const override { return std::string("ImageSeriesReader"); }
 
 
       /**
@@ -113,7 +113,7 @@ namespace itk {
       SITK_RETURN_SELF_TYPE_HEADER SetFileNames ( const std::vector<std::string> &fileNames );
       const std::vector<std::string> &GetFileNames() const;
 
-      Image Execute();
+      Image Execute() override;
 
       /** \brief Get the meta-data dictionary keys for a slice
        *
@@ -181,11 +181,11 @@ namespace itk {
    *  \param outputPixelType see ImageReaderBase::SetOutputPixelType
    *  \param imageIO see ImageReaderBase::SetImageIO
 
-   *     Note that when reading a series of images that have meta-data
-   *     associated with them (e.g. a DICOM series) the resulting
-   *     image will have an empty meta-data dictionary.
-   *     If you need the meta-data dictionaries associated with each
-   *     slice then you should use the ImageSeriesReader class.
+   *  \note When reading a series of images that have meta-data
+   *  associated with them (e.g. a DICOM series) the resulting
+   *  image will have an empty meta-data dictionary.
+   *  If you need the meta-data dictionaries associated with each
+   *  slice then you should use the ImageSeriesReader class.
    *
    * \sa itk::simple::ImageFileReader for reading a single file.
    * \sa itk::simple::ImageSeriesReader for reading a series and meta-data dictionaries.

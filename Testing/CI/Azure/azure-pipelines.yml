@@ -1,13 +1,15 @@
 # These pipelines are executed on every PR, and merge. They should provide quick
 # coverage for the common wrapped language and the SimpleITK core and examples.
 
-variables:
-  ExternalDataVersion: 1.2.0
+trigger:
+  - master
+  - develop
+  - release
 jobs:
   - job: Linux
     timeoutInMinutes: 0
     pool:
-      vmImage: 'ubuntu-16.04'
+      vmImage: 'ubuntu-20.04'
     variables:
       PYTHONUSERBASE: $(Agent.BuildDirectory)/.pypkgs
     workspace:
@@ -20,11 +22,13 @@ jobs:
           python -m site --user-site
           python -m pip install --upgrade --user pip
           python -m pip install --user setuptools
-          python -m pip install --user numpy scikit-ci-addons
-          sudo apt install ninja-build
+          python -m pip install --user scikit-ci-addons
+          python -m pip install --user numpy
+          python -m pip install --user lxml
         displayName: 'Install python tools and dependency'
       - bash: |
           set -x
+          sudo apt install ninja-build -y
           c++ --version
           cmake --version
           ninja --version
@@ -48,12 +52,13 @@ jobs:
           python -m ci_addons ctest_junit_formatter $(Build.SourcesDirectory)-build > $(Agent.BuildDirectory)/JUnitTestResults.xml
         condition: succeededOrFailed()
         displayName: 'Format CTest output in JUnit format'
-      - task: PublishTestResults@2
-        inputs:
-          testResultsFiles: "$(Agent.BuildDirectory)/JUnitTestResults.xml"
-          testRunTitle: 'CTest $(Agent.OS)'
-        condition: succeededOrFailed()
-        displayName: 'Publish test results'
+  # Don't publish to SimpleITK dashboard
+#      - task: PublishTestResults@2
+#        inputs:
+#          testResultsFiles: "$(Agent.BuildDirectory)/JUnitTestResults.xml"
+#          testRunTitle: 'CTest $(Agent.OS)'
+#        condition: succeededOrFailed()
+#        displayName: 'Publish test results'
 
   - job: macOS
     timeoutInMinutes: 0
@@ -104,12 +109,12 @@ jobs:
           python -m ci_addons ctest_junit_formatter $(Build.SourcesDirectory)-build > $(Agent.BuildDirectory)/JUnitTestResults.xml
         condition: succeededOrFailed()
         displayName: 'Format CTest output in JUnit format'
-      - task: PublishTestResults@2
-        inputs:
-          testResultsFiles: "$(Agent.BuildDirectory)/JUnitTestResults.xml"
-          testRunTitle: 'CTest $(Agent.OS)'
-        condition: succeededOrFailed()
-        displayName: 'Publish test results'
+# Don't publish to SimpleITK dashboard
+#        inputs:
+#          testResultsFiles: "$(Agent.BuildDirectory)/JUnitTestResults.xml"
+#          testRunTitle: 'CTest $(Agent.OS)'
+#        condition: succeededOrFailed()
+#        displayName: 'Publish test results'
 
   - job: Windows
     timeoutInMinutes: 0
@@ -154,9 +159,10 @@ jobs:
           python -m ci_addons ctest_junit_formatter $(Build.SourcesDirectory)-build > $(Agent.BuildDirectory)/JUnitTestResults.xml
         condition: succeededOrFailed()
         displayName: 'Format CTest output in JUnit format'
-      - task: PublishTestResults@2
-        inputs:
-          testResultsFiles: "$(Agent.BuildDirectory)/JUnitTestResults.xml"
-          testRunTitle: 'CTest $(Agent.OS)'
-        condition: succeededOrFailed()
-        displayName: 'Publish test results'
+# Don't publish to SimpleITK dashboard
+#      - task: PublishTestResults@2
+#        inputs:
+#          testResultsFiles: "$(Agent.BuildDirectory)/JUnitTestResults.xml"
+#          testRunTitle: 'CTest $(Agent.OS)'
+#        condition: succeededOrFailed()
+#        displayName: 'Publish test results'
