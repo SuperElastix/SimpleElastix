@@ -122,10 +122,6 @@ SET (_dashboard_cache "
 
 set_from_env(dashboard_cache "CTEST_CACHE" DEFAULT ${_dashboard_cache})
 
-endif()
-
-
-
 
 string(TIMESTAMP build_date "%Y-%m-%d")
 message("CDash Build Identifier: ${build_date} ${CTEST_BUILD_NAME}")
