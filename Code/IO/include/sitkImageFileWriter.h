@@ -49,20 +49,20 @@ class SmartPointer;
       public ProcessObject
     {
     public:
-      typedef ImageFileWriter Self;
+      using Self = ImageFileWriter;
 
       // list of pixel types supported
-      typedef NonLabelPixelIDTypeList PixelIDTypeList;
+      using PixelIDTypeList = NonLabelPixelIDTypeList;
 
-      virtual ~ImageFileWriter();
+      ~ImageFileWriter() override;
 
       ImageFileWriter();
 
       /** Print ourselves to string */
-      virtual std::string ToString() const;
+      std::string ToString() const override;
 
       /** return user readable name of the filter */
-      virtual std::string GetName() const { return std::string("ImageFileWriter"); }
+      std::string GetName() const override { return std::string("ImageFileWriter"); }
 
       /** \brief Get a vector of the names of registered itk ImageIOs
        */
@@ -72,14 +72,14 @@ class SmartPointer;
       /** \brief Enable compression if available for file type.
        *
        * These methods Set/Get/Toggle the UseCompression flag which
-       * get's passed to image file's itk::ImageIO object. This is
+       * gets passed to image file's itk::ImageIO object. This is
        * only a request as not all file formats support compression.
        * @{ */
       SITK_RETURN_SELF_TYPE_HEADER SetUseCompression( bool UseCompression );
-      bool GetUseCompression( void ) const;
+      bool GetUseCompression( ) const;
 
-      SITK_RETURN_SELF_TYPE_HEADER UseCompressionOn( void ) { return this->SetUseCompression(true); }
-      SITK_RETURN_SELF_TYPE_HEADER UseCompressionOff( void ) { return this->SetUseCompression(false); }
+      SITK_RETURN_SELF_TYPE_HEADER UseCompressionOn( ) { return this->SetUseCompression(true); }
+      SITK_RETURN_SELF_TYPE_HEADER UseCompressionOff( ) { return this->SetUseCompression(false); }
       /** @} */
 
 
@@ -90,7 +90,7 @@ class SmartPointer;
        *  for lossless zip or LZW like compression algorithms.  Please see the specific itk::ImageIO for details.
        * @{ */
       SITK_RETURN_SELF_TYPE_HEADER SetCompressionLevel(int);
-      int GetCompressionLevel(void) const;
+      int GetCompressionLevel() const;
       /** @} */
 
       /** \brief A compression algorithm hint
@@ -100,7 +100,7 @@ class SmartPointer;
        * itk::ImageIO for details.
        * @{ */
       SITK_RETURN_SELF_TYPE_HEADER SetCompressor(const std::string &);
-      std::string GetCompressor(void);
+      std::string GetCompressor();
       /** @} */
 
       /** \brief Set/Get name of ImageIO to use
@@ -116,23 +116,23 @@ class SmartPointer;
        * @{
        */
       virtual SITK_RETURN_SELF_TYPE_HEADER SetImageIO(const std::string &imageio);
-      virtual std::string GetImageIO( void ) const;
+      virtual std::string GetImageIO( ) const;
       /* @} */
 
 
       /** \brief Use the original study/series/frame of reference.
        *
        * These methods Set/Get/Toggle the KeepOriginalImageUID flag which
-       * get's passed to image file's itk::ImageIO object. This is
+       * gets passed to image file's itk::ImageIO object. This is
        * relevant only for the DICOM file format, configuring the writer
        * to use the information in the image's meta-data dictionary or
        * to create new study/series/frame of reference values.
        * @{ */
       SITK_RETURN_SELF_TYPE_HEADER SetKeepOriginalImageUID( bool KeepOriginalImageUID );
-      bool GetKeepOriginalImageUID( void ) const;
+      bool GetKeepOriginalImageUID( ) const;
 
-      SITK_RETURN_SELF_TYPE_HEADER KeepOriginalImageUIDOn( void ) { return this->SetKeepOriginalImageUID(true); }
-      SITK_RETURN_SELF_TYPE_HEADER KeepOriginalImageUIDOff( void ) { return this->SetKeepOriginalImageUID(false); }
+      SITK_RETURN_SELF_TYPE_HEADER KeepOriginalImageUIDOn( ) { return this->SetKeepOriginalImageUID(true); }
+      SITK_RETURN_SELF_TYPE_HEADER KeepOriginalImageUIDOff( ) { return this->SetKeepOriginalImageUID(false); }
       /** @} */
 
       SITK_RETURN_SELF_TYPE_HEADER SetFileName ( const std::string &fileName );
@@ -165,10 +165,22 @@ class SmartPointer;
 
     };
 
-  SITKIO_EXPORT void WriteImage ( const Image& image,
-    const std::string &fileName,
-    bool useCompression=false,
-    int compressionLevel=-1);
+  /**
+   * \brief WriteImage is a procedural interface to the ImageFileWriter.
+   *     class which is convenient for many image writing tasks.
+   *
+   *  \param image the input image to be written
+   *  \param fileName the filename of an Image e.g. "cthead.mha"
+   *  \param useCompression request to compress the written file
+   *  \param compressionLevel a hint for the amount of compression to
+   *    be applied during writing
+   *
+   * \sa itk::simple::ImageFileWriter for writing a single file.
+   */
+  SITKIO_EXPORT void WriteImage (const Image& image,
+                                 const std::string &fileName,
+                                 bool useCompression=false,
+                                 int compressionLevel=-1);
   }
 }
 

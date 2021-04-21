@@ -18,10 +18,11 @@ that treat an image as an array which has two implications: (1) pixel/voxel spac
 is assumed to be isotropic and (2) there is no notion of an image's location in
 physical space.
 
-SimpleITK images are either 2D, 3D, or 4D and can be a scalar, labelmap
+SimpleITK images are multi-dimensional ( the default configuration
+includes images from 2D upto 5D ) and can be a scalar, labelmap
 (scalar with run length encoding), complex value or have an arbitrary
-number of  scalar channels. The region in physical space which an
-image occupies is defined by the image's:
+number of  scalar channels ( also known as a vector image). The region
+in physical space which an image occupies is defined by the image's:
 
 1. Origin (vector like type) - location in the world coordinate system of
    the voxel with all zero indexes.
@@ -36,7 +37,6 @@ is visually illustrated in :ref:`this figure <lbl_image_metadata>`.
 
 .. _lbl_image_metadata:
 .. figure:: ../images/ImageOriginAndSpacing.svg
-   :scale: 50 %
    :alt: Image meta-data.
 
    An image in SimpleITK occupies a region in physical space which is defined by
@@ -76,7 +76,6 @@ treat images as an array will display a distorted image as shown in
 
 .. _lbl_isotropy:
 .. figure:: ../images/nonisotropicVsIsotropic.svg
-   :scale: 50 %
    :alt: nonisotropic vs. isotropic pixels.
 
    The same image displayed with a viewer that is not aware of spatial meta-data
@@ -91,7 +90,6 @@ the intensity values and pixel spacing are the same.
 
 .. _lbl_spatial_location:
 .. figure:: ../images/spatialRelationship.svg
-   :scale: 50 %
    :alt: images are spatial objects
 
    Two images with exactly the same pixel data, positioned in the world coordinate
@@ -114,11 +112,19 @@ units has `not ended well in the past <https://en.wikipedia.org/wiki/Mars_Climat
 Finally, having convinced you to think of images as objects occupying a physical region
 in space, we need to answer two questions:
 
-1. How do you access the pixel values in an image:
+1. How do you access the pixel values in an image?
 
-   .. code-block:: python
+   a. In dynamically typed typed languages such as Python and R use a type agnostic function:
 
-     image.GetPixel((0,0))
+      .. code-block:: python
+
+        image.GetPixel((0,0))
+
+   b. In statically typed languages such as C# and C++ use type specific functions:
+
+      .. code-block:: C++
+
+        image.GetPixelAsUInt8( {0, 0} )
 
    SimpleITK functions use a zero based indexing scheme. The toolkit also includes
    syntactic sugar that allows one to use the bracket operator in combination with
@@ -163,7 +169,7 @@ result in a significant waste of memory and computation time. Always become fami
 Additional Resources
 =====================
 1. The API for the SimpleITK
-   `Image class <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1Image.html>`_
+   `Image class <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1Image.html>`_
    in Doxygen format.
 2. To really understand the structure of SimpleITK images and how to work with them,
    we recommend some hands-on interaction using the
@@ -216,10 +222,10 @@ global domain. This transformation represents multiple transformations applied
 one after the other :math:`T_0(T_1(T_2(...T_n(p)...)))`. The semantics are
 stack based, that is, first in last applied:
 
-.. code-block:: r
+.. code-block:: python
 
- composite_transform <- Transform(T0)
- composite_transform$AddTransform(T1)
+ composite_transform = CompositeTransform([T0, T1])
+ composite_transform.AddTransform(T2)
 
 In the context of registration, if you use a composite transform as the transformation
 that is optimized, only the parameters of the last transformation :math:`T_n` will
@@ -230,19 +236,21 @@ Additional Resources
 
 1. The API for the SimpleITK transformation classes is available in Doxygen format:
 
-   * `2D or 3D translation <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1TranslationTransform.html>`_.
-   * `VersorTransform <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1VersorTransform.html>`_.
-   * `Euler2DTransform <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1Euler2DTransform.html>`_
-     and `Euler3DTransform <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1Euler3DTransform.html>`_.
-   * `Similarity2DTransform <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1Similarity2DTransform.html>`_
-     and `Similarity3DTransform <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1Similarity3DTransform.html>`_.
-   * `2D or 3D ScaleTransform <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1ScaleTransform.html>`_.
-   * `ScaleVersor3DTransform <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1ScaleVersor3DTransform.html>`_.
-   * `ScaleSkewVersor3DTransform <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1ScaleSkewVersor3DTransform.html>`_.
-   * `2D or 3D AffineTransform <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1AffineTransform.html>`_.
-   * `2D or 3D BSplineTransform <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1BSplineTransform.html>`_.
-   * `2D or 3D DisplacementFieldTransform <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1DisplacementFieldTransform.html>`_.
-   * `Transform <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1Transform.html>`_.
+   * `2D or 3D translation <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1TranslationTransform.html>`_.
+   * `VersorTransform <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1VersorTransform.html>`_.
+   * `Euler2DTransform <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1Euler2DTransform.html>`_
+     and `Euler3DTransform <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1Euler3DTransform.html>`_.
+   * `Similarity2DTransform <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1Similarity2DTransform.html>`_
+     and `Similarity3DTransform <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1Similarity3DTransform.html>`_.
+   * `2D or 3D ScaleTransform <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1ScaleTransform.html>`_.
+   * `ScaleVersor3DTransform <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1ScaleVersor3DTransform.html>`_.
+   * `ScaleSkewVersor3DTransform <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1ScaleSkewVersor3DTransform.html>`_.
+   * `ComposeScaleSkewVersor3DTransform <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1ComposeScaleSkewVersor3DTransform.html>`_.
+   * `2D or 3D AffineTransform <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1AffineTransform.html>`_.
+   * `2D or 3D BSplineTransform <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1BSplineTransform.html>`_.
+   * `2D or 3D DisplacementFieldTransform <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1DisplacementFieldTransform.html>`_.
+   * `CompositeTransform <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1CompositeTransform.html>`_.
+   * `Transform <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1Transform.html>`_.
 
 2. To really understand the structure of SimpleITK transforms and how to work with them,
    we recommend some hands-on interaction using the
@@ -297,7 +305,7 @@ Additional Resources
 =====================
 
 1. The API for the SimpleITK
-   `ResampleImageFilter class <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1ResampleImageFilter.html>`_
+   `ResampleImageFilter class <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1ResampleImageFilter.html>`_
    in Doxygen format. The procedural interface for this class supports the three variations for specifying the
    resampling grid described above.
 2. To really understand the structure of SimpleITK images and how to work with them

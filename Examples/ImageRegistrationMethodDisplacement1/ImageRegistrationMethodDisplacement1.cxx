@@ -35,7 +35,7 @@ public:
     : m_Method(m)
     {}
 
-  virtual void Execute( )
+  void Execute( ) override
     {
       // use sitk's output operator for std::vector etc..
       using sitk::operator<<;
@@ -72,7 +72,7 @@ public:
     : m_Method(m)
     {}
 
-  virtual void Execute( )
+  void Execute( ) override
     {
       // use sitk's output operator for std::vector etc..
       using sitk::operator<<;
@@ -110,15 +110,9 @@ int main(int argc, char *argv[])
   sitk::ImageRegistrationMethod R;
 
   {
-  std::vector<unsigned int> shrinkFactors;
-  shrinkFactors.push_back(3);
-  shrinkFactors.push_back(2);
-  shrinkFactors.push_back(1);
+  std::vector<unsigned int> shrinkFactors = { 3, 2, 1 };
 
-  std::vector<double> smoothingSigmas;
-  smoothingSigmas.push_back(2.0);
-  smoothingSigmas.push_back(1.0);
-  smoothingSigmas.push_back(1.0);
+  std::vector<double> smoothingSigmas = { 2.0, 1.0, 1.0 };
 
   R.SetShrinkFactorsPerLevel(shrinkFactors);
   R.SetSmoothingSigmasPerLevel(smoothingSigmas);
@@ -129,8 +123,8 @@ int main(int argc, char *argv[])
   R.MetricUseFixedImageGradientFilterOff();
 
   {
-  double learningRate=1.0;
-  unsigned int numberOfIterations=100;
+  double learningRate = 1.0;
+  unsigned int numberOfIterations = 100;
   double convergenceMinimumValue = 1e-6;
   unsigned int convergenceWindowSize = 10;
   sitk::ImageRegistrationMethod::EstimateLearningRateType estimateLearningRate = R.EachIteration;
@@ -143,7 +137,7 @@ int main(int argc, char *argv[])
   }
   R.SetOptimizerScalesFromPhysicalShift();
 
-  R.SetInitialTransform(initialTx, true);
+  R.SetInitialTransform(initialTx);
 
   R.SetInterpolator(sitk::sitkLinear);
 
@@ -153,10 +147,10 @@ int main(int argc, char *argv[])
   MultiResolutionIterationUpdate cmd2(R);
   R.AddCommand( sitk::sitkMultiResolutionIterationEvent, cmd2);
 
-  sitk::Transform outTx = R.Execute( fixed, moving );
+  sitk::Transform outTx1 = R.Execute( fixed, moving );
 
   std::cout << "-------" << std::endl;
-  std::cout << outTx.ToString() << std::endl;
+  std::cout << outTx1.ToString() << std::endl;
   std::cout << "Optimizer stop condition: " << R.GetOptimizerStopConditionDescription() << std::endl;
   std::cout << " Iteration: " << R.GetOptimizerIteration() << std::endl;
   std::cout << " Metric value: " << R.GetMetricValue() << std::endl;
@@ -165,14 +159,14 @@ int main(int argc, char *argv[])
   sitk::Image displacementField = sitk::Image(fixed.GetSize(), sitk::sitkVectorFloat64);
   displacementField.CopyInformation(fixed);
   sitk::DisplacementFieldTransform displacementTx(displacementField);
-  const double varianceForUpdateField=0.0;
-  const double varianceForTotalField=1.5;
+  const double varianceForUpdateField = 0.0;
+  const double varianceForTotalField = 1.5;
   displacementTx.SetSmoothingGaussianOnUpdate(varianceForUpdateField,
                                               varianceForTotalField);
 
 
 
-  R.SetMovingInitialTransform(outTx);
+  R.SetMovingInitialTransform(outTx1);
   R.SetInitialTransform(displacementTx, true);
 
   R.SetMetricAsANTSNeighborhoodCorrelation(4);
@@ -180,15 +174,9 @@ int main(int argc, char *argv[])
   R.MetricUseFixedImageGradientFilterOff();
 
   {
-  std::vector<unsigned int> shrinkFactors;
-  shrinkFactors.push_back(3);
-  shrinkFactors.push_back(2);
-  shrinkFactors.push_back(1);
+  std::vector<unsigned int> shrinkFactors = { 3, 2, 1 };
 
-  std::vector<double> smoothingSigmas;
-  smoothingSigmas.push_back(2.0);
-  smoothingSigmas.push_back(1.0);
-  smoothingSigmas.push_back(1.0);
+  std::vector<double> smoothingSigmas = { 2.0, 1.0, 1.0 };
 
   R.SetShrinkFactorsPerLevel(shrinkFactors);
   R.SetSmoothingSigmasPerLevel(smoothingSigmas);
@@ -197,8 +185,8 @@ int main(int argc, char *argv[])
   R.SetOptimizerScalesFromPhysicalShift();
 
   {
-  double learningRate=1.0;
-  unsigned int numberOfIterations=300;
+  double learningRate = 1.0;
+  unsigned int numberOfIterations = 300;
   double convergenceMinimumValue = 1e-6;
   unsigned int convergenceWindowSize = 10;
   sitk::ImageRegistrationMethod::EstimateLearningRateType estimateLearningRate = R.EachIteration;
@@ -209,15 +197,17 @@ int main(int argc, char *argv[])
                                    estimateLearningRate
     );
   }
-  outTx.AddTransform( R.Execute(fixed, moving) );
+  R.Execute(fixed, moving);
+
 
   std::cout << "-------" << std::endl;
-  std::cout << outTx.ToString() << std::endl;
+  std::cout << displacementTx.ToString() << std::endl;
   std::cout << "Optimizer stop condition: " << R.GetOptimizerStopConditionDescription() << std::endl;
   std::cout << " Iteration: " << R.GetOptimizerIteration() << std::endl;
   std::cout << " Metric value: " << R.GetMetricValue() << std::endl;
 
 
+  sitk::CompositeTransform outTx( {outTx1, displacementTx} );
   sitk::WriteTransform(outTx, argv[3]);
 
   return 0;

@@ -38,26 +38,27 @@ namespace itk {
 intended to initialize the center of rotation, versor, and translation
 of the VersorRigid3DTransform.
 
-This class derived from the CenteredTransformInitializerand uses it in
+
+This class is derived from the CenteredTransformInitializerFilter and uses it in
 a more constrained context. It always uses the Moments mode, and also
 takes advantage of the second order moments in order to initialize the
-Versorrepresenting rotation.
+Versor representing rotation.
 
 \sa itk::CenteredVersorTransformInitializer for the Doxygen on the original ITK class.
      */
     class SITKBasicFilters_EXPORT CenteredVersorTransformInitializerFilter : public ProcessObject {
     public:
-      typedef CenteredVersorTransformInitializerFilter Self;
+      using Self = CenteredVersorTransformInitializerFilter;
 
       /** Destructor */
-      virtual ~CenteredVersorTransformInitializerFilter();
+      ~CenteredVersorTransformInitializerFilter() override;
 
       /** Default Constructor that takes no arguments and initializes
        * default parameters */
       CenteredVersorTransformInitializerFilter();
 
       /** Define the pixels types supported by this filter */
-      typedef BasicPixelIDTypeList  PixelIDTypeList;
+      using PixelIDTypeList = BasicPixelIDTypeList;
 
 
       /**
@@ -74,18 +75,14 @@ Versorrepresenting rotation.
        */
         bool GetComputeRotation() const { return this->m_ComputeRotation; }
       /** Name of this class */
-      std::string GetName() const { return std::string ("CenteredVersorTransformInitializerFilter"); }
+      std::string GetName() const override { return std::string ("CenteredVersorTransformInitializerFilter"); }
 
       /** Print ourselves out */
-      std::string ToString() const;
+      std::string ToString() const override;
 
 
       /** Execute the filter on the input image */
       Transform Execute ( const Image & fixedImage, const Image & movingImage, const Transform & transform );
-
-
-      /** Execute the filter on the input image with the given parameters */
-      Transform Execute ( const Image & fixedImage, const Image & movingImage, const Transform & transform, bool computeRotation );
 
 
     private:

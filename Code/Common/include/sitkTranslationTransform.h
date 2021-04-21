@@ -36,37 +36,38 @@ class SITKCommon_EXPORT TranslationTransform
   : public Transform
 {
 public:
-typedef TranslationTransform Self;
-typedef Transform            Superclass;
+using Self = TranslationTransform;
+using Superclass = Transform;
 
-virtual ~TranslationTransform();
+~TranslationTransform() override;
 
 explicit TranslationTransform(unsigned int dimensions,
                               const std::vector<double> &offset = std::vector<double>(3,0.0) );
 
 TranslationTransform( const TranslationTransform & );
 
-TranslationTransform( const Transform & );
+explicit TranslationTransform( const Transform & );
 
 TranslationTransform &operator=( const TranslationTransform & );
+
+/** Name of this class */
+std::string GetName() const override { return std::string ("TranslationTransform"); }
 
 SITK_RETURN_SELF_TYPE_HEADER SetOffset(const std::vector<double> &params);
 std::vector<double> GetOffset( ) const;
 
 protected:
 
-virtual void SetPimpleTransform( PimpleTransformBase *pimpleTransform );
+void SetPimpleTransform( PimpleTransformBase *pimpleTransform ) override;
 
 private:
-
-using Superclass::AddTransform;
 
 struct MyVisitor
 {
   itk::TransformBase *transform;
   TranslationTransform *that;
   template< typename TransformType >
-  void operator() ( void ) const
+  void operator() ( ) const
     {
       TransformType *t = dynamic_cast<TransformType*>(transform);
       if (t && (typeid(*t) == typeid(TransformType)))

@@ -39,16 +39,16 @@ namespace simple
  * \sa itk::simple::Cast for the procedural interface
  */
 class SITKBasicFilters_EXPORT CastImageFilter
-  : public ImageFilter<1>
+  : public ImageFilter
 {
 public:
-  typedef CastImageFilter      Self;
+  using Self = CastImageFilter;
 
   /** Set/Get the output pixel type */
   SITK_RETURN_SELF_TYPE_HEADER SetOutputPixelType( PixelIDValueEnum pixelID );
-  PixelIDValueEnum GetOutputPixelType( void ) const;
+  PixelIDValueEnum GetOutputPixelType( ) const;
 
-  virtual ~CastImageFilter();
+  ~CastImageFilter() override;
 
   /**
    * Default Constructor that takes no arguments and initializes
@@ -57,10 +57,10 @@ public:
   CastImageFilter();
 
   /** Name of this class */
-  std::string GetName() const { return std::string ("CastImageFilter"); }
+  std::string GetName() const override { return std::string ("CastImageFilter"); }
 
   // See super class for doxygen
-  std::string ToString() const;
+  std::string ToString() const override;
 
   // See super class for doxygen
   Image Execute ( const Image & );
@@ -100,10 +100,10 @@ private:
   template < class TMemberFunctionPointer >
   struct CastAddressor
   {
-    typedef typename ::detail::FunctionTraits<TMemberFunctionPointer>::ClassType ObjectType;
+    using ObjectType = typename ::detail::FunctionTraits<TMemberFunctionPointer>::ClassType;
 
     template< typename TImageType1, typename TImageType2 >
-    TMemberFunctionPointer operator() ( void ) const
+    TMemberFunctionPointer operator() ( ) const
     {
       return &ObjectType::template ExecuteInternalCast< TImageType1, TImageType2 >;
     }
@@ -115,10 +115,10 @@ private:
   template < class TMemberFunctionPointer >
   struct ToVectorAddressor
   {
-    typedef typename ::detail::FunctionTraits<TMemberFunctionPointer>::ClassType ObjectType;
+    using ObjectType = typename ::detail::FunctionTraits<TMemberFunctionPointer>::ClassType;
 
     template< typename TImageType1, typename TImageType2 >
-    TMemberFunctionPointer operator() ( void ) const
+    TMemberFunctionPointer operator() ( ) const
     {
       return &ObjectType::template ExecuteInternalToVector< TImageType1, TImageType2 >;
     }
@@ -130,10 +130,10 @@ private:
   template < class TMemberFunctionPointer >
   struct ToLabelAddressor
   {
-    typedef typename ::detail::FunctionTraits<TMemberFunctionPointer>::ClassType ObjectType;
+    using ObjectType = typename ::detail::FunctionTraits<TMemberFunctionPointer>::ClassType;
 
     template< typename TImageType1, typename TImageType2 >
-    TMemberFunctionPointer operator() ( void ) const
+    TMemberFunctionPointer operator() ( ) const
     {
       return &ObjectType::template ExecuteInternalToLabel< TImageType1, TImageType2 >;
     }
@@ -145,10 +145,10 @@ private:
   template < class TMemberFunctionPointer >
   struct LabelToAddressor
   {
-    typedef typename ::detail::FunctionTraits<TMemberFunctionPointer>::ClassType ObjectType;
+    using ObjectType = typename ::detail::FunctionTraits<TMemberFunctionPointer>::ClassType;
 
     template< typename TImageType1, typename TImageType2 >
-    TMemberFunctionPointer operator() ( void ) const
+    TMemberFunctionPointer operator() ( ) const
     {
       return &ObjectType::template ExecuteInternalLabelToImage< TImageType1, TImageType2 >;
     }

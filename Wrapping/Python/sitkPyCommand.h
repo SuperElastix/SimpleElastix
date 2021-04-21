@@ -25,7 +25,7 @@
 
 #ifndef PyObject_HEAD
 struct _object;
-typedef _object PyObject;
+using PyObject = _object;
 #endif
 
 namespace itk
@@ -47,7 +47,7 @@ class PyCommand
   : public itk::simple::Command
 {
 public:
-  typedef Command   Super;
+  using Super = Command;
 
   PyCommand();
   ~PyCommand();
@@ -65,10 +65,10 @@ public:
 
   #ifndef SWIG
   // export for access in the custom ProcessObject method for callables
-  using Super::SetOwnedByProcessObjects;
-  using Super::GetOwnedByProcessObjects;
-  using Super::OwnedByProcessObjectsOn;
-  using Super::OwnedByProcessObjectsOff;
+  using Super::SetOwnedByObjects;
+  using Super::GetOwnedByObjects;
+  using Super::OwnedByObjectsOn;
+  using Super::OwnedByObjectsOff;
   #endif
 
 private:

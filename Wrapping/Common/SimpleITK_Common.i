@@ -58,7 +58,7 @@
 %ignore itk::simple::Image::GetITKBase( void );
 %ignore itk::simple::Image::GetITKBase( void ) const;
 
-#ifndef SWIGCSHARP
+#if !(defined(SWIGCSHARP) || defined(SWIGJAVA))
 %ignore itk::simple::Image::GetBufferAsInt8;
 %ignore itk::simple::Image::GetBufferAsUInt8;
 %ignore itk::simple::Image::GetBufferAsInt16;
@@ -96,6 +96,7 @@ namespace std
   %template(VectorFloat) vector<float>;
   %template(VectorDouble) vector<double>;
   %template(VectorOfImage) vector< itk::simple::Image >;
+  %template(VectorOfTransform) vector< itk::simple::Transform >;
   %template(VectorUIntList) vector< vector<unsigned int> >;
   %template(VectorString) vector< std::string >;
 
@@ -151,7 +152,9 @@ namespace std
 %include "sitkVersion.h"
 %include "sitkPixelIDValues.h"
 %include "sitkImage.h"
+%include "sitkObjectOwnedBase.h"
 %include "sitkCommand.h"
+%include "sitkLogger.h"
 %include "sitkInterpolator.h"
 %include "sitkKernel.h"
 %include "sitkEvent.h"
@@ -166,24 +169,19 @@ namespace std
 %include "sitkEuler2DTransform.h"
 %include "sitkScaleTransform.h"
 %include "sitkScaleSkewVersor3DTransform.h"
+%include "sitkComposeScaleSkewVersor3DTransform.h"
 %include "sitkScaleVersor3DTransform.h"
 %include "sitkSimilarity2DTransform.h"
 %include "sitkSimilarity3DTransform.h"
 %include "sitkTranslationTransform.h"
 %include "sitkVersorTransform.h"
 %include "sitkVersorRigid3DTransform.h"
+%include "sitkCompositeTransform.h"
 
 
 // Basic Filter Base
 %include "sitkProcessObject.h"
 %include "sitkImageFilter.h"
-
-%template(ImageFilter_0) itk::simple::ImageFilter<0>;
-%template(ImageFilter_1) itk::simple::ImageFilter<1>;
-%template(ImageFilter_2) itk::simple::ImageFilter<2>;
-%template(ImageFilter_3) itk::simple::ImageFilter<3>;
-%template(ImageFilter_4) itk::simple::ImageFilter<4>;
-%template(ImageFilter_5) itk::simple::ImageFilter<5>;
 
 // IO
 %include "sitkShow.h"
@@ -201,6 +199,8 @@ namespace std
 %include "sitkCenteredVersorTransformInitializerFilter.h"
 %include "sitkLandmarkBasedTransformInitializerFilter.h"
 %include "sitkCastImageFilter.h"
+%include "sitkExtractImageFilter.h"
+%include "sitkPasteImageFilter.h"
 %include "sitkAdditionalProcedures.h"
 
 // SimpleElastix

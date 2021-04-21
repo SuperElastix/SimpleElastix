@@ -40,9 +40,7 @@ namespace itk {
 namespace simple {
 
 ImageReaderBase
-::~ImageReaderBase()
-{
-}
+::~ImageReaderBase() = default;
 
 ImageReaderBase
 ::ImageReaderBase()
@@ -82,7 +80,7 @@ ImageReaderBase
 ::GetImageIOBase(const std::string &fileName)
 {
   itk::ImageIOBase::Pointer iobase;
-  if (this->m_ImageIOName == "")
+  if (this->m_ImageIOName.empty())
     {
     iobase = itk::ImageIOFactory::CreateImageIO( fileName.c_str(), itk::ImageIOFactory::FileModeEnum::ReadMode);
     }
@@ -132,7 +130,7 @@ ImageReaderBase
 
 PixelIDValueEnum
 ImageReaderBase
-::GetOutputPixelType( void ) const
+::GetOutputPixelType( ) const
 {
   return this->m_OutputPixelType;
 }
@@ -178,9 +176,32 @@ ImageReaderBase
 
 std::string
 ImageReaderBase
-::GetImageIO(void) const
+::GetImageIO() const
 {
   return this->m_ImageIOName;
+}
+
+std::string
+ImageReaderBase
+::GetImageIOFromFileName( const std::string &fileName )
+{
+  itk::ImageIOBase::Pointer iobase;
+  try
+    {
+    iobase = itk::ImageIOFactory::CreateImageIO( fileName.c_str(), itk::ImageIOFactory::FileModeEnum::ReadMode);
+    }
+  catch(...)
+    {
+    // ignore exceptions
+    }
+
+
+  if ( iobase.IsNull() )
+    {
+    return std::string();
+    }
+
+  return iobase->GetNameOfClass();
 }
 
 void

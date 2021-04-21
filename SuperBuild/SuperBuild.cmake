@@ -144,14 +144,8 @@ option(BUILD_SHARED_LIBS "Build SimpleITK ITK with shared libraries. This does n
 # as this option does not robustly work across platforms it will be marked as advanced
 mark_as_advanced( FORCE BUILD_SHARED_LIBS )
 
-set(SimpleITK_4D_IMAGES_DEFAULT ON)
-# 1900 = VS 14.0 (Visual Studio 2015)
-if(MSVC AND MSVC_VERSION VERSION_LESS 1900)
-  set( SimpleITK_4D_IMAGES_DEFAULT OFF )
-endif()
-option( SimpleITK_4D_IMAGES "Add Image and I/O support for four spatial dimensions." ${SimpleITK_4D_IMAGES_DEFAULT} )
-mark_as_advanced( SimpleITK_4D_IMAGES )
-unset(SimpleITK_4D_IMAGES_DEFAULT)
+include(sitkMaxDimensionOption)
+
 
 #-----------------------------------------------------------------------------
 # Setup build type
@@ -364,24 +358,6 @@ if ( BUILD_TESTING )
 endif()
 
 #------------------------------------------------------------------------------
-# Python virtualenv
-#------------------------------------------------------------------------------
-option( SimpleITK_USE_SYSTEM_VIRTUALENV "Use a system version of Python's virtualenv. " OFF )
-sitk_legacy_naming( SimpleITK_USE_SYSTEM_VIRTUALENV USE_SYSTEM_VIRTUALENV)
-mark_as_advanced(SimpleITK_USE_SYSTEM_VIRTUALENV)
-if( NOT DEFINED SimpleITK_PYTHON_USE_VIRTUALENV OR SimpleITK_PYTHON_USE_VIRTUALENV )
-  if ( SimpleITK_USE_SYSTEM_VIRTUALENV )
-    find_package( PythonVirtualEnv REQUIRED)
-  else()
-    include(External_virtualenv)
-    if ( WRAP_PYTHON )
-      list(APPEND ${CMAKE_PROJECT_NAME}_DEPENDENCIES virtualenv)
-    endif()
-  endif()
-  list(APPEND SimpleITK_VARS PYTHON_VIRTUALENV_SCRIPT)
-endif()
-
-#------------------------------------------------------------------------------
 # ITK
 #------------------------------------------------------------------------------
 
@@ -389,6 +365,7 @@ option(SimpleITK_USE_SYSTEM_ITK "Use a pre-built version of ITK" OFF)
 sitk_legacy_naming( SimpleITK_USE_SYSTEM_ITK USE_SYSTEM_ITK )
 mark_as_advanced(SimpleITK_USE_SYSTEM_ITK)
 if(SimpleITK_USE_SYSTEM_ITK)
+  set ( ITK_DIR "../ITK-build" )
   find_package(ITK REQUIRED)
   #we require certain packages be turned on in ITK
   include(sitkCheckForITKModuleDependencies)
@@ -406,28 +383,45 @@ sitk_legacy_naming(SimpleITK_USE_SYSTEM_ELASTIX USE_SYSTEM_ELASTIX)
 mark_as_advanced(SimpleITK_USE_SYSTEM_ELASTIX)
 
 if(SimpleITK_USE_SYSTEM_ELASTIX)
-  find_package(Elastix)
-  include(${ELASTIX_USE_FILE})
+  set( Elastix_DIR "../Elastix-build" )
+  find_package( Elastix REQUIRED )
+  include( ${ELASTIX_USE_FILE} )
+  message("Elastix-use-file = ${ELASTIX_USE_FILE}")
 
-  if(ELASTIX_USE_OPENMP)
-    find_package(OpenMP QUIET)
-    if( OPENMP_FOUND )
-      set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-    endif()
-  endif()
-else()
-  mark_as_advanced( SimpleITK_OPENMP )
-  option( SimpleITK_OPENMP "If available, use OpenMP to speed up certain elastix computations." OFF )
-
-  if(SimpleITK_OPENMP)
+  if(${ELASTIX_USE_OPENMP})
     find_package(OpenMP QUIET)
     if(OPENMP_FOUND)
       set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
     endif()
   endif()
-  
+else()
+  sitk_legacy_naming(SimpleITK_ELASTIX_USE_OPENMP SimpleITK_OPENMP)
+  option(SimpleITK_ELASTIX_USE_OPENMP "If available, use OpenMP to speed up certain elastix computations." OFF)
+  mark_as_advanced(SimpleITK_ELASTIX_USE_OPENMP)
+
+  if(${SimpleITK_ELASTIX_USE_OPENMP})
+    find_package(OpenMP QUIET)
+    if(OPENMP_FOUND)
+      set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    else()
+      set(SimpleITK_ELASTIX_USE_OPENMP OFF)
+      message(WARNING "OpenMP not found. Compiling elastix WITHOUT support for OpenMP.")
+    endif()
+  endif()
+
+  option( SimpleITK_ELASTIX_USE_OPENCL "If available, build elastix OpenCL components." OFF )
+  mark_as_advanced( SimpleITK_ELASTIX_USE_OPENCL )
+
+  if(${SimpleITK_ELASTIX_USE_OPENMP})
+    find_package(OpenCL QUIET)
+    if(NOT OPENMP_FOUND)
+      message(WARNING "OpenCL not found. Compiling elastix WITHOUT OpenCL components.")
+      set(SimpleITK_ELASTIX_USE_OPENMP OFF)
+    endif()
+  endif()
+
   include(External_Elastix)
   list(APPEND ${CMAKE_PROJECT_NAME}_DEPENDENCIES Elastix)
 endif()
@@ -435,7 +429,9 @@ endif()
 #------------------------------------------------------------------------------
 # SimpleITK
 #------------------------------------------------------------------------------
-
+if(MSVC)
+  set(CMAKE_CXX_FLAGS "/EHsc")
+endif()
 
 get_cmake_property( _varNames VARIABLES )
 
@@ -448,6 +444,8 @@ foreach (_varName ${_varNames})
         NOT _varName MATCHES "^SimpleITK_USE_SYSTEM"
           AND
         NOT _varName MATCHES "^SimpleITK_.*_COMPILE_OPTIONS"
+           AND
+        NOT _varName MATCHES "^SimpleITK_.*_DEFAULT"
           AND
         NOT _varName MATCHES "^SITK_UNDEFINED_SYMBOLS_ALLOWED")
       message( STATUS "Passing variable \"${_varName}=${${_varName}}\" to SimpleITK external project.")
@@ -502,17 +500,18 @@ ExternalProject_Add(${proj}
     -DSWIG_DIR:PATH=${SWIG_DIR}
     -DSWIG_EXECUTABLE:PATH=${SWIG_EXECUTABLE}
     -DBUILD_TESTING:BOOL=${BUILD_TESTING}
-    -DWRAP_LUA:BOOL=${WRAP_LUA}
+    -DWRAP_LUA:BOOL=0
     -DWRAP_PYTHON:BOOL=${WRAP_PYTHON}
-    -DWRAP_RUBY:BOOL=${WRAP_RUBY}
-    -DWRAP_JAVA:BOOL=${WRAP_JAVA}
-    -DWRAP_TCL:BOOL=${WRAP_TCL}
-    -DWRAP_CSHARP:BOOL=${WRAP_CSHARP}
+    -DWRAP_RUBY:BOOL=0
+    -DWRAP_JAVA:BOOL=0
+    -DWRAP_TCL:BOOL=0
+    -DWRAP_CSHARP:BOOL=0
     -DWRAP_R:BOOL=${WRAP_R}
-    -DWRAP_NODE:BOOL=${WRAP_NODE}
+    -DWRAP_NODE:BOOL=0
     -DBUILD_EXAMPLES:BOOL=${BUILD_TESTING}
   DEPENDS ${${CMAKE_PROJECT_NAME}_DEPENDENCIES}
   ${External_Project_USES_TERMINAL}
+  STEP_TARGETS configure build doc forcebuild
 )
 
 ExternalProject_Add_Step(${proj} forcebuild
@@ -532,10 +531,6 @@ ExternalProject_Add_Step(${proj} doc
   EXCLUDE_FROM_MAIN 1
   LOG 1
 )
-
-# adds superbuild level target "SimpleITK-documentation" etc..
-ExternalProject_Add_StepTargets(${proj} configure build test forcebuild doc)
-
 
 
 # Load the SimpleITK version variables, scope isolated in a function.

@@ -27,6 +27,9 @@
 #include "itkTranslationTransform.h"
 #include "itkScaleTransform.h"
 #include "itkScaleLogarithmicTransform.h"
+#include "itkScaleSkewVersor3DTransform.h"
+#include "itkComposeScaleSkewVersor3DTransform.h"
+#include "itkScaleVersor3DTransform.h"
 #include "itkSimilarity2DTransform.h"
 #include "itkSimilarity3DTransform.h"
 #include "itkEuler2DTransform.h"
@@ -58,15 +61,16 @@ namespace simple
 class SITKCommon_HIDDEN PimpleTransformBase
 {
 public:
-  virtual ~PimpleTransformBase( void ) {};
+
+  virtual ~PimpleTransformBase( ) = default;;
 
   // Get Access to the internal ITK transform class
-  virtual TransformBase * GetTransformBase( void ) = 0;
-  virtual const TransformBase * GetTransformBase( void ) const = 0;
+  virtual TransformBase * GetTransformBase( ) = 0;
+  virtual const TransformBase * GetTransformBase( ) const = 0;
 
   // general methods to get information about the internal class
-  virtual unsigned int GetInputDimension( void ) const = 0;
-  virtual unsigned int GetOutputDimension( void ) const = 0;
+  virtual unsigned int GetInputDimension( ) const = 0;
+  virtual unsigned int GetOutputDimension( ) const = 0;
 
   // Set the fixed parameter for the transform, converting from the
   // simpleITK std::vector to the ITK's array.
@@ -90,18 +94,18 @@ public:
     }
 
   // Get the fixed parameters form the transform
-  std::vector< double >  GetFixedParameters( void ) const
+  std::vector< double >  GetFixedParameters( ) const
     {
       const itk::TransformBase::ParametersType &p = this->GetTransformBase()->GetFixedParameters();
       return std::vector< double >( p.begin(), p.end() );
     }
 
-  unsigned int GetNumberOfFixedParameters( void ) const
+  unsigned int GetNumberOfFixedParameters( ) const
   {
     return this->GetTransformBase()->GetFixedParameters().GetSize();
   }
 
-  unsigned int GetNumberOfParameters( void ) const
+  unsigned int GetNumberOfParameters( ) const
   {
     return this->GetTransformBase()->GetNumberOfParameters();
   }
@@ -125,21 +129,19 @@ public:
       p.SetData( const_cast<double*>(&inParams[0]), numberOfParameters, false );
       this->GetTransformBase()->SetParameters( p );
     }
-  std::vector< double > GetParameters( void ) const
+  std::vector< double > GetParameters( ) const
     {
       const itk::TransformBase::ParametersType &p = this->GetTransformBase()->GetParameters();
       return std::vector< double >( p.begin(), p.end() );
     }
 
 
-  virtual PimpleTransformBase *ShallowCopy( void ) const = 0;
-  virtual PimpleTransformBase *DeepCopy( void ) const = 0;
+  virtual PimpleTransformBase *ShallowCopy( ) const = 0;
+  virtual PimpleTransformBase *DeepCopy( ) const = 0;
 
   virtual int GetReferenceCount( ) const = 0;
 
   virtual void SetIdentity() = 0;
-
-  virtual void FlattenTransform() = 0;
 
   // Tries to construct an inverse of the transform, if true is returned
   // the inverse was successful, and outputTransform is modified to
@@ -149,27 +151,23 @@ public:
 
   virtual bool IsLinear() const
     {
-      typedef itk::TransformBaseTemplate<double>::TransformCategoryEnum TransformCategoryEnum;
+      using TransformCategoryEnum = itk::TransformBaseTemplate<double>::TransformCategoryEnum;
       return (this->GetTransformBase()->GetTransformCategory() == TransformCategoryEnum::Linear);
     }
 
 
-  std::string ToString( void ) const
+  std::string ToString( ) const
     {
       std::ostringstream out;
       this->GetTransformBase()->Print ( out, 1 );
       return out.str();
     }
 
-  // note: the returned pointer needs to be externally managed and
-  // deleted
-  // Also the return pointer could be this
-  virtual PimpleTransformBase* AddTransform( Transform &t ) = 0;
-
-
   virtual std::vector< double > TransformPoint( const std::vector< double > &p ) const = 0;
   virtual std::vector< double > TransformVector( const std::vector< double > &v,
                                                  const std::vector< double > &p) const = 0;
+
+  virtual TransformEnum GetTransformEnum() const = 0;
 
 protected:
 
@@ -180,11 +178,11 @@ class SITKCommon_HIDDEN PimpleTransform
   : public PimpleTransformBase
 {
 public:
-  typedef PimpleTransform                  Self;
-  typedef TTransformType                   TransformType;
-  typedef typename TransformType::Pointer  TransformPointer;
+  using Self = PimpleTransform;
+  using TransformType = TTransformType;
+  using TransformPointer = typename TransformType::Pointer;
 
-  typedef itk::CompositeTransform<double, TransformType::InputSpaceDimension> CompositeTransformType;
+  using CompositeTransformType = itk::CompositeTransform<double, TransformType::InputSpaceDimension>;
 
   static const unsigned int InputDimension = TTransformType::InputSpaceDimension;
   static const unsigned int OutputDimension = TTransformType::OutputSpaceDimension;
@@ -216,30 +214,30 @@ public:
       m_Transform = s.m_Transform;
     }
 
-  virtual TransformBase * GetTransformBase( void ) { return this->m_Transform.GetPointer(); }
-  virtual const TransformBase * GetTransformBase( void ) const { return this->m_Transform.GetPointer(); }
+  TransformBase * GetTransformBase( ) override { return this->m_Transform.GetPointer(); }
+  const TransformBase * GetTransformBase( ) const override { return this->m_Transform.GetPointer(); }
 
-  virtual unsigned int GetInputDimension( void ) const { return InputDimension; }
-  virtual unsigned int GetOutputDimension( void ) const { return OutputDimension; }
+  unsigned int GetInputDimension( ) const override { return InputDimension; }
+  unsigned int GetOutputDimension( ) const override { return OutputDimension; }
 
 
-  virtual PimpleTransformBase *ShallowCopy( void ) const
+  PimpleTransformBase *ShallowCopy( ) const override
     {
       return new Self( this->m_Transform.GetPointer() );
     }
 
-  virtual PimpleTransformBase *DeepCopy( void ) const
+  PimpleTransformBase *DeepCopy( ) const override
     {
       PimpleTransformBase *copy( new Self( this->m_Transform->Clone() ) );
       return copy;
     }
 
-  virtual int GetReferenceCount( ) const
+  int GetReferenceCount( ) const override
     {
       return this->m_Transform->GetReferenceCount();
     }
 
-  virtual void SetIdentity()
+  void SetIdentity() override
     {
       this->SetIdentity(this->m_Transform.GetPointer());
     }
@@ -256,86 +254,8 @@ public:
       sitkExceptionMacro( "SetIdentity does is not implemented for transforms of type " << self->GetNameOfClass() );
     }
 
-#if ( ( SITK_ITK_VERSION_MAJOR == 4 ) && ( SITK_ITK_VERSION_MINOR < 7 ) )
-  template <typename UScalar, unsigned int UDimension>
-  void SetIdentity( itk::DisplacementFieldTransform<UScalar, UDimension> *self)
-      {
-        typedef itk::DisplacementFieldTransform<UScalar, UDimension> DFTType;
-        typename DFTType::DisplacementFieldType *displacementField;
 
-        displacementField = self->GetModifiableDisplacementField();
-        if (displacementField)
-          {
-          displacementField->FillBuffer(typename DFTType::OutputVectorType(0.0));
-          }
-        displacementField = self->GetModifiableInverseDisplacementField();
-        if (displacementField)
-          {
-          displacementField->FillBuffer(typename DFTType::OutputVectorType(0.0));
-          }
-      }
-
-  template <typename UScalar, unsigned int UDimension>
-  void SetIdentity( itk::BSplineSmoothingOnUpdateDisplacementFieldTransform<UScalar, UDimension> *self)
-      {
-        typedef itk::DisplacementFieldTransform<UScalar, UDimension> DFTType;
-        typename DFTType::DisplacementFieldType *displacementField;
-
-        displacementField = self->GetModifiableDisplacementField();
-        if (displacementField)
-          {
-          displacementField->FillBuffer(typename DFTType::OutputVectorType(0.0));
-          }
-        displacementField = self->GetModifiableInverseDisplacementField();
-        if (displacementField)
-          {
-          displacementField->FillBuffer(typename DFTType::OutputVectorType(0.0));
-          }
-      }
-
-  template <typename UScalar, unsigned int UDimension>
-  void SetIdentity( itk::GaussianSmoothingOnUpdateDisplacementFieldTransform<UScalar, UDimension> *self)
-      {
-        typedef itk::DisplacementFieldTransform<UScalar, UDimension> DFTType;
-        typename DFTType::DisplacementFieldType *displacementField;
-
-        displacementField = self->GetModifiableDisplacementField();
-        if (displacementField)
-          {
-          displacementField->FillBuffer(typename DFTType::OutputVectorType(0.0));
-          }
-        displacementField = self->GetModifiableInverseDisplacementField();
-        if (displacementField)
-          {
-          displacementField->FillBuffer(typename DFTType::OutputVectorType(0.0));
-          }
-      }
-
-
-#endif
-
-
-  virtual void FlattenTransform()
-    {
-      this->FlattenTransform(this->m_Transform.GetPointer());
-    }
-
-  template <typename UTransform>
-  void FlattenTransform( UTransform *self)
-    {
-      Unused(self);
-      // nothing to do
-    }
-
-  template <typename UScalar, unsigned int UDimension>
-  void FlattenTransform( itk::CompositeTransform<UScalar, UDimension> *self)
-    {
-      self->FlattenTransformQueue();
-      // TODO: If there is only one transform remove it from the
-      // composite transform.
-    }
-
-  virtual bool GetInverse(PimpleTransformBase * &outputTransform) const
+  bool GetInverse(PimpleTransformBase * &outputTransform) const override
     {
       typename itk::LightObject::Pointer light = this->m_Transform->CreateAnother();
       typename TransformType::Pointer another = dynamic_cast<TransformType*>(light.GetPointer());
@@ -353,47 +273,7 @@ public:
     }
 
 
-  virtual PimpleTransformBase* AddTransform( Transform &t )
-    {
-      if ( t.GetDimension() != TransformType::InputSpaceDimension )
-        {
-        sitkExceptionMacro( "Transform argument has dimension " << t.GetDimension()
-                            << " does not match this dimension of " << TransformType::InputSpaceDimension );
-        }
-
-      typename CompositeTransformType::TransformType* base =
-        dynamic_cast< typename CompositeTransformType::TransformType*>( t.GetITKBase() );
-
-      return this->AddTransform( base, typename std::is_same<TTransformType, CompositeTransformType>::type() );
-    }
-
-  PimpleTransformBase* AddTransform( typename CompositeTransformType::TransformType* t, std::true_type isCompositeTransform )
-    {
-      Unused( isCompositeTransform );
-      assert( t->GetInputSpaceDimension() == TransformType::InputSpaceDimension );
-
-      m_Transform->AddTransform( t );
-      m_Transform->SetAllTransformsToOptimizeOff();
-      m_Transform->SetOnlyMostRecentTransformToOptimizeOn();
-
-      return this;
-    }
-
-  PimpleTransformBase* AddTransform( typename CompositeTransformType::TransformType* t, std::false_type isNotCompositeTransform )
-    {
-      Unused( isNotCompositeTransform );
-
-      typename CompositeTransformType::Pointer composite = CompositeTransformType::New();
-      composite->AddTransform( this->m_Transform );
-      composite->AddTransform( t );
-      composite->SetAllTransformsToOptimizeOff();
-      composite->SetOnlyMostRecentTransformToOptimizeOn();
-
-      return new PimpleTransform<CompositeTransformType>( composite );
-    }
-
-
-  virtual std::vector< double > TransformPoint( const std::vector< double > &pt ) const
+  std::vector< double > TransformPoint( const std::vector< double > &pt ) const override
     {
       if (pt.size() != this->GetInputDimension() )
         {
@@ -407,7 +287,7 @@ public:
     }
 
 
-  virtual std::vector< double > TransformVector( const std::vector< double > &vec, const std::vector< double > &pt ) const
+  std::vector< double > TransformVector( const std::vector< double > &vec, const std::vector< double > &pt ) const override
     {
       if (vec.size() != this->GetInputDimension() )
         {
@@ -425,6 +305,67 @@ public:
 
       return sitkITKVectorToSTL<double>( this->m_Transform->TransformVector( itk_vec, itk_pt ) );
     }
+
+  TransformEnum GetTransformEnum() const override { return GetTransformEnum(this->m_Transform.GetPointer());}
+
+  template <typename VScalar, unsigned int VDimension>
+    TransformEnum GetTransformEnum( const itk::IdentityTransform< VScalar, VDimension > *) const {return sitkIdentity;}
+
+  template <typename VScalar, unsigned int VDimension>
+    TransformEnum GetTransformEnum( const itk::TranslationTransform< VScalar, VDimension > *) const {return sitkTranslation;}
+  template <typename VScalar, unsigned int VDimension>
+    TransformEnum GetTransformEnum( const itk::ScaleTransform< VScalar, VDimension > *) const {return sitkScale;}
+
+  template <typename VScalar, unsigned int VDimension>
+    TransformEnum GetTransformEnum( const itk::ScaleLogarithmicTransform< VScalar, VDimension > *) const {return sitkScaleLogarithmic;}
+
+  template <typename VScalar>
+    TransformEnum GetTransformEnum( const itk::Euler2DTransform< VScalar > *) const {return sitkEuler;}
+
+  template <typename VScalar>
+    TransformEnum GetTransformEnum( const itk::Euler3DTransform< VScalar > *) const {return sitkEuler;}
+
+  template <typename VScalar>
+    TransformEnum GetTransformEnum( const itk::Similarity2DTransform< VScalar > *) const {return sitkSimilarity;}
+
+  template <typename VScalar>
+    TransformEnum GetTransformEnum( const itk::Similarity3DTransform< VScalar > *) const {return sitkSimilarity;}
+
+
+  template <typename VScalar, unsigned int VDimension>
+    TransformEnum GetTransformEnum( const itk::AffineTransform< VScalar, VDimension > *) const {return sitkAffine;}
+
+  template <typename VScalar, unsigned int VDimension>
+    TransformEnum GetTransformEnum( const itk::CompositeTransform< VScalar, VDimension > *) const {return sitkComposite;}
+
+  template <typename VScalar, unsigned int VDimension, unsigned int VSplineOrder>
+    TransformEnum GetTransformEnum( const itk::BSplineTransform< VScalar, VDimension, VSplineOrder > *) const {return sitkBSplineTransform;}
+
+  template <typename VScalar, unsigned int VDimension>
+    TransformEnum GetTransformEnum( const itk::DisplacementFieldTransform< VScalar, VDimension > *) const {return sitkDisplacementField;}
+
+
+  template <typename VScalar>
+    TransformEnum GetTransformEnum( const itk::ScaleSkewVersor3DTransform< VScalar > *) const {return sitkScaleSkewVersor;}
+
+  template <typename VScalar>
+    TransformEnum GetTransformEnum( const itk::ComposeScaleSkewVersor3DTransform< VScalar > *) const {return sitkComposeScaleSkewVersor;}
+
+  template <typename VScalar>
+    TransformEnum GetTransformEnum( const itk::ScaleVersor3DTransform< VScalar > *) const {return sitkScaleVersor;}
+
+  template <typename VScalar>
+    TransformEnum GetTransformEnum( const itk::QuaternionRigidTransform< VScalar > *) const {return sitkQuaternionRigid;}
+
+  template <typename VScalar>
+    TransformEnum GetTransformEnum( const itk::VersorRigid3DTransform< VScalar > *) const {return sitkVersorRigid;}
+
+  template <typename VScalar>
+    TransformEnum GetTransformEnum( const itk::VersorTransform< VScalar > *) const {return sitkVersor;}
+
+
+  template <typename VTransform>
+    TransformEnum GetTransformEnum( const VTransform *) const {return sitkUnknownTransform;}
 
 private:
 

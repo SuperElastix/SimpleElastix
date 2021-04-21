@@ -42,7 +42,7 @@ std::vector<Image> sitkImageArrayConvert(const TImageArrayType &a)
 
 
 template<typename TBSplineTransform>
-unsigned int sitkGetOrder(void)
+unsigned int sitkGetOrder()
 {
   return TBSplineTransform::SplineOrder;
 }
@@ -81,7 +81,7 @@ void SetCoefficientImages(TBSplineTransform* bspline, const std::vector<Image> &
       sitkExceptionMacro( "Expected all coefficient images to be the same size " << coefficientImages[0].GetSize() );
       }
 
-    typedef typename TBSplineTransform::ImageType itkImageType;
+    using itkImageType = typename TBSplineTransform::ImageType;
 
 
     const itkImageType * itkImage = dynamic_cast <const itkImageType*>(sitkImage.GetITKBase());
@@ -100,9 +100,8 @@ void SetCoefficientImages(TBSplineTransform* bspline, const std::vector<Image> &
 
 }
 
-BSplineTransform::~BSplineTransform()
-{
-}
+
+BSplineTransform::~BSplineTransform() = default;
 
 // construct identity
 BSplineTransform::BSplineTransform(unsigned int dimensions, unsigned int order)

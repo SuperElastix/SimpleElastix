@@ -33,16 +33,16 @@ class SmartPointer;
   namespace simple {
 
     /** \class ImageReaderBase
-     * \brief An abract base class for image readers
+     * \brief An abstract base class for image readers
      *
      */
     class SITKIO_EXPORT ImageReaderBase :
       public ProcessObject
     {
     public:
-      typedef ImageReaderBase Self;
+      using Self = ImageReaderBase;
 
-      virtual ~ImageReaderBase();
+      ~ImageReaderBase() override;
 
       ImageReaderBase();
 
@@ -56,12 +56,12 @@ class SmartPointer;
        * @{
        */
       SITK_RETURN_SELF_TYPE_HEADER SetOutputPixelType( PixelIDValueEnum pixelID );
-      PixelIDValueEnum GetOutputPixelType( void ) const;
+      PixelIDValueEnum GetOutputPixelType( ) const;
       /* @} */
 
       virtual Image Execute() = 0;
 
-      virtual std::string ToString() const;
+      std::string ToString() const override;
 
       /** \brief Get a vector of the names of registered itk ImageIOs
        */
@@ -93,9 +93,18 @@ class SmartPointer;
        * @{
        */
       virtual SITK_RETURN_SELF_TYPE_HEADER SetImageIO(const std::string &imageio);
-      virtual std::string GetImageIO( void ) const;
+      virtual std::string GetImageIO( ) const;
       /* @} */
 
+      /** \brief Get the automatic ImageIO from the ImageIOFactory
+       *
+       * Returns the name of ImageIO automatically detected to read the
+       * file. The file is required to exist, and the file may be opened
+       * and/or the file extension examined. If an error is
+       * encountered such as the file does not exist, then an empty
+       * string ("") will be returned.
+       */
+      static std::string GetImageIOFromFileName(const std::string &fileName);
 
     protected:
 

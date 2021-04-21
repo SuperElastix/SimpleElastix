@@ -31,12 +31,12 @@ namespace simple
   * \brief Display an image in an external viewer (Fiji by default)
   *
   * The ImageViewer class displays an image with an external image display
-  * application.  By default the class will search for a Fiji ( https://fiji.sc )
+  * application.  By default the class will search for a [Fiji](https://fiji.sc)
   * executable.  The image is written out to a temporary file and then passed
   * to the application.
   *
-  * When SimpleITK is first invoked the following environment variables are
-  * queried to set up the external viewer:
+  * When the first ImageViewer object is constructed the following environment
+  * variables are queried to set up the external viewer:
   *
   * SITK_SHOW_EXTENSION:  file format extension of the temporary image file.
   * The default is '.mha', the [MetaIO](https://itk.org/Wiki/ITK/MetaIO)
@@ -45,7 +45,9 @@ namespace simple
   * SITK_SHOW_COMMAND:  The user can specify an application other than Fiji
   * to view images.
   *
-  * These environment variables are only checked at SimpleITK's launch.
+  * The environment variables are not checked for subsequent ImageViewer
+  * objects.
+  *
   */
 class SITKIO_EXPORT ImageViewer
 {
@@ -90,12 +92,20 @@ public:
 
   /** \brief Set the full path to the viewing application used in the command string.
    *
-   * The SetApplication method expects a full path name.
+   * The SetApplication method expects the \b app parameter to be a full path name
+   * to the display application's executable.  For instance, on Windows when
+   * using Fiji, one would use the full path to the ImageJ-win64.exe such as:
+   *
+   *     'C:\Users\dave\Fiji.app\ImageJ-win64.exe'
+   *
+   * On Linux, \b app would be set to something like:
+   *
+   *     '/home/dave/bin/Fiji.app/ImageJ-linux64'
    *
    * Using this method overrides the default application search.
    *
    * By default, when this method is called, the command string is
-   * set to "%a %f" which simply means *the application path*
+   * set to `"%a %f"` which simply means *the application path*
    * followed by *the temporary image file*.
    */
   void SetApplication( const std::string & app, const std::string & command = "%a %f" );

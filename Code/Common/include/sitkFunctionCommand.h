@@ -35,14 +35,14 @@ class SITKCommon_EXPORT FunctionCommand:
 {
 public:
 
-  typedef FunctionCommand Self;
+  using Self = FunctionCommand;
 
 
-  virtual ~FunctionCommand();
+  ~FunctionCommand() override;
 
   FunctionCommand();
 
-  virtual void Execute(void);
+  void Execute() override;
 
   /** Generic method to set a class's member function to be called in
    *  the Execute method.
@@ -68,7 +68,7 @@ public:
 
 private:
 
-  typedef std::function<void()> FunctionObjectType;
+  using FunctionObjectType = std::function<void()>;
   FunctionObjectType m_Function;
 
 };

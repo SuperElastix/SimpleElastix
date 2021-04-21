@@ -1,18 +1,26 @@
 if ( SimpleITK_DOC_FILES )
-  # create a python list for the import documents to include in
-  # packaging
+  # Copy the documentation files into the SimpleITK python package
+  # directory under "docs" sub-directory. And create a list of the
+  # copied files in the python list syntax.
 
-  # specially handle the first element
-  list( GET SimpleITK_DOC_FILES 0 d )
-  file(TO_NATIVE_PATH "${d}" d )
-  set( SimpleITK_DOC_FILES_AS_LIST "[r'${d}'")
-  set( _doc_list "${SimpleITK_DOC_FILES}" )
-  list( REMOVE_AT _doc_list 0 )
+  set( SimpleITK_DOC_FILES_AS_LIST "")
 
-  foreach( d ${_doc_list} )
-    file(TO_NATIVE_PATH "${d}" d )
-    set( SimpleITK_DOC_FILES_AS_LIST "${SimpleITK_DOC_FILES_AS_LIST},r'${d}'")
+  foreach( d ${SimpleITK_DOC_FILES} )
+    get_filename_component(fn "${d}" NAME)
+    set(_out "${CMAKE_CURRENT_BINARY_DIR}/SimpleITK/docs/${fn}")
+    configure_file(
+      "${d}"
+      "${_out}"
+     COPYONLY )
+
+    file(TO_NATIVE_PATH "${_out}" d )
+    if (SimpleITK_DOC_FILES_AS_LIST STREQUAL "")
+        set( SimpleITK_DOC_FILES_AS_LIST "${SimpleITK_DOC_FILES_AS_LIST}[r'${_out}'")
+    else()
+        set( SimpleITK_DOC_FILES_AS_LIST "${SimpleITK_DOC_FILES_AS_LIST},r'${_out}'")
+    endif()
   endforeach()
+
   set( SimpleITK_DOC_FILES_AS_LIST "${SimpleITK_DOC_FILES_AS_LIST}]")
 
 endif()
@@ -35,15 +43,19 @@ add_custom_command(
   COMMAND ${CMAKE_COMMAND}
     "-DSimpleITK_BINARY_MODULE=$<TARGET_FILE_NAME:${SWIG_MODULE_SimpleITKPython_TARGET_NAME}>"
     "-DCONFIGUREBUILDTIME_filename=${CMAKE_CURRENT_BINARY_DIR}/Packaging/setup.py.in"
-    "-DCONFIGUREBUILDTIME_out_filename=${CMAKE_CURRENT_BINARY_DIR}/Packaging/setup.py"
+    "-DCONFIGUREBUILDTIME_out_filename=${CMAKE_CURRENT_BINARY_DIR}/setup.py"
     -P "${SimpleITK_SOURCE_DIR}/CMake/configure_file_build_time.cmake"
   COMMENT "Generating setup.py..."
   )
 
-configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/Packaging/__init__.py"
-  "${CMAKE_CURRENT_BINARY_DIR}/__init__.py"
-  COPYONLY )
+
+foreach( _file ${SimpleITK_Py_Files})
+
+   configure_file(
+     "${CMAKE_CURRENT_SOURCE_DIR}/SimpleITK/${_file}"
+     "${CMAKE_CURRENT_BINARY_DIR}/SimpleITK/${_file}"
+     COPYONLY )
+endforeach()
 
 option(SimpleITK_PYTHON_USE_VIRTUALENV "Create a Python Virtual Environment for testing." ON)
 mark_as_advanced(SimpleITK_PYTHON_USE_VIRTUALENV)
@@ -51,20 +63,12 @@ sitk_legacy_naming(SimpleITK_PYTHON_USE_VIRTUALENV)
 
 if (SimpleITK_PYTHON_USE_VIRTUALENV)
 
-  # Executable to setup a new Python virtual environment
-  find_package( PythonVirtualEnv REQUIRED )
-
-  sitk_enforce_forbid_downloads( SimpleITK_PYTHON_USE_VIRTUALENV )
-
-  if (SimpleITK_PYTHON_WHEEL AND PYTHON_VIRTUALENV_VERSION VERSION_LESS "13")
-    message(SEND_ERROR "In sufficient version of virutalenv for \
-      building wheels. Require virtualenv>=13.0.")
-  endif()
+  #TODO Check python version
 
   #
   # Setup Python Virtual Environment for testing and packaging
   #
-  set( PythonVirtualenvHome "${${CMAKE_PROJECT_NAME}_BINARY_DIR}/Testing/Installation/PythonVirtualenv" )
+  set( PythonVirtualenvHome "${${CMAKE_PROJECT_NAME}_BINARY_DIR}/Testing/Installation/pyvenv" )
 
   # virtualenv places the python executable in different
   # locations. Also note than on windows installations where python is
@@ -78,28 +82,27 @@ if (SimpleITK_PYTHON_USE_VIRTUALENV)
   set(SimpleITK_PYTHON_TEST_EXECUTABLE "${VIRTUAL_PYTHON_EXECUTABLE}"
     CACHE INTERNAL "Python executable for testing." FORCE )
 
-  # configure a scripts which creates the virtualenv and installs numpy
-  configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/PythonVirtualEnvInstall.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/PythonVirtualEnvInstall.cmake"
-    @ONLY )
-
   set( PythonVirtualEnv_ALL "" )
   if ( BUILD_TESTING )
     set( PythonVirtualEnv_ALL "ALL" )
   endif()
 
   add_custom_target( PythonVirtualEnv ${PythonVirtualEnv_ALL}
-    DEPENDS "${VIRTUAL_PYTHON_EXECUTABLE}"
-    SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/PythonVirtualEnvInstall.cmake.in )
+    DEPENDS "${VIRTUAL_PYTHON_EXECUTABLE}" )
 
   add_custom_command( OUTPUT "${VIRTUAL_PYTHON_EXECUTABLE}"
-    COMMAND ${CMAKE_COMMAND} -P "${CMAKE_CURRENT_BINARY_DIR}/PythonVirtualEnvInstall.cmake"
+    COMMAND "${PYTHON_EXECUTABLE}" "-m" "venv" "--clear" "${PythonVirtualenvHome}"
+    COMMAND "${VIRTUAL_PYTHON_EXECUTABLE}" "setup.py" install
+    WORKING_DIRECTORY "${SimpleITK_Python_BINARY_DIR}"
     DEPENDS
     "${SWIG_MODULE_SimpleITKPython_TARGET_NAME}"
-    "${CMAKE_CURRENT_BINARY_DIR}/PythonVirtualEnvInstall.cmake"
-    COMMENT "Creating python virtual enviroment..."
+    COMMENT "Creating python virtual environment..."
     )
+
+  add_custom_command( TARGET PythonVirtualEnv
+    POST_BUILD
+    COMMAND "${VIRTUAL_PYTHON_EXECUTABLE}" -m pip --disable-pip-version-check install numpy wheel
+)
 endif()
 
 # Packaging for distribution

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # JSONGenerateSphinxFiltersDoc.py
 #
@@ -15,8 +15,10 @@ try:
 except ImportError:
     import ordereddict as OrderedDict
 
-f = open("Documentation/docs/source/filters.rst", "w+")
-f.write('''SimpleITK Filters
+f = open("docs/source/filters.rst", "w+")
+f.write('''.. _lbl_filter:
+
+SimpleITK Filters
 =================
 
 .. list-table::
@@ -26,7 +28,7 @@ f.write('''SimpleITK Filters
 
    * - Filter Name\n     - Brief Description''')
 
-entryFormat = "\n   * - `{0} <https://www.itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1{1}.html>`_\n     - {2}"
+entryFormat = "\n   * - `{0} <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1{1}.html>`_\n     - {2}"
 json_list = []
 for fname in sys.argv[1:]:
     with open( fname, "r" ) as fp:

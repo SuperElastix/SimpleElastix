@@ -41,6 +41,12 @@ function(sitk_add_test)
   # Add test with data in the SimpleITKData group.
   ExternalData_add_test(SimpleITKData NAME ${__NAME} COMMAND ${__COMMAND} ${__UNPARSED_ARGUMENTS})
 
+  if (SimpleITK_TESTING_NOSHOW)
+    set_property(TEST ${__NAME}
+        PROPERTY ENVIRONMENT SITK_NOSHOW=YES
+        )
+  endif()
+
 endfunction()
 
 
@@ -69,11 +75,6 @@ function(sitk_add_python_test name)
   set_property(TEST Python.${name}
       PROPERTY LABELS Python
       )
-  if (SimpleITK_TESTING_NOSHOW)
-    set_property(TEST Python.${name}
-        PROPERTY ENVIRONMENT SITK_NOSHOW=YES
-        )
-  endif()
   if (NOT SimpleITK_PYTHON_USE_VIRTUALENV)
     set_property(TEST Python.${name}
       APPEND PROPERTY ENVIRONMENT PYTHONPATH=${SimpleITK_Python_BINARY_DIR}
@@ -109,13 +110,8 @@ function(sitk_add_lua_test name)
     PROPERTY LABELS Lua
     )
   set_property(TEST Lua.${name}
-    PROPERTY ENVIRONMENT LUA_CPATH=$<TARGET_FILE:SimpleITKLuaModule_LUA>
+    APPEND PROPERTY ENVIRONMENT LUA_CPATH=$<TARGET_FILE:SimpleITKLuaModule_LUA>
     )
-  if (SimpleITK_TESTING_NOSHOW)
-    set_property(TEST Lua.${name}
-      APPEND PROPERTY ENVIRONMENT SITK_NOSHOW=YES
-      )
-  endif()
 endfunction()
 
 
@@ -128,7 +124,11 @@ function(sitk_add_ruby_test name)
     return()
   endif()
 
-  set(command "${RUBY_EXECUTABLE}")
+  if (DEFINED Ruby_EXECUTABLE)
+    set(command "${Ruby_EXECUTABLE}")
+  else()
+    set(command "${RUBY_EXECUTABLE}")
+  endif()
 
   # add extra command which may be needed on some systems
   if(CMAKE_OSX_ARCHITECTURES)
@@ -145,7 +145,7 @@ function(sitk_add_ruby_test name)
     PROPERTY LABELS Ruby
     )
   set_property(TEST Ruby.${name}
-    PROPERTY ENVIRONMENT RUBYLIB=$<TARGET_FILE_DIR:simpleitk_RUBY>
+    APPEND PROPERTY ENVIRONMENT RUBYLIB=$<TARGET_FILE_DIR:simpleitk_RUBY>
     )
 endfunction()
 
@@ -268,7 +268,7 @@ function(sitk_add_r_test name)
   file(TO_NATIVE_PATH "${SimpleITK_R_BINARY_DIR}/R_libs" _native_path)
 
   set_property(TEST R.${name}
-    PROPERTY ENVIRONMENT R_LIBS=${_native_path}
+    APPEND PROPERTY ENVIRONMENT R_LIBS=${_native_path}
     )
 endfunction()
 

@@ -23,6 +23,13 @@ if(NOT DEFINED Module_SimpleITKFilters)
   set(Module_SimpleITKFilters ON)
 endif()
 
+if (NOT DEFINED Module_ITKIOTransformMINC)
+  set(Module_ITKIOTransformMINC ON)
+endif()
+
+if (NOT DEFINED ITK_DEFAULT_THREADER)
+  set( ITK_DEFAULT_THREADER "Platform")
+endif()
 
 get_cmake_property( _varNames VARIABLES )
 
@@ -32,7 +39,8 @@ foreach (_varName ${_varNames})
       OR _varName MATCHES "^ITKV4"
       OR _varName MATCHES "FFTW"
       OR _varName MATCHES "^GDCM_"
-      OR _varName MATCHES "^Module_")
+      OR _varName MATCHES "^Module_"
+      OR _varName STREQUAL "TBB_DIR")
     message( STATUS "Passing variable \"${_varName}=${${_varName}}\" to ITK external project.")
     list(APPEND ITK_VARS ${_varName})
   endif()
@@ -53,7 +61,7 @@ set(ITK_GIT_REPOSITORY "${git_protocol}://github.com/InsightSoftwareConsortium/I
 mark_as_advanced(ITK_GIT_REPOSITORY)
 sitk_legacy_naming(ITK_GIT_REPOSITORY ITK_REPOSITORY)
 
-set(_DEFAULT_ITK_GIT_TAG "v5.1rc02")
+set(_DEFAULT_ITK_GIT_TAG "v5.2.0")
 set(ITK_GIT_TAG "${_DEFAULT_ITK_GIT_TAG}" CACHE STRING "Tag in ITK git repo")
 mark_as_advanced(ITK_GIT_TAG)
 set(ITK_TAG_COMMAND GIT_TAG "${ITK_GIT_TAG}")

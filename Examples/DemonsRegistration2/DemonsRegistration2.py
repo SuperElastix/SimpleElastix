@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#=========================================================================
+# =========================================================================
 #
 #  Copyright NumFOCUS
 #
@@ -15,47 +15,46 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-#=========================================================================
-
-from __future__ import print_function
+# =========================================================================
 
 import SimpleITK as sitk
 import sys
 import os
 
 
-def command_iteration(filter) :
-    print("{0:3} = {1:10.5f}".format(filter.GetElapsedIterations(),
-                                    filter.GetMetric()))
+def command_iteration(filter):
+    print(f"{filter.GetElapsedIterations():3} = {filter.GetMetric():10.5f}")
 
-if len ( sys.argv ) < 4:
-    print( "Usage: {0} <fixedImageFilter> <movingImageFile> [initialTransformFile] <outputTransformFile>".format(sys.argv[0]))
-    sys.exit ( 1 )
 
+if len(sys.argv) < 4:
+    print("Usage:", sys.argv[0], "<fixedImageFilter> <movingImageFile>",
+          "[initialTransformFile] <outputTransformFile>")
+    sys.exit(1)
 
 fixed = sitk.ReadImage(sys.argv[1])
 
 moving = sitk.ReadImage(sys.argv[2])
 
 matcher = sitk.HistogramMatchingImageFilter()
-if ( fixed.GetPixelID() in ( sitk.sitkUInt8, sitk.sitkInt8 ) ):
+if (fixed.GetPixelID() in (sitk.sitkUInt8, sitk.sitkInt8)):
     matcher.SetNumberOfHistogramLevels(128)
 else:
     matcher.SetNumberOfHistogramLevels(1024)
 matcher.SetNumberOfMatchPoints(7)
 matcher.ThresholdAtMeanIntensityOn()
-moving = matcher.Execute(moving,fixed)
+moving = matcher.Execute(moving, fixed)
 
 # The fast symmetric forces Demons Registration Filter
-# Note there is a whole family of Demons Registration algorithms included in SimpleITK
+# Note there is a whole family of Demons Registration algorithms included in
+# SimpleITK
 demons = sitk.FastSymmetricForcesDemonsRegistrationFilter()
 demons.SetNumberOfIterations(200)
 # Standard deviation for Gaussian smoothing of displacement field
 demons.SetStandardDeviations(1.0)
 
-demons.AddCommand( sitk.sitkIterationEvent, lambda: command_iteration(demons) )
+demons.AddCommand(sitk.sitkIterationEvent, lambda: command_iteration(demons))
 
-if len( sys.argv ) > 4:
+if len(sys.argv) > 4:
     initialTransform = sitk.ReadTransform(sys.argv[3])
     sys.argv[-1] = sys.argv.pop()
 
@@ -70,19 +69,17 @@ else:
 
     displacementField = demons.Execute(fixed, moving)
 
-
 print("-------")
-print("Number Of Iterations: {0}".format(demons.GetElapsedIterations()))
-print(" RMS: {0}".format(demons.GetRMSChange()))
+print(f"Number Of Iterations: {demons.GetElapsedIterations()}")
+print(f" RMS: {demons.GetRMSChange()}")
 
 outTx = sitk.DisplacementFieldTransform(displacementField)
 
 sitk.WriteTransform(outTx, sys.argv[3])
 
-if (not "SITK_NOSHOW" in os.environ):
-
+if ("SITK_NOSHOW" not in os.environ):
     resampler = sitk.ResampleImageFilter()
-    resampler.SetReferenceImage(fixed);
+    resampler.SetReferenceImage(fixed)
     resampler.SetInterpolator(sitk.sitkLinear)
     resampler.SetDefaultPixelValue(100)
     resampler.SetTransform(outTx)
@@ -90,5 +87,5 @@ if (not "SITK_NOSHOW" in os.environ):
     out = resampler.Execute(moving)
     simg1 = sitk.Cast(sitk.RescaleIntensity(fixed), sitk.sitkUInt8)
     simg2 = sitk.Cast(sitk.RescaleIntensity(out), sitk.sitkUInt8)
-    cimg = sitk.Compose(simg1, simg2, simg1//2.+simg2//2.)
-    sitk.Show( cimg, "DeformableRegistration1 Composition" )
+    cimg = sitk.Compose(simg1, simg2, simg1 // 2. + simg2 // 2.)
+    sitk.Show(cimg, "DeformableRegistration1 Composition")

@@ -47,21 +47,21 @@ SetTransformDomainMeshSize()before calling InitializeTransform().
      */
     class SITKBasicFilters_EXPORT BSplineTransformInitializerFilter : public ProcessObject {
     public:
-      typedef BSplineTransformInitializerFilter Self;
+      using Self = BSplineTransformInitializerFilter;
 
       /** Default Constructor that takes no arguments and initializes
        * default parameters */
       BSplineTransformInitializerFilter();
 
       /** Destructor */
-      virtual ~BSplineTransformInitializerFilter();
+      ~BSplineTransformInitializerFilter() override;
 
       /** Define the pixels types supported by this filter */
-      typedef AllPixelIDTypeList  PixelIDTypeList;
+      using PixelIDTypeList = AllPixelIDTypeList;
 
 
       /**
-       * Allow the user to set the mesh size of the transform via the initializer even though the initializer does not do anything with that information. Defeault = 1^ImageDimension.
+       * Allow the user to set the mesh size of the transform via the initializer even though the initializer does not do anything with that information. Default = 1^ImageDimension.
        */
       SITK_RETURN_SELF_TYPE_HEADER SetTransformDomainMeshSize ( const std::vector<uint32_t> & TransformDomainMeshSize ) { this->m_TransformDomainMeshSize = TransformDomainMeshSize; return *this; }
 
@@ -77,19 +77,14 @@ SetTransformDomainMeshSize()before calling InitializeTransform().
       unsigned int GetOrder() const {return this->m_Order;}
 
       /** Name of this class */
-      std::string GetName() const { return std::string ("BSplineTransformInitializerFilter"); }
+      std::string GetName() const override { return std::string ("BSplineTransformInitializerFilter"); }
 
       /** Print ourselves out */
-      std::string ToString() const;
+      std::string ToString() const override;
 
 
       /** Execute the filter on the input image */
       BSplineTransform Execute ( const Image& image1 );
-
-
-      /** Execute the filter on the input image with the given parameters */
-      BSplineTransform Execute ( const Image& image1, const std::vector<uint32_t> & transformDomainMeshSize, unsigned int order );
-
 
     private:
 

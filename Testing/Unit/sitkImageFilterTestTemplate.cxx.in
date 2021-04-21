@@ -31,6 +31,18 @@
 #include <sitkConditional.h>
 #include <sitkVersion.h>
 
+#include <array>
+
+static bool isLabelType( const itk::simple::Image &img)
+{
+  static const std::array<itk::simple::PixelIDValueEnum, 4> labelIDs{{
+      itk::simple::sitkLabelUInt8,
+      itk::simple::sitkLabelUInt16,
+      itk::simple::sitkLabelUInt32,
+      itk::simple::sitkLabelUInt64}};
+
+  return std::find(labelIDs.begin(), labelIDs.end(), img.GetPixelID()) != labelIDs.end();
+}
 
 TEST(BasicFilters,${name}) {
   itk::simple::ImageFileReader reader;
@@ -72,16 +84,6 @@ $(foreach members
   EXPECT_EQ ( filter.Get${name}(), ${default} ) << "Testing set/get for ${name}";]]
 end)
 )
-
-$(if template_type and template_type == "RegionGrowing" then OUT=[[
-  // Test size of default SeedList
-  EXPECT_EQ ( filter.GetSeedList().size(), (unsigned int)0 ) << "Testing empty seed list as default";]]
-end)
-
-$(if template_code_filename and template_code_filename == "FastMarchingImageFilter" then OUT=[[
-  // Test size of default TrialPoints
-  EXPECT_EQ ( filter.GetTrialPoints().size(), (unsigned int)0 ) << "Testing empty trial points as default";]]
-end)
 
 $(if number_of_inputs == 2 then
    OUT=[[ {
@@ -174,7 +176,7 @@ $(if inputA_cast then
       ASSERT_NO_THROW( inputs[i] = itk::simple::Cast( inputs[i], itk::simple::${inputB_cast } ) ) << "Failed to cast inputB to ${inputB_cast}";
       }
 ]] end)
-    ASSERT_TRUE ( inputs[i].GetITKBase() != NULL ) << "Could not read " << inputFileNames[i];
+    ASSERT_NE ( inputs[i].GetITKBase(), nullptr ) << "Could not read " << inputFileNames[i];
     }
 
     if ( !inputs.empty() )
@@ -199,14 +201,6 @@ for inum=1,#inputs-1 do
   OUT=OUT..", inputs["..inum.."]"
   count = count + 1
 end
-if template_type and template_type == "RegionGrowing" then
-  OUT=OUT..", std::vector< std::vector<unsigned int> >()"
-  count = count + 1
-end
-if template_code_filename and template_code_filename == "FastMarchingImageFilter" then
-  OUT=OUT..", std::vector< std::vector<unsigned int> >()"
-  count = count + 1
-end
 if template_code_filename and template_code_filename == "KernelImageFilter" then
   OUT=OUT..[[, 1, itk::simple::sitkBall]]
   count = count + 1
@@ -227,17 +221,10 @@ end)) ) << "Functional interface to ${name}";
 $(if settings then
 OUT=[[
 $(foreach settings
-  $(if parameter == "SeedList" then
-  OUT='filter.ClearSeeds();\
-  $(for i=1,#value do OUT=OUT .. "{unsigned int __seed[] = " .. value[i] .. "; filter.AddSeed( std::vector<unsigned int>(__seed, __seed + inputs[0].GetDimension()) );}" end);'
-  elseif parameter == "TrialPoints" then
-  OUT='filter.ClearTrialPoints();\
-  $(for i=1,#value do OUT=OUT .. "{unsigned int __point[] = " .. value[i] .. "; filter.AddTrialPoint( std::vector<unsigned int>(__point, __point + inputs[0].GetDimension()) );}" end);'
-  elseif point_vec and point_vec == 1 then
-    OUT="filter.Clear${parameter}();"
+  $(if point_vec and point_vec == 1 then
+    OUT="filter.Clear${parameter:gsub('List','s')}();\n"
     for i=1,#value do
-      OUT=OUT.. "{unsigned int __point[] = " .. value[i].. ";"
-      OUT=OUT.."filter.Add${parameter:gsub('s([0-9]?)$','%1')}( std::vector<unsigned int>(__point, __point + inputs[0].GetDimension()) );}"
+      OUT=OUT.."  filter.Add${parameter:gsub('List',''):gsub('s(%d?)$','%1')}("..value[i].." );\n"
      end
   elseif dim_vec and dim_vec == 1 then
   OUT='{\
@@ -282,18 +269,47 @@ end)
   ASSERT_NO_THROW ( $(if not no_return_image then OUT=[[output =]] end) filter.Execute ( $(if #inputs > 0 then OUT=[[inputs[0] ]] end)$(for inum=1,#inputs-1 do OUT=OUT..", inputs["..inum.."]" end) ) );
 
   if ( !inputs.empty() )
-      {
+    {
+
       // Check that the input is not modified
       // This will fail if the filter is being run in-place
       EXPECT_EQ ( inputSHA1hash,  itk::simple::Hash( inputs[0] ) ) << "Input was modified by filter.";
 
       // Check that the input buffer is different that the output
       // buffer, this does not check complex or label map pixel types.
-      if (GetBufferAsVoid(output) != nullptr && GetBufferAsVoid(inputs[0]) != nullptr)
+      if(!isLabelType(output) && !isLabelType(inputs[0]))
         {
-        EXPECT_NE(GetBufferAsVoid(output), GetBufferAsVoid(inputs[0]) ) << "Input buffer was copyied to output!";
+        EXPECT_NE(output.GetBufferAsVoid(), inputs[0].GetBufferAsVoid() ) << "Input buffer was copyied to output!";
+        }
+    }
+
+$(if in_place then
+    OUT=OUT..[=[
+  ASSERT_LE(1u, inputs.size());
+  itk::simple::Image inPlaceOutput;
+  itk::simple::Image temp = inputs[0];
+  temp.MakeUnique();
+  ASSERT_NO_THROW ( $(if not no_return_image then OUT=[[inPlaceOutput =]] end) filter.Execute ( $(if #inputs > 0 then OUT=[[std::move(temp)]] end)$(for inum=1,#inputs-1 do OUT=OUT..", inputs["..inum.."]" end) ) );
+
+  ASSERT_NE(nullptr, inPlaceOutput.GetITKBase());
+  EXPECT_EQ(itk::simple::Hash(output), itk::simple::Hash(inPlaceOutput)) << "InPlace value does not match!";
+
+  for( auto iter = ++(inputs.begin()); iter != inputs.end(); ++iter)
+    {
+    ASSERT_NE(nullptr, iter->GetITKBase());
+    if (!isLabelType(*iter))
+      {
+      EXPECT_NE(nullptr, iter->GetBufferAsVoid()) << "An input is missing it's buffer!";
+
+      if (!isLabelType(inPlaceOutput))
+        {
+        EXPECT_NE(inPlaceOutput.GetBufferAsVoid(), iter->GetBufferAsVoid()) << "An input and output buffer matches.";
         }
       }
+    }
+]=]
+end)
+
 
   $(if md5hash then
   OUT = [[

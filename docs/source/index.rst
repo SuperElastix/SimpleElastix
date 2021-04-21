@@ -14,7 +14,7 @@ SimpleITK are currently available for all three major operating systems
    :hidden:
 
    about
-   installation
+   gettingStarted
    fundamentalConcepts
    registrationOverview
    conventions
@@ -22,9 +22,9 @@ SimpleITK are currently available for all three major operating systems
    filters
    building
    setUp
-   cmake_cplusplus
    tutorialsAndCourses
    faq
+   migrationGuide2.0
    FilterTemplates
    link_examples
 
@@ -32,7 +32,7 @@ SimpleITK are currently available for all three major operating systems
 Relevant Resources
 ------------------
 
-* `Doxygen API Documentation <https://itk.org/SimpleITKDoxygen/html/>`_
+* `Doxygen API Documentation <https://simpleitk.org/doxygen/latest/html/>`_
 * `Jupyter Notebooks in Python and R <https://github.com/InsightSoftwareConsortium/SimpleITK-Notebooks>`_
 * `ITK Forum for Discussions and Questions <https://discourse.itk.org/>`_
 

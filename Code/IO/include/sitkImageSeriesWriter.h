@@ -50,14 +50,14 @@ class ImageIOBase;
       : public ProcessObject
     {
     public:
-      typedef ImageSeriesWriter Self;
+      using Self = ImageSeriesWriter;
 
-      virtual ~ImageSeriesWriter();
+      ~ImageSeriesWriter() override;
 
       ImageSeriesWriter();
 
       /** Print ourselves to string */
-      virtual std::string ToString() const;
+      std::string ToString() const override;
 
       /** \brief Get a vector of the names of registered itk ImageIOs
        */
@@ -76,23 +76,23 @@ class ImageIOBase;
        * @{
        */
       virtual SITK_RETURN_SELF_TYPE_HEADER SetImageIO(const std::string &imageio);
-      virtual std::string GetImageIO( void ) const;
+      virtual std::string GetImageIO( ) const;
       /* @} */
 
       /** return user readable name of the filter */
-      virtual std::string GetName() const { return std::string("ImageSeriesWriter"); }
+      std::string GetName() const override { return std::string("ImageSeriesWriter"); }
 
       /** \brief Enable compression if available for file type.
        *
        * These methods Set/Get/Toggle the UseCompression flag which
-       * get's passed to image file's itk::ImageIO object. This is
-       * only a request as not all file formatts support compression.
+       * gets passed to image file's itk::ImageIO object. This is
+       * only a request as not all file formats support compression.
        * @{ */
       SITK_RETURN_SELF_TYPE_HEADER SetUseCompression( bool UseCompression );
-      bool GetUseCompression( void ) const;
+      bool GetUseCompression( ) const;
 
-      SITK_RETURN_SELF_TYPE_HEADER UseCompressionOn( void ) { return this->SetUseCompression(true); }
-      SITK_RETURN_SELF_TYPE_HEADER UseCompressionOff( void ) { return this->SetUseCompression(false); }
+      SITK_RETURN_SELF_TYPE_HEADER UseCompressionOn( ) { return this->SetUseCompression(true); }
+      SITK_RETURN_SELF_TYPE_HEADER UseCompressionOff( ) { return this->SetUseCompression(false); }
       /** @} */
 
       /** \brief A hint for the amount of compression to be applied during writing.
@@ -102,7 +102,7 @@ class ImageIOBase;
        *  for lossless zip or LZW like compression algorithms.  Please see the specific itk::ImageIO for details.
        * @{ */
       SITK_RETURN_SELF_TYPE_HEADER SetCompressionLevel(int);
-      int GetCompressionLevel(void) const;
+      int GetCompressionLevel() const;
       /** @} */
 
       /** \brief A compression algorithm hint
@@ -112,7 +112,7 @@ class ImageIOBase;
        * itk::ImageIO for details.
        * @{ */
       SITK_RETURN_SELF_TYPE_HEADER SetCompressor(const std::string &);
-      std::string GetCompressor(void);
+      std::string GetCompressor();
       /** @} */
 
       /** The filenames to where the image slices are written.
@@ -152,12 +152,26 @@ class ImageIOBase;
       std::string m_ImageIOName;
     };
 
-    SITKIO_EXPORT void
-    WriteImage(const Image &                    image,
-               const std::vector<std::string> & fileNames,
-               bool                             useCompression = false,
-               int                              compressionLevel = -1);
-    }
+
+  /**
+   * \brief WriteImage is a procedural interface to the ImageSeriesWriter.
+   *     class which is convenient for many image writing tasks.
+   *
+   *  \param image the input image to be written
+   *  \param fileNames a vector of filenames of length equal to the
+   *  number of slices in the image.
+   *  \param useCompression request to compress the written file
+   *  \param compressionLevel a hint for the amount of compression to
+   *    be applied during writing.
+   *
+   *
+   * \sa itk::simple::ImageFileWriter for writing a single file.
+   */
+  SITKIO_EXPORT void WriteImage(const Image &                    image,
+                                const std::vector<std::string> & fileNames,
+                                bool                             useCompression = false,
+                                int                              compressionLevel = -1);
+  }
 }
 
 #endif

@@ -58,10 +58,7 @@ BSplineTransformInitializerFilter::BSplineTransformInitializerFilter ()
 //
 // Destructor
 //
-BSplineTransformInitializerFilter::~BSplineTransformInitializerFilter ()
-{
-
-}
+BSplineTransformInitializerFilter::~BSplineTransformInitializerFilter () = default;
 
 
 //
@@ -84,15 +81,6 @@ std::string BSplineTransformInitializerFilter::ToString() const
 //
 // Execute
 //
-BSplineTransform BSplineTransformInitializerFilter::Execute ( const Image& image1, const std::vector<uint32_t> & transformDomainMeshSize, unsigned int order )
-{
-  this->SetTransformDomainMeshSize ( transformDomainMeshSize );
-  this->SetOrder(order);
-
-  return this->Execute ( image1 );
-}
-
-
 BSplineTransform BSplineTransformInitializerFilter::Execute ( const Image& image1 )
 {
   PixelIDValueEnum type = image1.GetPixelID();
@@ -141,13 +129,13 @@ template <unsigned int NDimension, unsigned int NOrder>
 BSplineTransform  BSplineTransformInitializerFilter::ExecuteInternalWithOrder ( const Image& inImage1 )
 {
   // Define the input and output image types
-  typedef itk::ImageBase<NDimension> InputImageType;
+  using InputImageType = itk::ImageBase<NDimension>;
 
   // Get the pointer to the ITK image contained in image1
   typename InputImageType::ConstPointer image1 = this->CastImageToITK<InputImageType>( inImage1 );
 
 
-  typedef itk::BSplineTransformInitializer< itk::BSplineTransform< double, NDimension, NOrder >, InputImageType> FilterType;
+  using FilterType = itk::BSplineTransformInitializer< itk::BSplineTransform< double, NDimension, NOrder >, InputImageType>;
   // Set up the ITK filter
   typename FilterType::Pointer filter = FilterType::New();
 
@@ -183,7 +171,9 @@ BSplineTransform  BSplineTransformInitializerFilter::ExecuteInternalWithOrder ( 
 BSplineTransform BSplineTransformInitializer ( const Image& image1, const std::vector<uint32_t> & transformDomainMeshSize, unsigned int order )
 {
   BSplineTransformInitializerFilter filter;
-  return filter.Execute ( image1, transformDomainMeshSize, order );
+  filter.SetTransformDomainMeshSize( transformDomainMeshSize );
+  filter.SetOrder( order );
+  return filter.Execute ( image1 );
 }
 
 

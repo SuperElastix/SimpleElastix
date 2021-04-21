@@ -12,7 +12,7 @@ target_include_directories( ElastixImageFilter
         $<INSTALL_INTERFACE:${SimpleITK_INSTALL_INCLUDE_DIR}>
     PRIVATE 
         ${CMAKE_CURRENT_SOURCE_DIR} )
-target_link_libraries( ElastixImageFilter PRIVATE elastix )
+target_link_libraries( ElastixImageFilter PRIVATE elastix_lib )
 target_compile_options( ElastixImageFilter PUBLIC ${SimpleITK_PUBLIC_COMPILE_OPTIONS} PRIVATE ${SimpleITK_PRIVATE_COMPILE_OPTIONS} )
 target_compile_features( ElastixImageFilter PUBLIC cxx_std_11 )
 sitk_install_exported_target( ElastixImageFilter )
@@ -29,7 +29,7 @@ target_include_directories( TransformixImageFilter
         $<INSTALL_INTERFACE:${SimpleITK_INSTALL_INCLUDE_DIR}>
     PRIVATE 
         ${CMAKE_CURRENT_SOURCE_DIR} )
-target_link_libraries( TransformixImageFilter PRIVATE transformix )
+target_link_libraries( TransformixImageFilter PRIVATE transformix_lib )
 target_compile_options( TransformixImageFilter PUBLIC ${SimpleITK_PUBLIC_COMPILE_OPTIONS} PRIVATE ${SimpleITK_PRIVATE_COMPILE_OPTIONS} )
 target_compile_features( TransformixImageFilter PUBLIC cxx_std_11 )
 sitk_install_exported_target( TransformixImageFilter ) 

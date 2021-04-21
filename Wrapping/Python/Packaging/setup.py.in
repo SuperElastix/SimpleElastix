@@ -2,48 +2,24 @@ import sys
 import os
 
 try:
-    from setuptools import setup, Extension
+    from setuptools import setup, Extension, find_packages
     from setuptools.command.build_ext import build_ext as _build_ext
 except ImportError:
     from distutils.core import setup, Extension
     from distutils.command.build_ext import build_ext as _build_ext
 
 import re
+import os.path as osp
 
-doc_files = @SimpleITK_DOC_FILES_AS_LIST@
+from SimpleITK._version import __version__
 
-def get_pep386version():
-    """This method examines the SimpleITK's CMake version variables to make a pep 386 compliant version string when building a version indented for distribution."""
-    sitkMAJOR = "@SimpleITK_VERSION_MAJOR@"
-    sitkMINOR = "@SimpleITK_VERSION_MINOR@"
-    sitkPATCH = "@SimpleITK_VERSION_PATCH@"
-    sitkTWEAK = "@SimpleITK_VERSION_TWEAK@"
-    sitkRC    = "@SimpleITK_VERSION_RC@"
-    sitkPOST  = "@SimpleITK_VERSION_POST@"
-    sitkDEV   = "@SimpleITK_VERSION_DEV@"
-    sitkHASH  = "@SimpleITK_VERSION_HASH@"
+def to_package_relpath(filename, pkg_name='SimpleITK'):
+    return osp.relpath(filename, osp.join(os.curdir, pkg_name))
 
+doc_files = [to_package_relpath(f) for f in @SimpleITK_DOC_FILES_AS_LIST@]
 
-    version = sitkMAJOR+"."+sitkMINOR
-
-    if sitkPATCH:
-        version += "."+sitkPATCH
-        if sitkTWEAK:
-            version += "."+sitkTWEAK
-
-    if  sitkRC:
-        version += sitkRC
-
-    if sitkPOST:
-        version += ".post"+sitkPOST
-    elif sitkDEV:
-        version += ".dev"+sitkDEV
-
-    # Local Version Identifier
-    if sitkHASH and not "@SimpleITK_BUILD_DISTRIBUTE@" in ['1', 'ON']:
-        version += "+g"+sitkHASH
-
-    return version
+with open('@SimpleITK_SOURCE_DIR@/README.md', encoding='utf-8') as f:
+    long_description = f.read()
 
 class build_ext(_build_ext):
     """ Override standard command class to build an extension, to
@@ -70,18 +46,18 @@ class build_ext(_build_ext):
 
 
 setup(
-    name = 'SimpleITK',
-    version = get_pep386version(),
-    author = 'Insight Software Consortium',
+    name = 'SimpleElastix',
+    version = '0.0.1',
+    author = 'Insight Software Consortium & Kasper Marstal',
     author_email = 'insight-users@itk.org',
     ext_modules=[Extension('SimpleITK._SimpleITK', [r'@SimpleITK_BINARY_MODULE@'])],
-    packages= ['SimpleITK'],
+    packages= find_packages(),
     package_dir = {'SimpleITK':r'@SimpleITK_PYTHON_PACKAGE_DIR@'},
     data_files = [("", doc_files)],
     download_url = r'https://www.itk.org/SimpleITKDoxygen/html/PyDownloadPage.html',
     platforms = [],
-    description = r'SimpleITK is a simplified interface to the Insight Toolkit (ITK) for image registration and segmentation',
-    long_description  = 'SimpleITK provides an abstraction layer to ITK that enables developers \
+    description = r'SimpleElastix is an elastix extension of SimpleITK, a simplified interface to the Insight Toolkit (ITK) for image registration and segmentation',
+    long_description  = 'SimpleElastix adds the power of elastix to the SimpleITK package, that provides an abstraction layer to ITK that enables developers \
                          and users to access the powerful features of the InsightToolkit in an easy \
                          to use manner for biomedical image analysis.',
     classifiers=[
@@ -102,7 +78,12 @@ setup(
         "Operating System :: MacOS"
         ],
     license='Apache',
-    keywords = 'SimpleITK ITK InsightToolkit segmentation registration',
+    keywords = 'SimpleITK SimpleElastix Elastix ITK InsightToolkit segmentation registration',
     url = r'http://simpleitk.org/',
+    project_urls={
+        "Bug Tracker": "https://github.com/SimpleITK/SimpleITK/issues",
+        "Documentation": "https://simpleitk.readthedocs.io/en/release/",
+        "Source Code": "https://github.com/SimpleITK/SimpleITK",
+    },
     cmdclass={'build_ext':build_ext}
 )

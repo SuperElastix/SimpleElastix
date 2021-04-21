@@ -1,8 +1,42 @@
 /**
+<<<<<<< HEAD
 \mainpage  SimpleElastix
 
 \section intro Introduction
 Image registration is the process of transforming images into a common coordinate system so corresponding pixels represent homologous biological points. SimpleElastix is an extension of SimpleITK that offers a user-friendly API to the popular image registration algorithms of the elastix C++ library. This makes state-of-the-art medical image registration really easy to do in languages like Python, Java, C# and R. This package provides
+=======
+\mainpage  SimpleITK
+
+\image html simpleitk_logo.svg
+
+\section intro Introduction
+
+SimpleITK is a simplified programming interface to the algorithms and data structures of the Insight Toolkit (ITK) for image analysis.
+It supports interfaces for multiple programming languages including C++, Python, R, Java, C#, Lua, Ruby and TCL. These language
+bindings facilitate research, rapid software prototyping and education.
+
+The main characteristics of SimpleITK include:
+- C++ library
+- Object-oriented
+- Provides a simplified, easy-to-use, procedural interface
+- Is distributed under an open source Apache 2.0 License
+- Binary distributions for Python, C# and Java
+
+Toolkit development is overseen by the Insight Software Consortium,
+a non-profit, educational consortium dedicated to promoting and
+maintaining open-source, freely available software for medical image analysis.
+
+
+\section homepage Home Page
+
+The toolkit's home page can be found at :
+
+http://www.simpleitk.org
+
+The home page for the Insight toolkit can be found at :
+
+https://www.itk.org
+>>>>>>> originSimpleITK/master
 
 - elastix and transformix bindings for C++, Python, Java, R, Ruby, Octave, Lua, Tcl and C# (see elastix manual for a list of supported registration algorithms).
 - Pre-configured registration methods that work well in many cases and serve as starting points for tuning elastix to domain-specific applications.
@@ -10,11 +44,8 @@ Image registration is the process of transforming images into a common coordinat
 - A user-friendly API that aligns with the design philosophy of SimpleITK developed specifically for rapid prototyping. If you are interested, The Design of SimpleITK is a great read.
 - The complete set of SimpleITK image processing algorithms.
 
-This documentation describes the C++ API of the SimpleITK interface
-to the Insight Toolkit. The wrapped languages have a very similar
-interface, that should only be trivially different.  The
-Related Pages link presents interface conventions, user and
-developer information. Additionally the Example tab provides a
-variety of example of SimpleITK with different language bindings.
- */
+This documentation describes the SimpleITK C++ API.
+The wrapped languages have a very similar
+interface, that should only be trivially different.
+*/
 

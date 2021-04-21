@@ -36,10 +36,10 @@ class SITKCommon_EXPORT BSplineTransform
   : public Transform
 {
 public:
-  typedef BSplineTransform Self;
-  typedef Transform        Superclass;
+  using Self = BSplineTransform;
+  using Superclass = Transform;
 
-  virtual ~BSplineTransform();
+  ~BSplineTransform() override;
 
   explicit BSplineTransform(unsigned int dimensions, unsigned int order=3);
 
@@ -61,7 +61,7 @@ public:
   BSplineTransform &operator=( const BSplineTransform & );
 
   /** Name of this class */
-  std::string GetName() const { return std::string ("BSplineTransform"); }
+  std::string GetName() const override { return std::string ("BSplineTransform"); }
 
   /** parameters */
 
@@ -90,18 +90,16 @@ public:
 
 protected:
 
-  virtual void SetPimpleTransform( PimpleTransformBase *pimpleTransform );
+  void SetPimpleTransform( PimpleTransformBase *pimpleTransform ) override;
 
 private:
-
-  using Superclass::AddTransform;
 
   struct MyVisitor
   {
     itk::TransformBase *transform;
     BSplineTransform *that;
     template< typename TransformType >
-    void operator() ( void ) const
+    void operator() ( ) const
       {
         TransformType *t = dynamic_cast<TransformType*>(transform);
         if (t && (typeid(*t) == typeid(TransformType)))
