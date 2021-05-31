@@ -104,9 +104,8 @@ jobs:
 
     - name: Build Wheel
       run: |
-        cd SimpleElastix-build/SimpleITK-build
-        cmake --build . --target dist
-#        cmake -C SimpleITK-build dist
+        cd SimpleElastix-build
+        make -C SimpleITK-build dist
 
 
     - name: Prepare Artifacts Unix
