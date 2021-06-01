@@ -105,8 +105,8 @@ jobs:
     - name: Build Wheel
       run: |
         cd SimpleElastix-build
-        make -C SimpleITK-build dist
-
+        cmake --build . --target -GNinja dist
+        ninja
 
     - name: Prepare Artifacts Unix
       if: matrix.os != 'windows-2019'
