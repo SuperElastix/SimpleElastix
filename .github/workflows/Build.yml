@@ -103,7 +103,7 @@ jobs:
 
     - name: Build Wheel
       run: |
-        cd SimpleElastix-build
+        cd SimpleElastix-build/SimpleITK-build
         cmake --build . --target dist
         make --jobs=4
         
