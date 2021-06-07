@@ -105,7 +105,6 @@ jobs:
       run: |
         cd SimpleElastix-build/SimpleITK-build
         cmake --build . --target dist
-        make --jobs=4
         
     - name: Prepare Artifacts Unix
       if: matrix.os != 'windows-2019'
