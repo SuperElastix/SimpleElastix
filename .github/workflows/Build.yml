@@ -103,15 +103,18 @@ jobs:
 
     - name: Build Wheel
       run: |
-        cd SimpleElastix-build/SimpleITK-build
-        cmake --build . --target dist
+        cd SimpleElastix-build/SimpleITK-build/Wrapping/Python
+        cp SimpleITK/docs .
+        cp SimpleITK/_SimpleITK.so .
+        cp SimpleITK/SimpleITK.py .
+        python setup.py bdist_wheel
         
     - name: Prepare Artifacts Unix
       if: matrix.os != 'windows-2019'
       shell: bash
       run: |
         mkdir uploads
-        mv SimpleElastix-build/SimpleITK-build/Wrapping/Python uploads
+        mv SimpleElastix-build/SimpleITK-build/Wrapping/Python/dist uploads
 
     - name: Prepare Artifacts Windows
       if: matrix.os == 'windows-2019'
