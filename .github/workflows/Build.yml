@@ -104,7 +104,7 @@ jobs:
     - name: Build Wheel
       run: |
         cd SimpleElastix-build/SimpleITK-build/Wrapping/Python
-        cp SimpleITK/docs .
+        cp -r SimpleITK/docs .
         cp SimpleITK/_SimpleITK.so .
         cp SimpleITK/SimpleITK.py .
         python setup.py bdist_wheel
