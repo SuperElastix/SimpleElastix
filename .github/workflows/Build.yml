@@ -43,7 +43,7 @@ jobs:
             ELX_SOURCE_DIR: ../Elastix-source
             ELX_BUILD_DIR: ../Elastix-build
             cpSimpleITK: SimpleITK/_SimpleITK.dll
-            random_nr: 4
+            random_nr: 5
           - os: macos-10.15
             c-compiler: "clang"
             cxx-compiler: "clang++"
