@@ -1,0 +1,122 @@
+name: Elastix
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    # The CMake configure and build commands are platform agnostic and should work equally
+    # well on Windows or Mac.  You can convert this to a matrix build if you need
+    # cross-platform coverage.
+    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      max-parallel: 3
+      matrix:
+        os: [macos-10.15, ubuntu-18.04, windows-2019]
+        include:
+          - os: ubuntu-18.04
+            c-compiler: "gcc"
+            cxx-compiler: "g++"
+            itk-git-tag: "v5.2.0"
+            elastix-git-tag: "5.0.1"
+            cmake-build-type: "Release"
+            ANNLib: "libANNlib-5.0.so"
+            ANNLib2: "libANNlib-5.0.so.1"
+            ITK_SOURCE_DIR: ../ITK-source
+            ITK_BUILD_DIR: ../ITK-build
+            ELX_SOURCE_DIR: ../Elastix-source
+            ELX_BUILD_DIR: ../Elastix-build
+            cpSimpleITK: SimpleITK/_SimpleITK.so
+            random_nr: 5
+          - os: windows-2019
+            c-compiler: "cl.exe"
+            cxx-compiler: "cl.exe"
+            itk-git-tag: "v5.2.0"
+            elastix-git-tag: "5.0.1"
+            cmake-build-type: "Release"
+            ANNLib: "ANNlib-5.0.dll"
+            ITK_SOURCE_DIR: ../ITK-source
+            ITK_BUILD_DIR: ../ITK-build
+            ELX_SOURCE_DIR: ../Elastix-source
+            ELX_BUILD_DIR: ../Elastix-build
+            cpSimpleITK: SimpleITK/_SimpleITK.dll
+            random_nr: 5
+          - os: macos-10.15
+            c-compiler: "clang"
+            cxx-compiler: "clang++"
+            itk-git-tag: "v5.2.0"
+            elastix-git-tag: "5.0.1"
+            cmake-build-type: "Release"
+            ANNLib: "libANNlib-5.0.1.dylib"
+            ANNLib2: "libANNlib-5.0.dylib"
+            ITK_SOURCE_DIR: ../ITK-source
+            ITK_BUILD_DIR: ../ITK-build
+            ELX_SOURCE_DIR: ../Elastix-source
+            ELX_BUILD_DIR: ../Elastix-build
+            cpSimpleITK: SimpleITK/_SimpleITK.so
+            random_nr: 5
+
+    steps:
+    - uses: actions/checkout@v2
+  
+    - uses: actions/cache@v2
+      id: cache_simpleelastix
+      with:
+        path: |
+          SEb
+        key: ${{ matrix.os }}-${{ matrix.cmake-build-type }}-${{ matrix.random_nr }}
+
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.8
+
+    - name: Install build dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install ninja
+        python -m pip install setuptools
+        python -m pip install scikit-ci-addons
+        python -m pip install wheel
+    - name: Get specific version of CMake, Ninja
+      uses: lukka/get-cmake@v3.18.3
+
+    - name: Build SimpleElastix Unix
+      if: matrix.os != 'windows-2019' && steps.cache_simpleelastix.outputs.cache-hit != 'true'
+      run: |
+        export CXXFLAGS="$CXXFLAGS -fPIC"
+        mkdir SEb
+        cd SEb
+        cmake -DWRAP_LUA:BOOL=OFF -DWRAP_PYTHON:BOOL=ON -DWRAP_JAVA:BOOL=OFF -DWRAP_CSHARP:BOOL=OFF -DWRAP_TCL:BOOL=OFF -DWRAP_R:BOOL=OFF -DWRAP_RUBY:BOOL=OFF -DBUILD_EXAMPLES:BOOL=OFF -DBUILD_TESTING:BOOL=OFF -DCMAKE_CXX_FLAGS=-w -DCMAKE_C_FLAGS=-w -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DSimpleITK_USE_SYSTEM_ITK:BOOL=OFF -DSimpleITK_USE_SYSTEM_ELASTIX:BOOL=OFF -DSimpleITK_4D_IMAGES:BOOL=OFF -v ../SuperBuild &&
+        make --jobs=4
+        
+    - name: Build SimpleElastix Windows
+      if: matrix.os == 'windows-2019' && steps.cache_simpleelastix.outputs.cache-hit != 'true'
+      shell: cmd
+      run: |
+        call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+        mkdir SEb
+        cd SEb
+        cmake -DWRAP_LUA:BOOL=OFF -DWRAP_PYTHON:BOOL=ON -DWRAP_JAVA:BOOL=OFF -DWRAP_CSHARP:BOOL=OFF -DWRAP_TCL:BOOL=OFF -DWRAP_R:BOOL=OFF -DWRAP_RUBY:BOOL=OFF -DBUILD_EXAMPLES:BOOL=OFF -DBUILD_TESTING:BOOL=OFF -DCMAKE_CXX_FLAGS=-w -DCMAKE_C_FLAGS=-w -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DSimpleITK_USE_SYSTEM_ITK:BOOL=OFF -DSimpleITK_USE_SYSTEM_ELASTIX:BOOL=OFF -DSimpleITK_4D_IMAGES:BOOL=OFF -v -GNinja ../SuperBuild
+        ninja
+        
+    - name: Build Wheel
+      run: |
+        cd SEb/SimpleITK-build/Wrapping/Python
+        cp -r SimpleITK/docs .
+        cp ${{ matrix.cpSimpleITK }} .
+        cp SimpleITK/SimpleITK.py .
+        cp SimpleITK/__init__.py .
+        python setup.py bdist_wheel
+        
+    - name: Prepare Artifacts
+      shell: bash
+      run: |
+        mkdir uploads
+        mv SEb/SimpleITK-build/Wrapping/Python/dist uploads
+    - name: Publish Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: "${{ matrix.os }}"
+        path: uploads
