@@ -13,7 +13,8 @@ jobs:
     strategy:
       max-parallel: 3
       matrix:
-        os: [macos-10.15, ubuntu-18.04, windows-2019]
+        os: [macos-10.15, ubuntu-18.04]
+        # os: [macos-10.15, ubuntu-18.04, windows-2019]
         include:
           - os: ubuntu-18.04
             c-compiler: "gcc"
@@ -29,19 +30,19 @@ jobs:
             ELX_BUILD_DIR: ../Elastix-build
             cpSimpleITK: SimpleITK/_SimpleITK.so
             random_nr: 6
-          - os: windows-2019
-            c-compiler: "cl.exe"
-            cxx-compiler: "cl.exe"
-            itk-git-tag: "v5.2.0"
-            elastix-git-tag: "5.0.1"
-            cmake-build-type: "Release"
-            ANNLib: "ANNlib-5.0.dll"
-            ITK_SOURCE_DIR: ../ITK-source
-            ITK_BUILD_DIR: ../ITK-build
-            ELX_SOURCE_DIR: ../Elastix-source
-            ELX_BUILD_DIR: ../Elastix-build
-            cpSimpleITK: SimpleITK/_SimpleITK.dll
-            random_nr: 6
+          # - os: windows-2019
+          #   c-compiler: "cl.exe"
+          #   cxx-compiler: "cl.exe"
+          #   itk-git-tag: "v5.2.0"
+          #   elastix-git-tag: "5.0.1"
+          #   cmake-build-type: "Release"
+          #   ANNLib: "ANNlib-5.0.dll"
+          #   ITK_SOURCE_DIR: ../ITK-source
+          #   ITK_BUILD_DIR: ../ITK-build
+          #   ELX_SOURCE_DIR: ../Elastix-source
+          #   ELX_BUILD_DIR: ../Elastix-build
+          #   cpSimpleITK: SimpleITK/_SimpleITK.dll
+          #   random_nr: 6
           - os: macos-10.15
             c-compiler: "clang"
             cxx-compiler: "clang++"
