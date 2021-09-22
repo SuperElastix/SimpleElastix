@@ -8,16 +8,6 @@ trigger:
      exclude:
        - '*'
 pr: none
-<<<<<<< HEAD
-schedules:
-- cron: "0 3 * * *" # 10 pm EST->UTC
-  displayName: Daily build
-  branches:
-    include:
-    - develop
-  always: false
-=======
->>>>>>> originSimpleITK/master
 
 # Scheduled builds on master to build the "latest" are configure through the AZP GUI.
 
@@ -25,7 +15,7 @@ jobs:
   - job: Configure
     displayName: Configure Variables
     pool:
-      vmImage: 'Ubuntu-16.04'
+      vmImage: 'ubuntu-latest'
     steps:
       - checkout: none
       - bash: |
@@ -43,8 +33,6 @@ jobs:
       PYTHON_ARCH: x64
       CMAKE_PLATFORM: x64
       VCVAR_OPTIONS: amd64
-<<<<<<< HEAD
-=======
   - job: Doxygen
     dependsOn: Configure
     condition: ne( variables['configure.doxygen'], 'true' )
@@ -69,4 +57,3 @@ jobs:
         inputs:
           pathtoPublish: $(Build.ArtifactStagingDirectory)/Doxygen
           artifactName: Doxygen
->>>>>>> originSimpleITK/master

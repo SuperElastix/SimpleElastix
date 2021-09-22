@@ -495,6 +495,16 @@ namespace simple
     /** \brief Get the percentage of pixels used for metric evaluation.  */
     const std::vector<double> &GetMetricSamplingPercentagePerLevel() const;
 
+    /** \brief Sampling strategies for obtaining points.
+     *
+     * - NONE: use all voxels, sampled points are the voxel centers.
+     * - REGULAR: sample every n-th voxel while traversing the image
+     *            in scan-line order, then within each voxel randomly
+     *            perturb from center.
+     * - RANDOM: sample image voxels with replacement using a uniform
+     *           distribution, then within each voxel randomly perturb
+     *           from center.
+     */
     enum MetricSamplingStrategyType {
       NONE,
       REGULAR,
@@ -623,6 +633,17 @@ namespace simple
       */
     std::string GetOptimizerStopConditionDescription() const;
 
+
+    /** Stop Registration if actively running.
+     *
+     * This is an active method which can be called during a callback. Invoking this method will halt the registration
+     * at the current iteration, if supported by the optimizer. The LBFGSB, LBFGS2, and the Amoeba optimizers do not
+     * support user stopping.
+     *
+     * If user stopping is not supported or the optimizer is available ( not executed ), then false will be returned.
+     */
+    bool StopRegistration();
+
   protected:
 
     template<class TImage>
@@ -677,6 +698,7 @@ namespace simple
     std::function<uint64_t()> m_pfGetMetricNumberOfValidPoints;
     std::function<std::vector<double>()> m_pfGetOptimizerScales;
     std::function<std::string()> m_pfGetOptimizerStopConditionDescription;
+    std::function<void()> m_pfOptimizerStopRegistration;
 
 
     std::function<unsigned int()> m_pfGetCurrentLevel;

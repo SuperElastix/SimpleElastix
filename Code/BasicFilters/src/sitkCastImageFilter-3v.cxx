@@ -33,7 +33,6 @@ void CastImageFilter::RegisterMemberFactory3v()
 
   // basic to vector
   m_DualMemberFactory->RegisterMemberFunctions<BasicPixelIDTypeList, VectorPixelIDTypeList, 3, ToVectorAddressor<MemberFunctionType> > ();
-
 }
 
 } // end namespace simple

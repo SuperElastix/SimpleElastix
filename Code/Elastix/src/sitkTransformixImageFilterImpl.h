@@ -6,7 +6,7 @@
 #include "sitkMemberFunctionFactory.h"
 
 // Transformix
-#include "elxTransformixFilter.h"
+#include "itkTransformixFilter.h"
 #include "elxParameterObject.h"
 
 namespace itk { 

@@ -257,9 +257,6 @@ function(sitk_add_r_test name)
       ${command}
       ${ARGN}
     )
-  set_property(TEST R.${name}
-    PROPERTY LABELS R
-    )
 
   set_property(TEST R.${name}
     PROPERTY LABELS R

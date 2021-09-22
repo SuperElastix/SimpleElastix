@@ -59,7 +59,7 @@ include( sitkSITKLegacyNaming )
 include( sitkForbidDownloadsOption )
 include( sitkTargetUseITK )
 
-find_package(ITK REQUIRED PATHS ./ITK-build)
+find_package(ITK REQUIRED )
 #we require certain packages be turned on in ITK
 include(sitkCheckForITKModuleDependencies)
 
@@ -89,7 +89,7 @@ list(APPEND SimpleITK_PRIVATE_COMPILE_OPTIONS ${CXX_ADDITIONAL_WARNING_FLAGS})
 find_package(Elastix REQUIRED)
 include(${ELASTIX_USE_FILE})
 
-if(${ELASTIX_USE_OPENMP})
+if(ELASTIX_USE_OPENMP)
   find_package(OpenMP QUIET)
   if( OPENMP_FOUND )
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
@@ -98,7 +98,7 @@ if(${ELASTIX_USE_OPENMP})
 endif()
 
 # Check if libraries are available
-if(${ELASTIX_BUILD_EXECUTABLE})
+if(ELASTIX_BUILD_EXECUTABLE)
   message(FATAL_ERROR "SimpleElastix requires elastix libraries, please set ELASTIX_BUILD_EXECUTABLE=OFF and rebuild elastix.")
 endif()
 

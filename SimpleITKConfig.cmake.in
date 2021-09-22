@@ -68,7 +68,7 @@ if(NOT ELASTIX_CONFIG_TARGETS_FILE)
   if("@SimpleITKConfig_TREE@" STREQUAL "build")
     set(ELASTIX_CONFIG_TARGETS_FILE "@Elastix_DIR@/ElastixTargets.cmake")
   else()
-    find_package(Elastix "@ELASTIX_VERSION@" EXACT REQUIRED)
+    find_package(Elastix "@Elastix_VERSION@" EXACT REQUIRED)
   endif()
 endif()
 

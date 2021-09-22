@@ -124,13 +124,8 @@ public:
 
 };
 
-<<<<<<< HEAD
-TEST_F( Image4D, Create ) {
-  ASSERT_TRUE ( shortImage->GetITKBase() != NULL );
-=======
 TEST_F(Image4D,Create) {
   ASSERT_NE ( shortImage->GetITKBase(), nullptr );
->>>>>>> originSimpleITK/master
   EXPECT_EQ ( shortImage->GetWidth(), itkShortImage->GetLargestPossibleRegion().GetSize()[0] ) << " Checking image width";
   EXPECT_EQ ( shortImage->GetHeight(), itkShortImage->GetLargestPossibleRegion().GetSize()[1] ) << " Checking image height";
   EXPECT_EQ ( shortImage->GetDepth(), itkShortImage->GetLargestPossibleRegion().GetSize()[2] ) << " Checking image depth";
@@ -138,7 +133,7 @@ TEST_F(Image4D,Create) {
 
 }
 
-TEST_F( Image4D, ImageDataType ) {
+TEST_F(Image4D,ImageDataType) {
 
   // this test checks that the DataType of the images are correct
   int result;
@@ -191,7 +186,7 @@ TEST_F( Image4D, ImageDataType ) {
 
 }
 
-TEST_F( Image4D, Constructors ) {
+TEST_F(Image4D,Constructors) {
   itk::simple::HashImageFilter hasher;
   int result;
 
@@ -293,7 +288,7 @@ TEST_F( Image4D, Constructors ) {
 
 }
 
-TEST_F (Image4D,Transforms ) {
+TEST_F(Image4D,Transforms) {
 
   // Origin is [0.0, 1.1, 2.2, 3.3]
   // Spacing is [10, 11, 12, 13]
@@ -325,7 +320,7 @@ TEST_F (Image4D,Transforms ) {
   }
 }
 
-TEST_F( Image4D,Properties ) {
+TEST_F(Image4D,Properties) {
 
   // GetOrigin
   std::vector<double> origin = shortImage->GetOrigin();
@@ -396,7 +391,7 @@ TEST_F( Image4D,Properties ) {
 
 namespace sitk = itk::simple;
 
-TEST_F( Image4D, CopyInformation )
+TEST_F(Image4D, CopyInformation)
 {
   std::vector<unsigned int> s4d(4,10);
   sitk::Image img1d( 10, 20, sitk::sitkFloat32 );
@@ -422,7 +417,7 @@ TEST_F( Image4D, CopyInformation )
 
 }
 
-TEST_F( Image4D, CopyOnWrite )
+TEST_F(Image4D, CopyOnWrite)
 {
   std::vector<unsigned int> s4d(4,10);
   // test that a just constructed image only have 1 referecne
@@ -466,7 +461,7 @@ TEST_F( Image4D, CopyOnWrite )
 }
 
 
-TEST_F( Image4D, IO )
+TEST( IO, Image4D )
 {
   // Image
 

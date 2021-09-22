@@ -186,11 +186,6 @@ void itk::HolderCommand< T * >::Set(ObjectType *object)
 public ";
 
 
-%typemap(javaimports) itk::Image "/**
-C++ includes: sitkPixelIDTypes.h
-*/"
-
-
 %typemap(javaimports) itk::ImageIOFactoryRegisterManager "/**
 C++ includes: itkImageIOFactoryRegisterManager.h
 */"
@@ -6900,223 +6895,6 @@ public ";
 
 %javamethodmodifiers  itk::simple::ClosingByReconstructionImageFilter::~ClosingByReconstructionImageFilter "/**
 virtual itk::simple::ClosingByReconstructionImageFilter::~ClosingByReconstructionImageFilter()
-
-Destructor
-
-*/
-public ";
-
-
-%typemap(javaimports) itk::simple::CoherenceEnhancingDiffusionImageFilter "/**
-
-Coherence enhanging diffusion and edge enhancing diffusion.
-
-
-Implementation of Coherence Enhancing Diffusion (CED), and Edge
-Enhancing Diffusion (EED), as described by Weickert.
-
-CED heuristically smoothes everywhere except accross image contours,
-while EED smoothes nowhere but tangentially to image contours.
-
-The non-linear diffusion tensor is defined in terms of the structure
-tensor.
-
-Denote by $\\\\mu_i$ the structure tensor eigenvalues, at a given point $x$ , with $0\\\\leq i < d$ . Let also $\\\\mu_{\\\\rm min}$ and $\\\\mu_{\\\\rm max}$ , be the smallest and largest eigenvalues respectively. The diffusion
-tensor is defined by the same eigenvectors, but with modified with
-eigenvalues $\\\\lambda_i$ .
-
-Coherence Enhancing Diffusion:
-
-$\\\\lambda_i := g(\\\\mu_i - \\\\mu_{\\\\rm min})$ , where $g(s) = 1 - (1-\\\\alpha)*exp(-(\\\\lambda/s)^m)$
-
-Note the limit values $g(0) = 1$ , $g(\\\\infty) = \\\\alpha$ .
-
-Edge enhancing diffusion:
-
-$\\\\lambda_i := g(\\\\mu_{\\\\rm max} - \\\\mu_i)$ , where $g(s) = \\\\alpha + (1-\\\\alpha)*exp(-(\\\\lambda/s)^m)$
-
-Note the limit values $g(0) = \\\\alpha$ , $g(\\\\infty) = 1$ .
-See:
- itk::simple::CoherenceEnhancingDiffusion for the procedural interface
-
- itk::CoherenceEnhancingDiffusionImageFilter for the Doxygen on the original ITK class.
-
-
-C++ includes: sitkCoherenceEnhancingDiffusionImageFilter.h
-*/"
-
-%javamethodmodifiers  itk::simple::CoherenceEnhancingDiffusionImageFilter::AdimensionizeOff "/**
-Self& itk::simple::CoherenceEnhancingDiffusionImageFilter::AdimensionizeOff()
-*/
-public ";
-
-%javamethodmodifiers  itk::simple::CoherenceEnhancingDiffusionImageFilter::AdimensionizeOn "/**
-Self& itk::simple::CoherenceEnhancingDiffusionImageFilter::AdimensionizeOn()
-
-Set the value of Adimensionize to true or false respectfully.
-
-*/
-public ";
-
-%javamethodmodifiers  itk::simple::CoherenceEnhancingDiffusionImageFilter::CoherenceEnhancingDiffusionImageFilter "/**
-itk::simple::CoherenceEnhancingDiffusionImageFilter::CoherenceEnhancingDiffusionImageFilter()
-
-Default Constructor that takes no arguments and initializes default
-parameters
-
-*/
-public ";
-
-%javamethodmodifiers  itk::simple::CoherenceEnhancingDiffusionImageFilter::Execute "/**
-Image itk::simple::CoherenceEnhancingDiffusionImageFilter::Execute(const Image &image1)
-
-Execute the filter on the input image
-
-*/
-public ";
-
-%javamethodmodifiers  itk::simple::CoherenceEnhancingDiffusionImageFilter::Execute "/**
-Image itk::simple::CoherenceEnhancingDiffusionImageFilter::Execute(const Image &image1, double diffusionTime, double lambda,
-CoherenceEnhancingDiffusionImageFilter::EnhancementType enhancement,
-double noiseScale, double featureScale, double exponent, double alpha,
-double ratioToMaxStableTimeStep, uint8_t
-maxTimeStepsBetweenTensorUpdates, bool adimensionize)
-
-Execute the filter on the input image with the given parameters
-
-*/
-public ";
-
-%javamethodmodifiers  itk::simple::CoherenceEnhancingDiffusionImageFilter::GetAdimensionize "/**
-bool itk::simple::CoherenceEnhancingDiffusionImageFilter::GetAdimensionize() const
-*/
-public ";
-
-%javamethodmodifiers  itk::simple::CoherenceEnhancingDiffusionImageFilter::GetAlpha "/**
-double itk::simple::CoherenceEnhancingDiffusionImageFilter::GetAlpha() const
-*/
-public ";
-
-%javamethodmodifiers  itk::simple::CoherenceEnhancingDiffusionImageFilter::GetDiffusionTime "/**
-double itk::simple::CoherenceEnhancingDiffusionImageFilter::GetDiffusionTime() const
-*/
-public ";
-
-%javamethodmodifiers  itk::simple::CoherenceEnhancingDiffusionImageFilter::GetEnhancement "/**
-EnhancementType itk::simple::CoherenceEnhancingDiffusionImageFilter::GetEnhancement() const
-*/
-public ";
-
-%javamethodmodifiers  itk::simple::CoherenceEnhancingDiffusionImageFilter::GetExponent "/**
-double itk::simple::CoherenceEnhancingDiffusionImageFilter::GetExponent() const
-*/
-public ";
-
-%javamethodmodifiers  itk::simple::CoherenceEnhancingDiffusionImageFilter::GetFeatureScale "/**
-double itk::simple::CoherenceEnhancingDiffusionImageFilter::GetFeatureScale() const
-*/
-public ";
-
-%javamethodmodifiers  itk::simple::CoherenceEnhancingDiffusionImageFilter::GetLambda "/**
-double itk::simple::CoherenceEnhancingDiffusionImageFilter::GetLambda() const
-*/
-public ";
-
-%javamethodmodifiers  itk::simple::CoherenceEnhancingDiffusionImageFilter::GetMaxTimeStepsBetweenTensorUpdates "/**
-uint8_t itk::simple::CoherenceEnhancingDiffusionImageFilter::GetMaxTimeStepsBetweenTensorUpdates() const
-*/
-public ";
-
-%javamethodmodifiers  itk::simple::CoherenceEnhancingDiffusionImageFilter::GetName "/**
-std::string itk::simple::CoherenceEnhancingDiffusionImageFilter::GetName() const
-
-Name of this class
-
-*/
-public ";
-
-%javamethodmodifiers  itk::simple::CoherenceEnhancingDiffusionImageFilter::GetNoiseScale "/**
-double itk::simple::CoherenceEnhancingDiffusionImageFilter::GetNoiseScale() const
-*/
-public ";
-
-%javamethodmodifiers  itk::simple::CoherenceEnhancingDiffusionImageFilter::GetRatioToMaxStableTimeStep "/**
-double itk::simple::CoherenceEnhancingDiffusionImageFilter::GetRatioToMaxStableTimeStep() const
-*/
-public ";
-
-%javamethodmodifiers  itk::simple::CoherenceEnhancingDiffusionImageFilter::SetAdimensionize "/**
-Self& itk::simple::CoherenceEnhancingDiffusionImageFilter::SetAdimensionize(bool Adimensionize)
-*/
-public ";
-
-%javamethodmodifiers  itk::simple::CoherenceEnhancingDiffusionImageFilter::SetAlpha "/**
-Self& itk::simple::CoherenceEnhancingDiffusionImageFilter::SetAlpha(double Alpha)
-
-Exponent m involved in the function g defining eigenvalues.
-
-*/
-public ";
-
-%javamethodmodifiers  itk::simple::CoherenceEnhancingDiffusionImageFilter::SetDiffusionTime "/**
-Self& itk::simple::CoherenceEnhancingDiffusionImageFilter::SetDiffusionTime(double DiffusionTime)
-*/
-public ";
-
-%javamethodmodifiers  itk::simple::CoherenceEnhancingDiffusionImageFilter::SetEnhancement "/**
-Self& itk::simple::CoherenceEnhancingDiffusionImageFilter::SetEnhancement(EnhancementType Enhancement)
-
-Switch between CED, EED, and variants.
-
-*/
-public ";
-
-%javamethodmodifiers  itk::simple::CoherenceEnhancingDiffusionImageFilter::SetExponent "/**
-Self& itk::simple::CoherenceEnhancingDiffusionImageFilter::SetExponent(double Exponent)
-
-Exponent m involved in the function g defining eigenvalues.
-
-*/
-public ";
-
-%javamethodmodifiers  itk::simple::CoherenceEnhancingDiffusionImageFilter::SetFeatureScale "/**
-Self& itk::simple::CoherenceEnhancingDiffusionImageFilter::SetFeatureScale(double FeatureScale)
-*/
-public ";
-
-%javamethodmodifiers  itk::simple::CoherenceEnhancingDiffusionImageFilter::SetLambda "/**
-Self& itk::simple::CoherenceEnhancingDiffusionImageFilter::SetLambda(double Lambda)
-
-Exponent m involved in the function g defining eigenvalues.
-
-*/
-public ";
-
-%javamethodmodifiers  itk::simple::CoherenceEnhancingDiffusionImageFilter::SetMaxTimeStepsBetweenTensorUpdates "/**
-Self& itk::simple::CoherenceEnhancingDiffusionImageFilter::SetMaxTimeStepsBetweenTensorUpdates(uint8_t MaxTimeStepsBetweenTensorUpdates)
-*/
-public ";
-
-%javamethodmodifiers  itk::simple::CoherenceEnhancingDiffusionImageFilter::SetNoiseScale "/**
-Self& itk::simple::CoherenceEnhancingDiffusionImageFilter::SetNoiseScale(double NoiseScale)
-*/
-public ";
-
-%javamethodmodifiers  itk::simple::CoherenceEnhancingDiffusionImageFilter::SetRatioToMaxStableTimeStep "/**
-Self& itk::simple::CoherenceEnhancingDiffusionImageFilter::SetRatioToMaxStableTimeStep(double RatioToMaxStableTimeStep)
-*/
-public ";
-
-%javamethodmodifiers  itk::simple::CoherenceEnhancingDiffusionImageFilter::ToString "/**
-std::string itk::simple::CoherenceEnhancingDiffusionImageFilter::ToString() const
-
-Print ourselves out
-
-*/
-public ";
-
-%javamethodmodifiers  itk::simple::CoherenceEnhancingDiffusionImageFilter::~CoherenceEnhancingDiffusionImageFilter "/**
-virtual itk::simple::CoherenceEnhancingDiffusionImageFilter::~CoherenceEnhancingDiffusionImageFilter()
 
 Destructor
 
@@ -21810,10 +21588,9 @@ public ";
 %javamethodmodifiers  itk::simple::IsolatedConnectedImageFilter::SetSeed1 "/**
 Self& itk::simple::IsolatedConnectedImageFilter::SetSeed1(std::vector< unsigned int > Seed1)
 
-     Set a single seed point 1.
-
-This seed will be isolated from Seed2 (if possible). All pixels
-connected to this seed will be replaced with ReplaceValue.
+DeprecatedSet seed point 1. This seed will be isolated from Seed2 (if
+possible). All pixels connected to this seed will be replaced with
+ReplaceValue. This method is deprecated, please use AddSeed1() .
 
 */
 public ";
@@ -21821,9 +21598,8 @@ public ";
 %javamethodmodifiers  itk::simple::IsolatedConnectedImageFilter::SetSeed2 "/**
 Self& itk::simple::IsolatedConnectedImageFilter::SetSeed2(std::vector< unsigned int > Seed2)
 
-     Set a single seed point 2.
-
-This seed will be isolated from Seed1 (if possible).
+DeprecatedSet seed point 2. This seed will be isolated from Seed1 (if
+possible). This method is deprecated, please use AddSeed2() .
 
 */
 public ";
@@ -27413,7 +27189,6 @@ See:
  itk::simple::MaskNegated for the procedural interface
 
  itk::MaskNegatedImageFilter for the Doxygen on the original ITK class.
-
 
 
 C++ includes: sitkMaskNegatedImageFilter.h
@@ -34760,11 +34535,8 @@ de Jouy-en-Josas, France. https://hdl.handle.net/1926/153
 See:
  RegionalMaximaImageFilter
 
-<<<<<<< HEAD
-=======
  ValuedRegionalMinimaImageFilter
 
->>>>>>> v1.0.1
  HConcaveImageFilter
 
  itk::simple::RegionalMinima for the procedural interface
@@ -37992,7 +37764,6 @@ $ I = \\\\frac{N(I_0 \\\\times s)}{s} $
 
 where $ s $ is the scale factor.
  The Poisson-distributed variable $ \\\\lambda $ is computed by using the algorithm:
-<<<<<<< HEAD
 
 
 $ \\\\begin{array}{l} k \\\\leftarrow 0 \\\\\\\\ p \\\\leftarrow 1
@@ -38007,22 +37778,6 @@ approximated by a Gaussian distribution of mean and variance $ \\\\lambda $ when
 be 50. This leads to the faster algorithm:
 
 
-=======
-
-
-$ \\\\begin{array}{l} k \\\\leftarrow 0 \\\\\\\\ p \\\\leftarrow 1
-\\\\\\\\ \\\\textbf{repeat} \\\\\\\\ \\\\left\\\\{ \\\\begin{array}{l}
-k \\\\leftarrow k+1 \\\\\\\\ p \\\\leftarrow p \\\\ast U()
-\\\\end{array} \\\\right. \\\\\\\\ \\\\textbf{until } p >
-e^{\\\\lambda} \\\\\\\\ \\\\textbf{return} (k) \\\\end{array} $
-
-where $ U() $ provides a uniformly distributed random variable in the interval $ [0,1] $ .
- This algorithm is very inefficient for large values of $ \\\\lambda $ , though. Fortunately, the Poisson distribution can be accurately
-approximated by a Gaussian distribution of mean and variance $ \\\\lambda $ when $ \\\\lambda $ is large enough. In this implementation, this value is considered to
-be 50. This leads to the faster algorithm:
-
-
->>>>>>> v1.0.1
 $ \\\\lambda + \\\\sqrt{\\\\lambda} \\\\times N()$
 
 where $ N() $ is a normally distributed random variable of mean 0 and variance 1.

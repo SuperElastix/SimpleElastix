@@ -7,7 +7,7 @@
 #include "sitkDualMemberFunctionFactory.h"
 
 // Elastix
-#include "elxElastixFilter.h"
+#include "itkElastixRegistrationMethod.h"
 #include "elxParameterObject.h"
 
 namespace itk { 

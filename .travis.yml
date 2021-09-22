@@ -20,7 +20,7 @@ cache:
     - ${ITK_BUILD_DIR}
     - ${ELASTIX_SOURCE_DIR}
     - ${ELASTIX_BUILD_DIR}
-
+    
 matrix:
   include:
     - os: linux
@@ -57,7 +57,7 @@ script:
       mkdir -p ${ELASTIX_BUILD_DIR} &&
       cd ${ELASTIX_BUILD_DIR} &&
       cmake -DBUILD_TESTING:BOOL=OFF -DELASTIX_BUILD_EXECUTABLE:BOOL=OFF -DITK_DIR=${ITK_BUILD_DIR} -DCMAKE_BUILD_TYPE=Release ${ELASTIX_SOURCE_DIR} &&
-      make --jobs=4 &&
+      make --jobs=4 && 
       touch ${HOME}/built_cache; fi
   - cd ${SIMPLEELASTIX_BUILD_DIR}
   - if [[ ! -e ${HOME}/built_cache ]]; then

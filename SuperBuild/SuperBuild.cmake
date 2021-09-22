@@ -151,9 +151,9 @@ include(sitkMaxDimensionOption)
 # Setup build type
 #------------------------------------------------------------------------------
 
-# By default, let's build as Release
+# By default, let's build as Debug
 if(NOT DEFINED CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Release")
+  set(CMAKE_BUILD_TYPE "Debug")
 endif()
 
 # let a dashboard override the default.
@@ -326,11 +326,11 @@ endif()
 #------------------------------------------------------------------------------
 # Swig
 #------------------------------------------------------------------------------
-option ( SimpleITK_USE_SYSTEM_SWIG "Use a pre-compiled version of SWIG 3.0 previously configured for your system" OFF )
+option ( SimpleITK_USE_SYSTEM_SWIG "Use a pre-compiled version of SWIG 4.0 previously configured for your system" OFF )
 sitk_legacy_naming( SimpleITK_USE_SYSTEM_SWIG USE_SYSTEM_SWIG )
 mark_as_advanced(SimpleITK_USE_SYSTEM_SWIG)
 if(SimpleITK_USE_SYSTEM_SWIG)
-  find_package ( SWIG 3 REQUIRED )
+  find_package ( SWIG 4 REQUIRED )
 else()
   include(External_Swig)
   list(APPEND ${CMAKE_PROJECT_NAME}_DEPENDENCIES Swig)
@@ -483,7 +483,6 @@ ExternalProject_Add(${proj}
   CMAKE_GENERATOR ${gen}
   CMAKE_ARGS
     --no-warn-unused-cli
-    -DCMAKE_TOOLCHAIN_FILE:FILEPATH=${CMAKE_TOOLCHAIN_FILE}
     -C "${CMAKE_CURRENT_BINARY_DIR}/SimpleITK-build/CMakeCacheInit.txt"
     ${ep_simpleitk_args}
     ${ep_common_args}
@@ -495,19 +494,19 @@ ExternalProject_Add(${proj}
     -DCMAKE_RUNTIME_OUTPUT_DIRECTORY:PATH=<BINARY_DIR>/bin
     -DCMAKE_BUNDLE_OUTPUT_DIRECTORY:PATH=<BINARY_DIR>/bin
     ${ep_languages_args}
+    # ITK
     -DITK_DIR:PATH=${ITK_DIR}
     -DElastix_DIR:PATH=${Elastix_DIR}
     -DSWIG_DIR:PATH=${SWIG_DIR}
     -DSWIG_EXECUTABLE:PATH=${SWIG_EXECUTABLE}
     -DBUILD_TESTING:BOOL=${BUILD_TESTING}
-    -DWRAP_LUA:BOOL=0
+    -DWRAP_LUA:BOOL=${WRAP_LUA}
     -DWRAP_PYTHON:BOOL=${WRAP_PYTHON}
-    -DWRAP_RUBY:BOOL=0
-    -DWRAP_JAVA:BOOL=0
-    -DWRAP_TCL:BOOL=0
-    -DWRAP_CSHARP:BOOL=0
+    -DWRAP_RUBY:BOOL=${WRAP_RUBY}
+    -DWRAP_JAVA:BOOL=${WRAP_JAVA}
+    -DWRAP_TCL:BOOL=${WRAP_TCL}
+    -DWRAP_CSHARP:BOOL=${WRAP_CSHARP}
     -DWRAP_R:BOOL=${WRAP_R}
-    -DWRAP_NODE:BOOL=0
     -DBUILD_EXAMPLES:BOOL=${BUILD_TESTING}
   DEPENDS ${${CMAKE_PROJECT_NAME}_DEPENDENCIES}
   ${External_Project_USES_TERMINAL}

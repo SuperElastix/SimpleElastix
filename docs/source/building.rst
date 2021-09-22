@@ -3,7 +3,6 @@
 Building SimpleITK
 ******************
 
-
 Pre-built binaries (see :ref:`Downloading the binaries
 <installation-binaries>`) are available in many cases so
 users do not need to build SimpleITK. However, there are
@@ -45,6 +44,20 @@ To build SimpleITK you need:
 
 -  The R interface requires R version 3.3 or greater.
 
+System Requirements
+===================
+Building SimpleITK requires a significant amount of compute power, and we
+recommend a reasonably powerful, modern computer.  We suggest at least 4
+gigabytes (GB) of RAM plus an additional 2 GB per thread when building with
+multiple threads.  We also suggest a system with at least 4 cores for
+multithreaded compilation.
+
+Building a SuperBuild of SimpleITK's C++ core including all the testing and
+example code requires approximately 10 GB of disk space.  Enabling the
+wrapping of Python or R can add 2 GB per language, and enabling the
+wrapping of all the languages SimpleITK supports, can bring the entire
+build folder to 16 GB.
+
 Recipes / Formulas / Short cuts
 ===============================
 
@@ -71,6 +84,7 @@ building of SimpleITK (see their repository for more details):
    a SimpleITK rockspec is available at the `Luarocks repository <https://luarocks.org/modules/dave3d/simpleitk>`__
    or from `this GitHub repository <https://github.com/SimpleITK/SimpleITKLuaRock>`__.
 
+.. _source_code:
 
 Source code
 ===========
@@ -101,7 +115,7 @@ First obtain the SimpleITK source code:
 .. _building_superbuild:
 
 Building using SuperBuild
--------------------------
+=========================
 
 After downloading SimpleITK's source code we **STRONGLY** recommend
 running cmake on the SuperBuild subdirectory of SimpleITK. Execute the
@@ -137,9 +151,13 @@ important to use the appropriate flags to enable multi-process
 compilation i.e. "-j" for make, "/MP" for Visual Studio, or use the
 CMake `Ninja <https://ninja-build.org>`__ generator.
 
+For **building SimpleITK on Windows** using the CMake GUI see:
+
+.. toctree::
+  buildingWindows.rst
 
 Building Manually
------------------
+=================
 
 By not using the superbuild, you must manually specify all dependencies
 used during the building of SimpleITK instead of using the known
@@ -151,7 +169,7 @@ External CMake files in the Superbuild sub-directory.
 
 
 Additional Prerequisites
-^^^^^^^^^^^^^^^^^^^^^^^^
+------------------------
 
 The following are dependencies you will need when not using the SuperBuild:
 
@@ -173,7 +191,7 @@ The following are dependencies you will need when not using the SuperBuild:
 
 
 Configuration and Building
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------
 
 After the source code is obtained, SimpleITK can be configured on
 Unix-like systems like so:

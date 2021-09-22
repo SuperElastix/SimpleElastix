@@ -82,8 +82,6 @@ namespace itk {
       out << "    \"" << *iter << "\"" << std::endl;
       ++iter;
       }
-    out << "  Registered ImageIO:" << std::endl;
-    ioutils::PrintRegisteredImageIOs(out);
 
     out << "  ImageIOName: ";
     this->ToStringHelper(out, this->m_ImageIOName) << std::endl;

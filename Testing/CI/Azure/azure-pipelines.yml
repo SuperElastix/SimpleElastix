@@ -9,7 +9,9 @@ jobs:
   - job: Linux
     timeoutInMinutes: 0
     pool:
-      vmImage: 'ubuntu-16.04'
+      name: 'Default'
+      demands:
+      - Agent.OS -equals Linux
     variables:
       PYTHONUSERBASE: $(Agent.BuildDirectory)/.pypkgs
     workspace:
@@ -147,12 +149,10 @@ jobs:
           CFLAGS: /MP
           CTEST_CACHE: |
             BUILD_DOCUMENTS:BOOL=OFF
-            BUILD_EXAMPLES:BOOL=OFF
+            BUILD_EXAMPLES:BOOL=ON
             BUILD_SHARED_LIBS:BOOL=OFF
             BUILD_TESTING:BOOL=ON
             WRAP_DEFAULT:BOOL=OFF
-            WRAP_CSHARP:BOOL=OFF
-            WRAP_PYTHON:BOOL=OFF
         workingDirectory: $(Agent.BuildDirectory)
       - script: |
           python -m ci_addons ctest_junit_formatter $(Build.SourcesDirectory)-build > $(Agent.BuildDirectory)/JUnitTestResults.xml
