@@ -5,7 +5,7 @@ A rigid transform can register objects that are related by rotation and translat
 
 .. tip::
 
-    Rigid registration is one of the simplest of methods in the catagory of linear transformation models and is often used as initialization for affine- and non-rigid transforms. 
+    Rigid registration is one of the simplest of methods in the category of linear transformation models and is often used as initialization for affine- and non-rigid transforms. 
 
 The rigid transform is selected using :code:`(Transform "EulerTransform")`. Consider the images in Figure 8. 
 
