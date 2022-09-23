@@ -1,7 +1,7 @@
 Point-based Registation
 =======================
 
-Point-based registration allows us to help the registration via pre-defined sets of corresponding points. The :code:`CorrespondingPointsEuclideanDistanceMetric` minimises the distance of between a points on the fixed image and corresponding points on the moving image. The metric can be used to help in a difficult registration task by taking into account positions are known to correspond. Think of it as a way of embedding expert knowledge in the registration procedure. We can manually select points or automatically them via centroids of segmentations for example. Anything is possible.
+Point-based registration allows us to help the registration via pre-defined sets of corresponding points. The :code:`CorrespondingPointsEuclideanDistanceMetric` minimises the distance between points on the fixed image and corresponding points on the moving image. The metric can be used to help in a difficult registration task by taking into account positions that are known to correspond. Think of it as a way of embedding expert knowledge in the registration procedure. We can manually or automatically select points via centroids of segmentations for example. Anything is possible.
 
 To use :code:`CorrespondingPointsEuclideanDistanceMetric` we append it to the list of metrics in the parameter map. 
 
