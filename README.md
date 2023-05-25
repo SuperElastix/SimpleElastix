@@ -1,3 +1,11 @@
+# _Please note: SimpleElastix is no longer actively maintained!_
+_Instead of SimpleElastix (created by [Kasper Marstal](https://github.com/kaspermarstal)), you may use either SimpleITK or ITKElastix:_
+- _[SimpleITK](https://github.com/SimpleITK) (maintained by [Bradley Lowekamp](https://github.com/blowekamp)) now contains the original SimpleElastix implementation._ 
+- _[ITKElastix](https://github.com/InsightSoftwareConsortium/ITKElastix) (created by [Matt McCormick](https://github.com/thewtex)) is a new Python Elastix wrapper, based on the ITK Python package. It is available by_ `pip install itk-elastix`.
+
+_The original README follows below here:_
+
+-----------------------------------------------------------
 What is SimpleElastix?
 ======================
 Image registration is the process of transforming images into a common coordinate system so corresponding pixels represent homologous biological points. SimpleElastix is an extension of [SimpleITK](https://github.com/SimpleITK/SimpleITK "SimpleITK github repository") that offers a user-friendly API to the popular image registration algorithms of the [elastix](http://elastix.isi.uu.nl/ "Elastix website") C++ library. This makes state-of-the-art medical image registration really easy to do in languages like Python, Java, C# and R. This package provides
