@@ -44,3 +44,9 @@ sitk_add_python_test( Test.ArrayView
   "${CMAKE_CURRENT_SOURCE_DIR}/sitkGetArrayViewFromImageTest.py"
   )
 
+if("ActiveRegistrationModelShapeMetric" IN_LIST ELASTIX_ALL_COMPONENT_LIBS)
+  sitk_add_python_test( Test.ActiveRegistrationModel
+    "${CMAKE_CURRENT_SOURCE_DIR}/ActiveRegistrationModel.py"
+    )
+endif()
+
