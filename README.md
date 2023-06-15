@@ -1,9 +1,9 @@
-# _Please note: SimpleElastix is no longer actively maintained!_
-_Instead of SimpleElastix (created by [Kasper Marstal](https://github.com/kaspermarstal)), you may use either SimpleITK or ITKElastix:_
-- _[SimpleITK](https://github.com/SimpleITK) (maintained by [Bradley Lowekamp](https://github.com/blowekamp)) now contains the original SimpleElastix implementation._ 
-- _[ITKElastix](https://github.com/InsightSoftwareConsortium/ITKElastix) (created by [Matt McCormick](https://github.com/thewtex)) is a new Python Elastix wrapper, based on the ITK Python package. It is available by_ `pip install itk-elastix`.
+# _Please note: SimpleElastix has been integrated in https://github.com/SimpleITK/SimpleITK_
+_The current SimpleElastix repository (https://github.com/SuperElastix/SimpleElastix), originally created by [Kasper Marstal](https://github.com/kaspermarstal), is no longer maintained. SimpleElastix has now become a part of [SimpleITK](https://github.com/SimpleITK/SimpleITK)! It is enabled by the CMake option `SimpleITK_USE_ELASTIX`._
 
-_The original README follows below here:_
+_Instead of SimpleElastix, you may also consider [ITKElastix](https://github.com/InsightSoftwareConsortium/ITKElastix), a new Python Elastix wrapper, based on the ITK Python package. It is available via `pip install itk-elastix`._
+
+_The original SimpleElastix README follows below here:_
 
 -----------------------------------------------------------
 What is SimpleElastix?
