@@ -55,8 +55,8 @@ class SimpleAdaptorCommand
 {
 public:
 
-  typedef SimpleAdaptorCommand Self;
-  typedef SmartPointer< Self > Pointer;
+  using Self = SimpleAdaptorCommand;
+  using Pointer = SmartPointer< Self >;
 
   itkNewMacro(Self);
 
@@ -68,7 +68,7 @@ public:
     }
 
   /**  Invoke the member function. */
-  virtual void Execute(Object *, const EventObject & ) override
+  void Execute(Object *, const EventObject & ) override
   {
     if (m_That)
       {
@@ -77,7 +77,7 @@ public:
   }
 
   /**  Invoke the member function with a const object */
-  virtual void Execute(const Object *, const EventObject & ) override
+  void Execute(const Object *, const EventObject & ) override
   {
     if ( m_That )
       {
@@ -89,9 +89,9 @@ public:
   void operator=(const Self &) = delete;
 
 protected:
-  itk::simple::Command *                    m_That;
-  SimpleAdaptorCommand():m_That(0) {}
-  virtual ~SimpleAdaptorCommand() {}
+  itk::simple::Command *                    m_That{nullptr};
+  SimpleAdaptorCommand() = default;
+  ~SimpleAdaptorCommand() override = default;
 };
 
 } // end anonymous namespace
@@ -103,7 +103,8 @@ protected:
 //
 ProcessObject::ProcessObject ()
   : m_Debug(ProcessObject::GetGlobalDefaultDebug()),
-    m_NumberOfThreads(ProcessObject::GetGlobalDefaultNumberOfThreads()),
+    m_NumberOfThreads(itk::MultiThreaderBase::GetGlobalDefaultNumberOfThreads()),
+    m_NumberOfWorkUnits(0),
     m_ActiveProcess(nullptr),
     m_ProgressMeasurement(0.0)
 {
@@ -138,13 +139,14 @@ std::string ProcessObject::ToString() const
   out << "  NumberOfThreads: ";
   this->ToStringHelper(out, this->m_NumberOfThreads) << std::endl;
 
+  out << "  NumberOfWorkUnits: ";
+  this->ToStringHelper(out, this->m_NumberOfWorkUnits) << std::endl;
+
   out << "  Commands:" << (m_Commands.empty()?" (none)":"") << std::endl;
-  for( std::list<EventCommand>::const_iterator i = m_Commands.begin();
-       i != m_Commands.end();
-       ++i)
+  for( const auto &eventCommand : m_Commands)
     {
-    assert( i->m_Command );
-    out << "    Event: " << i->m_Event << " Command: " << i->m_Command->GetName() << std::endl;
+    assert( eventCommand.m_Command );
+    out << "    Event: " << eventCommand.m_Event << " Command: " << eventCommand.m_Command->GetName() << std::endl;
     }
 
   out << "  ProgressMeasurement: ";
@@ -277,13 +279,33 @@ void ProcessObject::SetGlobalDefaultDirectionTolerance(double tolerance)
 
 void ProcessObject::SetGlobalDefaultNumberOfThreads(unsigned int n)
 {
-  itk::ProcessObject::MultiThreaderType::SetGlobalDefaultNumberOfThreads(n);
+  itk::MultiThreaderBase::SetGlobalDefaultNumberOfThreads(n);
 }
-
 
 unsigned int ProcessObject::GetGlobalDefaultNumberOfThreads()
 {
-  return itk::ProcessObject::MultiThreaderType::GetGlobalDefaultNumberOfThreads();
+  return itk::MultiThreaderBase::GetGlobalDefaultNumberOfThreads();
+}
+
+bool ProcessObject::SetGlobalDefaultThreader(const std::string &threader)
+{
+  auto threaderEnum = itk::MultiThreaderBase::ThreaderTypeFromString(threader);
+  if (threaderEnum == itk::MultiThreaderBase::ThreaderEnum::Unknown
+#if !defined(ITK_USE_TBB)
+      || threaderEnum == itk::MultiThreaderBase::ThreaderEnum::Unknown
+#endif
+    )
+    {
+    return false;
+    }
+  itk::MultiThreaderBase::SetGlobalDefaultThreader(threaderEnum);
+  return true;
+}
+
+std::string ProcessObject::GetGlobalDefaultThreader()
+{
+  auto threaderEnum =  itk::MultiThreaderBase::GetGlobalDefaultThreader();
+  return itk::MultiThreaderBase::ThreaderTypeToString(threaderEnum);
 }
 
 
@@ -299,10 +321,22 @@ unsigned int ProcessObject::GetNumberOfThreads() const
 }
 
 
+void ProcessObject::SetNumberOfWorkUnits(unsigned int n)
+{
+  m_NumberOfWorkUnits = n;
+}
+
+
+unsigned int ProcessObject::GetNumberOfWorkUnits() const
+{
+  return m_NumberOfWorkUnits;
+}
+
+
 int ProcessObject::AddCommand(EventEnum event, Command &cmd)
 {
   // add to our list of event, command pairs
-  m_Commands.push_back(EventCommand(event,&cmd));
+  m_Commands.emplace_back(event,&cmd);
 
   // register ourselves with the command
   cmd.AddProcessObject(this);
@@ -325,7 +359,7 @@ int ProcessObject::AddCommand(itk::simple::EventEnum event, const std::function<
   cmd->SetCallbackFunction(func);
 
   int id = this->AddCommand(event, *cmd.get());
-  cmd->OwnedByProcessObjectsOn();
+  cmd->OwnedByObjectsOn();
   cmd.release();
   return id;
 }
@@ -361,14 +395,12 @@ void ProcessObject::RemoveAllCommands()
 
 bool ProcessObject::HasCommand( EventEnum event ) const
 {
-  std::list<EventCommand>::const_iterator i = m_Commands.begin();
-  while( i != m_Commands.end() )
+  for ( const auto& eventCommand: m_Commands)
     {
-    if (i->m_Event == event)
+    if (eventCommand.m_Event == event)
       {
       return true;
       }
-    ++i;
     }
   return false;
 }
@@ -398,28 +430,24 @@ void ProcessObject::PreUpdate(itk::ProcessObject *p)
   assert(p);
 
   // propagate number of threads
-  #if ITK_VERSION_MAJOR < 5
-  p->SetNumberOfThreads(this->GetNumberOfThreads());
-  #else
-  p->SetNumberOfWorkUnits(this->GetNumberOfThreads());
-  #endif
+  if ( this->GetNumberOfWorkUnits() != 0 )
+    {
+    p->SetNumberOfWorkUnits(this->GetNumberOfWorkUnits());
+    }
 
+  p->GetMultiThreader()->SetMaximumNumberOfThreads(this->GetNumberOfThreads());
 
   try
     {
     this->m_ActiveProcess = p;
 
     // add command on active process deletion
-    itk::SimpleMemberCommand<Self>::Pointer onDelete = itk::SimpleMemberCommand<Self>::New();
-    onDelete->SetCallbackFunction(this, &Self::OnActiveProcessDelete);
-    p->AddObserver(itk::DeleteEvent(), onDelete);
+    p->AddObserver(eventDeleteEvent, [this](const itk::EventObject &) {this->OnActiveProcessDelete();});
 
     // register commands
-    for (std::list<EventCommand>::iterator i = m_Commands.begin();
-         i != m_Commands.end();
-         ++i)
+    for (auto &eventCommand: m_Commands )
       {
-      this->AddObserverToActiveProcessObject(*i);
+      this->AddObserverToActiveProcessObject(eventCommand);
       }
 
     }

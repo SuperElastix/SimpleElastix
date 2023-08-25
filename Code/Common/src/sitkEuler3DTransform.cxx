@@ -25,9 +25,7 @@ namespace itk
 namespace simple
 {
 
-Euler3DTransform::~Euler3DTransform()
-{
-}
+Euler3DTransform::~Euler3DTransform() = default;
 
 // construct identity
 Euler3DTransform::Euler3DTransform()
@@ -151,7 +149,7 @@ void Euler3DTransform::SetPimpleTransform( PimpleTransformBase *pimpleTransform 
 void Euler3DTransform::InternalInitialization(itk::TransformBase *transform)
 {
 
-  typedef itk::Euler3DTransform<double> TransformType;
+  using TransformType = itk::Euler3DTransform<double>;
   TransformType *t = dynamic_cast<TransformType*>(transform);
 
   // explicitly remove all function pointer with reference to prior transform

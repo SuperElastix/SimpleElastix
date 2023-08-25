@@ -35,13 +35,13 @@ public:
   std::vector<double> scales;
   std::string toString;
 
-  virtual void Execute( )
+  void Execute( ) override
     {
       // use sitk's output operator for std::vector etc..
       using itk::simple::operator<<;
 
       // stash the stream state
-      std::ios  state(NULL);
+      std::ios  state(nullptr);
       state.copyfmt(std::cout);
 
       if ( m_Method.GetOptimizerIteration() == 0 )
@@ -85,7 +85,7 @@ public:
     :m_tx(tx), m_Method(m)
     {}
 
-  virtual void Execute( )
+  void Execute( ) override
     {
       // use sitk's output operator for std::vector etc..
       using itk::simple::operator<<;
@@ -183,7 +183,7 @@ public:
     }
 
 protected:
-  virtual void SetUp()
+  void SetUp() override
   {
     fixedBlobs = MakeDualGaussianBlobs(v2(64,64), v2(192,192), std::vector<unsigned int>(2,256));
     movingBlobs = MakeDualGaussianBlobs(v2(54,74), v2(192,192), std::vector<unsigned int>(2,256));
@@ -1175,6 +1175,61 @@ TEST_F(sitkRegistrationMethodTest, Optimizer_Sampling)
 }
 
 
+TEST_F(sitkRegistrationMethodTest, StopRegistration)
+{
+  sitk::Image fixedImage = MakeDualGaussianBlobs({ 64, 64}, {54, 74}, {256, 256,});
+  sitk::Image movingImage = MakeDualGaussianBlobs({61, 65}, {51.2, 75.5}, {256,256});
+
+
+  //fixedImage = sitk::AdditiveGaussianNoise(fixedImage,  0.1, 0, 1u);
+
+  sitk::ImageRegistrationMethod R;
+  R.SetInterpolator(sitk::sitkLinear);
+
+  sitk::TranslationTransform tx(2u);
+  R.SetInitialTransform(tx, false);
+  R.SetMetricAsMeanSquares();
+
+  constexpr unsigned int stop_iteration = 3;
+  auto stopLambda =  [&R, stop_iteration] ()
+  {
+    std::cout << R.GetOptimizerIteration() << " " << R.GetOptimizerPosition() << std::endl;
+    if ( R.GetOptimizerIteration() >= stop_iteration )
+    {
+      std::cout << "STOP" << std::endl;
+      R.StopRegistration();
+    }
+  };
+
+
+  std::function< void(void) > set_optimizer_funcs[] = {
+    [&R] () {R.SetOptimizerAsConjugateGradientLineSearch(1.0, 100);},
+    [&R] () {R.SetOptimizerAsGradientDescent(1.0, 100);},
+    [&R] () {R.SetOptimizerAsGradientDescentLineSearch(1.0, 100);},
+    [&R] () {R.SetOptimizerAsRegularStepGradientDescent(1.0, 0.001, 100, 0.5, 1e-6);},
+    [&R] () {R.SetOptimizerAsExhaustive({5, 5}, 0.5);},
+    [&R] () {R.SetOptimizerAsPowell(100, 100, 1,1e-6, 1e-8);},
+    [&R] () {R.SetOptimizerAsOnePlusOneEvolutionary(100);}
+  };
+
+
+  R.AddCommand(sitk::sitkIterationEvent, stopLambda);
+
+  for (const auto &setOptimizer : set_optimizer_funcs)
+  {
+    setOptimizer();
+
+    sitk::Transform outTx1 = R.Execute(fixedImage, movingImage);
+
+    std::cout << "GetOptimizerPosition(): " << R.GetOptimizerPosition() << std::endl;
+    std::cout << "outTx1.GetParameters(): " << outTx1.GetParameters() << std::endl;
+    std::cout << "GetOptimizerIteration(): " << R.GetOptimizerIteration() << std::endl;
+    std::cout << "Stop Condition: " << R.GetOptimizerStopConditionDescription() << std::endl;
+    EXPECT_EQ(stop_iteration+1, R.GetOptimizerIteration());
+  }
+
+}
+
 
 TEST_F(sitkRegistrationMethodTest, BSpline_adaptor)
 {
@@ -1368,7 +1423,7 @@ TEST_F(sitkRegistrationMethodTest, BSpline_adaptor_inplace)
   EXPECT_EQ( outTx.GetNumberOfParameters(), 450u);
   EXPECT_EQ( outTx.GetFixedParameters(), tx.GetFixedParameters() );
   EXPECT_EQ( outTx.GetParameters(), tx.GetParameters() );
-  ASSERT_EQ( cmd1.m_NumberOfParametersPerLevel.size(), 3);
+  ASSERT_EQ( cmd1.m_NumberOfParametersPerLevel.size(), 3u);
   EXPECT_EQ( cmd1.m_NumberOfParametersPerLevel[0], 72u);
   EXPECT_EQ( cmd1.m_NumberOfParametersPerLevel[1], 162u);
   EXPECT_EQ( cmd1.m_NumberOfParametersPerLevel[2], 450u);

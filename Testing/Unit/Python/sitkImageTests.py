@@ -25,6 +25,7 @@ import tempfile
 import os.path
 import shutil
 
+
 class ImageTests(unittest.TestCase):
     """Tests for the Python interface for the Image class"""
 
@@ -36,7 +37,6 @@ class ImageTests(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.test_dir)
 
-
     def assertImageEqual(self, img1, img2, msg=None):
         """ utility to compare two images"""
         self.assertEqual(img1.GetPixelID(), img2.GetPixelID())
@@ -47,7 +47,7 @@ class ImageTests(unittest.TestCase):
         self.assertEqual(img1.GetMetaDataKeys(), img2.GetMetaDataKeys())
 
         for k in img1.GetMetaDataKeys():
-            aself.assertEqual(img1.GetMetaData(k), img2.GetMetaData(k))
+            self.assertEqual(img1.GetMetaData(k), img2.GetMetaData(k))
 
         self.assertEqual(sitk.Hash(img1), sitk.Hash(img2))
 
@@ -78,6 +78,74 @@ class ImageTests(unittest.TestCase):
 
         img_c.SetOrigin([7, 8])
         self.assertNotEqual(img.GetOrigin(), img_c.GetOrigin())
+
+    def test_get_item_metadata(self):
+        """Test the __getitem__ with a string to access meta-data dictionary"""
+
+        img = sitk.Image([10, 9, 11], sitk.sitkFloat32 )
+        img.SetSpacing([.3, .1, .2])
+        img.SetOrigin([-3.0, -2.0, -1.0])
+
+        self.assertEqual(img["spacing"], (.3, .1, .2))
+        self.assertEqual(img["origin"], (-3.0, -2.0, -1.0))
+        self.assertEqual(img["direction"], (1.0,0.0,0.0, 0.0,1.0,0.0, 0.0,0.0, 1.0))
+
+        with self.assertRaises(KeyError):
+            img[""]
+
+        with self.assertRaises(KeyError):
+            img["does_not_exit"]
+
+    def test_setitem_metadata(self):
+        """Test the __setitem__ with a string to access meta-data dictionary"""
+
+        img = sitk.Image([10, 9], sitk.sitkFloat32)
+
+        img["spacing"] = [.3, .1, .2]
+        self.assertEqual(img["spacing"], (.3, .1))
+        self.assertEqual(img.GetSpacing(), (.3, .1))
+
+        img["origin"] = [-3.0, -2.0, -1.0]
+        self.assertEqual(img["origin"], (-3.0, -2.0))
+        self.assertEqual(img.GetOrigin(), (-3.0, -2.0))
+
+        with self.assertRaises(RuntimeError):
+            img["direction"] = (-1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
+
+        img["direction"] = (-1.0, 0.0, 0.0, 1.0)
+        self.assertEqual(img["direction"], (-1.0, 0.0, 0.0, 1.0))
+        self.assertEqual(img.GetDirection(), (-1.0, 0.0, 0.0, 1.0))
+
+
+        with self.assertRaises(TypeError):
+            img["test"] = 1
+
+    def test_delitem_metadata(self):
+        """Test the __delitem__ with a string key to remove elements from meta-data """
+
+        img = sitk.Image([10, 9], sitk.sitkFloat32)
+
+        for k in ['origin', 'spacing', 'direction']:
+            with self.assertRaises(KeyError):
+                del img[k]
+
+        for k in [1.0, [1, 2], (3, 4)]:
+            with self.assertRaises(TypeError):
+                k in img
+
+    def test_contains_metadata(self):
+        """Test the __contains__ with a string key  """
+
+        img = sitk.Image([10, 9], sitk.sitkFloat32)
+
+        for k in ['origin', 'spacing', 'direction']:
+            self.assertTrue(k in img)
+
+        for k in [1.0, [1, 2], (3, 4)]:
+            with self.assertRaises(TypeError):
+                k in img
+
+
 
     def test_pickle_file(self):
        """Test the custom pickling and un-pickling interface"""
@@ -172,9 +240,95 @@ class ImageTests(unittest.TestCase):
 
         self.assertEqual(len( image ), 100)
 
+    def test_inplace_operators(self):
+        """ Test in place operators with images """
+
+        image1 = sitk.Image([2, 2], sitk.sitkFloat64)
+        image2 = image1 + 1.0
+
+        self.assertEqual(image1[1, 1], 0.0)
+        self.assertEqual(image2[1, 1], 1.0)
+
+        image1 += image2
+        self.assertEqual(image1[1, 1], 1.0)
+
+        image1 *= image2+5.5
+        self.assertEqual(image1[0, 0], 6.5)
+
+        image1 -= image2
+        self.assertEqual(image1[0, 0], 5.5)
+
+        image1 /= image2*2.0
+        self.assertEqual(image1[0, 0], 2.75)
+
+        image1 //= image2*2.0
+        self.assertEqual(image1[0, 0], 1.0)
+
+        image1 **= image2
+        self.assertEqual(image1[0, 0], 1.0)
+
+        image1 = sitk.Image([3, 3], sitk.sitkUInt32)
+        image2 = sitk.Image([3,3], sitk.sitkUInt32)
+
+        image1 += (image2 + 0b10001110101)
+        self.assertEqual(image1[1, 1], 1141)
+
+        image1 &= (image2 + 0b11111111011)
+        self.assertEqual(image1[1, 1], 1137)
+
+        image1 |= (image2 + 0b00000000111)
+        self.assertEqual(image1[1, 1], 1143)
+
+        image1 ^= (image2 + 0b00000001101)
+        self.assertEqual(image1[1, 1], 1146)
+
+        image1 %= (image2 + 4)
+        self.assertEqual(image1[1, 1], 2)
+
+    def test_inplace_operators_constants(self):
+        """ Test in place operators with numeric constants"""
+
+        image = sitk.Image([2, 2], sitk.sitkFloat64)
+
+        self.assertEqual(image[0, 0], 0.0)
+
+        image += 3.125
+        self.assertEqual(image[0, 0], 3.125)
+
+        image *= 2.0
+        self.assertEqual(image[0, 0], 6.25)
+
+        image -= 4.0
+        self.assertEqual(image[0, 0], 2.25)
+
+        image /= 0.25
+        self.assertEqual(image[0, 0], 9.0)
+
+        image //= 2.2
+        self.assertEqual(image[0, 0], 4.0)
+
+        image **= 2.0
+        self.assertEqual(image[0, 0], 16.0)
+
+        image = sitk.Image([3, 3], sitk.sitkUInt32)
+
+        image += 0b10001110101
+        self.assertEqual(image[1, 1], 1141)
+
+        image &= 0b11111111011
+        self.assertEqual(image[1, 1], 1137)
+
+        image |= 0b00000000111
+        self.assertEqual(image[1, 1], 1143)
+
+        image ^= 0b00000001101
+        self.assertEqual(image[1, 1], 1146)
+
+        image %= 4
+        self.assertEqual(image[1, 1], 2)
 
     def test_legacy(self):
-        """ This is old testing cruft before tehe unittest enlightenment """
+        """ This is old testing cruft before unittest"""
 
         image = sitk.Image( 10, 10, sitk.sitkInt32 )
 
@@ -200,10 +354,10 @@ class ImageTests(unittest.TestCase):
 
         image += image
         image -= image
-        self.assertEqual(image.GetPixel(1,1), 0 )
+        self.assertEqual(image.GetPixel(1, 1), 0)
 
         image *= image
-        self.assertEqual(image.GetPixel(1,1), 0 )
+        self.assertEqual(image.GetPixel(1, 1), 0)
 
 
         # True division will results in "nan" while

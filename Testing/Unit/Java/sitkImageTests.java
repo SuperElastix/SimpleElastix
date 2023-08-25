@@ -17,6 +17,7 @@
 *=========================================================================*/
 
 import java.math.BigInteger;
+import static java.lang.Math.toIntExact;
 import org.itk.simple.*;
 
 /* This class is needed because on some systems uint64_t gets converted to long
@@ -39,7 +40,6 @@ class sitkImageTests
 
   public static void main(String argv[])
     {
-    int ntests = 2;
     int npass = 0;
     int nfail = 0;
 
@@ -61,6 +61,20 @@ class sitkImageTests
     System.out.println("[----------]");
 
     System.out.println("[----------]");
+    System.out.println("[ RUN      ] Java.ImageBufferTest");
+    if (ImageBufferTest())
+      {
+      System.out.println("[       OK ] Java.ImageBufferTest");
+      npass++;
+      }
+    else
+      {
+      System.out.println("[     FAIL ] Java.ImageBufferTest");
+      nfail++;
+      }
+    System.out.println("[----------]");
+
+    System.out.println("[----------]");
     System.out.println("[ RUN      ] Java.LabelShapeStatisticsTest");
     if (LabelShapeStatisticsTest())
       {
@@ -74,7 +88,8 @@ class sitkImageTests
       }
     System.out.println("[----------]");
     System.out.println("[==========]");
-    if (npass == ntests)
+
+    if (nfail == 0)
       {
       System.out.println("[  PASSED  ]");
       }
@@ -87,13 +102,8 @@ class sitkImageTests
 
   public static boolean BasicImageTest()
     {
-    int[] v = {1,1};
-    VectorUInt32 idx = new VectorUInt32( v.length );
-
-    for (int i = 0; i < v.length; i++)
-      {
-      idx.set( i, v[i] );
-      }
+    long[] v = {1,1};
+    VectorUInt32 idx = new VectorUInt32( v );
 
     int size = 10;
     short val = 42;
@@ -132,17 +142,77 @@ class sitkImageTests
     return true;
     }
 
+  public static boolean ImageBufferTest()
+    {
+      long[] v = {2,3,4};
+    VectorUInt32 idx = new VectorUInt32( v );
+
+    int size = 7*8*9;
+    short val = 42;
+
+    Image image = new Image(7,8,9, PixelIDValueEnum.sitkUInt8);
+    image.setPixelAsUInt8(idx, (short)99);
+
+    // Low level method is not recommended, but has been useful when
+    // interfacing with other low level C based libraries in Java
+    long ptr = image.getBufferAsNativePointer();
+
+    if (ptr == 0)
+      {
+        System.out.println("Null native buffer pointer");
+        return false;
+      }
+
+    java.nio.Buffer b1 = image.getBufferAsBuffer();
+
+    if (b1.capacity() != size)
+      {
+        System.out.println("Capacity is not as expected");
+        return false;
+      }
+
+    if (!b1.isDirect())
+      {
+        System.out.println("Buffer is not direct");
+        return false;
+      }
+
+    if (b1.isReadOnly())
+      {
+        System.out.println("Buffer is read-only");
+        return false;
+      }
+
+    java.nio.ByteBuffer bb = (java.nio.ByteBuffer) b1;
+
+    if (bb.get(0) != 0)
+      {
+        System.out.println("Expected 0 value");
+        return false;
+      }
+
+    if (bb.get(2+7*3+7*8*4) != 99)
+      {
+        System.out.println("Expected 99 value");
+        return false;
+      }
+
+
+
+    return true;
+    }
+
   public static boolean LabelShapeStatisticsTest()
     {
     int size = 10;
-    int i;
+    long i;
     long j;
     short val = 1;
 
 
     /* Make a 10x10 test image */
     Image image = new Image(size, size, PixelIDValueEnum.sitkUInt8);
-    VectorUInt32 idx = new VectorUInt32( 2 );
+    VectorUInt32 idx = new VectorUInt32( 2, 0 );
 
     /* Fill in a 4x4 square in the middle of the image */
     for (j=4; j<8; j++)
@@ -162,8 +232,8 @@ class sitkImageTests
       filter.execute(image);
 
       VectorInt64 labels = filter.getLabels();
-      j = BigIntegerFix.Convert( filter.getNumberOfLabels() );
-      if (j != 1)
+      long numberOfLabels =  BigIntegerFix.Convert( filter.getNumberOfLabels() );
+      if (numberOfLabels != 1)
         {
         throw new Exception("Wrong number of labels");
         }
@@ -171,11 +241,12 @@ class sitkImageTests
       double perim;
 
       System.out.println("Label,\t#pix,\tperimeter");
-      for (i=0; i<j; i++)
+      for (i=0; i<numberOfLabels; i++)
         {
-        npix = BigIntegerFix.Convert( filter.getNumberOfPixels(labels.get(i)) );
-        perim = filter.getPerimeter( labels.get(i) );
-        System.out.format( "%d,\t%d,\t%f\n", labels.get(i), npix, perim );
+        int label = toIntExact(labels.get(toIntExact(i)));
+        npix =  BigIntegerFix.Convert( filter.getNumberOfPixels(label) );
+        perim = filter.getPerimeter(label);
+        System.out.format( "%d,\t%d,\t%f\n", label, npix, perim );
 
         /* The first (and only) label should have 16 pixels */
         if (i==0)

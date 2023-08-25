@@ -196,14 +196,14 @@ Image
 ElastixImageFilter::ElastixImageFilterImpl
 ::DualExecuteInternal( void )
 {
-  typedef elastix::ElastixFilter< TFixedImage, TMovingImage >   ElastixFilterType;
-  typedef typename ElastixFilterType::Pointer                   ElastixFilterPointer;
-  typedef typename ElastixFilterType::FixedMaskType             FixedMaskType;
-  typedef typename ElastixFilterType::MovingMaskType            MovingMaskType;
+  typedef itk::ElastixRegistrationMethod< TFixedImage, TMovingImage >   ElastixRegistrationMethodType;
+  typedef typename ElastixRegistrationMethodType::Pointer                   ElastixRegistrationMethodPointer;
+  typedef typename ElastixRegistrationMethodType::FixedMaskType             FixedMaskType;
+  typedef typename ElastixRegistrationMethodType::MovingMaskType            MovingMaskType;
 
   try
   {
-    ElastixFilterPointer elastixFilter = ElastixFilterType::New();
+    ElastixRegistrationMethodPointer elastixFilter = ElastixRegistrationMethodType::New();
 
     for( unsigned int i = 0; i < this->GetNumberOfFixedImages(); ++i )
     {

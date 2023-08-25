@@ -39,8 +39,7 @@ namespace itk {
   }
 
   ImageSeriesWriter::~ImageSeriesWriter()
-  {
-  }
+  = default;
 
   ImageSeriesWriter::ImageSeriesWriter()
   {
@@ -49,7 +48,7 @@ namespace itk {
     this->m_CompressionLevel = -1;
 
     // list of pixel types supported
-    typedef NonLabelPixelIDTypeList PixelIDTypeList;
+    using PixelIDTypeList = NonLabelPixelIDTypeList;
 
     this->m_MemberFactory.reset( new detail::MemberFunctionFactory<MemberFunctionType>( this ) );
 
@@ -83,8 +82,6 @@ namespace itk {
       out << "    \"" << *iter << "\"" << std::endl;
       ++iter;
       }
-    out << "  Registered ImageIO:" << std::endl;
-    ioutils::PrintRegisteredImageIOs(out);
 
     out << "  ImageIOName: ";
     this->ToStringHelper(out, this->m_ImageIOName) << std::endl;
@@ -113,7 +110,7 @@ namespace itk {
 
   std::string
   ImageSeriesWriter
-  ::GetImageIO(void) const
+  ::GetImageIO() const
   {
     return this->m_ImageIOName;
   }
@@ -123,7 +120,7 @@ namespace itk {
   ::GetImageIOBase(const std::string &fileName)
   {
     itk::ImageIOBase::Pointer iobase;
-    if (this->m_ImageIOName == "")
+    if (this->m_ImageIOName.empty())
       {
       iobase = itk::ImageIOFactory::CreateImageIO( fileName.c_str(), itk::ImageIOFactory::FileModeEnum::WriteMode);
       }
@@ -148,7 +145,7 @@ namespace itk {
     return *this;
   }
 
-  bool ImageSeriesWriter::GetUseCompression( void ) const
+  bool ImageSeriesWriter::GetUseCompression( ) const
   {
     return this->m_UseCompression;
   }
@@ -161,7 +158,7 @@ namespace itk {
   }
 
   int
-  ImageSeriesWriter::GetCompressionLevel(void) const
+  ImageSeriesWriter::GetCompressionLevel() const
   {
     return m_CompressionLevel;
   }
@@ -174,7 +171,7 @@ namespace itk {
   }
 
   std::string
-  ImageSeriesWriter::GetCompressor(void)
+  ImageSeriesWriter::GetCompressor()
   {
     return m_Compressor;
   }
@@ -215,7 +212,7 @@ namespace itk {
   ImageSeriesWriter::ExecuteInternal( const Image& inImage )
   {
     // Define the input and output image types
-    typedef TImageType     InputImageType;
+    using InputImageType = TImageType;
 
     // Verify input file name are provided
     if( this->m_FileNames.empty() )
@@ -239,8 +236,8 @@ namespace itk {
 
     typename InputImageType::ConstPointer image = this->CastImageToITK<InputImageType>( inImage );
 
-    typedef itk::ImageSeriesWriter<InputImageType,
-                                   typename InputImageType::template Rebind<typename InputImageType::PixelType, InputImageType::ImageDimension-1>::Type> Writer;
+    using Writer = itk::ImageSeriesWriter<InputImageType,
+                                   typename InputImageType::template Rebind<typename InputImageType::PixelType, InputImageType::ImageDimension-1>::Type>;
 
     typename Writer::Pointer writer = Writer::New();
     writer->SetUseCompression( this->m_UseCompression );
@@ -249,7 +246,7 @@ namespace itk {
 
     itk::ImageIOBase::Pointer imageio = this->GetImageIOBase( this->m_FileNames[0] );
 
-    if (this->m_Compressor != "")
+    if (!this->m_Compressor.empty())
     {
       imageio->SetCompressor(this->m_Compressor);
     }

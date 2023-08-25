@@ -37,10 +37,10 @@ class SITKCommon_EXPORT VersorRigid3DTransform
   : public Transform
 {
 public:
-  typedef VersorRigid3DTransform Self;
-  typedef Transform              Superclass;
+  using Self = VersorRigid3DTransform;
+  using Superclass = Transform;
 
-  virtual ~VersorRigid3DTransform();
+  ~VersorRigid3DTransform() override;
 
   // construct identity
   VersorRigid3DTransform();
@@ -58,6 +58,9 @@ public:
                           const std::vector< double> &fixedCenter=std::vector< double >(3, 0.0) );
 
   VersorRigid3DTransform &operator=( const VersorRigid3DTransform & );
+
+  /** Name of this class */
+  std::string GetName() const override { return std::string ("VersorRigid3DTransform"); }
 
 /** fixed parameter */
   SITK_RETURN_SELF_TYPE_HEADER SetCenter(const std::vector<double> &params);
@@ -79,11 +82,9 @@ public:
 
 protected:
 
-  virtual void SetPimpleTransform( PimpleTransformBase *pimpleTransform );
+  void SetPimpleTransform( PimpleTransformBase *pimpleTransform ) override;
 
 private:
-
-  using Superclass::AddTransform;
 
   void InternalInitialization(itk::TransformBase *transform);
 

@@ -108,9 +108,9 @@ validate () {
 download_object() {
   algo="$1" ; hash="$2" ; path="$3"
   mkdir -p $(dirname "$path") &&
-  if curl -f "https://simpleitk.github.io/SimpleITKExternalData/$algo/$hash" --output "$path.tmp$$" 1>&2||
-     curl -f "https://s3.amazonaws.com/simpleitk/public/$algo/$hash" --output "$path.tmp$$" 1>&2 ||
-     curl -f "https://data.kitware.com:443/api/v1/file/hashsum/$algo/$hash/download" --output "$path.tmp$$" 1>&2; then
+  if curl -Lf "https://simpleitk.org/SimpleITKExternalData/$algo/$hash" --output "$path.tmp$$" 1>&2 ||
+     curl -Lf "https://s3.amazonaws.com/simpleitk/public/$algo/$hash" --output "$path.tmp$$" 1>&2 ||
+     curl -Lf "https://data.kitware.com:443/api/v1/file/hashsum/$algo/$hash/download" --output "$path.tmp$$" 1>&2; then
     mv "$path.tmp$$" "$path"
   else
     rm -f "$path.tmp$$"
@@ -126,8 +126,8 @@ index_data_objects() {
     # Find the object file on disk
     if test -f "$path"; then
       file="$path" # available in place
-    elif test -f ~/"$path" ; then
-      file=~/"$path" # available in home dir
+    elif test -n "$ExternalData_OBJECT_STORES" -a -f "$ExternalData_OBJECT_STORES/$algo/$hash" ; then
+      file=$ExternalData_OBJECT_STORES/$algo/$hash # available from env path
     else
       download_object "$algo" "$hash" "$path" &&
       file="$path"

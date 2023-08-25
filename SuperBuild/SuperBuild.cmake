@@ -144,22 +144,16 @@ option(BUILD_SHARED_LIBS "Build SimpleITK ITK with shared libraries. This does n
 # as this option does not robustly work across platforms it will be marked as advanced
 mark_as_advanced( FORCE BUILD_SHARED_LIBS )
 
-set(SimpleITK_4D_IMAGES_DEFAULT ON)
-# 1900 = VS 14.0 (Visual Studio 2015)
-if(MSVC AND MSVC_VERSION VERSION_LESS 1900)
-  set( SimpleITK_4D_IMAGES_DEFAULT OFF )
-endif()
-option( SimpleITK_4D_IMAGES "Add Image and I/O support for four spatial dimensions." ${SimpleITK_4D_IMAGES_DEFAULT} )
-mark_as_advanced( SimpleITK_4D_IMAGES )
-unset(SimpleITK_4D_IMAGES_DEFAULT)
+include(sitkMaxDimensionOption)
+
 
 #-----------------------------------------------------------------------------
 # Setup build type
 #------------------------------------------------------------------------------
 
-# By default, let's build as Release
+# By default, let's build as Debug
 if(NOT DEFINED CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Release")
+  set(CMAKE_BUILD_TYPE "Debug")
 endif()
 
 # let a dashboard override the default.
@@ -332,11 +326,11 @@ endif()
 #------------------------------------------------------------------------------
 # Swig
 #------------------------------------------------------------------------------
-option ( SimpleITK_USE_SYSTEM_SWIG "Use a pre-compiled version of SWIG 3.0 previously configured for your system" OFF )
+option ( SimpleITK_USE_SYSTEM_SWIG "Use a pre-compiled version of SWIG 4.0 previously configured for your system" OFF )
 sitk_legacy_naming( SimpleITK_USE_SYSTEM_SWIG USE_SYSTEM_SWIG )
 mark_as_advanced(SimpleITK_USE_SYSTEM_SWIG)
 if(SimpleITK_USE_SYSTEM_SWIG)
-  find_package ( SWIG 3 REQUIRED )
+  find_package ( SWIG 4 REQUIRED )
 else()
   include(External_Swig)
   list(APPEND ${CMAKE_PROJECT_NAME}_DEPENDENCIES Swig)
@@ -364,24 +358,6 @@ if ( BUILD_TESTING )
 endif()
 
 #------------------------------------------------------------------------------
-# Python virtualenv
-#------------------------------------------------------------------------------
-option( SimpleITK_USE_SYSTEM_VIRTUALENV "Use a system version of Python's virtualenv. " OFF )
-sitk_legacy_naming( SimpleITK_USE_SYSTEM_VIRTUALENV USE_SYSTEM_VIRTUALENV)
-mark_as_advanced(SimpleITK_USE_SYSTEM_VIRTUALENV)
-if( NOT DEFINED SimpleITK_PYTHON_USE_VIRTUALENV OR SimpleITK_PYTHON_USE_VIRTUALENV )
-  if ( SimpleITK_USE_SYSTEM_VIRTUALENV )
-    find_package( PythonVirtualEnv REQUIRED)
-  else()
-    include(External_virtualenv)
-    if ( WRAP_PYTHON )
-      list(APPEND ${CMAKE_PROJECT_NAME}_DEPENDENCIES virtualenv)
-    endif()
-  endif()
-  list(APPEND SimpleITK_VARS PYTHON_VIRTUALENV_SCRIPT)
-endif()
-
-#------------------------------------------------------------------------------
 # ITK
 #------------------------------------------------------------------------------
 
@@ -389,6 +365,7 @@ option(SimpleITK_USE_SYSTEM_ITK "Use a pre-built version of ITK" OFF)
 sitk_legacy_naming( SimpleITK_USE_SYSTEM_ITK USE_SYSTEM_ITK )
 mark_as_advanced(SimpleITK_USE_SYSTEM_ITK)
 if(SimpleITK_USE_SYSTEM_ITK)
+  set ( ITK_DIR "../ITK-build" )
   find_package(ITK REQUIRED)
   #we require certain packages be turned on in ITK
   include(sitkCheckForITKModuleDependencies)
@@ -406,28 +383,45 @@ sitk_legacy_naming(SimpleITK_USE_SYSTEM_ELASTIX USE_SYSTEM_ELASTIX)
 mark_as_advanced(SimpleITK_USE_SYSTEM_ELASTIX)
 
 if(SimpleITK_USE_SYSTEM_ELASTIX)
-  find_package(Elastix)
-  include(${ELASTIX_USE_FILE})
+  set( Elastix_DIR "../Elastix-build" )
+  find_package( Elastix REQUIRED )
+  include( ${ELASTIX_USE_FILE} )
+  message("Elastix-use-file = ${ELASTIX_USE_FILE}")
 
-  if(ELASTIX_USE_OPENMP)
-    find_package(OpenMP QUIET)
-    if( OPENMP_FOUND )
-      set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-    endif()
-  endif()
-else()
-  mark_as_advanced( SimpleITK_OPENMP )
-  option( SimpleITK_OPENMP "If available, use OpenMP to speed up certain elastix computations." OFF )
-
-  if(SimpleITK_OPENMP)
+  if(${ELASTIX_USE_OPENMP})
     find_package(OpenMP QUIET)
     if(OPENMP_FOUND)
       set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
     endif()
   endif()
-  
+else()
+  sitk_legacy_naming(SimpleITK_ELASTIX_USE_OPENMP SimpleITK_OPENMP)
+  option(SimpleITK_ELASTIX_USE_OPENMP "If available, use OpenMP to speed up certain elastix computations." OFF)
+  mark_as_advanced(SimpleITK_ELASTIX_USE_OPENMP)
+
+  if(${SimpleITK_ELASTIX_USE_OPENMP})
+    find_package(OpenMP QUIET)
+    if(OPENMP_FOUND)
+      set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    else()
+      set(SimpleITK_ELASTIX_USE_OPENMP OFF)
+      message(WARNING "OpenMP not found. Compiling elastix WITHOUT support for OpenMP.")
+    endif()
+  endif()
+
+  option( SimpleITK_ELASTIX_USE_OPENCL "If available, build elastix OpenCL components." OFF )
+  mark_as_advanced( SimpleITK_ELASTIX_USE_OPENCL )
+
+  if(${SimpleITK_ELASTIX_USE_OPENMP})
+    find_package(OpenCL QUIET)
+    if(NOT OPENMP_FOUND)
+      message(WARNING "OpenCL not found. Compiling elastix WITHOUT OpenCL components.")
+      set(SimpleITK_ELASTIX_USE_OPENMP OFF)
+    endif()
+  endif()
+
   include(External_Elastix)
   list(APPEND ${CMAKE_PROJECT_NAME}_DEPENDENCIES Elastix)
 endif()
@@ -435,7 +429,9 @@ endif()
 #------------------------------------------------------------------------------
 # SimpleITK
 #------------------------------------------------------------------------------
-
+if(MSVC)
+  set(CMAKE_CXX_FLAGS "/EHsc")
+endif()
 
 get_cmake_property( _varNames VARIABLES )
 
@@ -448,6 +444,8 @@ foreach (_varName ${_varNames})
         NOT _varName MATCHES "^SimpleITK_USE_SYSTEM"
           AND
         NOT _varName MATCHES "^SimpleITK_.*_COMPILE_OPTIONS"
+           AND
+        NOT _varName MATCHES "^SimpleITK_.*_DEFAULT"
           AND
         NOT _varName MATCHES "^SITK_UNDEFINED_SYMBOLS_ALLOWED")
       message( STATUS "Passing variable \"${_varName}=${${_varName}}\" to SimpleITK external project.")
@@ -485,7 +483,6 @@ ExternalProject_Add(${proj}
   CMAKE_GENERATOR ${gen}
   CMAKE_ARGS
     --no-warn-unused-cli
-    -DCMAKE_TOOLCHAIN_FILE:FILEPATH=${CMAKE_TOOLCHAIN_FILE}
     -C "${CMAKE_CURRENT_BINARY_DIR}/SimpleITK-build/CMakeCacheInit.txt"
     ${ep_simpleitk_args}
     ${ep_common_args}
@@ -497,6 +494,7 @@ ExternalProject_Add(${proj}
     -DCMAKE_RUNTIME_OUTPUT_DIRECTORY:PATH=<BINARY_DIR>/bin
     -DCMAKE_BUNDLE_OUTPUT_DIRECTORY:PATH=<BINARY_DIR>/bin
     ${ep_languages_args}
+    # ITK
     -DITK_DIR:PATH=${ITK_DIR}
     -DElastix_DIR:PATH=${Elastix_DIR}
     -DSWIG_DIR:PATH=${SWIG_DIR}
@@ -509,10 +507,10 @@ ExternalProject_Add(${proj}
     -DWRAP_TCL:BOOL=${WRAP_TCL}
     -DWRAP_CSHARP:BOOL=${WRAP_CSHARP}
     -DWRAP_R:BOOL=${WRAP_R}
-    -DWRAP_NODE:BOOL=${WRAP_NODE}
     -DBUILD_EXAMPLES:BOOL=${BUILD_TESTING}
   DEPENDS ${${CMAKE_PROJECT_NAME}_DEPENDENCIES}
   ${External_Project_USES_TERMINAL}
+  STEP_TARGETS configure build doc forcebuild
 )
 
 ExternalProject_Add_Step(${proj} forcebuild
@@ -532,10 +530,6 @@ ExternalProject_Add_Step(${proj} doc
   EXCLUDE_FROM_MAIN 1
   LOG 1
 )
-
-# adds superbuild level target "SimpleITK-documentation" etc..
-ExternalProject_Add_StepTargets(${proj} configure build test forcebuild doc)
-
 
 
 # Load the SimpleITK version variables, scope isolated in a function.

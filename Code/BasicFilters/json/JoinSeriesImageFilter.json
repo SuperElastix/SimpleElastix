@@ -5,7 +5,7 @@
   "number_of_inputs" : 1,
   "pixel_types" : "NonLabelPixelIDTypeList",
   "output_image_type" : "typename InputImageType::template Rebind<typename InputImageType::PixelType, InputImageType::ImageDimension+1>::Type",
-  "custom_register" : "this->m_MemberFactory->RegisterMemberFunctions< PixelIDTypeList, 2 > ();\n  #ifdef SITK_4D_IMAGES\n    this->m_MemberFactory->RegisterMemberFunctions< PixelIDTypeList, 3 > ();\n  #endif",
+  "custom_register" : "this->m_MemberFactory->RegisterMemberFunctions< PixelIDTypeList, 2, SITK_MAX_DIMENSION-1 > ();\n",
   "members" : [
     {
       "name" : "Origin",
@@ -107,5 +107,6 @@
   "briefdescription" : "Join N-D images into an (N+1)-D image.",
   "detaileddescription" : "This filter is templated over the input image type and the output image type. The pixel type of them must be the same and the input dimension must be less than the output dimension. When the input images are N-dimensional, they are joined in order and the size of the N+1'th dimension of the output is same as the number of the inputs. The spacing and the origin (where the first input is placed) for the N+1'th dimension is specified in this filter. The output image informations for the first N dimensions are taken from the first input. Note that all the inputs should have the same information.\n\n\\author Hideaki Hiraki\n\n\nContributed in the users list http://public.kitware.com/pipermail/insight-users/2004-February/006542.html",
   "itk_module" : "ITKImageCompose",
-  "itk_group" : "ImageCompose"
+  "itk_group" : "ImageCompose",
+  "in_place" : false
 }

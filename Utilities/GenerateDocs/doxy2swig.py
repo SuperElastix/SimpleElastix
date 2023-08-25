@@ -40,8 +40,6 @@ import regex
 
 debug = 0
 
-debug = 0
-
 def my_open_read(source):
     if hasattr(source, "read"):
         return source

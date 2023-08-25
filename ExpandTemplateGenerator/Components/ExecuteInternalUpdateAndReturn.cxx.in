@@ -10,7 +10,7 @@ if temp then
 OUT=OUT..[[
 
   // release the old filter ( and output data )
-  if ( this->m_Filter != NULL)
+  if ( this->m_Filter != nullptr)
     {
 ]]
 for i = 1,#measurements do
@@ -22,7 +22,7 @@ end
 
 OUT=OUT..[[
       this->m_Filter->UnRegister();
-      this->m_Filter = NULL;
+      this->m_Filter = nullptr;
     }
 
   this->m_Filter = filter;
@@ -37,7 +37,7 @@ $(if measurements then
 for i = 1,#measurements do
   if measurements[i].active then
     OUT=OUT..'  this->m_pfGet'..measurements[i].name..' = std::bind('
-    if measurements[i].custom_cast or measurements[i].label_map then
+    if measurements[i].custom_cast or measurements[i].label_map or measurements[i].itk_get then
       OUT=OUT..'&'..measurements[i].name..'CustomCast<FilterType>::CustomCast'
     else
       OUT=OUT..'&FilterType::Get'..measurements[i].name
@@ -71,8 +71,9 @@ OUT=[[
 ]]
 else
 OUT=[[
-  typename FilterType::OutputImageType *itkOutImage = filter->GetOutput();
-  this->FixNonZeroIndex( itkOutImage );
-  return Image( this->CastITKToImage(itkOutImage) );
+  typename FilterType::OutputImageType::Pointer itkOutImage{ filter->GetOutput()};
+  filter = nullptr;
+  this->FixNonZeroIndex( itkOutImage.GetPointer() );
+  return Image{ this->CastITKToImage( itkOutImage.GetPointer() ) };
 ]]
 end)

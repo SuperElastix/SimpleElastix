@@ -27,9 +27,9 @@ copyright = u'2020, NumFOCUS'
 author = u'Insight Software Consortium'
 
 # The short X.Y version
-version = u'1.2'
+version = u'2.0'
 # The full version, including alpha/beta/rc tags
-release = u'1.2.0.dev'
+release = u'2.0rc2'
 
 
 # -- General configuration ---------------------------------------------------
@@ -78,7 +78,7 @@ pygments_style = None
 # -- Options for HTML output -------------------------------------------------
 
 def setup(app):
-    app.add_stylesheet("style.css")
+    app.add_css_file("style.css")
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.

@@ -1,11 +1,38 @@
 {
   "name" : "ClosingByReconstructionImageFilter",
-  "template_code_filename" : "KernelImageFilter",
+  "template_code_filename" : "ImageFilter",
   "template_test_filename" : "ImageFilter",
   "number_of_inputs" : 1,
   "doc" : "",
   "pixel_types" : "BasicPixelIDTypeList",
+  "filter_type" : "itk::ClosingByReconstructionImageFilter<InputImageType, OutputImageType, itk::FlatStructuringElement< InputImageType::ImageDimension > >",
+  "include_files" : [
+    "sitkCreateKernel.h"
+  ],
   "members" : [
+    {
+      "name" : "KernelRadius",
+      "type" : "unsigned int",
+      "default" : "std::vector<uint32_t>(3, 1)",
+      "dim_vec" : 1,
+      "set_as_scalar" : 1,
+      "doc" : "",
+      "custom_itk_cast" : "",
+      "briefdescriptionSet" : "",
+      "detaileddescriptionSet" : "Set the radius of the kernel structuring element.",
+      "briefdescriptionGet" : "",
+      "detaileddescriptionGet" : "Get the radius of the kernel structuring element."
+    },
+    {
+      "name" : "KernelType",
+      "type" : "KernelEnum",
+      "default" : "itk::simple::sitkBall",
+      "custom_itk_cast" : "auto kernel = CreateKernel<InputImageType::ImageDimension>( m_KernelType, m_KernelRadius );\n  filter->SetKernel( kernel );",
+      "briefdescriptionSet" : "",
+      "detaileddescriptionSet" : "Set the kernel or structuring element used for the morphology.",
+      "briefdescriptionGet" : "",
+      "detaileddescriptionGet" : "Get the kernel or structuring element used for the morphology."
+    },
     {
       "name" : "FullyConnected",
       "type" : "bool",
@@ -59,5 +86,6 @@
   "briefdescription" : "Closing by reconstruction of an image.",
   "detaileddescription" : "This filter is similar to the morphological closing, but contrary to the morphological closing, the closing by reconstruction preserves the shape of the components. The closing by reconstruction of an image \"f\" is defined as:\n\nClosingByReconstruction(f) = ErosionByReconstruction(f, Dilation(f)).\n\nClosing by reconstruction not only preserves structures preserved by the dilation, but also levels raises the contrast of the darkest regions. If PreserveIntensities is on, a subsequent reconstruction by dilation using a marker image that is the original image for all unaffected pixels.\n\nClosing by reconstruction is described in Chapter 6.3.9 of Pierre Soille's book \"Morphological Image Analysis: Principles and\nApplications\", Second Edition, Springer, 2003.\n\n\\author Gaetan Lehmann. Biologie du Developpement et de la Reproduction, INRA de Jouy-en-Josas, France.\n\n\n\\see GrayscaleMorphologicalClosingImageFilter",
   "itk_module" : "ITKMathematicalMorphology",
-  "itk_group" : "MathematicalMorphology"
+  "itk_group" : "MathematicalMorphology",
+  "in_place" : false
 }

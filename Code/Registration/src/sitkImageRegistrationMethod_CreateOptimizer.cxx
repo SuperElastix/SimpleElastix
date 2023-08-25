@@ -83,7 +83,7 @@ namespace simple
   itk::ObjectToObjectOptimizerBaseTemplate<double>*
   ImageRegistrationMethod::CreateOptimizer( unsigned int numberOfTransformParameters )
   {
-    typedef double InternalComputationValueType;
+    using InternalComputationValueType = double;
 
     if ( m_OptimizerType == ConjugateGradientLineSearch )
       {
@@ -110,6 +110,7 @@ namespace simple
       this->m_pfGetOptimizerScales = [x]() {
         return PositionOptimizerCustomCast::Helper(x->GetScales());
       };
+      this->m_pfOptimizerStopRegistration = std::bind(&_OptimizerType::StopOptimization, optimizer.GetPointer());
 
       optimizer->Register();
       return optimizer.GetPointer();
@@ -135,6 +136,7 @@ namespace simple
       this->m_pfGetOptimizerScales = [x]() {
         return PositionOptimizerCustomCast::Helper(x->GetScales());
       };
+      this->m_pfOptimizerStopRegistration = std::bind(&_OptimizerType::StopOptimization, optimizer.GetPointer());
 
       optimizer->Register();
       return optimizer.GetPointer();
@@ -164,6 +166,7 @@ namespace simple
       this->m_pfGetOptimizerScales = [x]() {
         return PositionOptimizerCustomCast::Helper(x->GetScales());
       };
+      this->m_pfOptimizerStopRegistration = std::bind(&_OptimizerType::StopOptimization, optimizer.GetPointer());
 
 
       optimizer->Register();
@@ -193,6 +196,7 @@ namespace simple
       this->m_pfGetOptimizerScales = [x]() {
         return PositionOptimizerCustomCast::Helper(x->GetScales());
       };
+      this->m_pfOptimizerStopRegistration = std::bind(&_OptimizerType::StopOptimization, optimizer.GetPointer());
 
 
       return optimizer.GetPointer();
@@ -245,6 +249,7 @@ namespace simple
       this->m_pfGetOptimizerScales = [x]() {
         return PositionOptimizerCustomCast::Helper(x->GetScales());
       };
+      this->m_pfOptimizerStopRegistration = nullptr;
 
 
       return optimizer.GetPointer();
@@ -272,6 +277,7 @@ namespace simple
       this->m_pfGetOptimizerScales = [x]() {
         return PositionOptimizerCustomCast::Helper(x->GetScales());
       };
+      this->m_pfOptimizerStopRegistration = nullptr;
 
 
       return optimizer.GetPointer();
@@ -298,6 +304,7 @@ namespace simple
                                                   &(this->m_MetricValue),
                                                   std::placeholders::_1);
 
+      this->m_pfOptimizerStopRegistration = std::bind(&_OptimizerType::StopWalking, optimizer.GetPointer());
 
       optimizer->Register();
       return optimizer.GetPointer();
@@ -324,6 +331,7 @@ namespace simple
       this->m_pfGetOptimizerScales = [x]() {
         return PositionOptimizerCustomCast::Helper(x->GetScales());
       };
+      this->m_pfOptimizerStopRegistration = nullptr;
 
 
       optimizer->Register();
@@ -347,6 +355,7 @@ namespace simple
       this->m_pfGetOptimizerScales = [x]() {
         return PositionOptimizerCustomCast::Helper(x->GetScales());
       };
+      this->m_pfOptimizerStopRegistration = std::bind(&_OptimizerType::StopOptimization, optimizer.GetPointer());
 
 
       optimizer->Register();
@@ -362,7 +371,7 @@ namespace simple
                              this->m_OptimizerGrowthFactor,
                              this->m_OptimizerShrinkFactor);
 
-      typedef itk::Statistics::NormalVariateGenerator  GeneratorType;
+      using GeneratorType = itk::Statistics::NormalVariateGenerator;
       GeneratorType::Pointer generator = GeneratorType::New();
       if ( this->m_OptimizerSeed == sitkWallClock )
         {
@@ -386,7 +395,7 @@ namespace simple
       this->m_pfGetOptimizerScales = [x]() {
         return PositionOptimizerCustomCast::Helper(x->GetScales());
       };
-
+      this->m_pfOptimizerStopRegistration = std::bind(&_OptimizerType::StopOptimization, optimizer.GetPointer());
 
       optimizer->Register();
       return optimizer.GetPointer();

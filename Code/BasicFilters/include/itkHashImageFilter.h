@@ -30,7 +30,7 @@ namespace itk {
 /** \class HashImageFilter
  * \brief Generates a hash string from an image.
  *
- * \note This class utlizes low level buffer pointer access, to work
+ * \note This class utilizes low level buffer pointer access, to work
  * with itk::Image and itk::VectorImage. It is modeled after the access
  * an ImageFileWriter provides to an ImageIO.
  *
@@ -41,13 +41,13 @@ class HashImageFilter:
     public CastImageFilter< TImageType, TImageType >
 {
 public:
-  /** Standard Self typedef */
-  typedef HashImageFilter                           Self;
-  typedef CastImageFilter< TImageType, TImageType > Superclass;
-  typedef SmartPointer< Self >                      Pointer;
-  typedef SmartPointer< const Self >                ConstPointer;
+  /** Standard Self type alias */
+  using Self = HashImageFilter;
+  using Superclass = CastImageFilter< TImageType, TImageType >;
+  using Pointer = SmartPointer< Self >;
+  using ConstPointer = SmartPointer< const Self >;
 
-  typedef typename TImageType::RegionType RegionType;
+  using RegionType = typename TImageType::RegionType;
 
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
@@ -56,10 +56,10 @@ public:
   itkTypeMacro(HashImageFilter, CastImageFilter);
 
   /** Smart Pointer type to a DataObject. */
-  typedef typename DataObject::Pointer DataObjectPointer;
+  using DataObjectPointer = typename DataObject::Pointer;
 
   /** Type of DataObjects used for scalar outputs */
-  typedef SimpleDataObjectDecorator< std::string >  HashObjectType;
+  using HashObjectType = SimpleDataObjectDecorator< std::string >;
 
   /** Get the computed Hash values */
   std::string GetHash() const
@@ -77,9 +77,9 @@ public:
 
 /** Make a DataObject of the correct type to be used as the specified
    * output. */
-  typedef ProcessObject::DataObjectPointerArraySizeType DataObjectPointerArraySizeType;
+  using DataObjectPointerArraySizeType = ProcessObject::DataObjectPointerArraySizeType;
   using Superclass::MakeOutput;
-  virtual DataObjectPointer MakeOutput(DataObjectPointerArraySizeType idx) ITK_OVERRIDE;
+  DataObjectPointer MakeOutput(DataObjectPointerArraySizeType idx) override;
 
 protected:
 
@@ -87,18 +87,18 @@ protected:
 
   // virtual ~HashImageFilter(); // implementation not needed
 
-  virtual void PrintSelf(std::ostream & os, Indent indent) const ITK_OVERRIDE;
+  void PrintSelf(std::ostream & os, Indent indent) const override;
 
   // See superclass for doxygen documentation
   //
   // This method is to do work after the superclass potential threaded
   // copy.
-  void AfterThreadedGenerateData() ITK_OVERRIDE;
+  void AfterThreadedGenerateData() override;
 
   // See superclass for doxygen documentation
   //
   // Override since the filter produces all of its output
-  void EnlargeOutputRequestedRegion(DataObject *data) ITK_OVERRIDE;
+  void EnlargeOutputRequestedRegion(DataObject *data) override;
 
 private:
   HashImageFilter(const Self &); //purposely not implemented

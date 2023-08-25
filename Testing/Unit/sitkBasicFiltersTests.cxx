@@ -53,6 +53,9 @@
 #include <sitkCommand.h>
 #include <sitkResampleImageFilter.h>
 #include <sitkSignedMaurerDistanceMapImageFilter.h>
+#include <sitkDICOMOrientImageFilter.h>
+#include <sitkPasteImageFilter.h>
+#include <sitkN4BiasFieldCorrectionImageFilter.h>
 
 #include "itkVectorImage.h"
 #include "itkVector.h"
@@ -84,9 +87,9 @@
 #include "sitkScaleVersor3DTransform.h"
 
 TEST(BasicFilter,FastSymmetricForcesDemonsRegistrationFilter_ENUMCHECK) {
-  typedef itk::Image<float,3> ImageType;
-  typedef itk::Image<itk::Vector<float,3>,3> DisplacementType;
-  typedef itk::FastSymmetricForcesDemonsRegistrationFilter<ImageType,ImageType,DisplacementType>::DemonsRegistrationFunctionType ITKType;
+  using ImageType = itk::Image<float,3>;
+  using DisplacementType = itk::Image<itk::Vector<float,3>,3>;
+  using ITKType = itk::FastSymmetricForcesDemonsRegistrationFilter<ImageType,ImageType,DisplacementType>::DemonsRegistrationFunctionType;
 
   EXPECT_EQ( (int)ITKType::Symmetric, (int)itk::simple::FastSymmetricForcesDemonsRegistrationFilter::Symmetric);
   EXPECT_EQ( (int)ITKType::Fixed, (int)itk::simple::FastSymmetricForcesDemonsRegistrationFilter::Fixed);
@@ -96,9 +99,9 @@ TEST(BasicFilter,FastSymmetricForcesDemonsRegistrationFilter_ENUMCHECK) {
 
 
 TEST(BasicFilter,DiffeomorphicDemonsRegistrationFilter_ENUMCHECK) {
-  typedef itk::Image<float,3> ImageType;
-  typedef itk::Image<itk::Vector<float,3>,3> DisplacementType;
-  typedef itk::DiffeomorphicDemonsRegistrationFilter<ImageType,ImageType,DisplacementType>::DemonsRegistrationFunctionType ITKType;
+  using ImageType = itk::Image<float,3>;
+  using DisplacementType = itk::Image<itk::Vector<float,3>,3>;
+  using ITKType = itk::DiffeomorphicDemonsRegistrationFilter<ImageType,ImageType,DisplacementType>::DemonsRegistrationFunctionType;
 
   EXPECT_EQ( (int)ITKType::Symmetric, (int)itk::simple::DiffeomorphicDemonsRegistrationFilter::Symmetric);
   EXPECT_EQ( (int)ITKType::Fixed, (int)itk::simple::DiffeomorphicDemonsRegistrationFilter::Fixed);
@@ -107,7 +110,7 @@ TEST(BasicFilter,DiffeomorphicDemonsRegistrationFilter_ENUMCHECK) {
 }
 
 TEST(BasicFilters,MergeLabelMap_ENUMCHECK) {
-  typedef itk::MergeLabelMapFilter< itk::LabelMap< itk::LabelObject<int, 3> > >  ITKType;
+  using ITKType = itk::MergeLabelMapFilter< itk::LabelMap< itk::LabelObject<int, 3> > >;
   EXPECT_EQ( (int)ITKType::MethodChoice::KEEP, (int)itk::simple::MergeLabelMapFilter::Keep);
   EXPECT_EQ( (int)ITKType::MethodChoice::AGGREGATE, (int)itk::simple::MergeLabelMapFilter::Aggregate);
   EXPECT_EQ( (int)ITKType::MethodChoice::PACK, (int)itk::simple::MergeLabelMapFilter::Pack);
@@ -115,7 +118,7 @@ TEST(BasicFilters,MergeLabelMap_ENUMCHECK) {
 }
 
 TEST(BasicFilters,ScalarToRGBColormap_ENUMCHECK) {
-  typedef itk::ScalarToRGBColormapImageFilter< itk::Image<float,3>, itk::Image< itk::RGBPixel<float>,3> > ITKType;
+  using ITKType = itk::ScalarToRGBColormapImageFilter< itk::Image<float,3>, itk::Image< itk::RGBPixel<float>,3> >;
   EXPECT_EQ( (int)ITKType::ColormapEnumType::Red, (int)itk::simple::ScalarToRGBColormapImageFilter::Red);
   EXPECT_EQ( (int)ITKType::ColormapEnumType::Green, (int)itk::simple::ScalarToRGBColormapImageFilter::Green);
   EXPECT_EQ( (int)ITKType::ColormapEnumType::Blue, (int)itk::simple::ScalarToRGBColormapImageFilter::Blue);
@@ -133,14 +136,14 @@ TEST(BasicFilters,ScalarToRGBColormap_ENUMCHECK) {
 }
 
 TEST(BasicFilters,RecursiveGaussian_ENUMCHECK) {
-  typedef itk::RecursiveGaussianImageFilter< itk::Image<float,3> > ITKRecursiveGausianType;
+  using ITKRecursiveGausianType = itk::RecursiveGaussianImageFilter< itk::Image<float,3> >;
   EXPECT_EQ( (int)ITKRecursiveGausianType::OrderEnumType::ZeroOrder, (int)itk::simple::RecursiveGaussianImageFilter::ZeroOrder );
   EXPECT_EQ( (int)ITKRecursiveGausianType::OrderEnumType::FirstOrder, (int)itk::simple::RecursiveGaussianImageFilter::FirstOrder );
   EXPECT_EQ( (int)ITKRecursiveGausianType::OrderEnumType::SecondOrder, (int)itk::simple::RecursiveGaussianImageFilter::SecondOrder );
 }
 
 TEST(BasicFilters,Extract_ENUMCHECK) {
-  typedef itk::ExtractImageFilter< itk::Image<float,3>, itk::Image<float,3> > ITKExtractType;
+  using ITKExtractType = itk::ExtractImageFilter< itk::Image<float,3>, itk::Image<float,3> >;
   EXPECT_EQ( (int)ITKExtractType::DirectionCollapseStrategyEnum::DIRECTIONCOLLAPSETOUNKOWN, (int)itk::simple::ExtractImageFilter::DIRECTIONCOLLAPSETOUNKOWN );
   EXPECT_EQ( (int)ITKExtractType::DirectionCollapseStrategyEnum::DIRECTIONCOLLAPSETOIDENTITY, (int)itk::simple::ExtractImageFilter::DIRECTIONCOLLAPSETOIDENTITY );
   EXPECT_EQ( (int)ITKExtractType::DirectionCollapseStrategyEnum::DIRECTIONCOLLAPSETOSUBMATRIX, (int)itk::simple::ExtractImageFilter::DIRECTIONCOLLAPSETOSUBMATRIX );
@@ -148,50 +151,50 @@ TEST(BasicFilters,Extract_ENUMCHECK) {
 }
 
 TEST(BasicFilters,FastMarching_ENUMCHECK) {
-  typedef itk::FastMarchingImageFilterBase< itk::Image<float,3>, itk::Image<float,3> > ITKType;
+  using ITKType = itk::FastMarchingImageFilterBase< itk::Image<float,3>, itk::Image<float,3> >;
   EXPECT_EQ( (int) ITKType::Nothing, (int) itk::simple::FastMarchingBaseImageFilter::Nothing );
   EXPECT_EQ( (int) ITKType::NoHandles, (int) itk::simple::FastMarchingBaseImageFilter::NoHandles );
   EXPECT_EQ( (int) ITKType::Strict, (int) itk::simple::FastMarchingBaseImageFilter::Strict );
 }
 
 TEST(BasicFilters,InverseDeconvolution_ENUMCHECK) {
-  typedef itk::InverseDeconvolutionImageFilter< itk::Image<float,3>, itk::Image<float,3> > ITKType;
+  using ITKType = itk::InverseDeconvolutionImageFilter< itk::Image<float,3>, itk::Image<float,3> >;
   EXPECT_EQ( (int) ITKType::OutputRegionModeEnum::SAME, (int) itk::simple::InverseDeconvolutionImageFilter::SAME );
   EXPECT_EQ( (int) ITKType::OutputRegionModeEnum::VALID, (int) itk::simple::InverseDeconvolutionImageFilter::VALID );
 }
 
 TEST(BasicFilters,TikhonovDeconvolution_ENUMCHECK) {
-  typedef itk::TikhonovDeconvolutionImageFilter< itk::Image<float,3>, itk::Image<float,3> > ITKType;
+  using ITKType = itk::TikhonovDeconvolutionImageFilter< itk::Image<float,3>, itk::Image<float,3> >;
   EXPECT_EQ( (int) ITKType::OutputRegionModeEnum::SAME, (int) itk::simple::TikhonovDeconvolutionImageFilter::SAME );
   EXPECT_EQ( (int) ITKType::OutputRegionModeEnum::VALID, (int) itk::simple::TikhonovDeconvolutionImageFilter::VALID );
 }
 
 TEST(BasicFilters,WienerDeconvolution_ENUMCHECK) {
-  typedef itk::WienerDeconvolutionImageFilter< itk::Image<float,3>, itk::Image<float,3> > ITKType;
+  using ITKType = itk::WienerDeconvolutionImageFilter< itk::Image<float,3>, itk::Image<float,3> >;
   EXPECT_EQ( (int) ITKType::OutputRegionModeEnum::SAME, (int) itk::simple::WienerDeconvolutionImageFilter::SAME );
   EXPECT_EQ( (int) ITKType::OutputRegionModeEnum::VALID, (int) itk::simple::WienerDeconvolutionImageFilter::VALID );
 }
 
 TEST(BasicFilters,LandweberDeconvolution_ENUMCHECK) {
-  typedef itk::LandweberDeconvolutionImageFilter< itk::Image<float,3>, itk::Image<float,3> > ITKType;
+  using ITKType = itk::LandweberDeconvolutionImageFilter< itk::Image<float,3>, itk::Image<float,3> >;
   EXPECT_EQ( (int) ITKType::OutputRegionModeEnum::SAME, (int) itk::simple::LandweberDeconvolutionImageFilter::SAME );
   EXPECT_EQ( (int) ITKType::OutputRegionModeEnum::VALID, (int) itk::simple::LandweberDeconvolutionImageFilter::VALID );
 }
 
 TEST(BasicFilters,ProjectedLandweberDeconvolution_ENUMCHECK) {
-  typedef itk::ProjectedLandweberDeconvolutionImageFilter< itk::Image<float,3>, itk::Image<float,3> > ITKType;
+  using ITKType = itk::ProjectedLandweberDeconvolutionImageFilter< itk::Image<float,3>, itk::Image<float,3> >;
   EXPECT_EQ( (int) ITKType::OutputRegionModeEnum::SAME, (int) itk::simple::ProjectedLandweberDeconvolutionImageFilter::SAME );
   EXPECT_EQ( (int) ITKType::OutputRegionModeEnum::VALID, (int) itk::simple::ProjectedLandweberDeconvolutionImageFilter::VALID );
 }
 
 TEST(BasicFilters,RichardsonLucyDeconvolution_ENUMCHECK) {
-  typedef itk::RichardsonLucyDeconvolutionImageFilter< itk::Image<float,3>, itk::Image<float,3> > ITKType;
+  using ITKType = itk::RichardsonLucyDeconvolutionImageFilter< itk::Image<float,3>, itk::Image<float,3> >;
   EXPECT_EQ( (int) ITKType::OutputRegionModeEnum::SAME, (int) itk::simple::RichardsonLucyDeconvolutionImageFilter::SAME );
   EXPECT_EQ( (int) ITKType::OutputRegionModeEnum::VALID, (int) itk::simple::RichardsonLucyDeconvolutionImageFilter::VALID );
 }
 
 TEST(BasicFilters,LabelMapContourOverlay_ENUMCHECK) {
-  typedef itk::LabelMapContourOverlayImageFilter< itk::LabelMap<itk::LabelObject<int,3> >, itk::Image<float,3>, itk::VectorImage<int,3> > ITKType;
+  using ITKType = itk::LabelMapContourOverlayImageFilter< itk::LabelMap<itk::LabelObject<int,3> >, itk::Image<float,3>, itk::VectorImage<int,3> >;
   EXPECT_EQ( (int) ITKType::PLAIN, (int)         itk::simple::LabelMapContourOverlayImageFilter::PLAIN );
   EXPECT_EQ( (int) ITKType::CONTOUR, (int)       itk::simple::LabelMapContourOverlayImageFilter::CONTOUR );
   EXPECT_EQ( (int) ITKType::SLICE_CONTOUR, (int) itk::simple::LabelMapContourOverlayImageFilter::SLICE_CONTOUR );
@@ -203,7 +206,7 @@ TEST(BasicFilters,LabelMapContourOverlay_ENUMCHECK) {
 }
 
 TEST(BasicFilters,PatchBasedBaseDenoising_ENUMCHECK) {
-  typedef itk::PatchBasedDenoisingImageFilter< itk::Image<float,3>, itk::Image<float,3> > ITKType;
+  using ITKType = itk::PatchBasedDenoisingImageFilter< itk::Image<float,3>, itk::Image<float,3> >;
   EXPECT_EQ( (int) ITKType::NOMODEL, (int) itk::simple::PatchBasedDenoisingImageFilter::NOMODEL );
   EXPECT_EQ( (int) ITKType::GAUSSIAN, (int) itk::simple::PatchBasedDenoisingImageFilter::GAUSSIAN );
   EXPECT_EQ( (int) ITKType::RICIAN, (int) itk::simple::PatchBasedDenoisingImageFilter::RICIAN );
@@ -212,7 +215,7 @@ TEST(BasicFilters,PatchBasedBaseDenoising_ENUMCHECK) {
 
 
 TEST(BasicFilters,ConnectedThreshold_ENUMCHECK) {
-  typedef itk::ConnectedThresholdImageFilter< itk::Image<float,3>, itk::Image<float,3> > ITKType;
+  using ITKType = itk::ConnectedThresholdImageFilter< itk::Image<float,3>, itk::Image<float,3> >;
   EXPECT_EQ( (int) ITKType::FaceConnectivity, (int) itk::simple::ConnectedThresholdImageFilter::FaceConnectivity );
   EXPECT_EQ( (int) ITKType::FullConnectivity, (int) itk::simple::ConnectedThresholdImageFilter::FullConnectivity );
 }
@@ -298,7 +301,7 @@ TEST(BasicFilters,ImageFilter) {
   namespace sitk = itk::simple;
 
   sitk::CastImageFilter caster;
-  sitk::ImageFilter<1> &filter = caster;
+  sitk::ImageFilter &filter = caster;
 
   filter.DebugOn();
 }
@@ -366,7 +369,7 @@ TEST(BasicFilters,Cast) {
 
   reader.SetFileName ( dataFinder.GetFile ( "Input/RA-Float.nrrd" ) );
   itk::simple::Image image = reader.Execute();
-  ASSERT_TRUE ( image.GetITKBase() != NULL );
+  ASSERT_NE ( image.GetITKBase(), nullptr );
   hasher.SetHashFunction ( itk::simple::HashImageFilter::MD5 );
   EXPECT_EQ ( "3ccccde44efaa3d688a86e94335c1f16", hasher.Execute ( image ) );
 
@@ -374,7 +377,7 @@ TEST(BasicFilters,Cast) {
   EXPECT_EQ ( image.GetPixelID(), itk::simple::sitkFloat32 );
   EXPECT_EQ ( image.GetPixelIDTypeAsString(), "32-bit float" );
 
-  typedef std::map<std::string,itk::simple::PixelIDValueEnum> MapType;
+  using MapType = std::map<std::string,itk::simple::PixelIDValueEnum>;
   MapType mapping;
   mapping["2f27e9260baeba84fb83dd35de23fa2d"] = itk::simple::sitkUInt8;
   mapping["2f27e9260baeba84fb83dd35de23fa2d"] = itk::simple::sitkInt8;
@@ -916,8 +919,8 @@ TEST(BasicFilters,ResampleImageFilter_DefaultParameters)
   sitk::Image result = filter.Execute(img);
 
   // Resample with default parameters returns a 0x0 image
-  EXPECT_EQ ( 0, result.GetWidth() );
-  EXPECT_EQ ( 0, result.GetHeight() );
+  EXPECT_EQ ( 0u, result.GetWidth() );
+  EXPECT_EQ ( 0u, result.GetHeight() );
 }
 
 
@@ -933,4 +936,388 @@ TEST(BasicFilters,OtsuThreshold_CheckNamesInputCompatibility)
   // is thrown.
   EXPECT_THROW( sitk::OtsuThreshold(input, mask1), sitk::GenericException );
   EXPECT_THROW( sitk::OtsuThreshold(input, mask2), sitk::GenericException );
+}
+
+TEST(BasicFilters, DICOMOrientImageFilter_Direction)
+{
+  namespace sitk= itk::simple;
+
+  auto directionLPS= v9(1.0,0.0,0.0,
+                        0.0,1.0,
+                        0.0,0.0,0.0,1.0);
+  auto directionRAS= v9(-1.0,0.0,0.0,
+                        0.0,-1.0,0.0,
+                        0.0,0.0,1.0);
+
+  EXPECT_EQ(directionLPS,
+            sitk::DICOMOrientImageFilter::GetDirectionCosinesFromOrientation("LPS"));
+  EXPECT_EQ("LPS",  sitk::DICOMOrientImageFilter::GetOrientationFromDirectionCosines(directionLPS));
+
+  EXPECT_EQ(v9(-1.0,0.0,0.0, 0.0,-1.0,0.0, 0.0,0.0,1.0),
+            sitk::DICOMOrientImageFilter::GetDirectionCosinesFromOrientation("RAS"));
+  EXPECT_EQ("RAS",sitk::DICOMOrientImageFilter::GetOrientationFromDirectionCosines(directionRAS));
+
+}
+
+
+TEST(BasicFilters, ExtractImageFilter_2D)
+{
+  namespace sitk = itk::simple;
+
+  sitk::Image input( {10, 10}, sitk::sitkUInt8);
+  sitk::Image output;
+
+  sitk::ExtractImageFilter extractor;
+
+  extractor.SetIndex({0,0});
+  extractor.SetSize({10,10});
+  ASSERT_NO_THROW(output = extractor.Execute(input));
+  EXPECT_EQ(sitk::Hash(input), sitk::Hash(output));
+  EXPECT_EQ(input.GetSize(), output.GetSize());
+
+  extractor.SetIndex({0,0,0});
+  extractor.SetSize({10,10,10});
+  ASSERT_NO_THROW(output = extractor.Execute(input));
+  EXPECT_EQ(sitk::Hash(input), sitk::Hash(output));
+  EXPECT_VECTOR_NEAR(input.GetSize(), output.GetSize(), 1e-20);
+
+  extractor.SetIndex({0});
+  extractor.SetSize({10,10,10});
+  ASSERT_ANY_THROW(output = extractor.Execute(input));
+
+  extractor.SetIndex({0,0,0});
+  extractor.SetSize({10});
+  ASSERT_ANY_THROW(output = extractor.Execute(input));
+
+  extractor.SetIndex({0,0,0});
+  extractor.SetSize({0,0});
+  ASSERT_ANY_THROW(output = extractor.Execute(input));
+
+  extractor.SetIndex({0,0,0});
+  extractor.SetSize({10, 0});
+  ASSERT_ANY_THROW(output = extractor.Execute(input));
+
+  extractor.SetIndex({0,0,0});
+  extractor.SetSize({0, 10});
+  ASSERT_ANY_THROW(output = extractor.Execute(input));
+
+}
+
+
+TEST(BasicFilters, ExtractImageFilter_3D)
+{
+  namespace sitk = itk::simple;
+
+  sitk::Image input( {10, 10, 10}, sitk::sitkUInt8);
+  input.SetOrigin( {1.0, 2.0, 3.0});
+  sitk::Image output;
+
+  sitk::ExtractImageFilter extractor;
+
+  extractor.SetIndex({0,0,0});
+  extractor.SetSize({10,10,10});
+  ASSERT_NO_THROW(output = extractor.Execute(input));
+  EXPECT_EQ(sitk::Hash(input), sitk::Hash(output));
+  EXPECT_EQ(input.GetSize(), output.GetSize());
+  EXPECT_VECTOR_NEAR(input.GetSize(), output.GetSize(), 1e-20);
+  EXPECT_VECTOR_NEAR(input.GetOrigin(), output.GetOrigin(), 1e-20);
+
+  extractor.SetIndex({0,0,0,0});
+  extractor.SetSize({10,10,10,10});
+  ASSERT_NO_THROW(output = extractor.Execute(input));
+  EXPECT_EQ(sitk::Hash(input), sitk::Hash(output));
+  EXPECT_VECTOR_NEAR(input.GetSize(), output.GetSize(), 1e-20);
+  EXPECT_VECTOR_NEAR(input.GetOrigin(), output.GetOrigin(), 1e-20);
+
+  extractor.SetIndex({0,0,0});
+  extractor.SetSize({0,10,10});
+  ASSERT_NO_THROW(output = extractor.Execute(input));
+  EXPECT_VECTOR_NEAR( v2(10,10), output.GetSize(), 1e-20);
+  EXPECT_VECTOR_NEAR(v2(2.0, 3.0), output.GetOrigin(), 1e-20);
+
+  extractor.SetIndex({0,0,0});
+  extractor.SetSize({0,10,10});
+  ASSERT_NO_THROW(output = extractor.Execute(input));
+  EXPECT_VECTOR_NEAR(v2(10,10), output.GetSize(), 1e-20);
+  EXPECT_VECTOR_NEAR(v2(2.0, 3.0), output.GetOrigin(), 1e-20);
+
+  extractor.SetIndex({0,0,0});
+  extractor.SetSize({10,0,10});
+  ASSERT_NO_THROW(output = extractor.Execute(input));
+  EXPECT_VECTOR_NEAR(v2(10,10), output.GetSize(), 1e-20);
+  EXPECT_VECTOR_NEAR(v2(1.0, 3.0), output.GetOrigin(), 1e-20);
+
+  extractor.SetIndex({0,0,0});
+  extractor.SetSize({10,10,0});
+  ASSERT_NO_THROW(output = extractor.Execute(input));
+  EXPECT_VECTOR_NEAR(v2(10,10), output.GetSize(), 1e-20);
+  EXPECT_VECTOR_NEAR(v2(1.0, 2.0), output.GetOrigin(), 1e-20);
+
+
+  extractor.SetIndex({0,0});
+  extractor.SetSize({10,10,10});
+  ASSERT_ANY_THROW(output = extractor.Execute(input));
+
+  extractor.SetIndex({0,0,0});
+  extractor.SetSize({10,10});
+  ASSERT_ANY_THROW(output = extractor.Execute(input));
+
+  extractor.SetIndex({0,0,0});
+  extractor.SetSize({10,0,0});
+  ASSERT_ANY_THROW(output = extractor.Execute(input));
+
+  extractor.SetSize({0,10,0});
+  ASSERT_ANY_THROW(output = extractor.Execute(input));
+
+}
+
+
+#if SITK_MAX_DIMENSION >= 4
+TEST(BasicFilters, ExtractImageFilter_4D)
+{
+  namespace sitk = itk::simple;
+
+  sitk::Image input( {10, 11, 12, 13}, sitk::sitkUInt8);
+  input.SetOrigin( {1.0, 2.0, 3.0, 4.0});
+  sitk::Image output;
+
+  sitk::ExtractImageFilter extractor;
+
+  extractor.SetIndex({0,0,0,0});
+  extractor.SetSize({10,11,12,13});
+  ASSERT_NO_THROW(output = extractor.Execute(input));
+  EXPECT_EQ(sitk::Hash(input), sitk::Hash(output));
+  EXPECT_EQ(input.GetSize(), output.GetSize());
+  EXPECT_VECTOR_NEAR(input.GetSize(), output.GetSize(), 1e-20);
+  EXPECT_VECTOR_NEAR(input.GetOrigin(), output.GetOrigin(), 1e-20);
+
+  extractor.SetIndex({0,0,0,0});
+  extractor.SetSize({0,11,12,13});
+  ASSERT_NO_THROW(output = extractor.Execute(input));
+  EXPECT_VECTOR_NEAR(v3(11,12,13), output.GetSize(), 1e-20);
+  EXPECT_VECTOR_NEAR(v3(2,3,4), output.GetOrigin(), 1e-20);
+
+  extractor.SetIndex({0,0,0,0});
+  extractor.SetSize({0,11,12,0});
+  ASSERT_NO_THROW(output = extractor.Execute(input));
+  EXPECT_VECTOR_NEAR(v2(11,12), output.GetSize(), 1e-20);
+  EXPECT_VECTOR_NEAR(v2(2,3), output.GetOrigin(), 1e-20);
+
+  extractor.SetIndex({0,0,0,0});
+  extractor.SetSize({10,0,0,13});
+  ASSERT_NO_THROW(output = extractor.Execute(input));
+  EXPECT_VECTOR_NEAR(v2(10,13), output.GetSize(), 1e-20);
+  EXPECT_VECTOR_NEAR(v2(1,4), output.GetOrigin(), 1e-20);
+
+
+  extractor.SetIndex({0,0,0});
+  extractor.SetSize({10,11,12,13});
+  ASSERT_ANY_THROW(output = extractor.Execute(input));
+
+  extractor.SetIndex({0,0,0,0});
+  extractor.SetSize({10,11,12});
+  ASSERT_ANY_THROW(output = extractor.Execute(input));
+
+  extractor.SetIndex({0,0,0,0});
+  extractor.SetSize({0, 0, 0, 13});
+  ASSERT_ANY_THROW(output = extractor.Execute(input));
+
+  extractor.SetIndex({0,0,0,0});
+  extractor.SetSize({0, 0, 12, 0});
+  ASSERT_ANY_THROW(output = extractor.Execute(input));
+
+  extractor.SetIndex({0,0,0,0});
+  extractor.SetSize({0, 11, 0, 0});
+  ASSERT_ANY_THROW(output = extractor.Execute(input));
+
+  extractor.SetIndex({0,0,0,0});
+  extractor.SetSize({10, 0, 0, 0});
+  ASSERT_ANY_THROW(output = extractor.Execute(input));
+
+}
+#endif
+
+#if SITK_MAX_DIMENSION >= 5
+TEST(BasicFilters, ExtractImageFilter_5D)
+{
+  namespace sitk = itk::simple;
+
+  sitk::Image input( {10, 11, 12, 13, 14}, sitk::sitkUInt8);
+  input.SetOrigin( {1.0, 2.0, 3.0, 4.0, 5.0});
+  sitk::Image output;
+
+  sitk::ExtractImageFilter extractor;
+
+  extractor.SetIndex({0,0,0,0,0});
+  extractor.SetSize({10,11,12,13,14});
+  ASSERT_NO_THROW(output = extractor.Execute(input));
+  EXPECT_EQ(sitk::Hash(input), sitk::Hash(output));
+  EXPECT_EQ(input.GetSize(), output.GetSize());
+  EXPECT_VECTOR_NEAR(input.GetSize(), output.GetSize(), 1e-20);
+  EXPECT_VECTOR_NEAR(input.GetOrigin(), output.GetOrigin(), 1e-20);
+
+  extractor.SetIndex({0,0,0,0,0});
+  extractor.SetSize({0,11,12,13,14});
+  ASSERT_NO_THROW(output = extractor.Execute(input));
+  EXPECT_VECTOR_NEAR(v4(11,12,13,14), output.GetSize(), 1e-20);
+  EXPECT_VECTOR_NEAR(v4(2,3,4,5), output.GetOrigin(), 1e-20);
+
+  extractor.SetIndex({0,0,0,0,0});
+  extractor.SetSize({0,11,12,0,14});
+  ASSERT_NO_THROW(output = extractor.Execute(input));
+  EXPECT_VECTOR_NEAR(v3(11,12,14), output.GetSize(), 1e-20);
+  EXPECT_VECTOR_NEAR(v3(2,3,5), output.GetOrigin(), 1e-20);
+
+  extractor.SetIndex({0,0,0,0,0});
+  extractor.SetSize({10,0,0,13,14});
+  ASSERT_NO_THROW(output = extractor.Execute(input));
+  EXPECT_VECTOR_NEAR(v3(10,13,14), output.GetSize(), 1e-20);
+  EXPECT_VECTOR_NEAR(v3(1,4,5), output.GetOrigin(), 1e-20);
+
+  extractor.SetIndex({0,0,0,0,0});
+  extractor.SetSize({0,0,12,0,14});
+  ASSERT_NO_THROW(output = extractor.Execute(input));
+  EXPECT_VECTOR_NEAR(v2(12,14), output.GetSize(), 1e-20);
+  EXPECT_VECTOR_NEAR(v2(3,5), output.GetOrigin(), 1e-20);
+
+  extractor.SetIndex({0,0,0,0,0});
+  extractor.SetSize({10,0,0,13,0});
+  ASSERT_NO_THROW(output = extractor.Execute(input));
+  EXPECT_VECTOR_NEAR(v2(10,13), output.GetSize(), 1e-20);
+  EXPECT_VECTOR_NEAR(v2(1,4), output.GetOrigin(), 1e-20);
+
+  extractor.SetIndex({0,0,0,0});
+  extractor.SetSize({10,11,12,13,14});
+  ASSERT_ANY_THROW(output = extractor.Execute(input));
+
+  extractor.SetIndex({0,0,0,0,0});
+  extractor.SetSize({10,11,12,13});
+  ASSERT_ANY_THROW(output = extractor.Execute(input));
+
+  extractor.SetIndex({0,0,0,0,0});
+  extractor.SetSize({0, 0, 0, 0, 14});
+  ASSERT_ANY_THROW(output = extractor.Execute(input));
+
+  extractor.SetIndex({0,0,0,0,0});
+  extractor.SetSize({0, 0, 12, 0, 0});
+  ASSERT_ANY_THROW(output = extractor.Execute(input));
+
+  extractor.SetIndex({0,0,0,0,0});
+  extractor.SetSize({0, 11, 0, 0,0});
+  ASSERT_ANY_THROW(output = extractor.Execute(input));
+
+  extractor.SetIndex({0,0,0,0,0});
+  extractor.SetSize({10, 0, 0, 0,0});
+  ASSERT_ANY_THROW(output = extractor.Execute(input));
+
+}
+#endif
+
+
+TEST(BasicFilters, PasteImageFilter_2D)
+{
+  constexpr uint16_t value = 17;
+
+  namespace sitk = itk::simple;
+  sitk::Image img = sitk::Image({32,32}, sitk::sitkUInt16);
+  sitk::Image simg = sitk::Image({5,5}, sitk::sitkUInt16);
+  simg.SetPixelAsUInt16({1,2}, value);
+
+  sitk::Image output;
+
+  sitk::PasteImageFilter paster;
+
+  paster.SetDestinationIndex({11,13});
+  paster.SetSourceSize(simg.GetSize());
+  output = paster.Execute(img, simg);
+  EXPECT_EQ(value, output.GetPixelAsUInt16({12, 15}));
+  EXPECT_EQ(0, output.GetPixelAsUInt16({1, 2}));
+
+}
+
+TEST(BasicFilters, PasteImageFilter_Constant)
+{
+  constexpr int32_t c = 4321;
+
+  namespace sitk = itk::simple;
+  sitk::Image img = sitk::Image({32,32}, sitk::sitkInt32);
+
+  sitk::PasteImageFilter paster;
+
+  paster.SetDestinationIndex({11,13});
+  paster.SetSourceSize( {5,7});
+  sitk::Image  output = paster.Execute(img, c);
+  EXPECT_EQ(0, output.GetPixelAsInt32({10, 13}));
+  EXPECT_EQ(0, output.GetPixelAsInt32({11, 12}));
+
+  EXPECT_EQ(c, output.GetPixelAsInt32({11, 13}));
+  EXPECT_EQ(c, output.GetPixelAsInt32({15, 13}));
+  EXPECT_EQ(c, output.GetPixelAsInt32({11, 19}));
+
+  EXPECT_EQ(c, output.GetPixelAsInt32({15, 19}));
+
+}
+
+
+TEST(BasicFilters, PasteImageFilter_3D_2D)
+{
+  constexpr uint16_t value = 17;
+
+  namespace sitk = itk::simple;
+  sitk::Image img = sitk::Image({32,32,32}, sitk::sitkUInt16);
+  sitk::Image simg = sitk::Image({5,5}, sitk::sitkUInt16);
+  simg.SetPixelAsUInt16({1,2}, value);
+
+  sitk::Image output;
+
+  sitk::PasteImageFilter paster;
+
+  paster.SetDestinationIndex({11,13, 15});
+  paster.SetSourceSize(simg.GetSize());
+  output = paster.Execute(img, simg);
+  EXPECT_EQ(value, output.GetPixelAsUInt16({12, 15, 15}));
+  EXPECT_EQ(0, output.GetPixelAsUInt16({1, 2, 15}));
+
+  paster.SetDestinationIndex({11,13,15});
+  paster.SetDestinationSkipAxes({true, false, false});
+  paster.SetSourceSize(simg.GetSize());
+  output = paster.Execute(img, simg);
+  EXPECT_EQ(0, output.GetPixelAsUInt16({12, 15, 15}));
+  EXPECT_EQ(value, output.GetPixelAsUInt16({11, 14, 17}));
+
+  paster.SetDestinationIndex({11,13,15});
+  paster.SetDestinationSkipAxes({false, true, false});
+  paster.SetSourceSize(simg.GetSize());
+  output = paster.Execute(img, simg);
+  EXPECT_EQ(0, output.GetPixelAsUInt16({12, 15, 15}));
+  EXPECT_EQ(value, output.GetPixelAsUInt16({12, 13, 17}));
+
+}
+
+TEST(BasicFilters, N4BiasFieldCorrectionImageFilter_GetLogBiasField)
+{
+  namespace sitk = itk::simple;
+  sitk::Image img(100,100, sitk::sitkFloat32);
+
+  sitk::N4BiasFieldCorrectionImageFilter n4;
+
+  // test before execution
+  EXPECT_ANY_THROW(n4.GetLogBiasFieldAsImage(img));
+
+  n4.Execute(img);
+
+  n4.GetLogBiasFieldAsImage(img);
+
+  n4.GetLogBiasFieldAsImage(sitk::Image(15,15, sitk::sitkUInt8));
+  sitk::Image reference(200, 200, sitk::sitkLabelUInt8);
+  reference.SetOrigin( { 1.1, 2.2 } );
+  reference.SetSpacing( { 0.5, 0.4 } );
+  sitk::Image logBiasField = n4.GetLogBiasFieldAsImage(reference);
+
+
+  EXPECT_EQ( reference.GetSize(), logBiasField.GetSize() );
+  EXPECT_VECTOR_DOUBLE_NEAR( reference.GetOrigin(), logBiasField.GetOrigin(), 1e-8 );
+  EXPECT_VECTOR_DOUBLE_NEAR( reference.GetSpacing(), logBiasField.GetSpacing(), 1e-8 );
+  EXPECT_VECTOR_DOUBLE_NEAR( reference.GetDirection(), logBiasField.GetDirection(), 1e-8 );
+
 }

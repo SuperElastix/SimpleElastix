@@ -3,6 +3,16 @@ Common Conventions
 
 This document contains common conventions that SimpleITK filters, and objects follow. It is intended to describe the interfaces that users should use and developers should implement. If a method or class does not specify different behavior or default values then those described here, it should be assumed that it follows the following conventions.
 
+Naming
+......
+
+The object oriented interface of process objects are named based on the specific operation they perform on their input image(s)
+with a suffix of **ImageFilter**, the ITK convention. For example, `AbsImageFilter <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1AbsImageFilter.html>`_, `BinaryMinMaxCurvatureFlowImageFilter <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1BinaryMinMaxCurvatureFlowImageFilter.html>`_ etc. For almost all process objects there is also a procedural interface. This interface provides one or more functions which
+allow setting parameter values and invoking the operation in one call. This results in concise code and is useful if the filter is only applied once.
+These functions use the same naming as the object oriented interface only without the suffix. That is,
+the corresponding procedural methods to the object oriented interface examples above are `Abs <https://simpleitk.org/doxygen/latest/html/namespaceitk_1_1simple.html#a54161a47394e60c5758193cd0ab6930e>`_ and `BinaryMinMaxCurvatureFlow <https://simpleitk.org/doxygen/latest/html/namespaceitk_1_1simple.html#ab0cd996e578cd566b0e7318978bd0420>`_.
+
+Note that the complete/detailed documentation appears in the doxygen of the object oriented interface.
 
 Dimensional Vectors
 ...................
@@ -15,7 +25,7 @@ The SimpleITK image class can contain 2 or 3 dimensional images. In ITK proper, 
 Image Access
 ............
 
-`Image <http://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1Image.html>`_ access is in x,y,z order, ``GetPixel(x,y,z)`` or ``image[x,y,z]``, with zero based indexing.
+`Image <http://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1Image.html>`_ access is in x,y,z order, ``GetPixel(x,y,z)`` or ``image[x,y,z]``, with zero based indexing.
 
 .. _lbl_conventions_mask_image:
 
@@ -58,6 +68,6 @@ Images As Parameters
 
 The dimensionality (2D or 3D) and pixel type (``sitkUInt8``, ``sitkFloat64``...) of images is required to be the same for most methods that receive multiple images as input.
 
-The `ImageRegistrationMethod <http://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1ImageRegistrationMethod.html>`_ only supports images with ``sitkFloat32`` and ``sitkFloat64`` pixel types.
+The `ImageRegistrationMethod <http://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1ImageRegistrationMethod.html>`_ only supports images with ``sitkFloat32`` and ``sitkFloat64`` pixel types.
 
-Casting an image's pixel type into another is done with the SimpleITK `Cast() <http://itk.org/SimpleITKDoxygen/html/namespaceitk_1_1simple.html#af8c9d7cc96a299a05890e9c3db911885>`_ function.
+Casting an image's pixel type into another is done with the SimpleITK `Cast() <http://simpleitk.org/doxygen/latest/html/namespaceitk_1_1simple.html#af8c9d7cc96a299a05890e9c3db911885>`_ function.

@@ -10,7 +10,7 @@ transformation estimated via registration is said to map points from the
 
 SimpleITK provides a configurable multi-resolution registration
 framework, implemented in the `ImageRegistrationMethod
-<https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1ImageRegistrationMethod.html>`_ class.
+<https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1ImageRegistrationMethod.html>`_ class.
 In addition, a number of variations of the Demons registration algorithm are
 implemented independently from this class as they do not fit into the framework.
 
@@ -20,6 +20,32 @@ Actual Code
 Code illustrating various aspects of the registration framework can be found in
 the set of :ref:`examples <lbl_examples>` which are part of the SimpleITK distribution
 and in the SimpleITK `Jupyter notebook repository <http://insightsoftwareconsortium.github.io/SimpleITK-Notebooks/>`_.
+
+Initialization and Center of Rotation
+.....................................
+
+The task of registration is formulated using non-linear optimization which requires an initial estimate. The two
+most common initialization approaches are (1) Use the identity transform (a.k.a. forgot to initialize).
+(2) Align the physical centers of the two images (see `CenteredTransformInitializerFilter <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1CenteredTransformInitializerFilter.html>`_). If after initialization there is no overlap between the
+images, registration will fail. The closer the initialization transformation is to the actual transformation, the higher the probability
+of convergence to the correct solution.
+
+If your registration involves the use of a global domain transform (:ref:`described here <lbl_transforms>`), you should also set
+an appropriate center of rotation. In many cases you want the center of rotation to be the physical center of the fixed image
+(the CenteredTransformCenteredTransformInitializerFilter ensures this). This is of significant importance for registration convergence due
+to the non-linear nature of rotation. When the center of rotation is far from our physical region of interest (ROI), a small rotational angle
+results in a large displacement. Think of moving the pivot/fulcrum point of a `lever <https://en.wikipedia.org/wiki/Lever>`_. For the same
+rotation angle, the farther you are from the fulcrum the larger the displacement. For numerical stability we do not want our computations
+to be sensitive to very small variations in the rotation angle, thus the ideal center of rotation is the point which minimizes the
+distance to the farthest point in our ROI:
+
+.. math::
+
+   p_{center} = \underset{p_{rotation}} {\arg\min}\ dist(p_{rotation}, \{p_{roi}\})
+
+
+Without additional knowledge we can only assume that the ROI is the whole fixed image. If your ROI is only in a sub
+region of the image, a more appropriate point would be the center of the oriented bounding box of that ROI.
 
 
 ImageRegistrationMethod
@@ -41,20 +67,21 @@ The type of transformation defines the mapping between the two images. SimpleITK
 supports a variety of global and local transformations. The available
 transformations include:
 
-* `TranslationTransform <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1TranslationTransform.html>`_.
-* `VersorTransform <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1VersorTransform.html>`_.
-* `VersorRigid3DTransform <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1VersorRigid3DTransform.html>`_.
-* `Euler2DTransform <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1Euler2DTransform.html>`_.
-* `Euler3DTransform <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1Euler3DTransform.html>`_.
-* `Similarity2DTransform <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1Similarity2DTransform.html>`_.
-* `Similarity3DTransform <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1Similarity3DTransform.html>`_.
-* `ScaleTransform <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1ScaleTransform.html>`_.
-* `ScaleVersor3DTransform <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1ScaleVersor3DTransform.html>`_.
-* `ScaleSkewVersor3DTransform <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1ScaleSkewVersor3DTransform.html>`_.
-* `AffineTransform <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1AffineTransform.html>`_.
-* `BSplineTransform <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1BSplineTransform.html>`_.
-* `DisplacementFieldTransform <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1DisplacementFieldTransform.html>`_.
-* `Composite Transform <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1Transform.html>`_.
+* `TranslationTransform <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1TranslationTransform.html>`_.
+* `VersorTransform <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1VersorTransform.html>`_.
+* `VersorRigid3DTransform <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1VersorRigid3DTransform.html>`_.
+* `Euler2DTransform <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1Euler2DTransform.html>`_.
+* `Euler3DTransform <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1Euler3DTransform.html>`_.
+* `Similarity2DTransform <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1Similarity2DTransform.html>`_.
+* `Similarity3DTransform <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1Similarity3DTransform.html>`_.
+* `ScaleTransform <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1ScaleTransform.html>`_.
+* `ScaleVersor3DTransform <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1ScaleVersor3DTransform.html>`_.
+* `ScaleSkewVersor3DTransform <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1ScaleSkewVersor3DTransform.html>`_.
+* `ComposeScaleSkewVersor3DTransform <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1ComposeScaleSkewVersor3DTransform.html>`_.
+* `AffineTransform <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1AffineTransform.html>`_.
+* `BSplineTransform <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1BSplineTransform.html>`_.
+* `DisplacementFieldTransform <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1DisplacementFieldTransform.html>`_.
+* `Composite Transform <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1Transform.html>`_.
 
 The parameters modified by the registration framework are those returned by the
 transforms **GetParameters()** method. This requires special attention when the
@@ -108,7 +135,7 @@ Interpolator
 SimpleITK has a large number of interpolators. In most cases linear
 interpolation, the default setting, is sufficient. Unlike the similarity metric
 and optimizer, the interpolator is set using the **SetInterpolator** method which
-receives a `parameter <https://itk.org/SimpleITKDoxygen/html/namespaceitk_1_1simple.html#a7cb1ef8bd02c669c02ea2f9f5aa374e5>`_
+receives a `parameter <https://simpleitk.org/doxygen/latest/html/namespaceitk_1_1simple.html#a7cb1ef8bd02c669c02ea2f9f5aa374e5>`_
 indicating the interpolator type.
 
 Features of Interest
@@ -146,12 +173,12 @@ Multi Resolution Framework
 ===========================
 
 The ImageRegistrationMethod supports multi-resolution, pyramid, registration
-via two methods `SetShrinkFactorsPerLevel <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1ImageRegistrationMethod.html#a59fef92122919202cf4a00f84fd87ea5>`_
-and `SetSmoothingSigmasPerLevel <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1ImageRegistrationMethod.html#a0aea868182491c8d6900129955b4f5b4>`_.
+via two methods `SetShrinkFactorsPerLevel <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1ImageRegistrationMethod.html#a59fef92122919202cf4a00f84fd87ea5>`_
+and `SetSmoothingSigmasPerLevel <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1ImageRegistrationMethod.html#a0aea868182491c8d6900129955b4f5b4>`_.
 The former receives the shrink factors to apply when moving from one level of
 the pyramid to the next and the later receives the sigmas to use for smoothing
 when moving from level to level. Sigmas can be specified either in voxel units
-or physical units (default) using `SetSmoothingSigmasAreSpecifiedInPhysicalUnits <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1ImageRegistrationMethod.html#a50c2a2242421fdcafdc42d548b994ed9>`_.
+or physical units (default) using `SetSmoothingSigmasAreSpecifiedInPhysicalUnits <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1ImageRegistrationMethod.html#a50c2a2242421fdcafdc42d548b994ed9>`_.
 
 Sampling
 ========
@@ -159,8 +186,41 @@ Sampling
 For many registration tasks one can use a fraction of the image voxels to
 estimate the similarity measure. Aggressive sampling can significantly reduce
 the registration runtime. The ImageRegistration method allows you to
-specify how/if to sample the voxels, `SetMetricSamplingStrategy <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1ImageRegistrationMethod.html#aa49fdfae5950c2ec6e01a75df59078f6>`_, and
-if using a sampling, what percentage, `SetMetricSamplingPercentage <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1ImageRegistrationMethod.html#a8b891c62404a8dc5010241fea619c932>`_.
+specify how/if to sample the voxels, `SetMetricSamplingStrategy <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1ImageRegistrationMethod.html#aa49fdfae5950c2ec6e01a75df59078f6>`_, and
+if using a sampling, what percentage, `SetMetricSamplingPercentage <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1ImageRegistrationMethod.html#a8b891c62404a8dc5010241fea619c932>`_.
+
+The registration framework supports three sampling strategies:
+
+1. NONE - use all voxels, sampled points are the voxel centers.
+2. REGULAR - sample every n-th voxel while traversing the image
+   in scan-line order, then within each voxel randomly
+   perturb from center.
+3. RANDOM - sample image voxels with replacement using a uniform distribution, then within each voxel randomly perturb from center.
+
+When using the REGULAR or RANDOM sampling strategies, running the same
+registration code multiple times will yield different results. To remove
+the randomness, set the pseudo-random number generator's seed in the
+`SetMetricSamplingPercentage <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1ImageRegistrationMethod.html#a8b891c62404a8dc5010241fea619c932>`_
+method to a constant. The default seed value is
+wall clock time.
+
+Note that using the RANDOM sampling strategy with a 100% sampling rate is not
+equivalent to using the sampling strategy of NONE. Given an image with N voxels,
+the former randomly selects N voxels with repetition and perturbs the points
+within each voxel, the latter uses the centers of all N voxels. Thus, for
+repeated random sampling with 100% rate, different samples are produced and likely
+none of them is of the centers of all N voxels.
+
+Combining a mask with sampling is done using a rejection approach. First a sample is generated and
+then it is accepted or rejected if it is inside or outside the mask. This may cause
+problems when the mask region occupies a very small region in the original image. Because the sampling
+only discards data,the sample rate may be reduced from the requested one. For some similarity metrics (e.g. mutual information)
+this can result in an insufficient number of samples for metric value computation, leading to registraiton failure.
+Other metrics are more robust to small sample sizes (e.g. mean squares), but they all suffer from it.
+In such cases it is better to use a cropped version of the image for registration, possibly the mask's bounding box,
+instead of the original image with a mask.
+
+
 
 Scaling in Parameter Space
 ==========================
@@ -169,9 +229,9 @@ The ITKv4 framework introduced automated methods for estimating scaling factors
 for non-commensurate parameter units. These change the step size per parameter
 so that the effect of a unit of change has similar effects in physical space
 (think rotation of 1 radian and translation of 1 millimeter).
-The relevant methods are `SetOptimizerScalesFromPhysicalShift <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1ImageRegistrationMethod.html#a53934282121e152d37781ffa5224ec5f>`_,
-`SetOptimizerScalesFromIndexShift <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1ImageRegistrationMethod.html#a0ad235e8291716cb44c87a01c6b545a9>`_ and
-`SetOptimizerScalesFromJacobian <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1ImageRegistrationMethod.html#afe20311a9a425f312e3cefaaf683fab4>`_.
+The relevant methods are `SetOptimizerScalesFromPhysicalShift <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1ImageRegistrationMethod.html#a53934282121e152d37781ffa5224ec5f>`_,
+`SetOptimizerScalesFromIndexShift <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1ImageRegistrationMethod.html#a0ad235e8291716cb44c87a01c6b545a9>`_ and
+`SetOptimizerScalesFromJacobian <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1ImageRegistrationMethod.html#afe20311a9a425f312e3cefaaf683fab4>`_.
 In many cases this scaling is what determines if the the optimization converges to the
 correct optimum.
 
@@ -180,6 +240,21 @@ Observing Registration Progress
 
 The ImageRegistrationMethod enables you to observe the registration process as it progresses.
 This is done using the Command-Observer pattern, associating callbacks with specific events.
-To associate a callback with a specific `event <https://itk.org/SimpleITKDoxygen/html/namespaceitk_1_1simple.html#aa7399868984d99493c5a307cce373ace>`_
-use the `AddCommand <https://itk.org/SimpleITKDoxygen/html/classitk_1_1simple_1_1ProcessObject.html#a2199e5cca19b45d504676a595e1f6cfd>`_
+To associate a callback with a specific `event <https://simpleitk.org/doxygen/latest/html/namespaceitk_1_1simple.html#aa7399868984d99493c5a307cce373ace>`_
+use the `AddCommand <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1ProcessObject.html#a2199e5cca19b45d504676a595e1f6cfd>`_
 method.
+
+Reproducibility
+===============
+
+Generally speaking, repeated registrations of the same datasets will yield slightly different results. This is
+associated with the registration framework's similarity metric computation implementation which utilizes both
+randomization and multi-threading.
+
+The primary source of variability is the use of randomization. To eliminate randomization variability,
+set the seed parameter for the `SetMetricSamplingPercentage <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1ImageRegistrationMethod.html#a8b891c62404a8dc5010241fea619c932>`_ to a fixed value (e.g. `42 <https://en.wikipedia.org/wiki/42_(number)>`_).
+
+The secondary, and much more minor, source of variability has to do with the multithreading implementation, different
+order of operations in each registration run. To eliminate multithreading variability, set the number of threads to one
+via the `SetGlobalDefaultNumberOfThreads <https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1ProcessObject.html#a305b43330f9feb26325eadfc30695bd9>`_ method. From a practical standpoint, in the tradeoff between full reproducibility and computational efficiency with minor
+variability in results, computational efficiency is most often more important.

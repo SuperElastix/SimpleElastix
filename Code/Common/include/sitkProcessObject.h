@@ -23,6 +23,7 @@
 #include "sitkTemplateFunctions.h"
 #include "sitkEvent.h"
 #include "sitkImage.h"
+#include "sitkImageConvert.h"
 
 #include <iostream>
 #include <list>
@@ -51,7 +52,7 @@ namespace itk {
       protected NonCopyable
   {
     public:
-      typedef ProcessObject Self;
+      using Self = ProcessObject;
 
       /**
        * Default Constructor that takes no arguments and initializes
@@ -115,14 +116,6 @@ namespace itk {
       static bool GetGlobalWarningDisplay();
       /**@}*/
 
-      /** Set the number of threads that all new process objects are
-       *  initialized with.
-       * @{
-       */
-      static void SetGlobalDefaultNumberOfThreads(unsigned int n);
-      static unsigned int GetGlobalDefaultNumberOfThreads();
-      /**@}*/
-
       /** \brief Access the global tolerance to determine congruent spaces.
        *
        * The default tolerance is governed by the
@@ -142,13 +135,83 @@ namespace itk {
       static void SetGlobalDefaultDirectionTolerance(double);
       /**@}*/
 
+
+      /** \brief Set/Get the default threader used for process objects.
+       *
+       * The possible available multi-threaders are:
+       *  - "POOL" itk::PoolMultiThreader
+       *  - "TBB" itk::TBBThreader (optional)
+       *  - "PLATFORM" itk::PlatformMultiThreader
+       *
+       * The default and the available multi-threaders are
+       * dependent upon ITK's configuration. See the ITK
+       * documentation for more details about the behavior of the
+       * multi-threaders.
+       *
+       * The environment variable "ITK_GLOBAL_DEFAULT_THREADER" can be
+       * used to initialize this value.
+       *
+       * The set method returns true when the threader string is valid
+       * and ITK's default is updated, otherwise false is returned. The
+       * threader argument is not case sensitive.
+       *
+       * \sa itk::MultiThreaderBase itk::PoolMultiThreader
+       * itk::TBBThreader itk::PlatformMultiThreader
+       * @{
+       */
+      static bool SetGlobalDefaultThreader(const std::string &threader);
+      static std::string GetGlobalDefaultThreader();
+      /**@{*/
+
+      /** Set the number of threads with which new process objects are
+       *  initialized.
+       *
+       * If the environment variable
+       * "ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS" is defined, then this
+       * value is initialized as defined in the
+       * environment. Otherwise, the value will be initialized with
+       * the number of virtual CPUs on the system.
+       *
+       * \note After the "POOL" multi-thread initially constructs the
+       * thread pool, this value will has no effect on the thread pool.
+       * @{
+       */
+      static void SetGlobalDefaultNumberOfThreads(unsigned int n);
+      static unsigned int GetGlobalDefaultNumberOfThreads();
+      /**@}*/
+
       /** The number of threads used when executing a filter if the
-       * filter is multi-threaded
+       * filter is multi-threaded.
+       *
+       * With ITK version 5, this parameter now corresponds to
+       * itk::MultiThreaderBase::SetMaximumNumberOfThreads and the
+       * corresponding get method. The is clamped to be limited by the
+       * "global" maximum.
+       *
+       * \note The "POOL" multi-threader cannot reduce the number of
+       * threads. As the "POOL" multi-threader  has a single instance
+       * of a thread pool, the number of threads will increased for
+       * subsequent processes.
        * @{
        */
       virtual void SetNumberOfThreads(unsigned int n);
       virtual unsigned int GetNumberOfThreads() const;
       /**@}*/
+
+      /** The work (image) is requested to be divided into this number
+       * of sub-tasks.
+       *
+       * If zero then, the default number from the process object and
+       * the multi-threader will be used.
+       *
+       * \note The "PLATFORM" multi-threader set the number of threads
+       * equal to the number of work units.
+       * @{
+       */
+      virtual void SetNumberOfWorkUnits(unsigned int n);
+      virtual unsigned int GetNumberOfWorkUnits() const;
+      /**@}*/
+
 
       /** \brief Add a Command Object to observer the event.
        *
@@ -265,7 +328,7 @@ namespace itk {
       // an exception is throw.
       virtual itk::ProcessObject *GetActiveProcess( );
 
-      // overidable callback when the active process has completed
+      // overridable callback when the active process has completed
       virtual void OnActiveProcessDelete( );
 
       friend class itk::simple::Command;
@@ -304,23 +367,9 @@ namespace itk {
                 template<typename, unsigned int> class TVector >
         static Image CastITKToImage( itk::Image< TVector< TPixelType, VLength >, VImageDimension> *img )
       {
-        typedef itk::VectorImage< TPixelType, VImageDimension > VectorImageType;
-
-        size_t numberOfElements = img->GetBufferedRegion().GetNumberOfPixels();
-        typename VectorImageType::InternalPixelType* buffer = reinterpret_cast<typename VectorImageType::InternalPixelType*>( img->GetPixelContainer()->GetBufferPointer() );
-
-        // Unlike an image of Vectors a VectorImage's container is a
-        // container of TPixelType, whos size is the image's number of
-        // pixels * number of pixels per component
-        numberOfElements *= VImageDimension;
-
-        typename VectorImageType::Pointer out = VectorImageType::New();
-
-        // Set the image's pixel container to import the pointer provided.
-        out->GetPixelContainer()->SetImportPointer(buffer, numberOfElements, true );
-        img->GetPixelContainer()->ContainerManageMemoryOff();
-        out->CopyInformation( img );
-        out->SetRegions( img->GetBufferedRegion() );
+        // The implementation defined int sitkImageConvert.hxx needs
+        // to be manually included when this method is used.
+        auto out = GetVectorImageFromImage(img, true);
 
         return Image(out.GetPointer());
       }
@@ -361,6 +410,7 @@ namespace itk {
       bool m_Debug;
 
       unsigned int m_NumberOfThreads;
+      unsigned int m_NumberOfWorkUnits;
 
       std::list<EventCommand> m_Commands;
 

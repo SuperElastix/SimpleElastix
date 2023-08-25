@@ -29,6 +29,7 @@
 namespace itk {
   namespace simple {
 
+  constexpr unsigned int SITK_IO_INPUT_MAX_DIMENSION = 5 > SITK_MAX_DIMENSION ? 5 : SITK_MAX_DIMENSION;
   namespace {
 
       // Simple ITK must use a zero based index
@@ -75,8 +76,7 @@ namespace itk {
 
 
   ImageFileReader::~ImageFileReader()
-  {
-  }
+  = default;
 
   ImageFileReader::ImageFileReader() :
     m_PixelType(sitkUnknown),
@@ -84,13 +84,11 @@ namespace itk {
     m_NumberOfComponents(0)
   {
     // list of pixel types supported
-    typedef NonLabelPixelIDTypeList PixelIDTypeList;
+    using PixelIDTypeList = NonLabelPixelIDTypeList;
 
     this->m_MemberFactory.reset( new detail::MemberFunctionFactory<MemberFunctionType>( this ) );
 
-    this->m_MemberFactory->RegisterMemberFunctions< PixelIDTypeList, 4 > ();
-    this->m_MemberFactory->RegisterMemberFunctions< PixelIDTypeList, 3 > ();
-    this->m_MemberFactory->RegisterMemberFunctions< PixelIDTypeList, 2 > ();
+    this->m_MemberFactory->RegisterMemberFunctions< PixelIDTypeList, 2, SITK_MAX_DIMENSION > ();
   }
 
     std::string ImageFileReader::ToString() const {
@@ -178,42 +176,42 @@ namespace itk {
 
     PixelIDValueEnum
     ImageFileReader
-    ::GetPixelID( void ) const
+    ::GetPixelID( ) const
     {
       return this->m_PixelType;
     }
 
     PixelIDValueType
     ImageFileReader
-    ::GetPixelIDValue( void ) const
+    ::GetPixelIDValue( ) const
     {
       return this->m_PixelType;
     }
 
     unsigned int
     ImageFileReader
-    ::GetDimension( void ) const
+    ::GetDimension( ) const
     {
       return this->m_Dimension;
     }
 
     unsigned int
     ImageFileReader
-    ::GetNumberOfComponents( void ) const
+    ::GetNumberOfComponents( ) const
     {
       return this->m_NumberOfComponents;
     }
 
     const std::vector<double> &
     ImageFileReader
-    ::GetOrigin( void ) const
+    ::GetOrigin( ) const
     {
       return this->m_Origin;
     }
 
     const std::vector<double> &
     ImageFileReader
-    ::GetSpacing( void ) const
+    ::GetSpacing( ) const
     {
       return this->m_Spacing;
     }
@@ -227,14 +225,14 @@ namespace itk {
 
     const std::vector<uint64_t> &
     ImageFileReader
-    ::GetSize( void ) const
+    ::GetSize( ) const
     {
       return this->m_Size;
     }
 
     void
     ImageFileReader
-    ::ReadImageInformation( void )
+    ::ReadImageInformation( )
     {
       itk::ImageIOBase::Pointer imageio = this->GetImageIOBase( this->m_FileName );
       this->UpdateImageInformationFromImageIO(imageio);
@@ -244,7 +242,7 @@ namespace itk {
 
     std::vector<std::string>
     ImageFileReader
-    ::GetMetaDataKeys( void ) const
+    ::GetMetaDataKeys( ) const
     {
       return this->m_pfGetMetaDataKeys();
     }
@@ -299,6 +297,13 @@ namespace itk {
 
 
       unsigned int dimension = this->GetDimension();
+
+      if ( dimension < 2 || dimension > SITK_IO_INPUT_MAX_DIMENSION )
+        {
+        sitkExceptionMacro( "The file has unsupported image dimension of " << dimension << ".\n"
+                            << "The maximum supported IO dimension is " << SITK_IO_INPUT_MAX_DIMENSION << "." );
+        }
+
       if (!m_ExtractSize.empty())
         {
         dimension = 0;
@@ -309,21 +314,20 @@ namespace itk {
             ++dimension;
             }
           }
+        if ( dimension < 2 || dimension > SITK_MAX_DIMENSION )
+          {
+          sitkExceptionMacro( "The extraction region has unsupported output dimension of " << dimension << "."
+                              << "The maximum supported output Image dimension is " << SITK_MAX_DIMENSION << "." );
+          }
         }
+
+
 
       if (type == sitkUnknown)
         {
         type = this->GetPixelIDValue();
         }
 
-#ifdef SITK_4D_IMAGES
-      if ( dimension != 2 && dimension != 3  && dimension != 4 )
-#else
-      if ( dimension != 2 && dimension != 3 )
-#endif
-        {
-        sitkExceptionMacro( "The file has unsupported " << dimension << " dimensions." );
-        }
 
       if ( !this->m_MemberFactory->HasMemberFunction( type, dimension ) )
         {
@@ -341,12 +345,11 @@ namespace itk {
   ImageFileReader::ExecuteInternal( itk::ImageIOBase *imageio )
   {
 
-    const unsigned int MAX_DIMENSION = 5;
-    typedef TImageType                      ImageType;
-    typedef itk::ImageFileReader<ImageType> Reader;
+    using ImageType = TImageType;
+    using Reader = itk::ImageFileReader<ImageType>;
 
-    typedef typename ImageType::template Rebind<typename ImageType::PixelType, MAX_DIMENSION>::Type InternalImageType;
-    typedef itk::ImageFileReader<InternalImageType> InternalReader;
+    using InternalImageType = typename ImageType::template Rebind<typename ImageType::PixelType, SITK_IO_INPUT_MAX_DIMENSION>::Type;
+    using InternalReader = itk::ImageFileReader<InternalImageType>;
 
     // if the InstantiatedToken is correctly implemented this should
     // not occur
@@ -389,10 +392,10 @@ namespace itk {
   Image
   ImageFileReader::ExecuteExtract( TInternalImageType * itkImage )
   {
-    typedef TInternalImageType InternalImageType;
-    typedef TImageType         ImageType;
+    using InternalImageType = TInternalImageType;
+    using ImageType = TImageType;
 
-    typedef itk::ExtractImageFilter<InternalImageType, ImageType> ExtractType;
+    using ExtractType = itk::ExtractImageFilter<InternalImageType, ImageType>;
     typename ExtractType::Pointer extractor = ExtractType::New();
 
     extractor->InPlaceOn();

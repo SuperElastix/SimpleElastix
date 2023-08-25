@@ -55,10 +55,7 @@ CenteredVersorTransformInitializerFilter::CenteredVersorTransformInitializerFilt
 //
 // Destructor
 //
-CenteredVersorTransformInitializerFilter::~CenteredVersorTransformInitializerFilter ()
-{
-
-}
+CenteredVersorTransformInitializerFilter::~CenteredVersorTransformInitializerFilter () = default;
 
 
 //
@@ -79,14 +76,6 @@ std::string CenteredVersorTransformInitializerFilter::ToString() const
 //
 // Execute
 //
-Transform CenteredVersorTransformInitializerFilter::Execute ( const Image & fixedImage, const Image & movingImage, const Transform & transform,  bool computeRotation )
-{
-  this->SetComputeRotation ( computeRotation );
-
-  return this->Execute ( fixedImage, movingImage, transform );
-}
-
-
 Transform CenteredVersorTransformInitializerFilter::Execute ( const Image & fixedImage, const Image & movingImage, const Transform & transform )
 {
   PixelIDValueEnum type = fixedImage.GetPixelID();
@@ -120,17 +109,17 @@ template <class TImageType>
 Transform CenteredVersorTransformInitializerFilter::ExecuteInternal ( const Image * inFixedImage, const Image * inMovingImage, const Transform * inTransform )
 {
 
-  typedef itk::CenteredVersorTransformInitializer< TImageType, TImageType> FilterType;
+  using FilterType = itk::CenteredVersorTransformInitializer< TImageType, TImageType>;
   // Set up the ITK filter
   typename FilterType::Pointer filter = FilterType::New();
 
 
-  assert( inFixedImage != NULL );
+  assert( inFixedImage );
   filter->SetFixedImage( this->CastImageToITK<typename FilterType::FixedImageType>(*inFixedImage) );
-  assert( inMovingImage != NULL );
+  assert( inMovingImage );
   typename FilterType::MovingImageType::ConstPointer image2 = this->CastImageToITK<typename FilterType::MovingImageType>( *inMovingImage );
   filter->SetMovingImage( image2 );
-  assert( inTransform != NULL );
+  assert( inTransform );
 
   // This initializers modifies the input, we copy the transform to
   // prevent this change
@@ -157,7 +146,8 @@ Transform CenteredVersorTransformInitializerFilter::ExecuteInternal ( const Imag
 Transform CenteredVersorTransformInitializer ( const Image & fixedImage, const Image & movingImage, const Transform & transform, bool computeRotation )
 {
   CenteredVersorTransformInitializerFilter filter;
-  return filter.Execute( fixedImage, movingImage, transform, computeRotation );
+  filter.SetComputeRotation( computeRotation );
+  return filter.Execute( fixedImage, movingImage, transform  );
 }
 
 } // end namespace simple

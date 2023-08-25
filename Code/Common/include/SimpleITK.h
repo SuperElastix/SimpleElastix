@@ -44,12 +44,14 @@
 #include "sitkEuler3DTransform.h"
 #include "sitkScaleTransform.h"
 #include "sitkScaleSkewVersor3DTransform.h"
+#include "sitkComposeScaleSkewVersor3DTransform.h"
 #include "sitkScaleVersor3DTransform.h"
 #include "sitkSimilarity2DTransform.h"
 #include "sitkSimilarity3DTransform.h"
 #include "sitkTranslationTransform.h"
 #include "sitkVersorTransform.h"
 #include "sitkVersorRigid3DTransform.h"
+#include "sitkCompositeTransform.h"
 #include "sitkShow.h"
 
 #include "sitkInterpolator.h"
@@ -58,8 +60,10 @@
 
 #include "sitkProcessObject.h"
 #include "sitkImageFilter.h"
+#include "sitkObjectOwnedBase.h"
 #include "sitkCommand.h"
 #include "sitkFunctionCommand.h"
+#include "sitkLogger.h"
 
 // IO classes
 #include "sitkImageFileReader.h"
@@ -80,6 +84,8 @@
 #include "sitkCenteredVersorTransformInitializerFilter.h"
 #include "sitkLandmarkBasedTransformInitializerFilter.h"
 #include "sitkCastImageFilter.h"
+#include "sitkExtractImageFilter.h"
+#include "sitkPasteImageFilter.h"
 
 #include "sitkAdditionalProcedures.h"
 

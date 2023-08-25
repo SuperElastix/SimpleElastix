@@ -25,9 +25,7 @@ namespace itk
 namespace simple
 {
 
-Euler2DTransform::~Euler2DTransform()
-{
-}
+Euler2DTransform::~Euler2DTransform() = default;
 
 // construct identity
 Euler2DTransform::Euler2DTransform()
@@ -130,7 +128,7 @@ void Euler2DTransform::SetPimpleTransform( PimpleTransformBase *pimpleTransform 
 void Euler2DTransform::InternalInitialization(itk::TransformBase *transform)
 {
 
-  typedef itk::Euler2DTransform<double> TransformType;
+  using TransformType = itk::Euler2DTransform<double>;
   TransformType *t = dynamic_cast<TransformType*>(transform);
 
   this->m_pfSetCenter = nullptr;

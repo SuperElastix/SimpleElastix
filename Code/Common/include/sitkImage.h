@@ -75,12 +75,12 @@ namespace simple
   class SITKCommon_EXPORT Image
   {
   public:
-    typedef Image              Self;
+    using Self = Image;
 
     virtual ~Image( );
 
     /** \brief Default constructor, creates an image of size 0 */
-    Image( void );
+    Image( );
 
     // copy constructor
     Image( const Image &img );
@@ -94,8 +94,8 @@ namespace simple
      * destructing and assignment; all other operations have undefined
      * behavior.
      */
-    Image( Image &&img );
-    Image& operator=( Image &&img );
+    Image( Image &&img ) noexcept;
+    Image& operator=( Image &&img ) noexcept;
 #endif
 
 
@@ -137,15 +137,12 @@ namespace simple
      * @{
      */
     template <typename TImageType>
-    explicit Image( itk::SmartPointer<TImageType> image )
-      : m_PimpleImage( nullptr )
-      {
-        static_assert( ImageTypeToPixelIDValue<TImageType>::Result != (int)sitkUnknown,
-                          "invalid pixel type" );
-        this->InternalInitialization<ImageTypeToPixelIDValue<TImageType>::Result, TImageType::ImageDimension>( image.GetPointer() );
-      }
+      explicit Image( itk::SmartPointer<TImageType> image )
+      : Image( image.GetPointer() )
+    {}
+
     template <typename TImageType>
-    explicit Image( TImageType* image )
+      explicit Image( TImageType* image )
       : m_PimpleImage( nullptr )
       {
         static_assert( ImageTypeToPixelIDValue<TImageType>::Result != (int)sitkUnknown,
@@ -168,8 +165,8 @@ namespace simple
      *
      * @{
      */
-    itk::DataObject* GetITKBase( void );
-    const itk::DataObject* GetITKBase( void ) const;
+    itk::DataObject* GetITKBase( );
+    const itk::DataObject* GetITKBase( ) const;
     /**@}*/
 
     /** Get the pixel type
@@ -178,11 +175,11 @@ namespace simple
      * manually changed, unless by assignment. The value may be -1 or
      * "Unknown".
      */
-    PixelIDValueEnum GetPixelID( void ) const;
-    PixelIDValueType GetPixelIDValue( void ) const;
+    PixelIDValueEnum GetPixelID( ) const;
+    PixelIDValueType GetPixelIDValue( ) const;
 
     /** Return the pixel type as a human readable string value. */
-    std::string GetPixelIDTypeAsString( void ) const;
+    std::string GetPixelIDTypeAsString( ) const;
 
     /** Get the number of physical dimensions.
      *
@@ -191,29 +188,36 @@ namespace simple
      * applicable to. This does not include the pixels' vector index
      * as a dimension.
      */
-    unsigned int GetDimension( void ) const;
+    unsigned int GetDimension( ) const;
 
     /** \brief Get the number of components for each pixel
      *
-     * For scalar images this methods returns 1. For vector images the
-     * number of components for each pixel is returned.
+     * For images with scalar or complex pixel types this method
+     * returns one. For images with a vector pixel type the method
+     * returns the number of vector components per pixel.
      */
-    unsigned int GetNumberOfComponentsPerPixel( void ) const;
+    unsigned int GetNumberOfComponentsPerPixel( ) const;
 
     /** \brief Get the number of pixels in the image
      *
-     * To Calculate the total number of values stored continuously for
+     * To calculate the total number of values stored continuously for
      * the image's buffer, the NumberOfPixels should be multiplied by
      * NumberOfComponentsPerPixel in order to account for multiple
      * component images.
      *
      */
-    uint64_t GetNumberOfPixels( void ) const;
+    uint64_t GetNumberOfPixels( ) const;
+
+    /** \brief Get the number of bytes per component of a pixel.
+     *
+     * Returns the `sizeof` the pixel component type.
+     */
+    unsigned int GetSizeOfPixelComponent( ) const;
 
     /** Get/Set the Origin in physical space
      * @{
      */
-    std::vector< double > GetOrigin( void ) const;
+    std::vector< double > GetOrigin( ) const;
     void SetOrigin( const std::vector< double > &origin );
     /** @} */
 
@@ -223,7 +227,7 @@ namespace simple
      * length of the vector is equal to the dimension of the Image.
      * @{
      */
-    std::vector< double > GetSpacing( void ) const;
+    std::vector< double > GetSpacing( ) const;
     void SetSpacing( const std::vector< double > &spacing );
     /** @} */
 
@@ -253,17 +257,17 @@ namespace simple
     /** Get the number of pixels the Image is in each dimension as a
       * std::vector. The size of the vector is equal to the number of dimensions
       * for the image. */
-    std::vector< unsigned int > GetSize( void ) const;
+    std::vector< unsigned int > GetSize( ) const;
 
     /** Get the number of pixels the Image is in the first dimension */
-    unsigned int GetWidth( void ) const;
+    unsigned int GetWidth( ) const;
 
     /** Get the number of pixels the Image is in the second dimension */
-    unsigned int GetHeight( void ) const;
+    unsigned int GetHeight( ) const;
 
     /** Get the number of pixels the Image is in the third dimension
       * or 0 if the Image is only 2D */
-    unsigned int GetDepth( void ) const;
+    unsigned int GetDepth( ) const;
 
 
     /** \brief Copy common meta-data from an image to this one.
@@ -284,7 +288,7 @@ namespace simple
      * image's meta-data dictionary. Iterate through with these keys
      * to get the values.
      */
-    std::vector<std::string> GetMetaDataKeys( void ) const;
+    std::vector<std::string> GetMetaDataKeys( ) const;
 
     /** \brief Query the meta-data dictionary for the existence of a key.
      */
@@ -313,7 +317,7 @@ namespace simple
      */
     bool EraseMetaData( const std::string &key );
 
-    std::string ToString( void ) const;
+    std::string ToString( ) const;
 
     /** \brief Get the value of a pixel
      *
@@ -457,17 +461,21 @@ namespace simple
      * assignment. This method make sure that coping actually happens
      * to the itk::Image pointed to is only pointed to by this object.
      */
-    void MakeUnique( void );
+    void MakeUnique( );
+
+    /** \brief Returns true if no other SimpleITK Image object
+     * refers to the same internal data structure. */
+    bool IsUnique( ) const;
 
   protected:
 
     /** \brief Methods called by the constructor to allocate and initialize
      * an image.
      *
-     * This method internally utlizes the member function factory to
+     * This method internally utilizes the member function factory to
      * dispatch to methods instantiated on the image of the pixel ID
      */
-    void Allocate ( unsigned int width, unsigned int height, unsigned int depth, unsigned int dim4, PixelIDValueEnum valueEnum, unsigned int numberOfComponents );
+    void Allocate ( const std::vector<unsigned int > &size, PixelIDValueEnum valueEnum, unsigned int numberOfComponents );
 
     /** \brief Dispatched methods for allocating images
      *
@@ -478,15 +486,15 @@ namespace simple
      */
     template<class TImageType>
     typename std::enable_if<IsBasic<TImageType>::Value>::type
-    AllocateInternal ( unsigned int width, unsigned int height, unsigned int depth, unsigned int dim4, unsigned int numberOfComponents );
+    AllocateInternal ( const std::vector<unsigned int > &size, unsigned int numberOfComponents );
 
     template<class TImageType>
     typename std::enable_if<IsVector<TImageType>::Value>::type
-    AllocateInternal ( unsigned int width, unsigned int height, unsigned int depth, unsigned int dim4, unsigned int numberOfComponents );
+    AllocateInternal ( const std::vector<unsigned int > &size, unsigned int numberOfComponents );
 
     template<class TImageType>
     typename std::enable_if<IsLabel<TImageType>::Value>::type
-    AllocateInternal ( unsigned int width, unsigned int height, unsigned int depth, unsigned int dim4, unsigned int numberOfComponents );
+    AllocateInternal ( const std::vector<unsigned int > &size, unsigned int numberOfComponents );
     /**@}*/
 
 
@@ -527,10 +535,10 @@ namespace simple
     template < class TMemberFunctionPointer >
     struct AllocateMemberFunctionAddressor
     {
-      typedef typename ::detail::FunctionTraits<TMemberFunctionPointer>::ClassType ObjectType;
+      using ObjectType = typename ::detail::FunctionTraits<TMemberFunctionPointer>::ClassType;
 
       template< typename TImageType >
-      TMemberFunctionPointer operator() ( void ) const
+      TMemberFunctionPointer operator() ( ) const
       {
         return &ObjectType::template AllocateInternal< TImageType >;
       }

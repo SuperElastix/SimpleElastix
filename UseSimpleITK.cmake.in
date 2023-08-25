@@ -4,9 +4,11 @@
 # included directly, but rather through the SimpleITK_USE_FILE setting
 # obtained from SimpleITKConfig.cmake.
 #
+set(Elastix_BUILD_DIR "@Elastix_DIR@/bin")
 
 # Add include directories needed to use SimpleITK.
 include_directories(${SimpleITK_INCLUDE_DIRS})
 
 # Add link directories needed to use SimpleITK.
 link_directories(${SimpleITK_LIBRARY_DIRS})
+link_directories(${Elastix_BUILD_DIR})

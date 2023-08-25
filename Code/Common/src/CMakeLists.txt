@@ -3,6 +3,7 @@ set ( SimpleITKCommonSource
   sitkImageExplicit.cxx
   sitkProcessObject.cxx
   sitkTransform.cxx
+  sitkCompositeTransform.cxx
   sitkAffineTransform.cxx
   sitkBSplineTransform.cxx
   sitkDisplacementFieldTransform.cxx
@@ -10,6 +11,7 @@ set ( SimpleITKCommonSource
   sitkEuler3DTransform.cxx
   sitkScaleTransform.cxx
   sitkScaleSkewVersor3DTransform.cxx
+  sitkComposeScaleSkewVersor3DTransform.cxx
   sitkScaleVersor3DTransform.cxx
   sitkSimilarity2DTransform.cxx
   sitkSimilarity3DTransform.cxx
@@ -22,8 +24,10 @@ set ( SimpleITKCommonSource
   sitkExceptionObject.cxx
   sitkKernel.cxx
   sitkEvent.cxx
+  sitkLogger.cxx
   sitkInterpolator.cxx
   sitkVersion.cxx
+  sitkObjectOwnedBase.cxx
   ../include/Ancillary/hl_sha1.cxx
   )
 

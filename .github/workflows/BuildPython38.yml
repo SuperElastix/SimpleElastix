@@ -1,0 +1,85 @@
+name: Elastix Python 3.8
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    # The CMake configure and build commands are platform agnostic and should work equally
+    # well on Windows or Mac.  You can convert this to a matrix build if you need
+    # cross-platform coverage.
+    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      max-parallel: 3
+      matrix:
+        os: [macos-10.15, ubuntu-18.04, windows-2019]
+        include:
+          - os: ubuntu-18.04
+            cmake-build-type: "Release"
+            ANNLib: "libANNlib-5.0.so"
+            ANNLib2: "libANNlib-5.0.so.1"
+          - os: windows-2019
+            cmake-build-type: "Release"
+            ANNLib: "ANNlib-5.0.dll"
+          - os: macos-10.15
+            ANNLib: "libANNlib-5.0.1.dylib"
+            ANNLib2: "libANNlib-5.0.dylib"
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.8
+
+    - name: Install build dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install ninja
+        python -m pip install setuptools
+        python -m pip install scikit-ci-addons
+        python -m pip install wheel
+    - name: Get specific version of CMake, Ninja
+      uses: lukka/get-cmake@v3.18.3
+
+    - name: Build SimpleElastix Unix
+      if: matrix.os != 'windows-2019'
+      run: |
+        export CXXFLAGS="$CXXFLAGS -fPIC"
+        mkdir SEb
+        cd SEb
+        cmake -DWRAP_LUA:BOOL=OFF -DWRAP_PYTHON:BOOL=ON -DWRAP_JAVA:BOOL=OFF -DWRAP_CSHARP:BOOL=OFF -DWRAP_TCL:BOOL=OFF -DWRAP_R:BOOL=OFF -DWRAP_RUBY:BOOL=OFF -DBUILD_EXAMPLES:BOOL=OFF -DBUILD_TESTING:BOOL=ON -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DSimpleITK_USE_SYSTEM_ITK:BOOL=OFF -DSimpleITK_USE_SYSTEM_ELASTIX:BOOL=OFF -DSimpleITK_4D_IMAGES:BOOL=OFF -v ../SuperBuild &&
+        make --jobs=4
+
+    - name: Build SimpleElastix Windows
+      if: matrix.os == 'windows-2019'
+      shell: cmd
+      run: |
+        call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+        mkdir SEb
+        cd SEb
+        cmake -DWRAP_LUA:BOOL=OFF -DWRAP_PYTHON:BOOL=ON -DWRAP_JAVA:BOOL=OFF -DWRAP_CSHARP:BOOL=OFF -DWRAP_TCL:BOOL=OFF -DWRAP_R:BOOL=OFF -DWRAP_RUBY:BOOL=OFF -DBUILD_EXAMPLES:BOOL=OFF -DBUILD_TESTING:BOOL=ON -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DSimpleITK_USE_SYSTEM_ITK:BOOL=OFF -DSimpleITK_USE_SYSTEM_ELASTIX:BOOL=OFF -DSimpleITK_4D_IMAGES:BOOL=OFF -v -GNinja ../SuperBuild
+        ninja
+
+    - name: Test SimpleITK
+      run: |
+        ctest -C Release
+
+
+    - name: Build Wheel
+      run: |
+        cd SEb/SimpleITK-build/Wrapping/Python
+        python setup.py bdist_wheel
+
+    - name: Prepare Artifacts
+      shell: bash
+      run: |
+        mkdir uploads
+        mv SEb/SimpleITK-build/Wrapping/Python/dist uploads
+    - name: Publish Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: "${{ matrix.os }}"
+        path: uploads

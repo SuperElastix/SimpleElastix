@@ -5,6 +5,7 @@
   "number_of_inputs" : 1,
   "doc" : "",
   "pixel_types" : "NonLabelPixelIDTypeList",
+  "custom_register" : "this->m_MemberFactory->RegisterMemberFunctions< PixelIDTypeList, 2, SITK_MAX_DIMENSION > ();\n",
   "members" : [
     {
       "name" : "Radius",
@@ -49,5 +50,6 @@
   "briefdescription" : "Applies an averaging filter to an image.",
   "detaileddescription" : "Computes an image where a given pixel is the mean value of the the pixels in a neighborhood about the corresponding input pixel.\n\nA mean filter is one of the family of linear filters.\n\n\\see Image \n\n\n\\see Neighborhood \n\n\n\\see NeighborhoodOperator \n\n\n\\see NeighborhoodIterator",
   "itk_module" : "ITKSmoothing",
-  "itk_group" : "Smoothing"
+  "itk_group" : "Smoothing",
+  "in_place" : false
 }

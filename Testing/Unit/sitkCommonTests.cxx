@@ -26,11 +26,14 @@
 #include <sitkVersion.h>
 #include <sitkVersionConfig.h>
 #include <itkConfigure.h>
+#include "sitkLogger.h"
+#include <cctype>
 
+#include "itkMacro.h"
 
-TEST( VersionTest, VersoinTest)
+TEST( VersionTest, VersionTest)
 {
-  typedef itk::simple::Version Version;
+  using Version = itk::simple::Version;
 
   EXPECT_EQ(Version::MajorVersion(), SimpleITK_VERSION_MAJOR);
   EXPECT_EQ(Version::MinorVersion(), SimpleITK_VERSION_MINOR);
@@ -351,7 +354,7 @@ TEST( ProcessObject, DeleteCommandActiveProcess )
       {
       }
 
-    virtual void Execute( )
+    void Execute( ) override
       {
         if ( m_Process.GetProgress() >= m_AbortAt )
           {
@@ -395,7 +398,7 @@ TEST( ProcessObject, RemoveAllCommandsActiveProcess )
       {
       }
 
-    virtual void Execute( )
+    void Execute( ) override
       {
         if ( m_Process.GetProgress() >= m_AbortAt )
           {
@@ -492,12 +495,12 @@ TEST( ProcessObject, Command_Ownership ) {
   {
   public:
     HeapCommand() : v(false) {};
-    ~HeapCommand() {++destroyedCount;}
-    virtual void Execute() {v=true;}
-    using Command::SetOwnedByProcessObjects;
-    using Command::GetOwnedByProcessObjects;
-    using Command::OwnedByProcessObjectsOn;
-    using Command::OwnedByProcessObjectsOff;
+    ~HeapCommand() override {++destroyedCount;}
+    void Execute() override {v=true;}
+    using Command::SetOwnedByObjects;
+    using Command::GetOwnedByObjects;
+    using Command::OwnedByObjectsOn;
+    using Command::OwnedByObjectsOff;
 
     bool v;
   };
@@ -505,16 +508,16 @@ TEST( ProcessObject, Command_Ownership ) {
   {
   // test set/get/on/off
   HeapCommand cmd;
-  EXPECT_FALSE(cmd.GetOwnedByProcessObjects());
-  cmd.SetOwnedByProcessObjects(true);
-  EXPECT_TRUE(cmd.GetOwnedByProcessObjects());
-  cmd.OwnedByProcessObjectsOff();
-  EXPECT_FALSE(cmd.GetOwnedByProcessObjects());
-  cmd.OwnedByProcessObjectsOn();
-  EXPECT_TRUE(cmd.GetOwnedByProcessObjects());
+  EXPECT_FALSE(cmd.GetOwnedByObjects());
+  cmd.SetOwnedByObjects(true);
+  EXPECT_TRUE(cmd.GetOwnedByObjects());
+  cmd.OwnedByObjectsOff();
+  EXPECT_FALSE(cmd.GetOwnedByObjects());
+  cmd.OwnedByObjectsOn();
+  EXPECT_TRUE(cmd.GetOwnedByObjects());
 
   HeapCommand *cmd1 = new HeapCommand();
-  cmd1->OwnedByProcessObjectsOn();
+  cmd1->OwnedByObjectsOn();
   EXPECT_EQ(0,destroyedCount);
   delete cmd1;
   EXPECT_EQ(1,destroyedCount);
@@ -528,7 +531,7 @@ TEST( ProcessObject, Command_Ownership ) {
   sitk::Image img(5,5, sitk::sitkUInt16);
 
   HeapCommand *cmd2 = new HeapCommand();
-  cmd2->OwnedByProcessObjectsOn();
+  cmd2->OwnedByObjectsOn();
   po.AddCommand(sitk::sitkAnyEvent, *cmd2);
 
   EXPECT_FALSE(cmd2->v);
@@ -537,7 +540,7 @@ TEST( ProcessObject, Command_Ownership ) {
   cmd2->v = false;
 
   HeapCommand *cmd3 = new HeapCommand();
-  cmd3->OwnedByProcessObjectsOn();
+  cmd3->OwnedByObjectsOn();
   po.AddCommand(sitk::sitkAnyEvent, *cmd3);
 
   EXPECT_FALSE(cmd2->v);
@@ -559,7 +562,7 @@ TEST( ProcessObject, Command_Ownership ) {
   std::unique_ptr<sitk::CastImageFilter> po2(new sitk::CastImageFilter());
 
   HeapCommand *cmd = new HeapCommand();
-  cmd->OwnedByProcessObjectsOn();
+  cmd->OwnedByObjectsOn();
 
   po1->AddCommand(sitk::sitkAnyEvent, *cmd);
   po1->AddCommand(sitk::sitkStartEvent, *cmd);
@@ -580,6 +583,28 @@ TEST( ProcessObject, Command_Ownership ) {
   EXPECT_EQ(5,destroyedCount);
 
 
+}
+
+TEST( ProcessObject, Threads )
+{
+  namespace sitk = itk::simple;
+
+  sitk::CastImageFilter po;
+
+  EXPECT_EQ( sitk::ProcessObject::GetGlobalDefaultNumberOfThreads(), po.GetNumberOfThreads() );
+
+
+  auto strupper = [](std::string s) {
+    std::transform( s.begin(), s.end(), s.begin(), [] ( char c ) { return (std::toupper( c ) ); } );
+    return s;
+  };
+
+  EXPECT_TRUE( sitk::ProcessObject::SetGlobalDefaultThreader("PLATFORM") );
+  EXPECT_EQ( "PLATFORM", strupper(sitk::ProcessObject::GetGlobalDefaultThreader()) );
+
+
+  EXPECT_TRUE( sitk::ProcessObject::SetGlobalDefaultThreader("POOL") );
+  EXPECT_EQ( "POOL", strupper(sitk::ProcessObject::GetGlobalDefaultThreader()) );
 }
 
 TEST( Command, Test2 ) {
@@ -622,7 +647,7 @@ struct MemberFunctionCommandTest
 };
 
 int gValue = 0;
-void functionCommand(void)
+void functionCommand()
 {
   gValue = 98;
 }
@@ -741,5 +766,104 @@ TEST( Kernel, Test1 )
   ss.str("");
   ss << sitk::sitkPolygon9;
   EXPECT_EQ("Polygon9", ss.str());
+
+}
+
+TEST(Logger, Logger)
+{
+  namespace sitk = itk::simple;
+
+  auto logger = sitk::LoggerBase::GetGlobalITKLogger();
+
+
+  testing::internal::CaptureStderr();
+
+  logger.DisplayText("one\n");
+
+  logger.DisplayErrorText("two\n");
+
+  logger.DisplayWarningText("three\n");
+
+  logger.DisplayGenericOutputText("four\n");
+
+  logger.DisplayDebugText("five\n");
+
+  const std::string expectedOutput = "one\n"
+                                     "two\n"
+                                     "three\n"
+                                     "four\n"
+                                     "five\n";
+
+  EXPECT_EQ( testing::internal::GetCapturedStderr(), expectedOutput);
+}
+
+namespace {
+// A mockup of a logger which saves messages to strings.
+class MockLogger
+:public itk::simple::LoggerBase {
+public:
+
+  MockLogger() = default;
+
+  ~MockLogger() override = default;
+
+  void DisplayText(const char * t) override {m_DisplayText << t;}
+
+  void DisplayErrorText(const char * t) override {m_DisplayErrorText << t;}
+
+  void DisplayWarningText(const char * t) override {m_DisplayWarningText << t;}
+
+  void DisplayGenericOutputText(const char * t) override {m_DisplayGenericOutputText << t;}
+
+  void DisplayDebugText(const char * t) override {m_DisplayDebugText << t;}
+
+  std::stringstream m_DisplayText;
+  std::stringstream m_DisplayErrorText;
+  std::stringstream m_DisplayWarningText;
+  std::stringstream m_DisplayGenericOutputText;
+  std::stringstream m_DisplayDebugText;
+};
+}
+
+
+TEST(Logger, MockLogger)
+{
+
+  namespace sitk = itk::simple;
+
+  testing::internal::CaptureStderr();
+
+  {
+    MockLogger logger;
+
+    logger.SetAsGlobalITKLogger();
+
+    logger.DisplayText("test1\n");
+    itk::OutputWindowDisplayText( "OutputWindowDisplayText1\n" );
+    itk::OutputWindowDisplayErrorText( "OutputWindowDisplayErrorText1\n" );
+    itk::OutputWindowDisplayWarningText( "OutputWindowDisplayWarningText1\n" );
+    itk::OutputWindowDisplayGenericOutputText( "OutputWindowDisplayGenericOutputText1\n" );
+    itk::OutputWindowDisplayDebugText("OutputWindowDebugText1\n" );
+
+
+    EXPECT_EQ(logger.m_DisplayText.str(), "test1\nOutputWindowDisplayText1\n" );
+    EXPECT_EQ(logger.m_DisplayErrorText.str(), "OutputWindowDisplayErrorText1\n" );
+    EXPECT_EQ(logger.m_DisplayWarningText.str(), "OutputWindowDisplayWarningText1\n" );
+    EXPECT_EQ(logger.m_DisplayGenericOutputText.str(), "OutputWindowDisplayGenericOutputText1\n" );
+    EXPECT_EQ(logger.m_DisplayDebugText.str(), "OutputWindowDebugText1\n" );
+  }
+  itk::OutputWindowDisplayText( "OutputWindowDisplayText2\n" );
+  itk::OutputWindowDisplayErrorText( "OutputWindowDisplayErrorText2\n" );
+  itk::OutputWindowDisplayWarningText( "OutputWindowDisplayWarningText2\n" );
+  itk::OutputWindowDisplayGenericOutputText( "OutputWindowDisplayGenericOutputText2\n" );
+  itk::OutputWindowDisplayDebugText("OutputWindowDebugText2\n" );
+
+  const std::string expectedLogOutput = "OutputWindowDisplayText2\n"
+                                        "OutputWindowDisplayErrorText2\n"
+                                        "OutputWindowDisplayWarningText2\n"
+                                        "OutputWindowDisplayGenericOutputText2\n"
+                                        "OutputWindowDebugText2\n";
+
+  EXPECT_EQ( testing::internal::GetCapturedStderr(), expectedLogOutput);
 
 }

@@ -34,7 +34,7 @@ TransformixImageFilter::TransformixImageFilterImpl
 
   this->m_OutputDirectory = ".";
   this->m_LogFileName = "";
-  
+
   this->m_LogToFile = false;
   this->m_LogToConsole = true;
 }
@@ -67,7 +67,7 @@ Image
 TransformixImageFilter::TransformixImageFilterImpl
 ::ExecuteInternal()
 {
-  typedef elastix::TransformixFilter< TMovingImage > TransformixFilterType;
+  typedef itk::TransformixFilter< TMovingImage > TransformixFilterType;
   typedef typename TransformixFilterType::Pointer TransforimxFilterPointer;
 
   try
@@ -119,10 +119,10 @@ TransformixImageFilter::TransformixImageFilterImpl
   return this->m_ResultImage;
 }
 
-const std::string 
+const std::string
 TransformixImageFilter::TransformixImageFilterImpl
 ::GetName()
-{ 
+{
   const std::string name = std::string( "TransformixImageFilter" );
   return name;
 }
@@ -148,14 +148,14 @@ TransformixImageFilter::TransformixImageFilterImpl
   this->SetMovingImage( Image() );
 }
 
-void 
+void
 TransformixImageFilter::TransformixImageFilterImpl
 ::SetFixedPointSetFileName( const std::string movingPointSetFileName )
 {
   this->m_MovingPointSetFileName = movingPointSetFileName;
 }
 
-std::string 
+std::string
 TransformixImageFilter::TransformixImageFilterImpl
 ::GetFixedPointSetFileName()
 {
@@ -176,7 +176,7 @@ TransformixImageFilter::TransformixImageFilterImpl
   this->m_ComputeSpatialJacobian = computeSpatialJacobian;
 }
 
-bool 
+bool
 TransformixImageFilter::TransformixImageFilterImpl
 ::GetComputeSpatialJacobian()
 {
@@ -188,7 +188,7 @@ TransformixImageFilter::TransformixImageFilterImpl
 ::ComputeSpatialJacobianOn()
 {
   this->SetComputeSpatialJacobian( true );
-  
+
 }
 
 void
@@ -205,7 +205,7 @@ TransformixImageFilter::TransformixImageFilterImpl
   this->m_ComputeDeterminantOfSpatialJacobian = computeDeterminantOfSpatialJacobian;
 }
 
-bool 
+bool
 TransformixImageFilter::TransformixImageFilterImpl
 ::GetComputeDeterminantOfSpatialJacobian()
 {
@@ -224,7 +224,7 @@ TransformixImageFilter::TransformixImageFilterImpl
 ::ComputeDeterminantOfSpatialJacobianOff()
 {
   this->SetComputeDeterminantOfSpatialJacobian( false );
-  
+
 }
 
 void
@@ -253,10 +253,10 @@ TransformixImageFilter::TransformixImageFilterImpl
 ::ComputeDeformationFieldOff()
 {
   this->SetComputeDeformationField( false );
-  
+
 }
 
-void 
+void
 TransformixImageFilter::TransformixImageFilterImpl
 ::SetOutputDirectory( const std::string outputDirectory )
 {
@@ -270,14 +270,14 @@ TransformixImageFilter::TransformixImageFilterImpl
   return this->m_OutputDirectory;
 }
 
-void 
+void
 TransformixImageFilter::TransformixImageFilterImpl
 ::RemoveOutputDirectory()
 {
   this->m_OutputDirectory = std::string();
 }
 
-void 
+void
 TransformixImageFilter::TransformixImageFilterImpl
 ::SetLogFileName( std::string logFileName )
 {
@@ -291,19 +291,19 @@ TransformixImageFilter::TransformixImageFilterImpl
   return this->m_LogFileName;
 }
 
-void 
+void
 TransformixImageFilter::TransformixImageFilterImpl
 ::RemoveLogFileName()
 {
   this->m_LogFileName = std::string();
 }
 
-void 
+void
 TransformixImageFilter::TransformixImageFilterImpl
 ::SetLogToFile( bool logToFile )
 {
   this->m_LogToFile = logToFile;
-  
+
 }
 
 bool
@@ -313,21 +313,21 @@ TransformixImageFilter::TransformixImageFilterImpl
   return this->m_LogToFile;
 }
 
-void 
+void
 TransformixImageFilter::TransformixImageFilterImpl
 ::LogToFileOn()
 {
   this->SetLogToFile( true );
 }
 
-void 
+void
 TransformixImageFilter::TransformixImageFilterImpl
 ::LogToFileOff()
 {
   this->SetLogToFile( false );
 }
 
-void 
+void
 TransformixImageFilter::TransformixImageFilterImpl
 ::SetLogToConsole( bool logToConsole )
 {
@@ -341,14 +341,14 @@ TransformixImageFilter::TransformixImageFilterImpl
   return this->m_LogToConsole;
 }
 
-void 
+void
 TransformixImageFilter::TransformixImageFilterImpl
 ::LogToConsoleOn()
 {
   this->SetLogToConsole( true );
 }
 
-void 
+void
 TransformixImageFilter::TransformixImageFilterImpl
 ::LogToConsoleOff()
 {
@@ -369,7 +369,7 @@ TransformixImageFilter::TransformixImageFilterImpl
   ParameterMapVectorType parameterMapVector;
   parameterMapVector.push_back( parameterMap );
   this->SetTransformParameterMap( parameterMapVector );
-  
+
 }
 
 void
@@ -497,7 +497,7 @@ TransformixImageFilter::TransformixImageFilterImpl
   for( unsigned int i = 0; i < this->m_TransformParameterMapVector.size(); i++ )
   {
     this->RemoveTransformParameter( i, key );
-  } 
+  }
 }
 
 void
@@ -512,7 +512,7 @@ TransformixImageFilter::TransformixImageFilterImpl
   this->m_TransformParameterMapVector[ index ].erase( key );
 }
 
-TransformixImageFilter::TransformixImageFilterImpl::ParameterMapType 
+TransformixImageFilter::TransformixImageFilterImpl::ParameterMapType
 TransformixImageFilter::TransformixImageFilterImpl
 ::ReadParameterFile( const std::string filename )
 {
@@ -545,7 +545,7 @@ TransformixImageFilter::TransformixImageFilterImpl
   this->PrintParameterMap( this->GetTransformParameterMap() );
 }
 
-void 
+void
 TransformixImageFilter::TransformixImageFilterImpl
 ::PrintParameterMap( const ParameterMapType parameterMap )
 {
@@ -554,14 +554,14 @@ TransformixImageFilter::TransformixImageFilterImpl
   this->PrintParameterMap( parameterMapVector );
 }
 
-void 
+void
 TransformixImageFilter::TransformixImageFilterImpl
 ::PrintParameterMap( const ParameterMapVectorType parameterMapVector )
 {
   ParameterObjectPointer parameterObject = ParameterObjectType::New();
   parameterObject->SetParameterMap( parameterMapVector );
   parameterObject->Print( std::cout );
-  
+
 }
 
 Image
